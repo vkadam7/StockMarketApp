@@ -11,7 +11,7 @@ config = {
 'messagingSenderId': "873475091746",
 'appId': "1:873475091746:web:08017b0f8ad6a57cf5497b",
 'measurementId': "G-XVH9S3L9JM",
-'databaseURL' : ''
+'databaseURL' : 'https://stockmarketapp-bb30c-default-rtdb.firebaseio.com/'
 }
 
 firebase = pyrebase.initialize_app(config)
