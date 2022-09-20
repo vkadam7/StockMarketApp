@@ -19,6 +19,32 @@ authen = firebase.auth()
 
 app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
+class RegistrationForm(FlaskForm):
+    name = StringField('Name', validators=[InputRequired(), Length(max = 10)])
+    email = StringField('Email', validators = [LENGTH_REQUIRED(min = 3, max = 20)])
+    username = StringField('Username', validators = [InputRequired(), Length(min = 3, max = 10)])
+    password =  PasswordField('Password', validators=[InputRequired(), Length(min = 3, max = 10)])
+
+
+@app.route('/register', methods = ['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if(form.validate_on_submit):
+        return '<h1>' + form.username.data + ' ' + form.password.data + '</h1>'
+    
+    return render_template('register.html', form = form)
+        
+@app.route('/')
+def index():
+    return render_template('home.html')
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('home.html'))
+    
 #place holder until html pages are up
 #@app.route('/Home')
 #def index():
