@@ -19,10 +19,9 @@ authen = firebase.auth()
 
 app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
-#place holder until html pages are up
-#@app.route('/Home')
-#def index():
-#    return render_template('Home.html')
+@app.route('/')
+def hello(name=None):
+    return render_template('home.html')
 
 if __name__ == '__main__':
     app.run(port=1111)
