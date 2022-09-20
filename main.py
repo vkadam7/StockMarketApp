@@ -25,6 +25,7 @@ authen = firebase.auth()
 
 app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
+
 class RegistrationForm(FlaskForm):
     name = StringField('Name', validators=[InputRequired(), Length(max = 10)])
     email = StringField('Email', validators = [LENGTH_REQUIRED(min = 3, max = 20)])
@@ -55,6 +56,11 @@ def logout():
 #@app.route('/Home')
 #def index():
 #    return render_template('Home.html')
+=======
+@app.route('/')
+def hello(name=None):
+    return render_template('home.html')
+
 
 if __name__ == '__main__':
     app.run(port=1111)

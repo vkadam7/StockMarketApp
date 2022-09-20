@@ -45,6 +45,7 @@ file = open(fileToOpen)
 csvreader = csv.reader(file)
 header = next(csvreader)
 
+# Weekly data extractor
 datesW = []
 opensW = []
 highsW = []
@@ -66,6 +67,7 @@ file = open(fileToOpen)
 csvreader = csv.reader(file)
 header = next(csvreader)
 
+# Monthly data extractor
 datesM = []
 opensM = []
 highsM = []
