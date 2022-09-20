@@ -1,7 +1,7 @@
-from flask import flask, session, render_template, request, redirect
+from flask import Flask, session, render_template, request, redirect
 import pyrebase
 
-app = flask(__name__)
+app = Flask(__name__)
 
 config = {
 'apiKey': "AIzaSyCLXmXYf9D0k_frKUquLoXPofRsWfwP3po",
