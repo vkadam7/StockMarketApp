@@ -7,9 +7,11 @@ class StockData:
     #
     #   Inputs: db - Database object, connected to Firestore
     #           req - Key for requested stock
+    #           timeMeasure - Which timespan measure was chosen? 
+    #           'daily', 'weekly', or 'monthly'?
     #
     #   Author: Ian McNulty
-    def __init__(self, db, req):
+    def __init__(self, db, req, timeMeasure):
         self.firebase = db.database
         self.ticker = req
         self.data = self.retrieve(self.ticker)
@@ -17,13 +19,7 @@ class StockData:
             self.name = self.data['name']
             self.headquarters = self.data['headquarters']
             self.listedAt = self.data['listedAt']
-            self.dates = self.data['dates']
-            self.opens = self.data['opens']
-            self.highs = self.data['highs']
-            self.lows = self.data['lows']
-            self.closes = self.data['closes']
-            self.adjCloses = self.data['adjustedCloses']
-            self.volumes = self.data['volumes']
+            self.howLong(timeMeasure)
         else:
             print(self.data)
 
@@ -40,16 +36,26 @@ class StockData:
         except:
             return 'This data entry does not exist'
 
-    def getData(self, start, end):
+    def getData(self, start, end, timeMeasure):
         try:
             dataMatrix = []
             tempArr = np.array(self.dates)
             startLoc = np.where(tempArr == start)
             endLoc = np.where(tempArr == end)
-            for i in range(startLoc, endLoc+1):
+            for i in range(startLoc[0][0], endLoc[0][0]+1):
                 dataMatrix.append([self.dates[i], self.opens[i], self.highs[i],
                                    self.lows[i], self.closes[i], self.adjCloses[i],
                                    self.volumes[i]])
             return dataMatrix
-        except:
-            print("An exception has been thrown")
+        except IndexError:
+            print("One of the selected dates are unavailable")
+
+    def howLong(self, timeMeasure):
+        tempData = self.data[timeMeasure]
+        self.dates = tempData['dates']
+        self.opens = tempData['opens']
+        self.highs = tempData['highs']
+        self.lows = tempData['lows']
+        self.closes = tempData['closes']
+        self.adjCloses = tempData['adjustedCloses']
+        self.volumes = tempData['volumes']
