@@ -104,12 +104,20 @@ h1{
 
 .loginform {
     text-align:center;
+    justify-content: center;
     background-color:aqua;
 }
 
 .registerform {
     text-align:center;
     justify-content: center;
+    background-color:aqua;
+}
+
+.passwordform {
+    text-align:center;
+    justify-content:center;
+    background-color:aqua;
 }
 
 footer{
