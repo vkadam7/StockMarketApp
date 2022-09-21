@@ -19,6 +19,11 @@
                 <li><a href = "information.html">Information</a></li>
             </ul>
         </nav>
+        <form action="/stockSearch" method="post">
+            <input type="search" name="searchTerm" placeholder="Find a stock..."
+                    value="{{ request.form['searchTerm'] }}">
+            <button>Search</button>
+        </form>
     </div>
 </header>
 <body>

@@ -1,5 +1,12 @@
 import numpy as np
 
+def doesThatStockExist(db, ticker):
+    tempData = db.child('Stocks').child(ticker).get().val() 
+    if tempData == None:
+        return False
+    else:
+        return True
+
 class StockData:
     ## StockData __init__
     #   Description: Initiates a StockData object with Database and 
@@ -12,7 +19,7 @@ class StockData:
     #
     #   Author: Ian McNulty
     def __init__(self, db, req, timeMeasure):
-        self.firebase = db.database
+        self.firebase = db
         self.ticker = req
         self.data = self.retrieve(self.ticker)
         if self.data != 'This data entry does not exist':
@@ -59,3 +66,14 @@ class StockData:
         self.closes = tempData['closes']
         self.adjCloses = tempData['adjustedCloses']
         self.volumes = tempData['volumes']
+
+    def stockPageFactory(self):
+        document = ["<!DOCTYPE html>"]
+        document.append("<html>")
+        document.append("<head>")
+
+        document.append("<p>Testing the factory!</p>")
+
+        document.append("</head>")
+        document.append("</html>")
+        return document

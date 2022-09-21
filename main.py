@@ -1,5 +1,8 @@
-from flask import Flask, session, render_template, request, redirect
+from flask import Flask, session, render_template, request, redirect, url_for
+from stockData import StockData, doesThatStockExist
 import pyrebase
+import plotly
+import numpy as np
 
 app = Flask(__name__)
 
@@ -23,5 +26,17 @@ app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 def hello(name=None):
     return render_template('home.html')
 
+@app.route('/stockSearch', methods=['POST', 'GET'])
+def stockSearch():
+    if request.method == 'POST':
+        if doesThatStockExist(firebase.database(), request.form["searchTerm"]):
+            return displayStock(request.form["searchTerm"])
+    return render_template('404Error.html')
+
+@app.route('/<ticker>')
+def displayStock(ticker):
+    stockData = StockData(firebase.database(), ticker, 'daily')
+    return render_template(stockData.stockPageFactory())
+    
 if __name__ == '__main__':
     app.run(port=1111)

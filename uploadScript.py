@@ -15,7 +15,7 @@ ticker = 'GOOG'
 name = 'Alphabet, Inc'
 headquarters = 'Mountain View, CA'
 listedAt = 'NASDAQ'
-fileToOpen = 'GOOGdaily.csv'
+fileToOpen = 'stockdata/GOOGdaily.csv'
 
 db = firebase.database()
 
@@ -40,7 +40,7 @@ for row in csvreader:
     adjClosesD.append(float(row[5]))
     volumesD.append(float(row[6]))
 
-fileToOpen = 'GOOGweekly.csv'
+fileToOpen = 'stockdata/GOOGweekly.csv'
 file = open(fileToOpen)
 csvreader = csv.reader(file)
 header = next(csvreader)
@@ -62,7 +62,7 @@ for row in csvreader:
     adjClosesW.append(float(row[5]))
     volumesW.append(float(row[6]))
 
-fileToOpen = 'GOOGmonthly.csv'
+fileToOpen = 'stockdata/GOOGmonthly.csv'
 file = open(fileToOpen)
 csvreader = csv.reader(file)
 header = next(csvreader)
@@ -99,4 +99,3 @@ data = {
                 'volumes': volumesM} 
 }
 db.child('Stocks').child(ticker).set(data)
-
