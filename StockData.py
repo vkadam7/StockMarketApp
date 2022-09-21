@@ -1,4 +1,7 @@
 import numpy as np
+import plotly
+import plotly.graph_objects as graph
+import pandas as pd
 
 def doesThatStockExist(db, ticker):
     tempData = db.child('Stocks').child(ticker).get().val() 
@@ -68,12 +71,21 @@ class StockData:
         self.volumes = tempData['volumes']
 
     def stockPageFactory(self):
-        document = ["<!DOCTYPE html>"]
-        document.append("<html>")
-        document.append("<head>")
+        chart = [graph.Scatter(x=self.dates,y=self.closes)]
+        mapping = graph.Layout(xaxis=dict(title='Date'),yaxis=dict(title="Closing Price"))
+        fig = graph.Figure(data=chart,layout=mapping)
 
-        document.append("<p>Testing the factory!</p>")
-
-        document.append("</head>")
-        document.append("</html>")
-        return document
+        stock = {
+            "ticker": self.ticker,
+            "name": self.name,
+            "headquarters": self.headquarters,
+            "listedAt": self.listedAt,
+            "dates": self.dates,
+            "opens": self.opens,
+            "highs": self.highs,
+            "lows": self.lows,
+            "closes": self.closes,
+            "adjCloses": self.adjCloses,
+            "volumes": self.volumes
+        }
+        return stock

@@ -36,7 +36,7 @@ def stockSearch():
 @app.route('/<ticker>')
 def displayStock(ticker):
     stockData = StockData(firebase.database(), ticker, 'daily')
-    return render_template(stockData.stockPageFactory())
+    return render_template('stockDisplay.html', stock=stockData.stockPageFactory())
     
 if __name__ == '__main__':
     app.run(port=1111)
