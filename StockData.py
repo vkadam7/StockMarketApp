@@ -71,9 +71,6 @@ class StockData:
         self.volumes = tempData['volumes']
 
     def stockPageFactory(self):
-        chart = [graph.Scatter(x=self.dates,y=self.closes)]
-        mapping = graph.Layout(xaxis=dict(title='Date'),yaxis=dict(title="Closing Price"))
-        fig = graph.Figure(data=chart,layout=mapping)
 
         stock = {
             "ticker": self.ticker,
