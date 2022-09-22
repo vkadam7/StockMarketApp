@@ -2,17 +2,13 @@ from statistics import mean
 from flask import Flask, session, render_template, request, redirect, url_for
 from StockData import StockData, doesThatStockExist
 import pyrebase
-import plotly
-import numpy as np
 import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import credentials
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
-
 dbfire = firestore.client() #firestore database
-
 app = Flask(__name__)
 
 config = {
@@ -29,16 +25,8 @@ config = {
 firebase = pyrebase.initialize_app(config)
 authen = firebase.auth()
 db1 = firebase.database()
-
 app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
-
 persons = {"logged_in": False,"uName": "", "uEmail": "", "uID": ""}
-
-#class RegistrationForm(FlaskForm):
-#    name = StringField('Name', validators=[InputRequired(), Length(max = 10)])
-#    email = StringField('Email', validators = [LENGTH_REQUIRED(min = 3, max = 20)])
-#    username = StringField('Username', validators = [InputRequired(), Length(min = 3, max = 10)])
-#    password =  PasswordField('Password', validators=[InputRequired(), Length(min = 3, max = 10)])
 
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
@@ -52,17 +40,10 @@ def register():
 def index():
     return render_template('home.html')
 
-
 @app.route("/logout")
-#@login_required
 def logout():
     logout_user()
     return redirect(url_for('home.html'))
-    
-#place holder until html pages are up
-#@app.route('/Home')
-#def index():
-#    return render_template('Home.html')
 
 @app.route('/')
 def hello(name=None):
