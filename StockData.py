@@ -59,6 +59,7 @@ class StockData:
             return dataMatrix
         except IndexError:
             print("One of the selected dates are unavailable")
+            return -1
 
     def howLong(self, timeMeasure):
         tempData = self.data[timeMeasure]

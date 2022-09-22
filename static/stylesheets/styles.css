@@ -94,3 +94,16 @@ h1{
 footer{
     text-align:center;
 }
+
+.stockUtilityBar {
+    display: table;
+    text-align: center;
+    vertical-align: middle;
+    width: 100%;
+    height: 10%;
+}
+
+.stockUtilityBarIcon {
+    display: table-cell;
+    height: auto;
+}
