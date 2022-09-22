@@ -27,31 +27,54 @@
         </div>
     </header>
     <body>
+        <div class="stockDisplay">
+            <h1>{{ stock['ticker'] }} - {{ stock['name'] }}</h1>
+            <h3>Headquarters: {{ stock['headquarters'] }}</h3>
+            <h3>Listed at: {{ stock['listedAt'] }}</h3>
+            <canvas id="stockChart" width="900" height="400"></canvas>
+            <script>
+                var ctx = document.getElementById("stockChart").getContext("2d");
+                var stockChart = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        labels: {{ dates | safe }},
+                        datasets: [{
+                            label: "Stock values",
+                            data: {{ avgs | safe }},
+                            fill: false,
+                            borderColor: "rgb(20, 100, 50)",
+                            lineTension: 0
+                        }]
+                    },
+                    options: {
+                        display: true
+                    }
+                });
+            </script>
+        </div>        
         <form action="/changeView" method="post">
-            <div class="stockDisplay">
-                <h1>{{ stock['name'] }}</h1>
-                <h3>Headquarters: {{ stock['headquarters'] }}</h3>
-                <h3>Listed at: {{ stock['listedAt'] }}</h3>
-                <canvas id="stockChart" width="900" height="400"></canvas>
-                <script>
-                    var ctx = document.getElementById("stockChart").getContext("2d");
-                    var stockChart = new Chart(ctx, {
-                        type: "line",
-                        data: {
-                            labels: {{ dates | safe }},
-                            datasets: [{
-                                label: "Stock values",
-                                data: {{ avgs | safe }},
-                                fill: false,
-                                borderColor: "rgb(20, 100, 50)",
-                                lineTension: 0.1
-                            }]
-                        },
-                        options: {
-                            display: true
-                        }
-                    });
-                </script>
+            <div class="stockUtilityBar">
+                <div class="stockUtilityBarIcon">
+                    <h3>Starting date:</h3>
+                    <input type="dateInput" name="startDate" placeholder="yyyy-mm-dd" 
+                        value="{{ request.form['startData'] }}">
+                </div>
+                <div class="stockUtilityBarIcon">
+                    <h3>Ending date:</h3>
+                    <input type="dateInput" name="endDate" placeholder="yyyy-mm-dd"
+                        value="{{ request.form['endData'] }}">
+                </div>
+                <div class="stockUtilityBarIcon">
+                    <h3>Timespan:</h3>
+                    <select name="timespan" value="{{ request.form['timespan'] }}">
+                        <option value="daily">Daily prices</option>
+                        <option value="weekly">Weekly prices</option>
+                        <option value="monthly">Monthly prices</option>
+                    </select>
+                </div>
+                <div class="stockUtilityBarIcon">
+                    <button type="submit">Show Range</button>
+                </div>
             </div>
         </form>
     </body>
