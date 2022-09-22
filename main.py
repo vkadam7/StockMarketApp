@@ -106,10 +106,6 @@ def login():
     else:
         print("didn't work")
         return render_template('login.html')
-            
-
-
-    #return render_template('login.html')
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
