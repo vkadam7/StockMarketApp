@@ -5,23 +5,10 @@ import pyrebase
 import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import credentials
-<<<<<<< HEAD
-from statistics import mean
-from StockData import StockData, doesThatStockExist
-import plotly
-import numpy as np
-
-
-cred = credentials.Certificate("serviceAccountKey.json") #firestore
-firebase_admin.initialize_app(cred) #firestore
-dbfire = firestore.client() #firestore database
-
-=======
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 dbfire = firestore.client() #firestore database
->>>>>>> 85339bcd567ddbf6785168d215203cd9ecc79b78
 app = Flask(__name__)
 
 config = {
@@ -35,19 +22,15 @@ config = {
 'databaseURL' : 'https://stockmarketapp-bb30c-default-rtdb.firebaseio.com/'
 }
 
-
 firebase = pyrebase.initialize_app(config)
 authen = firebase.auth()
 db1 = firebase.database()
 
-<<<<<<< HEAD
 app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
 #persons = {"logged_in": False,"uName": "", "uEmail": "", "uID": ""} may not need this, will see
 
 """""
-=======
->>>>>>> 85339bcd567ddbf6785168d215203cd9ecc79b78
 class RegistrationForm(FlaskForm):
     name = StringField('Name', validators=[InputRequired(), Length(max = 10)])
     email = StringField('Email', validators = [LENGTH_REQUIRED(min = 3, max = 20)])
@@ -84,17 +67,11 @@ def login():
         return render_template('login.html')
 
 @app.route("/logout")
-<<<<<<< HEAD
 
 def logout():
     session.pop('user')
     return render_template('home.html')
 
-=======
-def logout():
-    logout_user()
-    return redirect(url_for('home.html'))
->>>>>>> 85339bcd567ddbf6785168d215203cd9ecc79b78
 
 @app.route('/')
 def hello(name=None):
@@ -122,13 +99,6 @@ def stockSearch():
         return render_template('404Error.html')
     return render_template('404Error.html')
 
-<<<<<<< HEAD
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
-=======
 @app.route("/login", methods = ["POST","GET"])
 def login():
     if request.method == "POST":
@@ -213,16 +183,6 @@ def changeStockView():
     if request.method == 'POST':
         return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
     return -1
-    
->>>>>>> 85339bcd567ddbf6785168d215203cd9ecc79b78
-@app.route('/<ticker>')
-def displayStock(ticker):
-    stockData = StockData(firebase.database(), ticker, 'daily')
-    stock = stockData.stockPageFactory()
-    stockMatrix = stockData.getData("2021-09-08", "2022-09-19", "daily")
-    dates = [date[0] for date in stockMatrix]
-    avgs = [mean([open[2], open[3]]) for open in stockMatrix]
-    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
     
 if __name__ == '__main__':
     app.run(port=1111)
