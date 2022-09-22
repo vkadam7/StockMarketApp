@@ -1,4 +1,3 @@
-from re import M
 from flask import Flask, session, render_template, request, redirect
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField
@@ -28,7 +27,7 @@ app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
 class RegistrationForm(FlaskForm):
     name = StringField('Name', validators=[InputRequired(), Length(max = 10)])
-    email = StringField('Email', validators = [LENGTH_REQUIRED(min = 3, max = 20)])
+    email = StringField('Email', validators = [InputRequired(min = 3, max = 20)])
     username = StringField('Username', validators = [InputRequired(), Length(min = 3, max = 10)])
     password =  PasswordField('Password', validators=[InputRequired(), Length(min = 3, max = 10)])
 
@@ -56,7 +55,7 @@ def logout():
 #@app.route('/Home')
 #def index():
 #    return render_template('Home.html')
-=======
+
 @app.route('/')
 def hello(name=None):
     return render_template('home.html')
