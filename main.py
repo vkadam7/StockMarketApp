@@ -30,22 +30,6 @@ app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
 #persons = {"logged_in": False,"uName": "", "uEmail": "", "uID": ""} may not need this, will see
 
-"""""
-class RegistrationForm(FlaskForm):
-    name = StringField('Name', validators=[InputRequired(), Length(max = 10)])
-    email = StringField('Email', validators = [LENGTH_REQUIRED(min = 3, max = 20)])
-    username = StringField('Username', validators = [InputRequired(), Length(min = 3, max = 10)])
-    password =  PasswordField('Password', validators=[InputRequired(), Length(min = 3, max = 10)])
-
-@app.route('/register', methods = ['GET', 'POST'])
-def register():
-    form = RegistrationForm()
-    if(form.validate_on_submit):
-        return '<h1>' + form.username.data + ' ' + form.password.data + '</h1>'
-    
-    return render_template('register.html', form = form)
-"""
-
 @app.route("/login", methods = ["POST","GET"])
 def login():
     if('user' in session): #to check if the user is logged in will change to profile page
@@ -66,12 +50,27 @@ def login():
         print("didn't work at all")
         return render_template('login.html')
 
-@app.route("/logout")
+@app.route('/register', methods = ['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        
+        result = request.form
+        email = result["email"]
+        Password = result["password"]
+        try:
+            user = authen.create_user_with_email_and_password(email, Password)
+            print("Account Created")
+            return render_template('login.html')
+        except:
+            print("Invalid Registration")
+            return render_template('register.html')
+          
+    return render_template('register.html')   
 
+@app.route("/logout")
 def logout():
     session.pop('user')
     return render_template('home.html')
-
 
 @app.route('/')
 def hello(name=None):
@@ -98,58 +97,6 @@ def stockSearch():
     except KeyError:
         return render_template('404Error.html')
     return render_template('404Error.html')
-
-@app.route("/login", methods = ["POST","GET"])
-def login():
-    if request.method == "POST":
-        result = request.form
-        email = result["email"]
-        passw = result["password"]
-        try:
-            user = authen.sign_in_with_email_and_password(email,passw)
-            print("Log in succesful")
-            return render_template('home.html') # this will be a placeholder until I get the database up and running 
-        except:
-            print("invalid")
-            return render_template('register.html')
-    else:
-        print("didn't work")
-        return render_template('login.html')
-    
-@app.route('/register', methods = ['GET', 'POST'])
-def register():
-    form = RegistrationForm()
-    if request.method == 'POST':
-        
-        result = request.form
-        email = result["email"]
-        Password = result["password"]
-        try:
-            user = auth.create_user_with_email_and_password(email, Password)
-            print("Account Created")
-            return render_template('login.html')
-        except:
-            print("Invalid Registration")
-            return render_template('register.html')
-          
-    return render_template('register.html', form = form)           
-
-@app.route("/login", methods = ["POST","GET"])
-def login():
-    if request.method == "POST":
-        result = request.form
-        email = result["email"]
-        passw = result["password"]
-        try:
-            user = authen.sign_in_with_email_and_password(email,passw)
-            print("Log in succesful")
-            return render_template('home.html') # this will be a placeholder until I get the database up and running 
-        except:
-            print("invalid")
-            return render_template('register.html')
-    else:
-        print("didn't work")
-        return render_template('login.html')
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
