@@ -67,6 +67,23 @@ def register():
           
     return render_template('register.html')   
 
+## Attmept on Password recovery -Muneeb Khan NOT WORKING YET!
+@app.route('/PasswordRecovery', methods = ['GET', 'POST'])
+def PasswordRecovery():
+    if request.method == 'POST':
+        
+        result = request.form
+        email = result["email"]
+        try:
+            user = authen.authen.send_password_reset_email(email)
+            print("Password succesfully reset")
+            return render_template('login.html')
+        except:
+            print("Invalid email")
+            return render_template('PasswordRecovery.html')
+          
+    return render_template('PasswordRecovery.html')   
+
 @app.route("/logout")
 def logout():
     session.pop('user')
