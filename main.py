@@ -1,3 +1,4 @@
+
 from flask import Flask, session, render_template, request, redirect, url_for
 import pyrebase
 import firebase_admin
@@ -8,6 +9,14 @@ cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 
 dbfire = firestore.client() #firestore database
+=======
+from statistics import mean
+from flask import Flask, session, render_template, request, redirect, url_for
+from stockData import StockData, doesThatStockExist
+import pyrebase
+import plotly
+import numpy as np
+
 
 app = Flask(__name__)
 
@@ -56,13 +65,31 @@ def index():
 def logout():
     logout_user()
     return redirect(url_for('home.html'))
+
 """
 
+
+=======
+    
+#place holder until html pages are up
+#@app.route('/Home')
+#def index():
+#    return render_template('Home.html')
 
 
 @app.route('/')
 def hello(name=None):
     return render_template('home.html')
+    
+@app.route('/stockSearch', methods=['POST', 'GET'])
+def stockSearch():
+    try:
+        if request.method == 'POST':
+            if doesThatStockExist(firebase.database(), request.form["searchTerm"]):
+                return displayStock(request.form["searchTerm"])
+    except KeyError:
+        return render_template('404Error.html')
+    return render_template('404Error.html')
 
 @app.route("/login", methods = ["POST","GET"])
 def login():
@@ -87,3 +114,16 @@ def login():
 
 if __name__ == '__main__':
     app.run(debug=True)
+=======
+@app.route('/<ticker>')
+def displayStock(ticker):
+    stockData = StockData(firebase.database(), ticker, 'daily')
+    stock = stockData.stockPageFactory()
+    stockMatrix = stockData.getData("2021-09-08", "2022-09-19", "daily")
+    dates = [date[0] for date in stockMatrix]
+    avgs = [mean([open[2], open[3]]) for open in stockMatrix]
+    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+    
+if __name__ == '__main__':
+    app.run(port=1111)
+
