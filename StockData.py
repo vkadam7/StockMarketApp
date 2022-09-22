@@ -1,4 +1,14 @@
 import numpy as np
+import plotly
+import plotly.graph_objects as graph
+import pandas as pd
+
+def doesThatStockExist(db, ticker):
+    tempData = db.child('Stocks').child(ticker).get().val() 
+    if tempData == None:
+        return False
+    else:
+        return True
 
 class StockData:
     ## StockData __init__
@@ -12,7 +22,7 @@ class StockData:
     #
     #   Author: Ian McNulty
     def __init__(self, db, req, timeMeasure):
-        self.firebase = db.database
+        self.firebase = db
         self.ticker = req
         self.data = self.retrieve(self.ticker)
         if self.data != 'This data entry does not exist':
@@ -49,6 +59,7 @@ class StockData:
             return dataMatrix
         except IndexError:
             print("One of the selected dates are unavailable")
+            return -1
 
     def howLong(self, timeMeasure):
         tempData = self.data[timeMeasure]
@@ -59,3 +70,20 @@ class StockData:
         self.closes = tempData['closes']
         self.adjCloses = tempData['adjustedCloses']
         self.volumes = tempData['volumes']
+
+    def stockPageFactory(self):
+
+        stock = {
+            "ticker": self.ticker,
+            "name": self.name,
+            "headquarters": self.headquarters,
+            "listedAt": self.listedAt,
+            "dates": self.dates,
+            "opens": self.opens,
+            "highs": self.highs,
+            "lows": self.lows,
+            "closes": self.closes,
+            "adjCloses": self.adjCloses,
+            "volumes": self.volumes
+        }
+        return stock

@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>StockSim: Learn How To Trade</title>
-    <link rel = "stylesheet" href = "styles.css">
+    <link rel = "stylesheet" href = "/static/stylesheets/styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" 
     integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
 </head>
@@ -24,12 +24,12 @@
 <body>
     <section>
         <div class = "loginform">
-            <form>
+            <form method = "POST">
                 <label for="email">Enter your email</label>
                 <input type = "email" id = "email" name = "email" placeholder="ex: sameple@123.com">
                 <br><br>
                 <label for="password">Enter your password</label>
-                <input type = "password" id = "password" name = password">
+                <input type = "password" id = "password" name = "password">
                 <br><br>
                 <button type = "submit">Submit</button>
                 <p>Not yet registered? <a href = "register.html">click here</a>to sign up</p>
