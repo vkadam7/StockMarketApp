@@ -1,34 +1,55 @@
-body {
-    background-color: white;
-    color:black;
+.header{
+    background-color:greenyellow;
+    text-align:center;
+    justify-content: center;
+    padding:15px;
 }
 
 .login{
+    background-color:greenyellow;
     text-align:right;
     justify-content: right;
-    display:flex;
+    padding:15px;
 }
 
 .navbar ul{
     list-style-type: none;
-    background-color:black;
-    justify-content:left;
-    display:flex;
+    background-color:#333;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    padding: 15px;
 }
 
-.navbar ul li a {
+.navbar li {
+    float: left;
+}
+
+.navbar a {
     display: block;
-    color: green;
-    border: 1px solid;
-    border-radius: .5em;
-    margin: .5em;
-    flex-wrap: wrap;
-    flex: 1 1 50%;
+    color: white;
+    text-align:center;
+    padding: 14px 16px;
+    text-decoration:none;
 }
 
-.navbar a:hover{color: blue;}
-.navbar a:visited{color: grey;}
-.navbar a:active{color: red;}
+.navbar a:hover{
+    color: blue;
+    background-color:white;
+}
+
+.navbar a:visited{
+    color: grey;
+}
+
+.navbar a:active{
+    color: red;
+}
+
+body {
+    background-color: white;
+    color:black;
+}
 
 h1{
     text-align: center;
@@ -84,26 +105,22 @@ h1{
 .loginform {
     text-align:center;
     justify-content: center;
+    background-color:aqua;
+    border-radius:15px;
 }
 
 .registerform {
     text-align:center;
     justify-content: center;
+    background-color:aqua;
+}
+
+.passwordform {
+    text-align:center;
+    justify-content:center;
+    background-color:aqua;
 }
 
 footer{
     text-align:center;
-}
-
-.stockUtilityBar {
-    display: table;
-    text-align: center;
-    vertical-align: middle;
-    width: 100%;
-    height: 10%;
-}
-
-.stockUtilityBarIcon {
-    display: table-cell;
-    height: auto;
 }
