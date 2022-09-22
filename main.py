@@ -75,7 +75,19 @@ def logout():
 @app.route('/')
 def hello(name=None):
     return render_template('home.html')
-    
+
+@app.route("/home")
+def home():
+    return render_template('home.html')
+
+@app.route("/aboutus")
+def aboutus():
+    return render_template('aboutus.html')
+
+@app.route("/information")
+def information():
+    return render_template('information.html')
+
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
 #
