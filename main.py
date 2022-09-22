@@ -25,8 +25,12 @@ config = {
 firebase = pyrebase.initialize_app(config)
 authen = firebase.auth()
 db1 = firebase.database()
-app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
-persons = {"logged_in": False,"uName": "", "uEmail": "", "uID": ""}
+
+class RegistrationForm(FlaskForm):
+    name = StringField('Name', validators=[InputRequired(), Length(max = 10)])
+    email = StringField('Email', validators = [LENGTH_REQUIRED(min = 3, max = 20)])
+    username = StringField('Username', validators = [InputRequired(), Length(min = 3, max = 10)])
+    password =  PasswordField('Password', validators=[InputRequired(), Length(min = 3, max = 10)])
 
 @app.route('/register', methods = ['GET', 'POST'])
 def register():
@@ -87,6 +91,41 @@ def login():
     else:
         print("didn't work")
         return render_template('login.html')
+    
+@app.route('/register', methods = ['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if request.method == 'POST':
+        
+        result = request.form
+        email = result["email"]
+        Password = result["password"]
+        try:
+            user = auth.create_user_with_email_and_password(email, Password)
+            print("Account Created")
+            return render_template('login.html')
+        except:
+            print("Invalid Registration")
+            return render_template('register.html')
+          
+    return render_template('register.html', form = form)           
+
+@app.route("/login", methods = ["POST","GET"])
+def login():
+    if request.method == "POST":
+        result = request.form
+        email = result["email"]
+        passw = result["password"]
+        try:
+            user = authen.sign_in_with_email_and_password(email,passw)
+            print("Log in succesful")
+            return render_template('home.html') # this will be a placeholder until I get the database up and running 
+        except:
+            print("invalid")
+            return render_template('register.html')
+    else:
+        print("didn't work")
+        return render_template('login.html')
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
@@ -121,7 +160,15 @@ def changeStockView():
         return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
     return -1
     
+@app.route('/<ticker>')
+def displayStock(ticker):
+    stockData = StockData(firebase.database(), ticker, 'daily')
+    stock = stockData.stockPageFactory()
+    stockMatrix = stockData.getData("2021-09-08", "2022-09-19", "daily")
+    dates = [date[0] for date in stockMatrix]
+    avgs = [mean([open[2], open[3]]) for open in stockMatrix]
+    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+    
 if __name__ == '__main__':
     app.run(port=1111)
     app.run(debug=True)
-
