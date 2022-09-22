@@ -5,10 +5,23 @@ import pyrebase
 import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import credentials
+<<<<<<< HEAD
+from statistics import mean
+from StockData import StockData, doesThatStockExist
+import plotly
+import numpy as np
+
+
+cred = credentials.Certificate("serviceAccountKey.json") #firestore
+firebase_admin.initialize_app(cred) #firestore
+dbfire = firestore.client() #firestore database
+
+=======
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 dbfire = firestore.client() #firestore database
+>>>>>>> 85339bcd567ddbf6785168d215203cd9ecc79b78
 app = Flask(__name__)
 
 config = {
@@ -22,10 +35,19 @@ config = {
 'databaseURL' : 'https://stockmarketapp-bb30c-default-rtdb.firebaseio.com/'
 }
 
+
 firebase = pyrebase.initialize_app(config)
 authen = firebase.auth()
 db1 = firebase.database()
 
+<<<<<<< HEAD
+app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
+
+#persons = {"logged_in": False,"uName": "", "uEmail": "", "uID": ""} may not need this, will see
+
+"""""
+=======
+>>>>>>> 85339bcd567ddbf6785168d215203cd9ecc79b78
 class RegistrationForm(FlaskForm):
     name = StringField('Name', validators=[InputRequired(), Length(max = 10)])
     email = StringField('Email', validators = [LENGTH_REQUIRED(min = 3, max = 20)])
@@ -39,15 +61,40 @@ def register():
         return '<h1>' + form.username.data + ' ' + form.password.data + '</h1>'
     
     return render_template('register.html', form = form)
-        
-@app.route('/')
-def index():
-    return render_template('home.html')
+"""
+
+@app.route("/login", methods = ["POST","GET"])
+def login():
+    if('user' in session): #to check if the user is logged in will change to profile page
+        return 'Hi, {}'.format(session['user'])
+    if request.method == "POST":
+        result = request.form
+        email = result["email"]
+        passw = result["password"]
+        try:
+            user = authen.sign_in_with_email_and_password(email,passw)
+            session['user'] = email
+            print("Log in succesful")
+            return render_template('home.html') # this will be a placeholder until I get the database up and running 
+        except:
+            print("Failed to log in")
+            return render_template('login.html')
+    else:
+        print("didn't work at all")
+        return render_template('login.html')
 
 @app.route("/logout")
+<<<<<<< HEAD
+
+def logout():
+    session.pop('user')
+    return render_template('home.html')
+
+=======
 def logout():
     logout_user()
     return redirect(url_for('home.html'))
+>>>>>>> 85339bcd567ddbf6785168d215203cd9ecc79b78
 
 @app.route('/')
 def hello(name=None):
@@ -75,6 +122,13 @@ def stockSearch():
         return render_template('404Error.html')
     return render_template('404Error.html')
 
+<<<<<<< HEAD
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+=======
 @app.route("/login", methods = ["POST","GET"])
 def login():
     if request.method == "POST":
@@ -160,6 +214,7 @@ def changeStockView():
         return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
     return -1
     
+>>>>>>> 85339bcd567ddbf6785168d215203cd9ecc79b78
 @app.route('/<ticker>')
 def displayStock(ticker):
     stockData = StockData(firebase.database(), ticker, 'daily')
