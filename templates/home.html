@@ -1,36 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta class="UTF-8">
     <title>StockSim: Learn How To Trade</title>
     <link rel = "stylesheet" href = "/static/stylesheets/styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" 
     integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
 </head>
 <header>
-    <div class = "login">
-            <p><a href = "login">Login</a> or <a href = "register">Register</a></p>
+    <div class = "header">
+        <h1>Welcome to StockSim: Learn how to trade!</h1>
     </div>
-    <br>
+    <div class = "login">
+            <p><a href = "login.html">Login</a> or <a href = "register.html">Register</a></p>
+    </div>
     <div class = "navbar">
         <nav>
             <ul>
-                <li><a href = "home">Home</a></li>
-                <li><a href = "aboutus">About Us</a></li>
-                <li><a href = "information">Information</a></li>
+                <li><a href = "home.html">Home</a></li>
+                <li><a href = "aboutus.html">About Us</a></li>
+                <li><a href = "information.html">Information</a></li>
             </ul>
         </nav>
-        <form action="/stockSearch" method="post">
-            <input type="search" name="searchTerm" placeholder="Find a stock..."
-                    value="{{ request.form['searchTerm'] }}">
-            <button>Search</button>
-        </form>
     </div>
 </header>
 <body>
     <section>
-        <div>
-            <h1>Welcome to StockSim: Learn how to trade!</h1>
-        </div>
 
         <div class = "section1">
             <p>Welcome to our website where we will help with making your first investments,
@@ -60,8 +55,8 @@
         <br>
         <div class = "section4">
             <h2>Become a member</h2>
-            <p>If you havent already please register to become a member of our website
-                <br> or click here to login.
+            <p>If you havent already please <a href = "register.html ">click here</a> to register 
+            <br> to become a member of our website otherwise <a href = "login.html"> click here</a> to login
             </p>
         </div>
     </section>
@@ -69,6 +64,6 @@
     integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" 
     crossorigin="anonymous"></script>
 </body>
-<footer><p>Footer for copyright</p></footer>
+<footer><p>Copy right 2022 by StockSim</p></footer>
 
 </html>
