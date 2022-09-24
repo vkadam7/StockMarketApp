@@ -38,10 +38,6 @@
     background-color:white;
 }
 
-.navbar a:visited{
-    color: grey;
-}
-
 .navbar a:active{
     color: red;
 }
@@ -57,68 +53,74 @@ h1{
 
 .section1 p{
     font-size:large;
+    text-align:center;
 }
 
 .section2{
     background-color:blue;
+    padding:5px;
 }
 
 .section2 h2{
     text-align: right;
     justify-content: right;
+    color:white
 }
 
 .section2 p{
     text-align: right;
     justify-content: right;
     font-size:large;
+    color:white
 }
 
 .section3 {
     background-color: orange;
+    padding:5px;
 }
 
 .section3 h2{
     justify-content: left;
+    color:white
 }
 
 .section3 p{
     justify-content: left;
     font-size:large;
+    color:white;
 }
 
 .section4{
     background-color: grey;
+    padding:5px;
 }
 
 .section4 h2{
     text-align: right;
     justify-content: right;
+    color:white
 }
 
 .section4 p{
     text-align: right;
     justify-content: right;
     font-size:large;
+    color:white;
 }
 
 .loginform {
     text-align:center;
     justify-content: center;
-    background-color:aqua;
-    border-radius:15px;
 }
 
 .registerform {
     text-align:center;
     justify-content: center;
-    background-color:aqua;
 }
 
 .passwordform {
     text-align:center;
     justify-content:center;
-    background-color:aqua;
 }
 
 footer{
@@ -142,6 +144,8 @@ footer{
     content:"";
     display:table;   
     clear: both;
+    background-color:grey;
+    color:white;
 }
 
 .aboutuspart{
