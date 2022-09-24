@@ -1,24 +1,27 @@
 .header{
-    background-color:greenyellow;
+    background-color:rgb(24, 153, 41);
     text-align:center;
     justify-content: center;
     padding:15px;
 }
 
 .login{
-    background-color:greenyellow;
+    background-color:rgb(24, 153, 41);
     text-align:right;
     justify-content: right;
     padding:15px;
 }
 
+.navbar{
+    background-color: #333;
+    justify-content: center;
+}
+
 .navbar ul{
     list-style-type: none;
-    background-color:#333;
-    margin:0;
-    padding:0;
-    overflow:hidden;
-    padding: 15px;
+    justify-content: center;
+    display: flex;
+    flex-wrap: flex;
 }
 
 .navbar li {
@@ -28,7 +31,6 @@
 .navbar a {
     display: block;
     color: white;
-    text-align:center;
     padding: 14px 16px;
     text-decoration:none;
 }
@@ -57,55 +59,79 @@ h1{
 }
 
 .section2{
-    background-color:blue;
+    background-color:rgb(243, 243, 243);
     padding:5px;
 }
 
 .section2 h2{
-    text-align: right;
-    justify-content: right;
-    color:white
+    text-align: center;
+    color:black;
 }
 
 .section2 p{
-    text-align: right;
-    justify-content: right;
+    text-align: center;
     font-size:large;
-    color:white
+    color:black;
 }
 
 .section3 {
-    background-color: orange;
+    background-color: rgb(223, 223, 223);
     padding:5px;
 }
 
 .section3 h2{
-    justify-content: left;
-    color:white
+    text-align:center;
+    color:black;
 }
 
 .section3 p{
-    justify-content: left;
+    text-align: center;
     font-size:large;
-    color:white;
+    color:black;
 }
 
 .section4{
-    background-color: grey;
+    background-color: rgb(214, 214, 214);
     padding:5px;
 }
 
 .section4 h2{
-    text-align: right;
-    justify-content: right;
-    color:white
+    text-align: center;
+    color:black;
 }
 
 .section4 p{
-    text-align: right;
-    justify-content: right;
+    text-align: center;
     font-size:large;
-    color:white;
+    color:black;
+}
+
+.infopart1 h2{
+    text-align:center;
+}
+
+.infopart1 p{
+    margin-left: 50px;
+}
+
+.infopart2 h2{
+    text-align:center;
+}
+
+.infopart2 p{
+    margin-left: 50px;
+}
+
+.infopart2 img{
+    text-align: center;
+}
+
+.infopart3 h2{
+    text-align:center
+}
+
+.infopart3 p{
+    margin-left: 50px;
 }
 
 .loginform {
