@@ -11,11 +11,11 @@ import csv
 import pyrebase
 import numpy as np
 
-ticker = 'GOOG'
-name = 'Alphabet, Inc'
-headquarters = 'Mountain View, CA'
-listedAt = 'NASDAQ'
-fileToOpen = 'stockdata/GOOGdaily.csv'
+ticker = 'AMZN'
+name = 'Amazon.com, Inc'
+headquarters = 'Seattle, WA'
+listedAt = 'NASDAQGS'
+fileToOpen = 'stockdata/AMZN.csv'
 
 db = firebase.database()
 
@@ -40,49 +40,6 @@ for row in csvreader:
     adjClosesD.append(float(row[5]))
     volumesD.append(float(row[6]))
 
-fileToOpen = 'stockdata/GOOGweekly.csv'
-file = open(fileToOpen)
-csvreader = csv.reader(file)
-header = next(csvreader)
-
-# Weekly data extractor
-datesW = []
-opensW = []
-highsW = []
-lowsW = []
-closesW =[]
-adjClosesW = []
-volumesW = []
-for row in csvreader:
-    datesW.append(row[0])
-    opensW.append(float(row[1]))
-    highsW.append(float(row[2]))
-    lowsW.append(float(row[3]))
-    closesW.append(float(row[4]))
-    adjClosesW.append(float(row[5]))
-    volumesW.append(float(row[6]))
-
-fileToOpen = 'stockdata/GOOGmonthly.csv'
-file = open(fileToOpen)
-csvreader = csv.reader(file)
-header = next(csvreader)
-
-# Monthly data extractor
-datesM = []
-opensM = []
-highsM = []
-lowsM = []
-closesM =[]
-adjClosesM = []
-volumesM = []
-for row in csvreader:
-    datesM.append(row[0])
-    opensM.append(float(row[1]))
-    highsM.append(float(row[2]))
-    lowsM.append(float(row[3]))
-    closesM.append(float(row[4]))
-    adjClosesM.append(float(row[5]))
-    volumesM.append(float(row[6]))
 
 data = {
     'name': name,
@@ -90,12 +47,6 @@ data = {
     'listedAt': listedAt,
     'daily': {'dates': datesD, 'opens': opensD, 'highs': highsD,
                 'lows': lowsD, 'closes': closesD, 'adjustedCloses': adjClosesD,
-                'volumes': volumesD} ,
-    'weekly': {'dates': datesW, 'opens': opensW, 'highs': highsW,
-                'lows': lowsW, 'closes': closesW, 'adjustedCloses': adjClosesW,
-                'volumes': volumesW} ,
-    'monthly': {'dates': datesM, 'opens': opensM, 'highs': highsM,
-                'lows': lowsM, 'closes': closesM, 'adjustedCloses': adjClosesM,
-                'volumes': volumesM} 
+                'volumes': volumesD}
 }
 db.child('Stocks').child(ticker).set(data)
