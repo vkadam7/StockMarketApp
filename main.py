@@ -54,9 +54,9 @@ def login():
         print("didn't work at all")
         return render_template('login.html')
 
-@app.route('/register', methods = ['GET', 'POST'])
+@app.route('/register', methods = ["POST", "GET"])
 def register():
-    if request.method == 'POST':
+    if request.method == "POST":
         
         result = request.form
         email = result["email"]
@@ -73,6 +73,24 @@ def register():
             return render_template('register.html')
           
     return render_template('register.html')   
+
+## Attmept on Password recovery -Muneeb Khan NOT WORKING YET!
+@app.route('/PasswordRecovery', methods = ["POST", "GET"])
+def PasswordRecovery():
+    if request.method == "POST":
+        
+        result = request.form
+        email = result["email"]
+        try:
+            user = authen.send_password_reset_email(email)
+            print("Password reset notification was sent to your email")
+            return render_template('login.html')
+        except:
+            print("Email not found")
+            return render_template('PasswordRecovery.html')
+          
+    return render_template('PasswordRecovery.html')   
+
 #Logout
 # After user logs out session is ended and user is taken to login page
 # Author: Miqdad 
