@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta class="UTF-8">
+    <title>StockSim: Learn How To Trade</title>
+    <link rel = "stylesheet" href = "/static/stylesheets/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" 
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+</head>
+<header>
+    <div class = "header">
+        <h1>Welcome to StockSim: Learn how to trade!</h1>
+    </div>
+    <div class = "login">
+            <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
+    </div>
+    <br>
+    <div class = "navbar">
+        <nav>
+            <ul>
+                <li><a method = "POST" href = "home">Home</a></li>
+                <li><a method = "POST" href = "aboutus">About Us</a></li>
+                <li><a method = "POST" href = "information">Information</a></li>
+            </ul>
+        </nav>
+        <form action="/stockSearch" method="post">
+            <input type="search" name="searchTerm" placeholder="Find a stock..."
+                    value="{{ request.form['searchTerm'] }}">
+            <button>Search</button>
+        </form>
+    </div>
+</header>
+<body>
+    <section>
+        <div>
+            <h1>About Us</h1>
+        </div>
+        <div class = "Buy">
+        <p>When you buy a stock from a company, you ar buying a share of that company.
+        <br>A good time to buy a share of a company is when you think the price of that stock is going to rise.
+        </p>
+        </div>
+        <br>
+        <div class = "Sell">
+        <p>When you sell a stock, you selling that shares that you previously bought
+        <br>A good time to sell stocks is when you think that stock's rise is going to end.
+        </p>
+        </div>
+        <div class = "Volatility">
+        <p> A statistical measure of how much a stock moves up or down
+        <br>
+        </p>
+        </div>
+        <div class = "Liquidity">
+        <p> The measure of how easy it is to buy and sell a stock
+        </p>
+        </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" 
+    crossorigin="anonymous"></script>
+</body>
+<footer><p>Copy right 2022 by StockSim</p></footer>
+
+</html>

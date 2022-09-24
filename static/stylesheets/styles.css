@@ -1,3 +1,4 @@
+
 .header{
     background-color:rgb(24, 153, 41);
     text-align:center;
@@ -178,4 +179,181 @@ footer{
     float: left;
     width: 33.33%;
     padding: 1em;
+
+.header{
+    background-color:greenyellow;
+    text-align:center;
+    justify-content: center;
+    padding:15px;
+}
+
+.login{
+    background-color:greenyellow;
+    text-align:right;
+    justify-content: right;
+    padding:15px;
+}
+
+.navbar ul{
+    list-style-type: none;
+    background-color:#333;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    padding: 15px;
+}
+
+.navbar li {
+    float: left;
+}
+
+.navbar a {
+    display: block;
+    color: white;
+    text-align:center;
+    padding: 14px 16px;
+    text-decoration:none;
+}
+
+.navbar a:hover{
+    color: blue;
+    background-color:white;
+}
+
+.navbar a:active{
+    color: red;
+}
+
+body {
+    background-color: white;
+    color:black;
+}
+
+h1{
+    text-align: center;
+}
+
+.section1 p{
+    font-size:large;
+    text-align:center;
+}
+
+.section2{
+    background-color:blue;
+    padding:5px;
+}
+
+.section2 h2{
+    text-align: right;
+    justify-content: right;
+    color:white
+}
+
+.section2 p{
+    text-align: right;
+    justify-content: right;
+    font-size:large;
+    color:white
+}
+
+.section3 {
+    background-color: orange;
+    padding:5px;
+}
+
+.section3 h2{
+    justify-content: left;
+    color:white
+}
+
+.section3 p{
+    justify-content: left;
+    font-size:large;
+    color:white;
+}
+
+.section4{
+    background-color: grey;
+    padding:5px;
+}
+
+.section4 h2{
+    text-align: right;
+    justify-content: right;
+    color:white
+}
+
+.section4 p{
+    text-align: right;
+    justify-content: right;
+    font-size:large;
+    color:white;
+}
+
+.loginform {
+    text-align:center;
+    justify-content: center;
+}
+
+.registerform {
+    text-align:center;
+    justify-content: center;
+}
+
+.passwordform {
+    text-align:center;
+    justify-content:center;
+}
+
+footer{
+    text-align:center;
+}
+
+.stockUtilityBar {
+    display: table;
+    text-align: center;
+    vertical-align: middle;
+    width: 100%;
+    height: 10%;
+}
+
+.stockUtilityBarIcon {
+    display: table-cell;
+    height: auto;
+}
+
+.aboutusmain {
+    content:"";
+    display:table;   
+    clear: both;
+    background-color:grey;
+    color:white;
+}
+
+.aboutuspart{
+    float: left;
+    width: 33.33%;
+    padding: 1em;
+}
+
+.infopart1{
+
+    float: left;
+    padding: 1em;
+    border: 10px;
+    background-color: antiquewhite;
+}
+
+.infopart2{
+    text-align: center;
+    padding: 1em;
+    border: 10px;
+    background-color: antiquewhite;
+}
+.infopart3{
+    float: right;
+    padding: 1em;
+    border: 10px;
+    background-color: antiquewhite;
+
 }
