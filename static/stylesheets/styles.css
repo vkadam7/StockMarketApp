@@ -107,34 +107,6 @@ h1{
     color:black;
 }
 
-.infopart1 h2{
-    text-align:center;
-}
-
-.infopart1 p{
-    margin-left: 50px;
-}
-
-.infopart2 h2{
-    text-align:center;
-}
-
-.infopart2 p{
-    margin-left: 50px;
-}
-
-.infopart2 img{
-    text-align: center;
-}
-
-.infopart3 h2{
-    text-align:center
-}
-
-.infopart3 p{
-    margin-left: 50px;
-}
-
 .loginform {
     text-align:center;
     justify-content: center;
