@@ -81,9 +81,9 @@ class StockData:
             for i in range(startLoc[0][0], endLoc[0][0]+1):
                 if timespan != 'daily':
                     if self.checkDate(i, timespan):
-                        dataMatrix.append(tempDate, np.mean(tempOpens), np.mean(tempHighs),
+                        dataMatrix.append([tempDate, np.mean(tempOpens), np.mean(tempHighs),
                                         np.mean(tempLows), np.mean(tempCloses), np.mean(tempAdjCloses),
-                                        np.mean(tempVolumes))
+                                        np.mean(tempVolumes)])
                         tempOpens = []
                         tempCloses = []
                         tempHighs = []
@@ -122,7 +122,7 @@ class StockData:
                     return False
             else: return False
         elif timespan == 'weekly':
-            if int(self.dates[index+1][8]) - int(self.dates[index][8]) > 1:
+            if (int(self.dates[index+1][9]) - int(self.dates[index][9])) > 1:
                 return True
         else:
             return False
