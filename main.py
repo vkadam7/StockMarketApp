@@ -29,7 +29,11 @@ db1 = firebase.database()
 app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
 #persons = {"logged_in": False,"uName": "", "uEmail": "", "uID": ""} may not need this, will see
-
+# Login
+#  This function allows the user to log into the app with correct credentials
+#  If correct users will be taken to the profile page
+#  If incorrect, users will be taken back to login page
+#  Author: Miqdad Hafiz
 @app.route("/login", methods = ["POST","GET"])
 def login():
     if('user' in session): #to check if the user is logged in will change to profile page
@@ -42,7 +46,7 @@ def login():
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
             print("Log in succesful")
-            return render_template('home.html') # this will be a placeholder until I get the database up and running 
+            return render_template('home.html') # this will be a placeholder until I get the database and profile page are up and running 
         except:
             print("Failed to log in")
             return render_template('login.html')
@@ -57,8 +61,11 @@ def register():
         result = request.form
         email = result["email"]
         Password = result["password"]
+        NameU = result["names"]
+        UseN = result["username"]
         try:
             user = authen.create_user_with_email_and_password(email, Password)
+            dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
             print("Account Created")
             return render_template('login.html')
         except:
@@ -84,18 +91,26 @@ def PasswordRecovery():
           
     return render_template('PasswordRecovery.html')   
 
+#Logout
+# After user logs out session is ended and user is taken to login page
+# Author: Miqdad 
 @app.route("/logout")
 def logout():
     session.pop('user')
-    return render_template('home.html')
+    return render_template('login.html')
 
+#Home
+# Landing page of our website
+#Author: Miqdad
 @app.route('/')
 def hello(name=None):
     return render_template('home.html')
 
+'''' save if we need
 @app.route("/home")
 def home():
     return render_template('home.html')
+'''
 
 @app.route("/aboutus")
 def aboutus():
@@ -161,5 +176,4 @@ def changeStockView():
     return -1
     
 if __name__ == '__main__':
-    app.run(port=1111)
     app.run(debug=True)
