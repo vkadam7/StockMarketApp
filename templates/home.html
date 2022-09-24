@@ -3,7 +3,7 @@
 <head>
     <meta class="UTF-8">
     <title>StockSim: Learn How To Trade</title>
-    <link rel = "stylesheet" href = "styles.css">
+    <link rel = "stylesheet" href = "/static/stylesheets/styles.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" 
     integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
 </head>
@@ -12,16 +12,21 @@
         <h1>Welcome to StockSim: Learn how to trade!</h1>
     </div>
     <div class = "login">
-            <p><a href = "login.html">Login</a> or <a href = "register.html">Register</a></p>
+        <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
     </div>
     <div class = "navbar">
         <nav>
             <ul>
-                <li><a href = "home.html">Home</a></li>
-                <li><a href = "aboutus.html">About Us</a></li>
-                <li><a href = "information.html">Information</a></li>
+                <li><a method = "POST" href = "home">Home</a></li>
+                <li><a method = "POST" href = "aboutus">About Us</a></li>
+                <li><a method = "POST" href = "information">Information</a></li>
             </ul>
         </nav>
+        <form action="/stockSearch" method="post">
+            <input type="search" name="searchTerm" placeholder="Find a stock..."
+                    value="{{ request.form['searchTerm'] }}">
+            <button>Search</button>
+        </form>
     </div>
 </header>
 <body>
@@ -40,7 +45,7 @@
         <div class = "section2">
             <h2>About Us</h2>
             <p>
-                <a href = "aboutus.html">Click here</a> to see our about us page 
+                <a method = "POST" href = "aboutus">Click here</a> to see our about us page 
                 <br> 
                 for more information on the team.
             </p>
@@ -48,15 +53,15 @@
         <br>
         <div class = "section3">
             <h2>Information</h2>
-            <p><a href = "information.html">Click here</a> to check our information page
+            <p><a method = "POST" href = "information">Click here</a> to check our information page
                 <br> to learn more about stock investments before you start.
             </p>
         </div>
         <br>
         <div class = "section4">
             <h2>Become a member</h2>
-            <p>If you havent already please register to become a member of our website
-                <br> or click here to login.
+            <p>If you havent already please <a method = "POST" href = "register ">click here</a> to register 
+            <br> to become a member of our website otherwise <a method = "POST" href = "login"> click here</a> to login
             </p>
         </div>
     </section>

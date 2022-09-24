@@ -15,7 +15,6 @@ config = {
 firebase = pyrebase.initialize_app(config)
 authen = firebase.auth()
 
-
 email = 'testing@gmail.com'
 password = '12345'
 

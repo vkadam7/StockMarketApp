@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta class="UTF-8">
+    <title>StockSim: Learn How To Trade</title>
+    <link rel = "stylesheet" href = "/static/stylesheets/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" 
+    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+</head>
+<header>
+    <div class = "header">
+        <h1>Welcome to StockSim: Learn how to trade!</h1>
+    </div>
+    <div class = "login">
+            <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
+    </div>
+    <br>
+    <div class = "navbar">
+        <nav>
+            <ul>
+                <li><a method = "POST" href = "home">Home</a></li>
+                <li><a method = "POST" href = "aboutus">About Us</a></li>
+                <li><a method = "POST" href = "information">Information</a></li>
+            </ul>
+        </nav>
+        <form action="/stockSearch" method="post">
+            <input type="search" name="searchTerm" placeholder="Find a stock..."
+                    value="{{ request.form['searchTerm'] }}">
+            <button>Search</button>
+        </form>
+    </div>
+</header>
+<body>
+    <section>
+        <div>
+            <h1>About Us</h1>
+        </div>
+        <div class = "aboutuspart1">
+        <p>Founded in 2022 the Stocksim team are dedicated to helping users that are new
+        <br>to the stock market industry but are looking to start somewhere and want to
+        <br>learn
+        </p>
+        </div>
+        <br>
+        <div class = "aboutuspart2">
+        <p>Unlike our competitors we want to provide an easy to use
+        <br>website that can help new users with making the right
+        <br>investments that best fits their needs. Stocksim will
+        <br>show users the different options they can choose.
+        </p>
+        </div>
+        <div class = "aboutuspart3">
+        <p>Users may refer to our information page which will provide
+        <br>the educational information they will need to know
+        <br>
+        </p>
+        </div>
+        <div class = "aboutuspart4">
+            <h2>About the team</h2>
+        <p>We are team of software engineers who also invest in stocks 
+        <br>back when we started making investments in other sites such 
+        <br>as robinhood, we were not sure where to begin but this gave
+        <br>us the motivation to help others who are in the same position
+        <br>as us by creating our own stock investment site.
+        </p>
+        </div>
+    </section>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" 
+    crossorigin="anonymous"></script>
+</body>
+<footer><p>Copy right 2022 by StockSim</p></footer>
+
+</html>
