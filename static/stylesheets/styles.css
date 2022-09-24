@@ -137,3 +137,15 @@ footer{
     display: table-cell;
     height: auto;
 }
+
+.aboutusmain {
+    content:"";
+    display:table;   
+    clear: both;
+}
+
+.aboutuspart{
+    float: left;
+    width: 33.33%;
+    padding: 1em;
+}
