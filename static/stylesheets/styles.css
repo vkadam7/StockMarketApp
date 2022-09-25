@@ -108,6 +108,7 @@ h1{
     color:black;
 }
 
+<<<<<<< HEAD
 .infopart1 {
     text-align: center;
     border-style: double;
@@ -146,6 +147,8 @@ h1{
 
 
 
+=======
+>>>>>>> b3de6fa98da4722576222d87058a1df58b16581d
 .loginform {
     text-align:center;
     justify-content: center;

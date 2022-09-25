@@ -40,61 +40,6 @@
                 <br><br>
                 <label for="password">Enter your password</label>
                 <input type = "password" id = "password" name = "password" required>
-                <p>Forgot your password? <a href = "PasswordRecovery.html">click here</a></p>
-                <br><br>
-                <button type = "submit">Submit</button>
-                <p>Not yet registered? <a href = "register.html">click here</a> to sign up</p>
-              </form>
-            </div>
-    </section>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" 
-    integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" 
-    crossorigin="anonymous"></script>
-</body>
-<footer><p>Copy right 2022 by StockSim</p></footer>
-
-=======
-<!DOCTYPE html>
-<html>
-<head>
-    <meta class="UTF-8">
-    <title>StockSim: Learn How To Trade</title>
-    <link rel = "stylesheet" href = "/static/stylesheets/styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" 
-    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-</head>
-<header>
-    <div class = "header">
-        <h1>Welcome to StockSim: Learn how to trade!</h1>
-    </div>
-    <div class = "login">
-        <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
-    </div>
-    
-    <div class = "navbar">
-        <nav>
-            <ul>
-                <li><a method = "POST" href = "home">Home</a></li>
-                <li><a method = "POST" href = "aboutus">About Us</a></li>
-                <li><a method = "POST" href = "information">Information</a></li>
-            </ul>
-        </nav>
-        <form action="/stockSearch" method="post">
-            <input type="search" name="searchTerm" placeholder="Find a stock..."
-                    value="{{ request.form['searchTerm'] }}">
-            <button>Search</button>
-        </form>
-    </div>
-</header>
-<body>
-    <section>
-            <div class = "loginform">
-             <form action = "/login" method = "POST">
-                <label for="email">Enter your email</label>
-                <input type = "email" id = "email" name = "email" placeholder="ex: john123@sample.com" required>
-                <br><br>
-                <label for="password">Enter your password</label>
-                <input type = "password" id = "password" name = password" required>
                 <p>Forgot your password? <a href = "PasswordRecovery">click here</a></p>
                 <br><br>
                 <button type = "submit">Submit</button>
@@ -107,6 +52,4 @@
     crossorigin="anonymous"></script>
 </body>
 <footer><p>Copy right 2022 by StockSim</p></footer>
-
-
 </html>

@@ -74,7 +74,7 @@ def register():
           
     return render_template('register.html')   
 
-## Attmept on Password recovery -Muneeb Khan NOT WORKING YET!
+## Password Recovery Function by Muneeb Khan
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
 def PasswordRecovery():
     if request.method == "POST":
@@ -112,6 +112,7 @@ def home():
     return render_template('home.html')
 '''
 
+## Route for About us and Information pages - Muneeb Khan
 @app.route("/aboutus")
 def aboutus():
     return render_template('aboutus.html')
