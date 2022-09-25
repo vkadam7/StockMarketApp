@@ -52,6 +52,7 @@ body {
 
 h1{
     text-align: center;
+    font-size: large;
 }
 
 .section1 p{
@@ -107,33 +108,43 @@ h1{
     color:black;
 }
 
-.infopart1 h2{
-    text-align:center;
-}
-
-.infopart1 p{
-    margin-left: 50px;
-}
-
-.infopart2 h2{
-    text-align:center;
-}
-
-.infopart2 p{
-    margin-left: 50px;
-}
-
-.infopart2 img{
+.infopart1 {
     text-align: center;
+    border-style: double;
+    border-width: 5px 10px 5px 10px;
+    background-color: bisque;
 }
 
-.infopart3 h2{
-    text-align:center
+.info{
+    background-color: whitesmoke
 }
 
-.infopart3 p{
-    margin-left: 50px;
+.infopart2 {
+    text-align: center;
+    border-style: double;
+    display: block;
+    border-width: 5px 10px 5px 10px;
+    background-color: bisque;
+    color: black;
 }
+
+
+.stock{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+.infopart3 {
+    text-align: center;
+    text-align: center;
+    border-style: double;
+    border-width: 5px 10px 5px 10px;
+    background-color: bisque;
+}
+
+
 
 .loginform {
     text-align:center;
@@ -169,10 +180,10 @@ footer{
 
 .aboutusmain {
     content:"";
-    display:table;   
+    display: table;   
     clear: both;
-    background-color:grey;
-    color:white;
+    background-color: grey;
+    color: white;
 }
 
 .aboutuspart{
@@ -180,24 +191,6 @@ footer{
     width: 33.33%;
     padding: 1em;
 }
-
-.infopart1{
-    float: left;
-    padding: 1em;
-    border: 10px;
-    background-color: antiquewhite;
-}
-
-.infopart2{
-    text-align: center;
-    padding: 1em;
-    border: 10px;
-    background-color: antiquewhite;
-}
-.infopart3{
-    float: right;
-    padding: 1em;
-    border: 10px;
-    background-color: antiquewhite;
-
+.information{
+    background-color: black;
 }
