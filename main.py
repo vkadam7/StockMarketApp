@@ -37,7 +37,9 @@ app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 @app.route("/login", methods = ["POST","GET"])
 def login():
     if('user' in session): #to check if the user is logged in will change to profile page
-        return 'Hi, {}'.format(session['user'])
+        return render_template("profile.html", person = session['user'])
+        #return 'Hi, {}'.format(session['user'])
+
     if request.method == "POST":
         result = request.form
         email = result["email"]
@@ -45,8 +47,8 @@ def login():
         try:
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
-            print("Log in succesful")
-            return render_template('home.html') # this will be a placeholder until I get the database and profile page are up and running 
+            print("Log in succesful.")
+            return render_template('profile.html') # this will be a placeholder until I get the database and profile page are up and running 
         except:
             print("Failed to log in")
             return render_template('login.html')
@@ -61,7 +63,7 @@ def register():
         result = request.form
         email = result["email"]
         Password = result["password"]
-        NameU = result["names"]
+        NameU = result["Unames"]
         UseN = result["username"]
         try:
             user = authen.create_user_with_email_and_password(email, Password)
@@ -106,11 +108,11 @@ def logout():
 def hello(name=None):
     return render_template('home.html')
 
-'''' save if we need
+
 @app.route("/home")
 def home():
     return render_template('home.html')
-'''
+
 
 @app.route("/aboutus")
 def aboutus():
