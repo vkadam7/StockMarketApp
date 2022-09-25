@@ -53,7 +53,8 @@ def login():
     else:
         print("didn't work at all")
         return render_template('login.html')
-
+    
+#Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
 def register():
     if request.method == "POST":
@@ -73,6 +74,11 @@ def register():
             return render_template('register.html')
           
     return render_template('register.html')   
+
+'''Viraj Kadam. Will include later on
+@app.route('/StockDefinitions')
+def stockDefinitions():
+    return render_template("StockDefinitions.html")'''
 
 ## Attmept on Password recovery -Muneeb Khan NOT WORKING YET!
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
