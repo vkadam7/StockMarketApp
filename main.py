@@ -172,6 +172,11 @@ def displayStock(ticker, startDate="2021-09-08", endDate="2022-09-19", timespan=
     else:
         return displayStock(ticker)
 
+## changeStockView
+#   Description: Retrieves data from stockView page to determine how to change
+#   the view of the stock (monthly instead of weekly, change date range, etc)
+#
+#   Author: Ian McNulty
 @app.route('/changeView', methods=['POST'])
 def changeStockView():
     if request.method == 'POST':
