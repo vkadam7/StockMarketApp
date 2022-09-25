@@ -161,7 +161,7 @@ def stockSearch():
 #   Author: Ian McNulty
 @app.route('/<ticker>')
 def displayStock(ticker, startDate="2021-09-08", endDate="2022-09-19", timespan="daily"):
-    stockData = StockData(firebase.database(), ticker, timespan)
+    stockData = StockData(firebase.database(), ticker)
     global stock
     stock = stockData.stockPageFactory()
     stockMatrix = stockData.getData(startDate, endDate, timespan)
