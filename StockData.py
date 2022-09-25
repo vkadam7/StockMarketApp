@@ -114,7 +114,7 @@ class StockData:
     #
     #   Author: Ian McNulty
     def buyStock(self, user):
-
+        
         return -1
 
     ## sellStock
