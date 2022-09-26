@@ -98,7 +98,7 @@ def PasswordRecovery():
             print("Email not found")
             return redirect(url_for("PasswordRecovery"))
           
-    return redirect(url_for("PasswordRecovery"))   
+    return render_template("PasswordRecovery.html")   
 
 #Logout
 # After user logs out session is ended and user is taken to login page
