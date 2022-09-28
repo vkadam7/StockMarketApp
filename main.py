@@ -142,8 +142,8 @@ def stockSearch():
             if doesThatStockExist(firebase.database(), request.form["searchTerm"]):
                 return displayStock(request.form["searchTerm"])
     except KeyError:
-        return render_template('404Error.html')
-    return render_template('404Error.html')
+        return pageNotFound()
+    return pageNotFound()
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
@@ -182,6 +182,10 @@ def changeStockView():
     if request.method == 'POST':
         return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
     return -1
+
+@app.route('/404')
+def pageNotFound():
+    return render_template('404Error.html')
     
 if __name__ == '__main__':
     app.run(debug=True)
