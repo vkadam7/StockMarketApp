@@ -72,16 +72,36 @@ def register():
         Password = result["password"]
         NameU = result["Unames"]
         UseN = result["username"]
+
         try:
             user = authen.create_user_with_email_and_password(email, Password)
             dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
             print("Account Created")
             return redirect(url_for("login"))
+
         except:
             print("Invalid Registration")
-            return redirect(url_for("registration"))
+            return redirect(url_for("register"))
           
     return render_template('register.html')   
+
+## Attempt on email verification function by Muneeb Khan (WIP!)
+@app.route('/verification', methods = ["POST" , "GET"])
+def verification():
+    if request.method == "POST":
+
+        result = request.form
+        token = result["token"]
+        try:
+            user = authen.sign_in_with_custom_token(token)
+            return redirect(url_for("login"))
+
+        except:
+            print("Invalid token please try again!")
+            return redirect(url_for("verification"))
+
+    return render_template("verification.html")
+
 
 ## Password Recovery Function by Muneeb Khan
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
