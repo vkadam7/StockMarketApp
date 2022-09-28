@@ -106,6 +106,38 @@ class StockData:
             print("One of the selected dates are unavailable")
             return -1
 
+    ## buyStock
+    #   Description: Allows the given user to buy a specific stock and adds the order
+    #   to the database
+    #   
+    #   Inputs:
+    #
+    #   Author: Ian McNulty
+    def buyStock(self, user):
+        
+        return -1
+
+    ## sellStock
+    #   Description: Allows the given user to sell a specific stock and adds the order
+    #   to the database
+    #   
+    #   Inputs:
+    #
+    #   Author: Ian McNulty
+    def sellStock(self, user):
+
+        return -1
+
+    ## checkDate
+    #   Description: Checks the given date to see if it is the end of the selected
+    #   timespan, for example, if the current day is the 31st, then it is the end 
+    #   of the month or if today is the 7th and the next day in the data is more 
+    #   a day away, the week must have ended
+    #
+    #   Inputs: index - current day in the stock being compared
+    #   timespan - current timespan to check for
+    #
+    #   Author: Ian McNulty
     def checkDate(self, index, timespan):
         if timespan == 'monthly':
             if self.dates[index][8] == '3' and self.dates[index][9] == '1':
@@ -116,8 +148,9 @@ class StockData:
                 else:
                     return False
             elif self.dates[index][8] == '2' and self.dates[index][9] == '8':
-                if self.dates[index+1][8] == '0':
-                    return True
+                if self.dates[index+1][8] != '2':
+                    if self.dates[index+2][8] == '0':
+                        return True
                 else:
                     return False
             else: return False
@@ -127,7 +160,11 @@ class StockData:
         else:
             return False
             
-
+    ## stockPageFactory
+    #   Description: Returns a dictionary of values to be used with the stockView
+    #   HTML template
+    #
+    #   Author: Ian McNulty
     def stockPageFactory(self):
 
         stock = {
