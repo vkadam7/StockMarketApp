@@ -28,6 +28,13 @@ db1 = firebase.database()
 
 app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
+
+@app.route("/profile")
+def profile():
+    if('user' in session): #to check if the user is logged in will change to profile page
+       return render_template("profile.html", person = session['user'])
+    else:
+        redirect(url_for("login"))
 #persons = {"logged_in": False,"uName": "", "uEmail": "", "uID": ""} may not need this, will see
 # Login
 #  This function allows the user to log into the app with correct credentials
@@ -37,7 +44,7 @@ app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 @app.route("/login", methods = ["POST","GET"])
 def login():
     if('user' in session): #to check if the user is logged in will change to profile page
-        return render_template("profile.html", person = session['user'])
+        redirect(url_for("profile"))
         #return 'Hi, {}'.format(session['user'])
 
     if request.method == "POST":
@@ -48,10 +55,10 @@ def login():
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
             print("Log in succesful.")
-            return render_template('profile.html') # this will be a placeholder until I get the database and profile page are up and running 
+            return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
             print("Failed to log in")
-            return render_template('login.html')
+            return redirect(url_for("login"))
     else:
         print("didn't work at all")
         return render_template('login.html')
@@ -69,10 +76,10 @@ def register():
             user = authen.create_user_with_email_and_password(email, Password)
             dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
             print("Account Created")
-            return render_template('login.html')
+            return redirect(url_for("login"))
         except:
             print("Invalid Registration")
-            return render_template('register.html')
+            return redirect(url_for("registration"))
           
     return render_template('register.html')   
 
@@ -86,12 +93,12 @@ def PasswordRecovery():
         try:
             user = authen.send_password_reset_email(email)
             print("Password reset notification was sent to your email")
-            return render_template('login.html')
+            return redirect(url_for("login"))
         except:
             print("Email not found")
-            return render_template('PasswordRecovery.html')
+            return redirect(url_for("PasswordRecovery"))
           
-    return render_template('PasswordRecovery.html')   
+    return render_template("PasswordRecovery.html")   
 
 #Logout
 # After user logs out session is ended and user is taken to login page
@@ -99,7 +106,7 @@ def PasswordRecovery():
 @app.route("/logout")
 def logout():
     session.pop('user')
-    return render_template('login.html')
+    return redirect(url_for("login"))
 
 #Home
 # Landing page of our website
