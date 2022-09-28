@@ -1,5 +1,6 @@
+from re import T
 from statistics import mean
-from flask import Flask, session, render_template, request, redirect, url_for
+from flask import Flask, abort, session, render_template, request, redirect, url_for
 from StockData import StockData, doesThatStockExist
 import pyrebase
 import firebase_admin
@@ -147,10 +148,12 @@ def stockSearch():
     try:
         if request.method == 'POST':
             if doesThatStockExist(firebase.database(), request.form["searchTerm"]):
-                return displayStock(request.form["searchTerm"])
+                return redirect(url_for('displayStock', ticker=request.form["searchTerm"]))
+            else:
+                return redirect(url_for('fourOhFour'))
     except KeyError:
-        return pageNotFound()
-    return pageNotFound()
+        return redirect(url_for('fourOhFour'))
+    return redirect(url_for(request.url))
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
@@ -187,11 +190,13 @@ def displayStock(ticker, startDate="2021-09-08", endDate="2022-09-19", timespan=
 @app.route('/changeView', methods=['POST'])
 def changeStockView():
     if request.method == 'POST':
-        return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
+        #return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
+        return redirect(url_for('displayStock', ticker=stock['ticker'], startDate=request.form['startDate'], endDate=request.form['endDate'], timespan=request.form['timespan']))
     return -1
 
-@app.route('/404')
-def pageNotFound():
+## 
+@app.route('/404Error')
+def fourOhFour():
     return render_template('404Error.html')
     
 if __name__ == '__main__':
