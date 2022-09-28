@@ -73,11 +73,16 @@ def register():
         NameU = result["Unames"]
         UseN = result["username"]
 
-        try:
-            user = authen.create_user_with_email_and_password(email, Password)
-            dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
-            print("Account Created, you will now be redirected to verify your account")
-            return redirect(url_for("verification"))
+        try: ## Another way im trying to figure out the email verification part - Muneeb Khan
+            user = authen.send_email_verification(email['idToken'], Password)
+            if authen.send_email_verification == True:
+                user = authen.create_user_with_email_and_password(email, Password)
+                dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
+                print("Account Created, you will now be redirected to verify your account")
+                return redirect(url_for("login"))
+            else:
+                print("incorrect token! please re-register")
+                return redirect(url_for("register"))
 
         except:
             print("Invalid Registration")
@@ -93,7 +98,7 @@ def verification():
         result = request.form
         email = result["email"]
         try:
-            user = authen.send_email_verification(email)
+            user = authen.send_email_verification(email['idToken'])
             print("Verification sent")
             return redirect(url_for("login"))
 

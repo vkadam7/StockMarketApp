@@ -144,10 +144,6 @@ h1{
     background-color: bisque;
 }
 
-
-
-
-
 .loginform {
     text-align:center;
     justify-content: center;
@@ -165,6 +161,9 @@ h1{
 
 footer{
     text-align:center;
+    color:white;
+    font-size:small;
+    background-color:#333
 }
 
 .stockUtilityBar {
