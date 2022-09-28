@@ -76,8 +76,8 @@ def register():
         try:
             user = authen.create_user_with_email_and_password(email, Password)
             dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
-            print("Account Created")
-            return redirect(url_for("login"))
+            print("Account Created, you will now be redirected to verify your account")
+            return redirect(url_for("verification"))
 
         except:
             print("Invalid Registration")
@@ -91,9 +91,10 @@ def verification():
     if request.method == "POST":
 
         result = request.form
-        token = result["token"]
+        email = result["email"]
         try:
-            user = authen.sign_in_with_custom_token(token)
+            user = authen.send_email_verification(email)
+            print("Verification sent")
             return redirect(url_for("login"))
 
         except:
