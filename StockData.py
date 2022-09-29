@@ -2,6 +2,7 @@ import numpy as np
 import plotly
 import plotly.graph_objects as graph
 import pandas as pd
+import Order, User
 
 ## doesThatStockExist
 #   Description: Checks to see if that stock exists in the database yet,
