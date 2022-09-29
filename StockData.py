@@ -1,7 +1,4 @@
 import numpy as np
-import plotly
-import plotly.graph_objects as graph
-import pandas as pd
 import Order, User
 
 ## doesThatStockExist
@@ -80,7 +77,7 @@ class StockData:
             tempVolumes = []
             tempDate = start
             for i in range(startLoc[0][0], endLoc[0][0]+1):
-                if timespan != 'daily':
+                if timespan == 'monthly' or timespan == 'weekly':
                     if self.checkDate(i, timespan):
                         dataMatrix.append([tempDate, np.mean(tempOpens), np.mean(tempHighs),
                                         np.mean(tempLows), np.mean(tempCloses), np.mean(tempAdjCloses),
@@ -98,6 +95,10 @@ class StockData:
                     tempLows.append(self.lows[i])
                     tempAdjCloses.append(self.adjCloses[i])
                     tempVolumes.append(self.volumes[i])
+                elif timespan == 'hourly':
+                    interp = np.interp(range(0,23),[0, 12, 23],[self.opens[i], np.mean([self.opens[i], self.closes[i]]), self.closes[i]])
+                    
+                    return -1
                 else:
                     dataMatrix.append([self.dates[i], self.opens[i], self.highs[i],
                                     self.lows[i], self.closes[i], self.adjCloses[i],
