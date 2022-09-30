@@ -195,3 +195,11 @@ footer{
 .information{
     background-color: black;
 }
+
+.alert-pass {
+    background-color: skyblue;
+}
+
+.alert-fail {
+    background-color: orange;
+}

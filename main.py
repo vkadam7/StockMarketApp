@@ -1,5 +1,5 @@
 from statistics import mean
-from flask import Flask, session, render_template, request, redirect, url_for
+from flask import Flask, session, render_template, request, redirect, url_for, flash
 from StockData import StockData, doesThatStockExist
 import pyrebase
 import firebase_admin
@@ -44,7 +44,7 @@ def profile():
 @app.route("/login", methods = ["POST","GET"])
 def login():
     if('user' in session): #to check if the user is logged in will change to profile page
-        redirect(url_for("profile"))
+        return redirect(url_for("profile"))
         #return 'Hi, {}'.format(session['user'])
 
     if request.method == "POST":
@@ -54,13 +54,12 @@ def login():
         try:
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
-            print("Log in succesful.")
+            flash("Log in succesful.", "pass")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
-            print("Failed to log in")
+            flash("Failed to log in", "fail")
             return redirect(url_for("login"))
     else:
-        print("didn't work at all")
         return render_template('login.html')
 
 @app.route('/register', methods = ["POST", "GET"])
@@ -72,21 +71,40 @@ def register():
         Password = result["password"]
         NameU = result["Unames"]
         UseN = result["username"]
+        
+        if (Password.length() <= 6):
+            flash("Password is too short!, must contain at least 6 characters!")
 
-        try: ## Another way im trying to figure out the email verification part - Muneeb Khan
-            user = authen.send_email_verification(email['idToken'], Password)
-            if authen.send_email_verification == True:
+        elif (Password.length() >= 20):
+            flash("Password too long!, must be 20 characters maximum!")
+
+        elif (Password != ['A-Z']):
+            flash("Password must contain at least one Uppercase letter!")
+        
+        elif (Password != ['a-z']):
+            flash("Password must contain at least one Lowercase letter!")
+        
+        elif (Password != ['0-9']):
+            flash("Password must contain at least one digit! (i.e 0-9)")
+
+        elif (Password != ['!,@,#,$']):
+            flash("Password must contain at least one special character (i.e ! @ # $")
+
+        else:
+            try: ## Another way im trying to figure out the email verification part - Muneeb Khan
+            # user = authen.send_email_verification(email['idToken'], Password)
+                #if authen.send_email_verification == True:
                 user = authen.create_user_with_email_and_password(email, Password)
                 dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
-                print("Account Created, you will now be redirected to verify your account")
+                flash("Account Created, you will now be redirected to verify your account" , "pass")
                 return redirect(url_for("login"))
-            else:
-                print("incorrect token! please re-register")
-                return redirect(url_for("register"))
+            # else:
+            # print("incorrect token! please re-register")
+            # return redirect(url_for("register"))
 
-        except:
-            print("Invalid Registration")
-            return redirect(url_for("register"))
+            except:
+                flash("Invalid Registration" , "fail")
+                return redirect(url_for("register"))
           
     return render_template('register.html')   
 
@@ -118,10 +136,10 @@ def PasswordRecovery():
         email = result["email"]
         try:
             user = authen.send_password_reset_email(email)
-            print("Password reset notification was sent to your email")
+            flash("Password reset notification was sent to your email", "pass")
             return redirect(url_for("login"))
         except:
-            print("Email not found")
+            flash("Email not found" , "fail")
             return redirect(url_for("PasswordRecovery"))
           
     return render_template("PasswordRecovery.html")   
@@ -132,6 +150,7 @@ def PasswordRecovery():
 @app.route("/logout")
 def logout():
     session.pop('user')
+    flash('logout succesful')
     return redirect(url_for("login"))
 
 #Home
@@ -144,17 +163,26 @@ def hello(name=None):
 
 @app.route("/home")
 def home():
-    return render_template('home.html')
+    if('user' in session): #to check if the user is logged in will change to profile page
+        return render_template("home.html", person = session['user'])
+    else:
+        return render_template('home.html')
 
 
 ## Route for About us and Information pages - Muneeb Khan
 @app.route("/aboutus")
 def aboutus():
-    return render_template('aboutus.html')
+    if('user' in session): #to check if the user is logged in will change to profile page
+        return render_template("aboutus.html", person = session['user'])
+    else:
+        return render_template('aboutus.html')
 
 @app.route("/information")
 def information():
-    return render_template('information.html')
+    if('user' in session): #to check if the user is logged in will change to profile page
+        return render_template("information.html", person = session['user'])
+    else:
+        return render_template('information.html')
 
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
