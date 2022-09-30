@@ -97,8 +97,15 @@ class StockData:
                     tempVolumes.append(self.volumes[i])
                 elif timespan == 'hourly':
                     interp = np.interp(range(0,23),[0, 12, 23],[self.opens[i], np.mean([self.opens[i], self.closes[i]]), self.closes[i]])
-                    
-                    return -1
+                    date = self.dates[i]
+                    hourlyDates = []
+                    for i in range(0,24):
+                        if i < 10:
+                            tempDate = date + ' 0' + chr(i) + ':00:00'
+                        else:
+                            tempDate = date + ' ' + chr(i) + ':00:00'
+                        hourlyDates.append(tempDate)
+                    dataMatrix.append(interp, hourlyDates)
                 else:
                     dataMatrix.append([self.dates[i], self.opens[i], self.highs[i],
                                     self.lows[i], self.closes[i], self.adjCloses[i],
