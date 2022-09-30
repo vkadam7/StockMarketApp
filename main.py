@@ -148,7 +148,7 @@ def stockSearch():
     try:
         if request.method == 'POST':
             if doesThatStockExist(firebase.database(), request.form["searchTerm"]):
-                return redirect(url_for('displayStock', ticker=request.form["searchTerm"]))
+                return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-19", timespan="daily"))
             else:
                 return redirect(url_for('fourOhFour'))
     except KeyError:
@@ -170,15 +170,31 @@ def stockSearch():
 #
 #   Author: Ian McNulty
 @app.route('/<ticker>')
-def displayStock(ticker, startDate="2021-09-08", endDate="2022-09-19", timespan="daily"):
+def displayStock(ticker):
+    startDate = request.args['startDate']
+    endDate = request.args['endDate']
+    timespan = request.args['timespan']
     stockData = StockData(firebase.database(), ticker)
     global stock
     stock = stockData.stockPageFactory()
     stockMatrix = stockData.getData(startDate, endDate, timespan)
     if stockMatrix != -1:
-        dates = [date[0] for date in stockMatrix]
-        avgs = [mean([open[2], open[3]]) for open in stockMatrix]
-        return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+        if timespan != 'hourly':
+            dates = [row[0] for row in stockMatrix]
+            avgs = [mean([row[2], row[3]]) for row in stockMatrix]
+            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+        else:
+            dates = []
+            tempDates = [row[0] for row in stockMatrix]
+            for row in tempDates:
+                for i in range(0, len(tempDates[0])):
+                    dates.append(row[i])
+            avgs = []
+            tempAvgs = [row[1] for row in stockMatrix]
+            for row in tempAvgs:
+                for i in range(0, len(tempAvgs[0])):
+                    avgs.append(row[i])
+            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
     else:
         return displayStock(ticker)
 
@@ -191,7 +207,8 @@ def displayStock(ticker, startDate="2021-09-08", endDate="2022-09-19", timespan=
 def changeStockView():
     if request.method == 'POST':
         #return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
-        return redirect(url_for('displayStock', ticker=stock['ticker'], startDate=request.form['startDate'], endDate=request.form['endDate'], timespan=request.form['timespan']))
+        
+        return redirect(url_for('.displayStock', ticker=stock['ticker'], startDate=request.form['startDate'], endDate=request.form['endDate'], timespan=request.form['timespan']))
     return -1
 
 ## 
