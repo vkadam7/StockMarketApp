@@ -77,15 +77,19 @@ def register():
         digits = any(x.isdigit() for x in Password) # Digits will check for any digits in the password
         specials = any(x == '!' or x == '@' or x == '#' or x == '$' for x in Password) # Specials will check for any specials in the password
 
-        # If else conditions to check the password requirements
+        # If else conditions to check the password requirements - Muneeb Khan
         if (len(Password) < 6): # If the password is too short
-                flash("Password too short!")
+                flash("Password too short! Must be 6 characters min")
+
+        elif (len(Password) > 20): # If the password is too long
+                flash("Password is too long! Must be 20 characters maximum")
 
         elif (digits == 0): # If the password doesn't have a digit
                 flash("Password must contain at least 1 digit!")
         
         elif (specials == 0): # If the password doesn't have a special
-                flash("Password must contain at least 1 special character! (ie. !,@,#,$")
+                flash("Password must contain at least 1 special character! (ie. !,@,#,$)")
+
         else:
             try: ## Another way im trying to figure out the email verification part - Muneeb Khan
             # user = authen.send_email_verification(email['idToken'], Password)
