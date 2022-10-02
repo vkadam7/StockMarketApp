@@ -1,20 +1,20 @@
 
 .header{
-    background-color:rgb(24, 153, 41);
+    background-color:rgb(33, 103, 42);
     text-align:center;
     justify-content: center;
     padding:15px;
 }
 
 .login{
-    background-color:rgb(24, 153, 41);
+    background-color:rgb(33,103,42);
     text-align:right;
     justify-content: right;
     padding:15px;
 }
 
 .navbar{
-    background-color: #333;
+    background-color: rgb(70, 51, 51);
     justify-content: center;
 }
 
@@ -163,7 +163,7 @@ footer{
     text-align:center;
     color:white;
     font-size:small;
-    background-color:#333
+    background-color:rgb(95, 63, 63)
 }
 
 .stockUtilityBar {

@@ -1,3 +1,4 @@
+
 from statistics import mean
 from flask import Flask, session, render_template, request, redirect, url_for, flash
 from StockData import StockData, doesThatStockExist
@@ -71,25 +72,20 @@ def register():
         Password = result["password"]
         NameU = result["Unames"]
         UseN = result["username"]
+
+        # Variables for Password validation - Muneeb Khan
+        digits = any(x.isdigit() for x in Password) # Digits will check for any digits in the password
+        specials = any(x == '!' or x == '@' or x == '#' or x == '$' for x in Password) # Specials will check for any specials in the password
+
+        # If else conditions to check the password requirements
+        if (len(Password) < 6): # If the password is too short
+                flash("Password too short!")
+
+        elif (digits == 0): # If the password doesn't have a digit
+                flash("Password must contain at least 1 digit!")
         
-        if (Password.length() <= 6):
-            flash("Password is too short!, must contain at least 6 characters!")
-
-        elif (Password.length() >= 20):
-            flash("Password too long!, must be 20 characters maximum!")
-
-        elif (Password != ['A-Z']):
-            flash("Password must contain at least one Uppercase letter!")
-        
-        elif (Password != ['a-z']):
-            flash("Password must contain at least one Lowercase letter!")
-        
-        elif (Password != ['0-9']):
-            flash("Password must contain at least one digit! (i.e 0-9)")
-
-        elif (Password != ['!,@,#,$']):
-            flash("Password must contain at least one special character (i.e ! @ # $")
-
+        elif (specials == 0): # If the password doesn't have a special
+                flash("Password must contain at least 1 special character! (ie. !,@,#,$")
         else:
             try: ## Another way im trying to figure out the email verification part - Muneeb Khan
             # user = authen.send_email_verification(email['idToken'], Password)
