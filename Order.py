@@ -1,4 +1,4 @@
-import StockData
+import StockData, User
 
 class Order:
     def __init__(self, db, stock, user, index, buyOrSell, quantity, stockPrice):
