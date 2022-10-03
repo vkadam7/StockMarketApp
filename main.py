@@ -5,6 +5,7 @@ import pyrebase
 import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import credentials
+import pandas as pd
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
@@ -32,7 +33,11 @@ app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 @app.route("/profile")
 def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
-       return render_template("profile.html", person = session['user'])
+       results = dbfire.collection('Users').where('Email', '==', session['user'])
+       for doc in results.stream(): 
+        results = doc.to_dict()
+
+        return render_template("profile.html", results = results)
     else:
         redirect(url_for("login"))
 #persons = {"logged_in": False,"uName": "", "uEmail": "", "uID": ""} may not need this, will see
@@ -60,7 +65,7 @@ def login():
             print("Failed to log in")
             return redirect(url_for("login"))
     else:
-        print("didn't work at all")
+        print("Landing on page")
         return render_template('login.html')
 
 @app.route('/register', methods = ["POST", "GET"])
@@ -73,13 +78,14 @@ def register():
         NameU = result["Unames"]
         UseN = result["username"]
         try:
+            #dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN})
             user = authen.create_user_with_email_and_password(email, Password)
-            dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
+            dbfire.collection('Users').document(user['localId']).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN})
             print("Account Created")
             return redirect(url_for("login"))
         except:
             print("Invalid Registration")
-            return redirect(url_for("registration"))
+            return redirect(url_for("register"))
           
     return render_template('register.html')   
 
