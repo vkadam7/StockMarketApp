@@ -40,7 +40,6 @@ for row in csvreader:
     adjClosesD.append(float(row[5]))
     volumesD.append(float(row[6]))
 
-
 data = {
     'name': name,
     'headquarters': headquarters,

@@ -1,11 +1,12 @@
-
+from re import T
 from statistics import mean
-from flask import Flask, session, render_template, request, redirect, url_for, flash
+from flask import Flask, abort, session, render_template, request, redirect, url_for
 from StockData import StockData, doesThatStockExist
 import pyrebase
 import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import credentials
+import pandas as pd
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
@@ -33,7 +34,11 @@ app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 @app.route("/profile")
 def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
-       return render_template("profile.html", person = session['user'])
+       results = dbfire.collection('Users').where('Email', '==', session['user'])
+       for doc in results.stream(): 
+        results = doc.to_dict()
+
+        return render_template("profile.html", results = results)
     else:
         redirect(url_for("login"))
 #persons = {"logged_in": False,"uName": "", "uEmail": "", "uID": ""} may not need this, will see
@@ -61,6 +66,7 @@ def login():
             flash("Failed to log in", "fail")
             return redirect(url_for("login"))
     else:
+        print("Landing on page")
         return render_template('login.html')
 
 @app.route('/register', methods = ["POST", "GET"])
@@ -125,7 +131,6 @@ def verification():
             return redirect(url_for("verification"))
 
     return render_template("verification.html")
-
 
 ## Password Recovery Function by Muneeb Khan
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
@@ -201,10 +206,12 @@ def stockSearch():
     try:
         if request.method == 'POST':
             if doesThatStockExist(firebase.database(), request.form["searchTerm"]):
-                return displayStock(request.form["searchTerm"])
+                return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-19", timespan="daily"))
+            else:
+                return redirect(url_for('fourOhFour'))
     except KeyError:
-        return render_template('404Error.html')
-    return render_template('404Error.html')
+        return redirect(url_for('fourOhFour'))
+    return redirect(url_for(request.url))
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
@@ -221,23 +228,51 @@ def stockSearch():
 #
 #   Author: Ian McNulty
 @app.route('/<ticker>')
-def displayStock(ticker, startDate="2021-09-08", endDate="2022-09-19", timespan="daily"):
+def displayStock(ticker):
+    startDate = request.args['startDate']
+    endDate = request.args['endDate']
+    timespan = request.args['timespan']
     stockData = StockData(firebase.database(), ticker)
     global stock
     stock = stockData.stockPageFactory()
     stockMatrix = stockData.getData(startDate, endDate, timespan)
     if stockMatrix != -1:
-        dates = [date[0] for date in stockMatrix]
-        avgs = [mean([open[2], open[3]]) for open in stockMatrix]
-        return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+        if timespan != 'hourly':
+            dates = [row[0] for row in stockMatrix]
+            avgs = [mean([row[2], row[3]]) for row in stockMatrix]
+            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+        else:
+            dates = []
+            tempDates = [row[0] for row in stockMatrix]
+            for row in tempDates:
+                for i in range(0, len(tempDates[0])):
+                    dates.append(row[i])
+            avgs = []
+            tempAvgs = [row[1] for row in stockMatrix]
+            for row in tempAvgs:
+                for i in range(0, len(tempAvgs[0])):
+                    avgs.append(row[i])
+            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
     else:
         return displayStock(ticker)
 
+## changeStockView
+#   Description: Retrieves data from stockView page to determine how to change
+#   the view of the stock (monthly instead of weekly, change date range, etc)
+#
+#   Author: Ian McNulty
 @app.route('/changeView', methods=['POST'])
 def changeStockView():
     if request.method == 'POST':
-        return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
+        #return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
+        
+        return redirect(url_for('.displayStock', ticker=stock['ticker'], startDate=request.form['startDate'], endDate=request.form['endDate'], timespan=request.form['timespan']))
     return -1
+
+## 
+@app.route('/404Error')
+def fourOhFour():
+    return render_template('404Error.html')
     
 if __name__ == '__main__':
     app.run(debug=True)

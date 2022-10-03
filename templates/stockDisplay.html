@@ -41,7 +41,7 @@
                             label: "Stock values",
                             data: {{ avgs | safe }},
                             fill: false,
-                            borderColor: "rgb(20, 100, 50)",
+                            borderColor: "rgb(20, 100, 200)",
                             lineTension: 0
                         }]
                     },
@@ -54,18 +54,19 @@
         <form action="/changeView" method="post">
             <div class="stockUtilityBar">
                 <div class="stockUtilityBarIcon">
-                    <h3>Starting date:</h3>
+                    <h3>Starting Date:</h3>
                     <input type="dateInput" name="startDate" placeholder="yyyy-mm-dd" 
                         value="{{ request.form['startData'] }}">
                 </div>
                 <div class="stockUtilityBarIcon">
-                    <h3>Ending date:</h3>
+                    <h3>Ending Date:</h3>
                     <input type="dateInput" name="endDate" placeholder="yyyy-mm-dd"
                         value="{{ request.form['endData'] }}">
                 </div>
                 <div class="stockUtilityBarIcon">
                     <h3>Timespan:</h3>
                     <select name="timespan" value="{{ request.form['timespan'] }}">
+                        <option value="hourly">Hourly prices</option>
                         <option value="daily">Daily prices</option>
                         <option value="weekly">Weekly prices</option>
                         <option value="monthly">Monthly prices</option>
