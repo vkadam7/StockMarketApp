@@ -50,7 +50,7 @@ def profile():
 @app.route("/login", methods = ["POST","GET"])
 def login():
     if('user' in session): #to check if the user is logged in will change to profile page
-        redirect(url_for("profile"))
+        return redirect(url_for("profile"))
         #return 'Hi, {}'.format(session['user'])
 
     if request.method == "POST":
@@ -60,10 +60,10 @@ def login():
         try:
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
-            print("Log in succesful.")
+            flash("Log in succesful.", "pass")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
-            print("Failed to log in")
+            flash("Failed to log in", "fail")
             return redirect(url_for("login"))
     else:
         print("Landing on page")
@@ -78,17 +78,59 @@ def register():
         Password = result["password"]
         NameU = result["Unames"]
         UseN = result["username"]
-        try:
-            #dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN})
-            user = authen.create_user_with_email_and_password(email, Password)
-            dbfire.collection('Users').document(user['localId']).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN})
-            print("Account Created")
-            return redirect(url_for("login"))
-        except:
-            print("Invalid Registration")
-            return redirect(url_for("register"))
+
+        # Variables for Password validation - Muneeb Khan
+        digits = any(x.isdigit() for x in Password) # Digits will check for any digits in the password
+        specials = any(x == '!' or x == '@' or x == '#' or x == '$' for x in Password) # Specials will check for any specials in the password
+
+        # If else conditions to check the password requirements - Muneeb Khan
+        if (len(Password) < 6): # If the password is too short
+                flash("Password too short! Must be 6 characters min")
+
+        elif (len(Password) > 20): # If the password is too long
+                flash("Password is too long! Must be 20 characters maximum")
+
+        elif (digits == 0): # If the password doesn't have a digit
+                flash("Password must contain at least 1 digit!")
+        
+        elif (specials == 0): # If the password doesn't have a special
+                flash("Password must contain at least 1 special character! (ie. !,@,#,$)")
+
+        else:
+            try: ## Another way im trying to figure out the email verification part - Muneeb Khan
+            # user = authen.send_email_verification(email['idToken'], Password)
+                #if authen.send_email_verification == True:
+                user = authen.create_user_with_email_and_password(email, Password)
+                dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
+                flash("Account Created, you will now be redirected to verify your account" , "pass")
+                return redirect(url_for("login"))
+            # else:
+            # print("incorrect token! please re-register")
+            # return redirect(url_for("register"))
+
+            except:
+                flash("Invalid Registration" , "fail")
+                return redirect(url_for("register"))
           
     return render_template('register.html')   
+
+## Attempt on email verification function by Muneeb Khan (WIP!)
+@app.route('/verification', methods = ["POST" , "GET"])
+def verification():
+    if request.method == "POST":
+
+        result = request.form
+        email = result["email"]
+        try:
+            user = authen.send_email_verification(email['idToken'])
+            print("Verification sent")
+            return redirect(url_for("login"))
+
+        except:
+            print("Invalid token please try again!")
+            return redirect(url_for("verification"))
+
+    return render_template("verification.html")
 
 ## Password Recovery Function by Muneeb Khan
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
@@ -99,10 +141,10 @@ def PasswordRecovery():
         email = result["email"]
         try:
             user = authen.send_password_reset_email(email)
-            print("Password reset notification was sent to your email")
+            flash("Password reset notification was sent to your email", "pass")
             return redirect(url_for("login"))
         except:
-            print("Email not found")
+            flash("Email not found" , "fail")
             return redirect(url_for("PasswordRecovery"))
           
     return render_template("PasswordRecovery.html")   
@@ -113,6 +155,7 @@ def PasswordRecovery():
 @app.route("/logout")
 def logout():
     session.pop('user')
+    flash('logout succesful')
     return redirect(url_for("login"))
 
 #Home
@@ -125,17 +168,26 @@ def hello(name=None):
 
 @app.route("/home")
 def home():
-    return render_template('home.html')
+    if('user' in session): #to check if the user is logged in will change to profile page
+        return render_template("home.html", person = session['user'])
+    else:
+        return render_template('home.html')
 
 
 ## Route for About us and Information pages - Muneeb Khan
 @app.route("/aboutus")
 def aboutus():
-    return render_template('aboutus.html')
+    if('user' in session): #to check if the user is logged in will change to profile page
+        return render_template("aboutus.html", person = session['user'])
+    else:
+        return render_template('aboutus.html')
 
 @app.route("/information")
 def information():
-    return render_template('information.html')
+    if('user' in session): #to check if the user is logged in will change to profile page
+        return render_template("information.html", person = session['user'])
+    else:
+        return render_template('information.html')
 
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user

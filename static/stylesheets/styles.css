@@ -1,20 +1,20 @@
 
 .header{
-    background-color:rgb(24, 153, 41);
+    background-color:rgb(33, 103, 42);
     text-align:center;
     justify-content: center;
     padding:15px;
 }
 
 .login{
-    background-color:rgb(24, 153, 41);
+    background-color:rgb(33,103,42);
     text-align:right;
     justify-content: right;
     padding:15px;
 }
 
 .navbar{
-    background-color: #333;
+    background-color: rgb(70, 51, 51);
     justify-content: center;
 }
 
@@ -144,10 +144,6 @@ h1{
     background-color: bisque;
 }
 
-
-
-
-
 .loginform {
     text-align:center;
     justify-content: center;
@@ -165,6 +161,9 @@ h1{
 
 footer{
     text-align:center;
+    color:white;
+    font-size:small;
+    background-color:rgb(95, 63, 63)
 }
 
 .stockUtilityBar {
@@ -195,4 +194,12 @@ footer{
 }
 .information{
     background-color: black;
+}
+
+.alert-pass {
+    background-color: skyblue;
+}
+
+.alert-fail {
+    background-color: orange;
 }
