@@ -25,6 +25,7 @@
             </form>
         </div>
     </header>
+
     <body>
         <div class="stockDisplay">
             <h1>{{ stock['ticker'] }} - {{ stock['name'] }}</h1>
@@ -50,49 +51,16 @@
                     }
                 });
             </script>
-        </div>        
-        <form action="/changeView" method="post">
-            <div class="stockUtilityBar">
-                <div class="stockUtilityBarIcon">
-                    <h3>Starting date:</h3>
-                    <input type="dateInput" name="startDate" placeholder="yyyy-mm-dd" 
-                        value="{{ request.form['startData'] }}">
-                </div>
-                <div class="stockUtilityBarIcon">
-                    <h3>Ending date:</h3>
-                    <input type="dateInput" name="endDate" placeholder="yyyy-mm-dd"
-                        value="{{ request.form['endData'] }}">
-                </div>
-                <div class="stockUtilityBarIcon">
-                    <h3>Timespan:</h3>
-                    <select name="timespan" value="{{ request.form['timespan'] }}">
-                        <option value="daily">Daily prices</option>
-                        <option value="weekly">Weekly prices</option>
-                        <option value="monthly">Monthly prices</option>
-                    </select>
-                </div>
-                <div class="stockUtilityBarIcon">
-                    <button type="submit">Show Range</button>
-                </div>
-                <!--Author: Viraj
-                Buy sell features for the stock market simulator, will place here for now until plan for game is confirmed. Buttons will
-                only appear if user if logged in-->
-               
-                <div class = "buysell">
-                    <button type = "submit">Buy</button>
-                    <button type = "submit">Sell</button>
-                    <script>
-                        var Display = $('.login').css.('display','block'):
-                        var noDisplay = $('.login').css.('display', 'none'): 
-                        if($('.notloggedin').css.('display') == 'none'){
-                            $(Display);
-                        }
-                        else
-                            $(noDisplay);               
-                    </script>    
-                </div>
-
+            <div class = "buysell">
+                <button type = "submit">Buy</button>
+                <button type = "submit">Sell</button>
+                <script>
+                    function hideButton(){
+                        let headerBuy = 
+                    }
+                </script>
             </div>
-        </form>
     </body>
+
 </html>
+

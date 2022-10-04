@@ -198,6 +198,14 @@ def changeStockView():
 @app.route('/404Error')
 def fourOhFour():
     return render_template('404Error.html')
+
+@app.route('/portfolio')
+def Portfolio():
+    return render_template('portfolio.html')
+
+@app.route('/')
+def method_name():
+    pass
     
 if __name__ == '__main__':
     app.run(debug=True)
