@@ -202,8 +202,5 @@ footer{
 
 .alert-pass {
     background-color: skyblue;
-}
-
-.alert-fail {
-    background-color: orange;
+    text-align: center;
 }

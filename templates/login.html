@@ -41,14 +41,12 @@
                 <p>Forgot your password? <a href = "PasswordRecovery">click here</a></p>
                 <br>
                 
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}   
-                        {% for message in messages %}
+                {% with alerts = get_flashed_messages() %} 
+                    {% for print in alerts %}
                         <div class="alert-pass" role="alert">
-                            {{ message }}
+                            {{ print }}
                         </div>
-                        {% endfor %} 
-                    {% endif %} 
+                    {% endfor %} 
                 {% endwith %}
                 <br><br> 
                 <button type = "submit">Submit</button>

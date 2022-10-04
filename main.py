@@ -85,17 +85,12 @@ def register():
         specials = any(x == '!' or x == '@' or x == '#' or x == '$' for x in Password) # Specials will check for any specials in the password
 
         # If else conditions to check the password requirements - Muneeb Khan
-        if (len(Password) < 6): # If the password is too short
-                flash("Password too short! Must be 6 characters min")
-
-        elif (len(Password) > 20): # If the password is too long
-                flash("Password is too long! Must be 20 characters maximum")
-
-        elif (digits == 0): # If the password doesn't have a digit
-                flash("Password must contain at least 1 digit!")
-        
-        elif (specials == 0): # If the password doesn't have a special
-                flash("Password must contain at least 1 special character! (ie. !,@,#,$)")
+        if (len(Password) < 6 or len(Password) > 20 or digits == 0 or specials == 0): # If the password doesnt meet requirements
+            flash("Invalid Password! must contain the following requirements: ")
+            flash("6 characters minimum")
+            flash("20 characters maximum")
+            flash("at least 1 digit")
+            flash("at least 1 special character ('!','@','#', or '$'")
 
         else:
             try: ## Another way im trying to figure out the email verification part - Muneeb Khan
