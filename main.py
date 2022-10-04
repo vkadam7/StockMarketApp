@@ -212,6 +212,7 @@ def simulation():
             'endDate': request.form['endDate'],
             'initialCash': request.form['initialCash']
         }
+        session['currentCash'] = request.form['initialCash']
         return render_template('simulation.html', person=session['user'])
 
 ## stockSearch

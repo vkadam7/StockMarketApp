@@ -27,7 +27,7 @@
                             <button>Start a simulation!</button>
                         </form>
                         <script type="text/javascript">
-                            var email = {{ session['user'] | safe}};
+                            var email = {{ session['user'] }};
                             if (email == '') 
                                 document.getElementById('stockSimStart').style.display = "none";
                         </script>
