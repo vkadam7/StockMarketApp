@@ -178,7 +178,6 @@ class StockData:
     #
     #   Author: Ian McNulty
     def stockPageFactory(self):
-
         stock = {
             "ticker": self.ticker,
             "name": self.name,
