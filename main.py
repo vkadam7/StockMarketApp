@@ -1,11 +1,12 @@
 from re import T
 from statistics import mean
-from flask import Flask, abort, session, render_template, request, redirect, url_for
+from flask import Flask, abort, session, render_template, request, redirect, url_for, flash
 from StockData import StockData, doesThatStockExist
 import pyrebase
 import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import credentials
+import pandas as pd
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
@@ -33,7 +34,11 @@ app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 @app.route("/profile")
 def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
-       return render_template("profile.html", person = session['user'])
+        results = dbfire.collection('Users').where('Email', '==', session['user'])
+        for doc in results.stream(): 
+            results = doc.to_dict()
+
+        return render_template("profile.html", results = results)
     else:
         redirect(url_for("login"))
 #persons = {"logged_in": False,"uName": "", "uEmail": "", "uID": ""} may not need this, will see
@@ -45,7 +50,7 @@ def profile():
 @app.route("/login", methods = ["POST","GET"])
 def login():
     if('user' in session): #to check if the user is logged in will change to profile page
-        redirect(url_for("profile"))
+        return redirect(url_for("profile"))
         #return 'Hi, {}'.format(session['user'])
 
     if request.method == "POST":
@@ -55,13 +60,14 @@ def login():
         try:
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
-            print("Log in succesful.")
+            session['loginFlagPy'] = 1
+            flash("Log in succesful.", "pass")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
-            print("Failed to log in")
+            flash("Failed to log in", "fail")
             return redirect(url_for("login"))
     else:
-        print("didn't work at all")
+        print("Landing on page")
         return render_template('login.html')
 
 @app.route('/register', methods = ["POST", "GET"])
@@ -73,16 +79,59 @@ def register():
         Password = result["password"]
         NameU = result["Unames"]
         UseN = result["username"]
-        try:
-            user = authen.create_user_with_email_and_password(email, Password)
-            dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
-            print("Account Created")
-            return redirect(url_for("login"))
-        except:
-            print("Invalid Registration")
-            return redirect(url_for("registration"))
+
+        # Variables for Password validation - Muneeb Khan
+        digits = any(x.isdigit() for x in Password) # Digits will check for any digits in the password
+        specials = any(x == '!' or x == '@' or x == '#' or x == '$' for x in Password) # Specials will check for any specials in the password
+
+        # If else conditions to check the password requirements - Muneeb Khan
+        if (len(Password) < 6): # If the password is too short
+                flash("Password too short! Must be 6 characters min")
+
+        elif (len(Password) > 20): # If the password is too long
+                flash("Password is too long! Must be 20 characters maximum")
+
+        elif (digits == 0): # If the password doesn't have a digit
+                flash("Password must contain at least 1 digit!")
+        
+        elif (specials == 0): # If the password doesn't have a special
+                flash("Password must contain at least 1 special character! (ie. !,@,#,$)")
+
+        else:
+            try: ## Another way im trying to figure out the email verification part - Muneeb Khan
+            # user = authen.send_email_verification(email['idToken'], Password)
+                #if authen.send_email_verification == True:
+                user = authen.create_user_with_email_and_password(email, Password)
+                dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
+                flash("Account Created, you will now be redirected to verify your account" , "pass")
+                return redirect(url_for("login"))
+            # else:
+            # print("incorrect token! please re-register")
+            # return redirect(url_for("register"))
+
+            except:
+                flash("Invalid Registration" , "fail")
+                return redirect(url_for("register"))
           
     return render_template('register.html')   
+
+## Attempt on email verification function by Muneeb Khan (WIP!)
+@app.route('/verification', methods = ["POST" , "GET"])
+def verification():
+    if request.method == "POST":
+
+        result = request.form
+        email = result["email"]
+        try:
+            user = authen.send_email_verification(email['idToken'])
+            print("Verification sent")
+            return redirect(url_for("login"))
+
+        except:
+            print("Invalid token please try again!")
+            return redirect(url_for("verification"))
+
+    return render_template("verification.html")
 
 ## Password Recovery Function by Muneeb Khan
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
@@ -93,10 +142,10 @@ def PasswordRecovery():
         email = result["email"]
         try:
             user = authen.send_password_reset_email(email)
-            print("Password reset notification was sent to your email")
+            flash("Password reset notification was sent to your email", "pass")
             return redirect(url_for("login"))
         except:
-            print("Email not found")
+            flash("Email not found" , "fail")
             return redirect(url_for("PasswordRecovery"))
           
     return render_template("PasswordRecovery.html")   
@@ -107,6 +156,8 @@ def PasswordRecovery():
 @app.route("/logout")
 def logout():
     session.pop('user')
+    session['loginFlagPy'] = 0
+    flash('logout succesful')
     return redirect(url_for("login"))
 
 #Home
@@ -114,22 +165,37 @@ def logout():
 #Author: Miqdad
 @app.route('/')
 def hello(name=None):
+    session['loginFlagPy'] = 0
     return render_template('home.html')
 
 
 @app.route("/home")
 def home():
-    return render_template('home.html')
+    if('user' in session): #to check if the user is logged in will change to profile page
+        return render_template("home.html", person = session['user'])
+    else:
+        return render_template('home.html')
 
 
 ## Route for About us and Information pages - Muneeb Khan
 @app.route("/aboutus")
 def aboutus():
-    return render_template('aboutus.html')
+    if('user' in session): #to check if the user is logged in will change to profile page
+        return render_template("aboutus.html", person = session['user'])
+    else:
+        return render_template('aboutus.html')
 
 @app.route("/information")
 def information():
-    return render_template('information.html')
+    if('user' in session): #to check if the user is logged in will change to profile page
+        return render_template("information.html", person = session['user'])
+    else:
+        return render_template('information.html')
+
+@app.route("/stockSim", methods=['POST'])
+def stockSim():
+    if 'user' in session:
+        return render_template('stockSim.html', person=session['user'])
 
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
@@ -148,7 +214,7 @@ def stockSearch():
     try:
         if request.method == 'POST':
             if doesThatStockExist(firebase.database(), request.form["searchTerm"]):
-                return redirect(url_for('displayStock', ticker=request.form["searchTerm"]))
+                return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-19", timespan="daily"))
             else:
                 return redirect(url_for('fourOhFour'))
     except KeyError:
@@ -170,15 +236,31 @@ def stockSearch():
 #
 #   Author: Ian McNulty
 @app.route('/<ticker>')
-def displayStock(ticker, startDate="2021-09-08", endDate="2022-09-19", timespan="daily"):
+def displayStock(ticker):
+    startDate = request.args['startDate']
+    endDate = request.args['endDate']
+    timespan = request.args['timespan']
     stockData = StockData(firebase.database(), ticker)
     global stock
     stock = stockData.stockPageFactory()
     stockMatrix = stockData.getData(startDate, endDate, timespan)
     if stockMatrix != -1:
-        dates = [date[0] for date in stockMatrix]
-        avgs = [mean([open[2], open[3]]) for open in stockMatrix]
-        return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+        if timespan != 'hourly':
+            dates = [row[0] for row in stockMatrix]
+            avgs = [mean([row[2], row[3]]) for row in stockMatrix]
+            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+        else:
+            dates = []
+            tempDates = [row[0] for row in stockMatrix]
+            for row in tempDates:
+                for i in range(0, len(tempDates[0])):
+                    dates.append(row[i])
+            avgs = []
+            tempAvgs = [row[1] for row in stockMatrix]
+            for row in tempAvgs:
+                for i in range(0, len(tempAvgs[0])):
+                    avgs.append(row[i])
+            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
     else:
         return displayStock(ticker)
 
@@ -191,7 +273,8 @@ def displayStock(ticker, startDate="2021-09-08", endDate="2022-09-19", timespan=
 def changeStockView():
     if request.method == 'POST':
         #return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
-        return redirect(url_for('displayStock', ticker=stock['ticker'], startDate=request.form['startDate'], endDate=request.form['endDate'], timespan=request.form['timespan']))
+        
+        return redirect(url_for('.displayStock', ticker=stock['ticker'], startDate=request.form['startDate'], endDate=request.form['endDate'], timespan=request.form['timespan']))
     return -1
 
 ## 

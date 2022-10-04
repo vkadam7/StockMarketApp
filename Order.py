@@ -1,4 +1,4 @@
-import StockData
+import StockData, User
 
 
 
