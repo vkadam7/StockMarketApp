@@ -1,3 +1,4 @@
+from mimetypes import init
 import numpy as np
 
 ## doesThatStockExist
@@ -194,8 +195,26 @@ class StockData:
         return stock
 
 class Simulation:
-    def __init__(self) -> None:
-        pass
+    def __init__(self, db, user, startDate, endDate, initialCash):
+        self.firebase = db
+        self.user = user
+        self.startDate = startDate
+        self.endDate = endDate
+        self.initialCash = initialCash
+
+    def createSim(self):
+        count = len(self.db.child('Simulations').get().val())
+        simName = "Sim" + str(count)
+        data = {
+                'ongoing': 'true',
+                'user': self.user.email,
+                'startDate': self.startDate,
+                'endDate': self.endDate,
+                'initialCash': self.initialCash,
+                'Orders': []
+            }
+        self.db.child('Simulations').child(simName).set(data)
+        return 1
 
 class User:
     def __init__(self):
@@ -215,7 +234,7 @@ class Order:
 
     def buyOrder(self):
         if self.option == 'buy':
-            count = len(self.db.child(self.sim).child('Orders').get().val())
+            count = len(self.db.child('Simulations').child(self.sim).child('Orders').get().val())
             orderName = self.ticker + str(count)
             data = {
                 'validity': 'true',
@@ -226,13 +245,13 @@ class Order:
                 'avgStockPrice': self.avgStockPrice,
                 'totalPrice': self.totalPrice
             }
-            self.db.child(self.sim).child('Orders').child(orderName).set(data)
+            self.db.child('Simulations').child(self.sim).child('Orders').child(orderName).set(data)
         else: return -1
 
     def sellOrder(self):
         if self.option == 'sell':
             tempInitialQuant = self.quantity
-            tempData = self.db.child(self.sim).child('Orders').get().val()
+            tempData = self.db.child('Simulations').child(self.sim).child('Orders').get().val()
             listOfChangedOrders = []
             partialOrderFlag = False
             try:
@@ -255,7 +274,7 @@ class Order:
                 totalPrices = []
                 #stockPrices = []
                 for order in listOfChangedOrders:
-                    tempOrder = self.db.child(self.sim).child('Orders').child(order).get().val()
+                    tempOrder = self.db.child('Simulations').child(self.sim).child('Orders').child(order).get().val()
                     totalPrices.append(tempOrder['totalPrice'])
                     #stockPrices.append(tempOrder['avgStockPrice'])
                     updatedOrder = {
@@ -267,9 +286,9 @@ class Order:
                         'avgStockPrice': tempOrder['avgStockPrice'],
                         'totalPrice': tempOrder['totalPrice']
                     }
-                    self.db.child(self.sim).child('Orders').child(order).update(updatedOrder)
+                    self.db.child('Simulations').child(self.sim).child('Orders').child(order).update(updatedOrder)
                 if partialOrderFlag:
-                    finalOrder = self.db.child(self.sim).child('Orders').child(finalOrderName).get().val()
+                    finalOrder = self.db.child('Simulations').child(self.sim).child('Orders').child(finalOrderName).get().val()
                     totalPrices.append(finalOrder['totalPrice'])
                     #stockPrices.append(finalOrder['avgStockPrice'])
                     updatedFinalOrderOriginal = {
@@ -281,7 +300,7 @@ class Order:
                         'avgStockPrice': finalOrder['avgStockPrice'],
                         'totalPrice': finalOrder['totalPrice']
                     }
-                    self.db.child(self.sim).child('Orders').child(order).update(updatedFinalOrderOriginal)
+                    self.db.child('Simulations').child(self.sim).child('Orders').child(order).update(updatedFinalOrderOriginal)
                     updatedFinalOrderNew = {
                         'validity': 'true',
                         'ticker': finalOrder['ticker'],
@@ -291,9 +310,9 @@ class Order:
                         'avgStockPrice': finalOrder['avgStockPrice'],
                         'totalPrice': finalOrder['totalPrice']
                     }
-                    count = len(self.db.child(self.sim).child('Orders').get().val())
+                    count = len(self.db.child('Simulations').child(self.sim).child('Orders').get().val())
                     orderName = finalOrder['ticker'] + chr(count)
-                    self.db.child(self.sim).child('Orders').child(orderName).set(updatedFinalOrderNew)
+                    self.db.child('Simulations').child(self.sim).child('Orders').child(orderName).set(updatedFinalOrderNew)
                 sellOrderData = {
                     'validity': 'true',
                     'ticker': self.stock.ticker,
@@ -303,9 +322,9 @@ class Order:
                     'avgStockPrice': self.avgStockPrice,
                     'totalPrice': self.totalPrice
                 }
-                count = len(self.db.child(self.sim).child('Orders').get().val())
+                count = len(self.db.child('Simulations').child(self.sim).child('Orders').get().val())
                 orderName = self.ticker + chr(count)
-                self.db.child(self.sim).child('Orders').child(orderName).set(sellOrderData)
+                self.db.child('Simulations').child(self.sim).child('Orders').child(orderName).set(sellOrderData)
                 profit = sum(totalPrices) - self.totalPrice
                 return profit
             except IndexError:
