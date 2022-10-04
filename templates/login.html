@@ -41,16 +41,13 @@
                 <input type = "password" id = "password" name = "password" placeholder="Must be 6 characters minimum" required>
                 <p>Forgot your password? <a href = "PasswordRecovery">click here</a></p>
                 <br>
-                
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}   
-                        {% for message in messages %}
-                        <div class="alert-pass" role="alert">
-                            {{ message }}
+                {% with alerts = get_flashed_messages() %}
+                    {% for print in alerts %} 
+                        <div class="alert" role="alert">
+                            {{ print }}
                         </div>
-                        {% endfor %} 
-                    {% endif %} 
-                {% endwith %}
+                    {% endfor %}
+                {% endwith %} 
                 <br><br> 
                 <button type = "submit">Submit</button>
                 <p>Not yet registered? <a href = "register">click here</a> to sign up</p>

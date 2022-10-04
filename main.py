@@ -1,6 +1,6 @@
 from re import T
 from statistics import mean
-from flask import Flask, abort, session, render_template, request, redirect, url_for
+from flask import Flask, abort, session, render_template, request, redirect, url_for, flash
 from StockData import StockData, doesThatStockExist
 import pyrebase
 import firebase_admin
@@ -84,29 +84,19 @@ def register():
         specials = any(x == '!' or x == '@' or x == '#' or x == '$' for x in Password) # Specials will check for any specials in the password
 
         # If else conditions to check the password requirements - Muneeb Khan
-        if (len(Password) < 6): # If the password is too short
-                flash("Password too short! Must be 6 characters min")
-
-        elif (len(Password) > 20): # If the password is too long
-                flash("Password is too long! Must be 20 characters maximum")
-
-        elif (digits == 0): # If the password doesn't have a digit
-                flash("Password must contain at least 1 digit!")
-        
-        elif (specials == 0): # If the password doesn't have a special
-                flash("Password must contain at least 1 special character! (ie. !,@,#,$)")
+        if (len(Password) < 6 or len(Password) > 20 or digits == 0 or specials == 0): # If the password doesnt meet requirements
+                flash("Invalid Password! must contain the following requirements: ")
+                flash("6 characters minimum")
+                flash("20 characters maximum")
+                flash("at least 1 digit")
+                flash("at least 1 special character ('!','@','#', or '$'")
 
         else:
-            try: ## Another way im trying to figure out the email verification part - Muneeb Khan
-            # user = authen.send_email_verification(email['idToken'], Password)
-                #if authen.send_email_verification == True:
+            try: 
                 user = authen.create_user_with_email_and_password(email, Password)
                 dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
-                flash("Account Created, you will now be redirected to verify your account" , "pass")
+                flash("Account succesfully created, you may now login" , "pass")
                 return redirect(url_for("login"))
-            # else:
-            # print("incorrect token! please re-register")
-            # return redirect(url_for("register"))
 
             except:
                 flash("Invalid Registration" , "fail")
@@ -188,6 +178,13 @@ def information():
         return render_template("information.html", person = session['user'])
     else:
         return render_template('information.html')
+
+@app.route("/StockDefinitions")
+def StockDefinitions():
+    if('user' in session):
+        return render_template("StockDefinitions.html", person = session['user'])
+    else:
+        return render_template('StockDefinitions.html')
 
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
