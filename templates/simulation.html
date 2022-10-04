@@ -33,21 +33,23 @@
         </div>
     </header>
     <body>
-        <div class="stockSimStartForm">
-            <h1>Starting the simulation:</h1>
-            <h3>Just need to enter some details to get the simulation started!</h3>
-            <form method="post">
-                <label for="startDate">Starting Date of Simulation:</label>
-                <input type="startDate" value="{{ request.form['startDate'] }}">  
-                <br>
-                <label for="endDate">Ending Date of Simulation:</label>
-                <input type="endDate" value="{{ request.form['endDate'] }}">
-                <br>
-                <label for="startingCash">Starting Cash for Simulation:</label>
-                <input type="startingCash" value="{{ request.form['startingCash'] }}">
-                <br>
-                <button>Start Simulation!</button>
-            </form>
+        <div class="stockList">
+            <h3>Available stocks:</h3>
+        </div>
+        <div class="portfolio">
+            <h3>Your holdings:</h3>
+            <table>
+                <tr>
+                    <th>Current Money:</th>
+                    <td>${{ session['currentCash'] }}</td>
+                </tr>
+                <tr>
+                    
+                </tr>
+            </table>
+        </div>
+        <div class="orderListButton">
+            <a href="orderList">Order History</a>
         </div>
     </body>
 </html>

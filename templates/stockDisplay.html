@@ -23,11 +23,11 @@
                     <li><a method = "POST" href = "aboutus">About Us</a></li>
                     <li><a method = "POST" href = "information">Information</a></li>
                     <li class="stockSimStartButton">
-                        <form id="stockSimStart" action="/stockSim" method="post">
+                        <form id="stockSimStart" action="/stockSimForm" method="post">
                             <button>Start a simulation!</button>
                         </form>
                         <script type="text/javascript">
-                            var email = {{ session['user'] | safe}};
+                            var email = {{ session['user'] }};
                             if (email == '') 
                                 document.getElementById('stockSimStart').style.display = "none";
                         </script>

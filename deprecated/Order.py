@@ -1,11 +1,9 @@
 import StockData, User
 
-
-
-
 class Order:
-    def __init__(self, db, stock, user, index, buyOrSell, quantity, stockPrice):
+    def __init__(self, db, simulation, stock, user, index, buyOrSell, quantity, stockPrice):
         self.db = db
+        self.sim = simulation
         self.stock = stock
         self.user = user
         self.dayOfPurchase = index
@@ -16,8 +14,8 @@ class Order:
 
     def buyOrder(self):
         if self.option == 'buy':
-            count = len(self.db.child('Orders').child(self.user.username).get().val())
-            orderName = self.ticker + chr(count)
+            count = len(self.db.child(self.sim).child('Orders').get().val())
+            orderName = self.ticker + str(count)
             data = {
                 'validity': 'true',
                 'ticker': self.stock.ticker,
@@ -27,13 +25,13 @@ class Order:
                 'avgStockPrice': self.avgStockPrice,
                 'totalPrice': self.totalPrice
             }
-            self.db.child('Orders').child(self.user.username).child(orderName).set(data)
+            self.db.child(self.sim).child('Orders').child(orderName).set(data)
         else: return -1
 
     def sellOrder(self):
         if self.option == 'sell':
             tempInitialQuant = self.quantity
-            tempData = self.db.child('Orders').child(self.user.username).get().val()
+            tempData = self.db.child(self.sim).child('Orders').get().val()
             listOfChangedOrders = []
             partialOrderFlag = False
             try:
@@ -56,7 +54,7 @@ class Order:
                 totalPrices = []
                 #stockPrices = []
                 for order in listOfChangedOrders:
-                    tempOrder = self.db.child('Orders').child(order).get().val()
+                    tempOrder = self.db.child(self.sim).child('Orders').child(order).get().val()
                     totalPrices.append(tempOrder['totalPrice'])
                     #stockPrices.append(tempOrder['avgStockPrice'])
                     updatedOrder = {
@@ -68,9 +66,9 @@ class Order:
                         'avgStockPrice': tempOrder['avgStockPrice'],
                         'totalPrice': tempOrder['totalPrice']
                     }
-                    self.db.child('Orders').child(order).update(updatedOrder)
+                    self.db.child(self.sim).child('Orders').child(order).update(updatedOrder)
                 if partialOrderFlag:
-                    finalOrder = self.db.child('Orders').child(finalOrderName).get().val()
+                    finalOrder = self.db.child(self.sim).child('Orders').child(finalOrderName).get().val()
                     totalPrices.append(finalOrder['totalPrice'])
                     #stockPrices.append(finalOrder['avgStockPrice'])
                     updatedFinalOrderOriginal = {
@@ -82,7 +80,7 @@ class Order:
                         'avgStockPrice': finalOrder['avgStockPrice'],
                         'totalPrice': finalOrder['totalPrice']
                     }
-                    self.db.child('Orders').child(order).update(updatedFinalOrderOriginal)
+                    self.db.child(self.sim).child('Orders').child(order).update(updatedFinalOrderOriginal)
                     updatedFinalOrderNew = {
                         'validity': 'true',
                         'ticker': finalOrder['ticker'],
@@ -92,9 +90,9 @@ class Order:
                         'avgStockPrice': finalOrder['avgStockPrice'],
                         'totalPrice': finalOrder['totalPrice']
                     }
-                    count = len(self.db.child('Orders').child(self.user.username).get().val())
+                    count = len(self.db.child(self.sim).child('Orders').get().val())
                     orderName = finalOrder['ticker'] + chr(count)
-                    self.db.child('Orders').child(self.user.username).child(orderName).set(updatedFinalOrderNew)
+                    self.db.child(self.sim).child('Orders').child(orderName).set(updatedFinalOrderNew)
                 sellOrderData = {
                     'validity': 'true',
                     'ticker': self.stock.ticker,
@@ -104,9 +102,9 @@ class Order:
                     'avgStockPrice': self.avgStockPrice,
                     'totalPrice': self.totalPrice
                 }
-                count = len(self.db.child('Orders').child(self.user.username).get().val())
+                count = len(self.db.child(self.sim).child('Orders').get().val())
                 orderName = self.ticker + chr(count)
-                self.db.child('Orders').child(self.user.username).child(orderName).set(sellOrderData)
+                self.db.child(self.sim).child('Orders').child(orderName).set(sellOrderData)
                 profit = sum(totalPrices) - self.totalPrice
                 return profit
             except IndexError:

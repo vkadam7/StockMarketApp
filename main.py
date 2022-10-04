@@ -1,12 +1,13 @@
 from re import T
+from datetime import datetime
 from statistics import mean
 from flask import Flask, abort, session, render_template, request, redirect, url_for, flash
-from StockData import StockData, doesThatStockExist
-import pyrebase
-import firebase_admin
+from stockSim import StockData, User, Order, Simulation, doesThatStockExis
 from firebase_admin import firestore
 from firebase_admin import credentials
 import pandas as pd
+import pyrebase
+import firebase_admin
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
@@ -187,10 +188,30 @@ def information():
     else:
         return render_template('information.html')
 
-@app.route("/stockSim", methods=['POST'])
-def stockSim():
+## stockSim
+#   Description: Brings the logged in user to the stock sim start page, if the user
+#   isn't logged in, a 404 page error is given.
+#
+#   Author: Ian McNulty
+@app.route("/stockSimForm", methods=['POST'])
+def stockSimForm():
     if 'user' in session:
-        return render_template('stockSim.html', person=session['user'])
+        return render_template('stockSimForm.html', person=session['user'])
+    else:
+        return redirect(url_for('fourOhFour'))
+
+## startSimulation
+#   Description: 
+@app.route("/simulation", methods=['POST', 'GET'])
+def startSimulation():
+    if request.method == 'POST':
+        session['simulation'] = {
+            'startDate': request.form['startDate'],
+            'endDate': request.form['endDate'],
+            'initialCash': request.form['initialCash']
+        }
+        session['currentCash'] = request.form['initialCash']
+        return render_template('simulation.html', person=session['user'])
 
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
