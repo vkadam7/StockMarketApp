@@ -23,16 +23,6 @@
                     <li><a method = "POST" href = "home">Home</a></li>
                     <li><a method = "POST" href = "aboutus">About Us</a></li>
                     <li><a method = "POST" href = "information">Information</a></li>
-                    <li class="stockSimStartButton">
-                        <form id="stockSimStart" action="/stockSim" method="post">
-                            <button>Start a simulation!</button>
-                        </form>
-                        <script type="text/javascript">
-                            var email = {{ session['user'] | safe}};
-                            if (email == '') 
-                                document.getElementById('stockSimStart').style.display = "none";
-                        </script>
-                    </li>
                 </ul>
             </nav>
             <form action="/stockSearch" method="post">
@@ -43,6 +33,21 @@
         </div>
     </header>
     <body>
-
+        <div class="stockSimStartForm">
+            <h1>Starting the simulation:</h1>
+            <h3>Just need to enter some details to get the simulation started!</h3>
+            <form method="post">
+                <label for="startDate">Starting Date of Simulation:</label>
+                <input type="startDate" value="{{ request.form['startDate'] }}">  
+                <br>
+                <label for="endDate">Ending Date of Simulation:</label>
+                <input type="endDate" value="{{ request.form['endDate'] }}">
+                <br>
+                <label for="startingCash">Starting Cash for Simulation:</label>
+                <input type="startingCash" value="{{ request.form['startingCash'] }}">
+                <br>
+                <button>Start Simulation!</button>
+            </form>
+        </div>
     </body>
 </html>
