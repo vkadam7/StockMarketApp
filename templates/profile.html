@@ -23,12 +23,13 @@
             </ul>
         </nav>
     </div>
+    <form action="/stockSearch" method="post">
+        <input type="search" name="searchTerm" placeholder="Find a stock..."
+                value="{{ request.form['searchTerm'] }}">
+        <button>Search</button>
+    </form>
 </header>
 <body>
-
-    
-    
-
     <h1>
         Welcome, {{results['Name']}}
     </h1>

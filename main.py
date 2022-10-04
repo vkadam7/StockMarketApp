@@ -192,10 +192,23 @@ def information():
     else:
         return render_template('information.html')
 
+## stockSim
+#   Description: Brings the logged in user to the stock sim start page, if the user
+#   isn't logged in, a 404 page error is given.
+#
+#   Author: Ian McNulty
 @app.route("/stockSim", methods=['POST'])
 def stockSim():
     if 'user' in session:
-        return render_template('stockSim.html', person=session['user'])
+        return render_template('stockSimForm.html', person=session['user'])
+    else:
+        return redirect(url_for('fourOhFour'))
+
+@app.route("/simulation", methods=['POST', 'GET'])
+def simulation():
+    if request.method == 'POST':
+        return -1
+
 
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
