@@ -197,15 +197,17 @@ def information():
 #   isn't logged in, a 404 page error is given.
 #
 #   Author: Ian McNulty
-@app.route("/stockSim", methods=['POST'])
-def stockSim():
+@app.route("/stockSimForm", methods=['POST'])
+def stockSimForm():
     if 'user' in session:
         return render_template('stockSimForm.html', person=session['user'])
     else:
         return redirect(url_for('fourOhFour'))
 
+## startSimulation
+#   Description: 
 @app.route("/simulation", methods=['POST', 'GET'])
-def simulation():
+def startSimulation():
     if request.method == 'POST':
         session['simulation'] = {
             'startDate': request.form['startDate'],
