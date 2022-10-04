@@ -1,7 +1,7 @@
 from re import T
 from statistics import mean
 from flask import Flask, abort, session, render_template, request, redirect, url_for, flash
-from StockData import StockData, doesThatStockExist
+from stockSim import StockData, User, Order, Simulation, doesThatStockExist
 import pyrebase
 import firebase_admin
 from firebase_admin import firestore
@@ -207,8 +207,12 @@ def stockSim():
 @app.route("/simulation", methods=['POST', 'GET'])
 def simulation():
     if request.method == 'POST':
-        return -1
-
+        session['simulation'] = {
+            'startDate': request.form['startDate'],
+            'endDate': request.form['endDate'],
+            'initialCash': request.form['initialCash']
+        }
+        return render_template('simulation.html', person=session['user'])
 
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
