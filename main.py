@@ -1,6 +1,6 @@
 from re import T
 from statistics import mean
-from flask import Flask, abort, session, render_template, request, redirect, url_for
+from flask import Flask, abort, session, render_template, request, redirect, url_for, flash
 from StockData import StockData, doesThatStockExist
 import pyrebase
 import firebase_admin
@@ -34,9 +34,9 @@ app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 @app.route("/profile")
 def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
-       results = dbfire.collection('Users').where('Email', '==', session['user'])
-       for doc in results.stream(): 
-        results = doc.to_dict()
+        results = dbfire.collection('Users').where('Email', '==', session['user'])
+        for doc in results.stream(): 
+            results = doc.to_dict()
 
         return render_template("profile.html", results = results)
     else:
@@ -60,6 +60,7 @@ def login():
         try:
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
+            session['loginFlagPy'] = 1
             flash("Log in succesful.", "pass")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
@@ -155,6 +156,7 @@ def PasswordRecovery():
 @app.route("/logout")
 def logout():
     session.pop('user')
+    session['loginFlagPy'] = 0
     flash('logout succesful')
     return redirect(url_for("login"))
 
@@ -163,6 +165,7 @@ def logout():
 #Author: Miqdad
 @app.route('/')
 def hello(name=None):
+    session['loginFlagPy'] = 0
     return render_template('home.html')
 
 
@@ -188,6 +191,11 @@ def information():
         return render_template("information.html", person = session['user'])
     else:
         return render_template('information.html')
+
+@app.route("/stockSim", methods=['POST'])
+def stockSim():
+    if 'user' in session:
+        return render_template('stockSim.html', person=session['user'])
 
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
