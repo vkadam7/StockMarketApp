@@ -2,7 +2,7 @@ from re import T
 from datetime import datetime
 from statistics import mean
 from flask import Flask, abort, session, render_template, request, redirect, url_for, flash
-from stockSim import StockData, User, Order, Simulation, doesThatStockExis
+from stockSim import StockData, User, Order, Simulation, doesThatStockExist
 from firebase_admin import firestore
 from firebase_admin import credentials
 import pandas as pd
