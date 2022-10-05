@@ -11,7 +11,7 @@
     <div class = "header">
         <h1>Welcome to StockSim: Learn How to Trade!</h1>
     </div>
-    {% if session['user'] %}
+    {% if session['loginFlagPy'] %}
     <div class = "login">
         <p>Hello {{person}} <a method = "POST" href = "logout">Logout</a></p>
     </div>
@@ -26,6 +26,15 @@
                 <li><a method = "POST" href = "home">Home</a></li>
                 <li><a method = "POST" href = "aboutus">About Us</a></li>
                 <li><a method = "POST" href = "information">Information</a></li>
+                <li class="stockSimStartButton">
+                    <form id="stockSimStart" action="/stockSimForm" method="post">
+                        <button>Start a simulation!</button>
+                    </form>
+                    <script type="text/javascript">
+                        if ({{ session['loginFlagPy'] }} == 0) 
+                            document.getElementById('stockSimStart').style.display = "none";
+                    </script>
+                </li>
             </ul>
         </nav>
         <form action="/stockSearch" method="post">

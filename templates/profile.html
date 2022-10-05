@@ -29,12 +29,13 @@
             </ul>
         </nav>
     </div>
+    <form action="/stockSearch" method="post">
+        <input type="search" name="searchTerm" placeholder="Find a stock..."
+                value="{{ request.form['searchTerm'] }}">
+        <button>Search</button>
+    </form>
 </header>
 <body>
-
-    
-    
-
     <h1>
         Welcome, {{results['Name']}}
     </h1>
@@ -49,8 +50,12 @@
     <br>
     <h1>
         User ID: {{results['UserID']}}
-    </h1>            
-
+    </h1>     
+    <div class="stockSimStartButton">
+        <form id="stockSimStart" action="/stockSimForm" method="post">
+            <button>Start a simulation!</button>
+        </form>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" 
     integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" 
     crossorigin="anonymous"></script>

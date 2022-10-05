@@ -223,6 +223,10 @@ footer{
     height: auto;
 }
 
+.stockSimStartButton {
+    text-align: center;
+}
+
 .aboutusmain {
     content:"";
     display: table;   
