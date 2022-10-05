@@ -70,7 +70,8 @@ def login():
     else:
         print("Landing on page")
         return render_template('login.html')
-
+    
+#Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
 def register():
     if request.method == "POST":
@@ -111,6 +112,14 @@ def register():
           
     return render_template('register.html')   
 
+
+'''Viraj Kadam. Will include later on
+@app.route('/StockDefinitions')
+def stockDefinitions():
+    return render_template("StockDefinitions.html")'''
+
+## Attmept on Password recovery -Muneeb Khan NOT WORKING YET!
+
 ## Attempt on email verification function by Muneeb Khan (WIP!)
 @app.route('/verification', methods = ["POST" , "GET"])
 def verification():
@@ -130,6 +139,7 @@ def verification():
     return render_template("verification.html")
 
 ## Password Recovery Function by Muneeb Khan
+
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
 def PasswordRecovery():
     if request.method == "POST":
