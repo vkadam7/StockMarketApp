@@ -203,21 +203,36 @@ class Simulation:
 
     def createSim(self):
         count = len(self.db.child('Simulations').get().val())
-        simName = "Sim" + str(count)
+        simName = "Sim" + str(count+1)
+        self.simName = simName
         data = {
-                'ongoing': 'true',
+                'ongoing': 'True',
                 'user': self.user.email,
                 'startDate': self.startDate,
                 'endDate': self.endDate,
                 'initialCash': self.initialCash,
+                'currentCash': self.initialCash,
                 'Orders': []
             }
         self.db.child('Simulations').child(simName).set(data)
         return 1
 
+    def updateCash(self, newAmount):
+        data = self.db.child('Simulations').child(self.simName).get().val()
+        data['currentCash'] = newAmount
+        self.db.child('Simulations').child(self.simName).update(data)
+
+    def finishSimulation(self):
+        data = self.db.child('Simulations').child(self.simName).get().val()
+        data['ongoing'] = False
+        self.db.child('Simulations').child(self.simName).update(data)
+
 class User:
-    def __init__(self):
-        pass
+    def __init__(self, db, email, username, ID):
+        self.db = db
+        self.email = email
+        self.username = username
+        self.ID = ID
 
 class Order:
     def __init__(self, db, simulation, stock, user, index, buyOrSell, quantity, stockPrice):
@@ -236,7 +251,7 @@ class Order:
             count = len(self.db.child('Simulations').child(self.sim).child('Orders').get().val())
             orderName = self.ticker + str(count)
             data = {
-                'validity': 'true',
+                'validity': True,
                 'ticker': self.stock.ticker,
                 'dayOfPurchase': self.dayOfPurchase,
                 'buyOrSell': 'buy',
@@ -277,7 +292,7 @@ class Order:
                     totalPrices.append(tempOrder['totalPrice'])
                     #stockPrices.append(tempOrder['avgStockPrice'])
                     updatedOrder = {
-                        'validity': 'false',
+                        'validity': False,
                         'ticker': tempOrder['ticker'],
                         'dayOfPurchase': tempOrder['dayOfPurchase'],
                         'buyOrSell': 'buy',
@@ -291,7 +306,7 @@ class Order:
                     totalPrices.append(finalOrder['totalPrice'])
                     #stockPrices.append(finalOrder['avgStockPrice'])
                     updatedFinalOrderOriginal = {
-                        'validity': 'false',
+                        'validity': False,
                         'ticker': finalOrder['ticker'],
                         'dayOfPurchase': finalOrder['dayOfPurchase'],
                         'buyOrSell': 'buy',
@@ -301,7 +316,7 @@ class Order:
                     }
                     self.db.child('Simulations').child(self.sim).child('Orders').child(order).update(updatedFinalOrderOriginal)
                     updatedFinalOrderNew = {
-                        'validity': 'true',
+                        'validity': True,
                         'ticker': finalOrder['ticker'],
                         'dayOfPurchase': finalOrder['dayOfPurchase'],
                         'buyOrSell': 'buy',
@@ -313,7 +328,7 @@ class Order:
                     orderName = finalOrder['ticker'] + chr(count)
                     self.db.child('Simulations').child(self.sim).child('Orders').child(orderName).set(updatedFinalOrderNew)
                 sellOrderData = {
-                    'validity': 'true',
+                    'validity': True,
                     'ticker': self.stock.ticker,
                     'dayOfPurchase': self.dayOfPurchase,
                     'buyOrSell': 'sell',
