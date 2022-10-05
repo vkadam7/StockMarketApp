@@ -312,6 +312,12 @@ def fourOhFour():
 def Portfolio():
     return render_template('portfolio.html')
 
+## Need to complete this setup route for the dashboard, will show up to the user once they have started the simulation. 
+@app.route('/dashboard')
+def Dashboard():
+    if 'user' in session:
+        return render_template('dashboard.html')
+
 @app.route('/')
 def method_name():
     pass
