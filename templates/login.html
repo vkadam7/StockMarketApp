@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,12 +9,11 @@
 </head>
 <header>
     <div class = "header">
-        <h1>Welcome to StockSim: Learn how to trade!</h1>
+        <h1>Welcome to StockSim: Learn How to Trade!</h1>
     </div>
     <div class = "login">
         <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
     </div>
-    <br>
     <div class = "navbar">
         <nav>
             <ul>
@@ -36,19 +34,30 @@
             <div class = "loginform">
              <form method = "POST">
                 <label for="email">Enter your email</label>
-                <input type = "email" id = "email" name = "email" placeholder="ex: sameple@123.com" required>
+                <input type = "email" id = "email" name = "email" placeholder="ex: john123@sample.com" required>
                 <br><br>
                 <label for="password">Enter your password</label>
-                <input type = "password" id = "password" name = "password" required>
-                <p>Forgot your password? <a href = "PasswordRecovery.html">click here</a></p>
-                <br><br>
+                <input type = "password" id = "password" name = "password" placeholder="Must be 6 characters minimum" required>
+                <p>Forgot your password? <a href = "PasswordRecovery">click here</a></p>
+                <br>
+                
+                {% with alerts = get_flashed_messages() %} 
+                    {% for print in alerts %}
+                        <div class="alert-pass" role="alert">
+                            {{ print }}
+                        </div>
+                    {% endfor %} 
+                {% endwith %}
+                <br><br> 
                 <button type = "submit">Submit</button>
-                <p>Not yet registered? <a href = "register.html">click here</a> to sign up</p>
+                <p>Not yet registered? <a href = "register">click here</a> to sign up</p>
               </form>
+
             </div>
     </section>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" 
     integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" 
     crossorigin="anonymous"></script>
 </body>
-<footer><p>Copy right 2022 by StockSim</p></footer>
+<footer><p>Copyright 2022 by StockSim</p></footer>
+</html>
