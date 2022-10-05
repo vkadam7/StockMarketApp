@@ -19,9 +19,10 @@ from pypfopt import expected_returns
 db = firebase.database()
 investment = []
 portfolio = 0
-transactionCost = 0.
+transactionCost = 0.1
 amount = 1000
-totalMoney = 0;
+totalMoney = 0
+port_list = []
 
 class portfolio:
      def __init__(self, db, stock, user, index, buyOrSell, quantity, stockPrice):
@@ -67,6 +68,21 @@ def returns(quantity, price):
         investment.append(allocatedMoney)
         investment[-1] += investment[-2]
         
+        
+#Deletes a stock from the portfolio
+def delete(self, stock):
+     stock = stock.upper()
+     try:
+         self.portfolio.pop(stock)
+         return True
+     except Error:
+         return False
+     
+def funds_remaining():
+    intitialAmount = 1000
+    finalAmount = 0
+    
+                
             
     
     
