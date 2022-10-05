@@ -45,13 +45,13 @@
                 <label for="password">Create a new password</label>
                 <input type = "password" id = "password" name = "password" placeholder="Must be 6 characters minimum" required>
                 <br>
-                {% with alerts = get_flashed_messages() %} 
-                    {% for print in alerts %}
-                        <div class="alert-pass" role="alert">
+                {% with alerts = get_flashed_messages() %}
+                    {% for print in alerts %} 
+                        <div class="alert" role="alert">
                             {{ print }}
                         </div>
-                    {% endfor %} 
-                {% endwith %}
+                    {% endfor %}
+                {% endwith %} 
                 <br><br>
                 <button type = "submit">Submit</button>
                 <p>already have an account? <a href = login>click here</a> to login</p>

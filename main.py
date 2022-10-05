@@ -88,23 +88,18 @@ def register():
 
         # If else conditions to check the password requirements - Muneeb Khan
         if (len(Password) < 6 or len(Password) > 20 or digits == 0 or specials == 0): # If the password doesnt meet requirements
-            flash("Invalid Password! must contain the following requirements: ")
-            flash("6 characters minimum")
-            flash("20 characters maximum")
-            flash("at least 1 digit")
-            flash("at least 1 special character ('!','@','#', or '$'")
 
+                flash("Invalid Password! must contain the following requirements: ")
+                flash("6 characters minimum")
+                flash("20 characters maximum")
+                flash("at least 1 digit")
+                flash("at least 1 special character ('!','@','#', or '$'")
         else:
-            try: ## Another way im trying to figure out the email verification part - Muneeb Khan
-            # user = authen.send_email_verification(email['idToken'], Password)
-                #if authen.send_email_verification == True:
+            try: 
                 user = authen.create_user_with_email_and_password(email, Password)
                 dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
-                flash("Account Created, you will now be redirected to verify your account" , "pass")
+                flash("Account succesfully created, you may now login" , "pass")
                 return redirect(url_for("login"))
-            # else:
-            # print("incorrect token! please re-register")
-            # return redirect(url_for("register"))
 
             except:
                 flash("Invalid Registration" , "fail")
@@ -197,6 +192,13 @@ def information():
         return render_template("information.html", person = session['user'])
     else:
         return render_template('information.html')
+
+@app.route("/StockDefinitions")
+def StockDefinitions():
+    if('user' in session):
+        return render_template("StockDefinitions.html", person = session['user'])
+    else:
+        return render_template('StockDefinitions.html')
 
 ## stockSim
 #   Description: Brings the logged in user to the stock sim start page, if the user
