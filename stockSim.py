@@ -118,28 +118,6 @@ class StockData:
             print("One of the selected dates are unavailable")
             return -1
 
-    ## buyStock
-    #   Description: Allows the given user to buy a specific stock and adds the order
-    #   to the database
-    #   
-    #   Inputs:
-    #
-    #   Author: Ian McNulty
-    def buyStock(self, user):
-        
-        return -1
-
-    ## sellStock
-    #   Description: Allows the given user to sell a specific stock and adds the order
-    #   to the database
-    #   
-    #   Inputs:
-    #
-    #   Author: Ian McNulty
-    def sellStock(self, user):
-
-        return -1
-
     ## checkDate
     #   Description: Checks the given date to see if it is the end of the selected
     #   timespan, for example, if the current day is the 31st, then it is the end 
