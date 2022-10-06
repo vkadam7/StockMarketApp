@@ -14,6 +14,10 @@
     padding:15px;
 }
 
+.login a{
+    text-decoration: none;
+}
+
 .navbar{
     background-color: rgb(53, 100, 106);
     justify-content: center;

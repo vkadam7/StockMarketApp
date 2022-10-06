@@ -305,6 +305,13 @@ def changeStockView():
         return redirect(url_for('.displayStock', ticker=stock['ticker'], startDate=request.form['startDate'], endDate=request.form['endDate'], timespan=request.form['timespan']))
     return -1
 
+@app.route("/stockAvailability",methods=['POST'])
+def stockAvailability():
+    if request.method == 'POST':
+        return redirect(url_for('stockDisplay.html',ticker=stock['ticker'],startDate="2021-09-08",endDate="2022-09-19",timespan="daily"))
+
+    return -1    
+
 ## 
 @app.route('/404Error')
 def fourOhFour():
