@@ -194,20 +194,21 @@ class StockData:
         return stock
 
     # Stock availability by Muneeb Khan
-    def stockAvailability(self,db):
-        data = {
-            "ticker": self.ticker,
-            "name": self.name,
-            "startDate": self.startDate,
-            "endDate": self.endDate,
-            "timespan": self.timespan
-        }
+    def stockAvailability(self):
+        #data = {
+        #    "ticker": self.ticker,
+        #    "name": self.name,
+        #    "startDate": self.startDate,
+        #    "endDate": self.endDate,
+        #    "timespan": self.timespan
+        #}
+        tickers = []
 
-        tempData = db.child('Stocks').get().val()
+        tempData = self.firebase.child('Stocks').get().val()
         for i in range(['name']):
-            ticker = tempData['ticker'][i]
-        tempData['ticker']
-        tempData['name']
+            tickers.append(tempData[i])
+
+        return tickers
         
 class Simulation:
     def __init__(self, db, user, startDate, endDate, initialCash):
