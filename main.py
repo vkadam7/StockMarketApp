@@ -70,7 +70,8 @@ def login():
     else:
         print("Landing on page")
         return render_template('login.html')
-
+    
+#Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
 def register():
     if request.method == "POST":
@@ -87,29 +88,32 @@ def register():
 
         # If else conditions to check the password requirements - Muneeb Khan
         if (len(Password) < 6 or len(Password) > 20 or digits == 0 or specials == 0): # If the password doesnt meet requirements
-            flash("Invalid Password! must contain the following requirements: ")
-            flash("6 characters minimum")
-            flash("20 characters maximum")
-            flash("at least 1 digit")
-            flash("at least 1 special character ('!','@','#', or '$'")
 
+                flash("Invalid Password! must contain the following requirements: ")
+                flash("6 characters minimum")
+                flash("20 characters maximum")
+                flash("at least 1 digit")
+                flash("at least 1 special character ('!','@','#', or '$'")
         else:
-            try: ## Another way im trying to figure out the email verification part - Muneeb Khan
-            # user = authen.send_email_verification(email['idToken'], Password)
-                #if authen.send_email_verification == True:
+            try: 
                 user = authen.create_user_with_email_and_password(email, Password)
                 dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
-                flash("Account Created, you will now be redirected to verify your account" , "pass")
+                flash("Account succesfully created, you may now login" , "pass")
                 return redirect(url_for("login"))
-            # else:
-            # print("incorrect token! please re-register")
-            # return redirect(url_for("register"))
 
             except:
                 flash("Invalid Registration" , "fail")
                 return redirect(url_for("register"))
           
     return render_template('register.html')   
+
+
+'''Viraj Kadam. Will include later on
+@app.route('/StockDefinitions')
+def stockDefinitions():
+    return render_template("StockDefinitions.html")'''
+
+## Attmept on Password recovery -Muneeb Khan NOT WORKING YET!
 
 ## Attempt on email verification function by Muneeb Khan (WIP!)
 @app.route('/verification', methods = ["POST" , "GET"])
@@ -130,6 +134,7 @@ def verification():
     return render_template("verification.html")
 
 ## Password Recovery Function by Muneeb Khan
+
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
 def PasswordRecovery():
     if request.method == "POST":
@@ -185,6 +190,13 @@ def information():
         return render_template("information.html", person = session['user'])
     else:
         return render_template('information.html')
+
+@app.route("/StockDefinitions")
+def StockDefinitions():
+    if('user' in session):
+        return render_template("StockDefinitions.html", person = session['user'])
+    else:
+        return render_template('StockDefinitions.html')
 
 ## stockSim
 #   Description: Brings the logged in user to the stock sim start page, if the user
@@ -311,6 +323,12 @@ def fourOhFour():
 @app.route('/portfolio')
 def Portfolio():
     return render_template('portfolio.html')
+
+## Need to complete this setup route for the dashboard, will show up to the user once they have started the simulation. 
+@app.route('/dashboard')
+def Dashboard():
+    if 'user' in session:
+        return render_template('dashboard.html')
 
 @app.route('/')
 def method_name():
