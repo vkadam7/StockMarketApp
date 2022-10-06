@@ -26,7 +26,7 @@ class StockData:
     def __init__(self, db, req):
         self.firebase = db
         self.ticker = req
-        self.data = self.retrieve(self.ticker)
+        self.data = self.retrieve()
         if self.data != 'This data entry does not exist':
             self.name = self.data['name']
             self.headquarters = self.data['headquarters']
@@ -49,9 +49,9 @@ class StockData:
     #   Inputs: id - Database key for requested stock.
     #
     #   Author: Ian McNulty
-    def retrieve(self, id):
+    def retrieve(self):
         try:
-            return self.firebase.child("Stocks").child(id).get().val()
+            return self.firebase.child("Stocks").child(self.ticker).get().val()
         except:
             return 'This data entry does not exist'
 
@@ -215,7 +215,6 @@ class Simulation:
                 'Orders': []
             }
         self.db.child('Simulations').child(simName).set(data)
-        return 1
 
     def updateCash(self, newAmount):
         data = self.db.child('Simulations').child(self.simName).get().val()
@@ -228,11 +227,24 @@ class Simulation:
         self.db.child('Simulations').child(self.simName).update(data)
 
 class User:
-    def __init__(self, db, email, username, ID):
+    def __init__(self, db, username):
         self.db = db
-        self.email = email
         self.username = username
-        self.ID = ID
+        self.userDataDocument = self.retrieve()
+        if self.data != 'This data entry does not exist':
+            self.email = self.userDataDocument['Email']
+            self.userID = self.userDataDocument['UserID']
+        else:
+            print("This user does not exist")
+
+    def retrieve(self):
+        try:
+            return self.db.collection('Users').document(self.username).get()
+        except:
+            return 'This data entry does not exist'
+
+    def updateProfile(self, description, picture, experience):
+        return -1
 
 class Order:
     def __init__(self, db, simulation, stock, user, index, buyOrSell, quantity, stockPrice):
