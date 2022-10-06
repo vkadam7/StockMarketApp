@@ -164,14 +164,12 @@ def hello(name=None):
     session['loginFlagPy'] = 0
     return render_template('home.html')
 
-
 @app.route("/home")
 def home():
     if('user' in session): #to check if the user is logged in will change to profile page
         return render_template("home.html", person = session['user'])
     else:
         return render_template('home.html')
-
 
 ## Route for About us and Information pages - Muneeb Khan
 @app.route("/aboutus")
@@ -202,7 +200,7 @@ def stockSimForm():
 
 ## startSimulation
 #   Description: 
-@app.route("/simulation", methods=['POST', 'GET'])
+@app.route("/startSimulation", methods=['POST', 'GET'])
 def startSimulation():
     if request.method == 'POST':
         session['simulation'] = {
@@ -211,7 +209,19 @@ def startSimulation():
             'initialCash': request.form['initialCash']
         }
         session['currentCash'] = request.form['initialCash']
+        global sim
+        sim = Simulation(firebase.database(), session['user'], request.form['startDate'],
+                        request.form['endDate'], request.form['initialCash'])
+        sim.createSim()
         return render_template('simulation.html', person=session['user'])
+        
+@app.rout("/finishSimulation", methods=['POST', 'GET'])
+def finishSimulation():
+    sim.finishSimulation()
+
+@app.route("/orderForm/<option>", methods=['POST', 'GET'])
+def orderForm(option):
+    return -1
 
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
