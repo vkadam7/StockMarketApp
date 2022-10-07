@@ -1,6 +1,7 @@
 #Author: Viraj Kadam
 #initial portfolio python file, will need to fix some more
 from cgi import print_exception
+from re import I
 from main import firebase, app
 import csv
 import pyrebase
@@ -53,14 +54,11 @@ class portfolio:
         
         self.db.child()
         return -1
-    
-    
-    def get_profit(self, db, stock, quantity, stockPrice):
-        profit = 0
-        
+
+    #Need to include if statement for whether it is a net gain or loss    
     def Gain(self, db, stock, quanity, stockPrice):
         totalGain = 0
-        netGain = 0
+        netGainorLoss = 0
         CurrentPrice = 0
         tempData = self.db.child('Simulations').child(self.sim).child('Orders').get().val()
         data = {'name': self.name, 
@@ -70,12 +68,36 @@ class portfolio:
         if quanity > 0:
             tempPrice = self.db.child('Stocks').child('daily').child('closes').get().val()
             CurrentPrice = self.db.child('Stocks').child('daily').child('closes').get.val()
-            
-            
-            
+            for CurrentPrice in i:
+                netGainorLoss = (CurrentPrice[i+1] - tempPrice[i]) / (tempPrice[i]) * 100
+                return netGainorLoss
+        else: 
+            return -1
+                
+                
+     #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
+    def funds_remaining(self, quantity, avgStockPrice):
+        intitialAmount = 1000
+        finalAmount = 0
+        fundsUsed = 0
+        fundsRemainiing = 0
+        quantity = 0
+        tempPrice = self.db.child('Stocks').child('daily').child('closes').get.val()
+        data = {'name': self.name,
+                'quantity': self.quantity, 
+                'avgStockPrice': self.avgStockPrice     
+        }
+        fundsUsed = intitialAmount - (tempPrice)(quantity)
+        finalAmount = intitialAmount - fundsUsed
         
+    #Deleted initial profit feature, this is going to be the new one
+    def get_profit(self, db, stock, quantity, avgstockPrice):
+        data = {'name' : self.name, 
+                'quantity': self.quantity, 
+                'avgStockPrice': self.avgStockPrice}
+        profit = 0
         
-            
+
 
     def returns(quantity, price):
         global portfolio, amount
@@ -99,15 +121,6 @@ class portfolio:
             except Error:
                  return False
      
-    def funds_remaining():
-        intitialAmount = 1000
-        finalAmount = 0
-        fundsUsed = 0
-        if (fundsUsed < intitialAmount):
-            finalAmount = intitialAmount -  investment.append(intitialAmount)
-            return finalAmount
-        else:
-            return intitialAmount
         
         
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
