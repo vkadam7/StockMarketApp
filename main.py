@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from re import T
 from datetime import datetime
 from statistics import mean
@@ -31,7 +32,6 @@ db1 = firebase.database()
 
 app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
-
 @app.route("/profile")
 def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
@@ -62,6 +62,7 @@ def login():
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
             session['loginFlagPy'] = 1
+            session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
             flash("Log in succesful.", "pass")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
@@ -159,6 +160,7 @@ def PasswordRecovery():
 def logout():
     session.pop('user')
     session['loginFlagPy'] = 0
+    session['Simulation'] = NULL
     flash('logout succesful')
     return redirect(url_for("login"))
 

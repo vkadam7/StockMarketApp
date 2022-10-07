@@ -31,7 +31,7 @@
                         <button>Start a simulation!</button>
                     </form>
                     <script type="text/javascript">
-                        if ({{ session['loginFlagPy'] }} == 0) 
+                        if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
                             document.getElementById('stockSimStart').style.display = "none";
                     </script>
                 </li>

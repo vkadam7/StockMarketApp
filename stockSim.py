@@ -185,7 +185,7 @@ class Simulation:
         simName = "Sim" + str(count+1)
         self.simName = simName
         data = {
-                'ongoing': 'True',
+                'ongoing': True,
                 'user': self.user.email,
                 'startDate': self.startDate,
                 'endDate': self.endDate,
@@ -209,11 +209,7 @@ class Simulation:
         self.db.collection('Simulations').document(self.simName).update(data)
 
     def retrieveOngoing(db, email):
-        data = db.collection("Simulations").order_by_collection("")
-
-    def simSearch(db, email):
-        data = db.collection("Simulations").order_by_collection("user").equal_to(email).get()
-
+        return db.collection('Simulations').where('ongoing','==',True).where('user','==',email)
 
 class User:
     def __init__(self, db, username):
