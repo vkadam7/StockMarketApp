@@ -97,7 +97,8 @@ def register():
         else:
             try: 
                 user = authen.create_user_with_email_and_password(email, Password)
-                dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
+                User.registerUser(dbfire, UseN, email, NameU, user['localId'])
+                #dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
                 flash("Account succesfully created, you may now login" , "pass")
                 return redirect(url_for("login"))
 
