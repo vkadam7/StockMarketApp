@@ -176,8 +176,44 @@ h1{
 }
 
 .loginform {
+    margin: auto;
+    width: 40%;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
     text-align:center;
     justify-content: center;
+}
+
+.loginform form{
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    border-radius: 2px;
+    background-color: silver;
+    box-shadow: 2px;
+}
+
+.loginform h3{
+    padding-bottom: 15px;
+    border-radius: 4px;
+}
+
+.loginform button{
+    color:black;
+    background-color:olive;
+    width:50%;
+    height:100%;
+    border-radius: 5px;
+}
+
+.loginform button :hover{
+    background-color: blue;
+}
+
+.loginform button :active{
+    background-color: red;
 }
 
 input[type=text] {
@@ -198,11 +234,61 @@ input[type=password] {
 .registerform {
     text-align:center;
     justify-content: center;
+    margin: auto;
+    width: 40%;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    text-align:center;
+    justify-content: center;
+}
+
+.registerform form{
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    border-radius: 2px;
+    background-color: silver;
+    box-shadow: 2px;
+}
+
+.registerform button{
+    color:black;
+    background-color:olive;
+    width:50%;
+    height:100%;
+    border-radius: 5px;
 }
 
 .passwordform {
     text-align:center;
     justify-content:center;
+    margin: auto;
+    width: 40%;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    text-align:center;
+    justify-content: center;
+}
+
+.passwordform form {
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    border-radius: 2px;
+    background-color: silver;
+    box-shadow: 2px;
+}
+
+.passwordform button {
+    color:black;
+    background-color:olive;
+    width:50%;
+    height:100%;
+    border-radius: 5px;
 }
 
 footer{
@@ -256,5 +342,10 @@ footer{
 
 .alert-pass {
     background-color: skyblue;
+    text-align: center;
+}
+
+.alert-fail {
+    background-color: orangered;
     text-align: center;
 }

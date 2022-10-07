@@ -1,3 +1,4 @@
+<!--Profile page by Miqdad Hafiz-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,6 +21,7 @@
         <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
     </div>
     {% endif %}
+    <!--Navbar by Muneeb Khan-->
     <div class = "navbar">
         <nav>
             <ul>
@@ -50,7 +52,22 @@
     <br>
     <h1>
         User ID: {{results['UserID']}}
-    </h1>     
+    </h1>
+    <br>
+    {% with alerts = get_flashed_messages() %}
+        {% for print in alerts %}
+            {% if print in get_flashed_messages(category_filter = ['pass']) %} 
+            <div class="alert-pass" role="alert">
+                {{ print }}
+            </div>
+            {% elif print in get_flashed_messages(category_filter = ['fail']) %}
+            <div class="alert-fail" role="alert">
+                {{ print }}
+            </div>
+            {% endif %}
+        {% endfor %}
+    {% endwith %} 
+    <br>
     <div class="stockSimStartButton">
         <form id="stockSimStart" action="/stockSimForm" method="post">
             <button>Start a simulation!</button>

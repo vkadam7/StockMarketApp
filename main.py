@@ -85,7 +85,6 @@ def register():
         # Variables for Password validation - Muneeb Khan
         digits = any(x.isdigit() for x in Password) # Digits will check for any digits in the password
         specials = any(x == '!' or x == '@' or x == '#' or x == '$' for x in Password) # Specials will check for any specials in the password
-
         # If else conditions to check the password requirements - Muneeb Khan
         if (len(Password) < 6 or len(Password) > 20 or digits == 0 or specials == 0): # If the password doesnt meet requirements
 
@@ -95,6 +94,7 @@ def register():
                 flash("at least 1 digit")
                 flash("at least 1 special character ('!','@','#', or '$'")
         else:
+
             try: 
                 user = authen.create_user_with_email_and_password(email, Password)
                 dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
@@ -158,7 +158,7 @@ def PasswordRecovery():
 def logout():
     session.pop('user')
     session['loginFlagPy'] = 0
-    flash('logout succesful')
+    flash('logout succesful','pass')
     return redirect(url_for("login"))
 
 #Home
@@ -182,6 +182,8 @@ def home():
 @app.route("/aboutus")
 def aboutus():
     if('user' in session): #to check if the user is logged in will change to profile page
+        person = dbfire.collection("Users").where("Name","==","session")
+
         return render_template("aboutus.html", person = session['user'])
     else:
         return render_template('aboutus.html')
