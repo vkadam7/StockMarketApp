@@ -1,6 +1,7 @@
 #Author: Viraj Kadam
 #initial portfolio python file, will need to fix some more
 from cgi import print_exception
+from lib2to3.pgen2.token import CIRCUMFLEXEQUAL
 from re import I
 from main import firebase, app
 import csv
@@ -52,13 +53,28 @@ class portfolio:
                 'avgStockPrice': self.avgStockPrice,
                 'totalPrice': self.totalPrice}
         
-        self.db.child()
+        self.db.child('Stocks').child('name').get().val()
+        
         return -1
 
-    #Need to include if statement for whether it is a net gain or loss    
-    def Gain(self, db, stock, quanity, stockPrice):
+    #Returns profit from the simulator(Need to test and fix if needed )
+    def get_profit(self, db, stock, quantity, avgstockPrice):
+        data = {'name' : self.name, 
+                'quantity': self.quantity, 
+                'avgStockPrice': self.avgStockPrice}
+        profit = 0
+        tempPrice = self.db.child('Stocks').child('daily').child('closes').get().val()
+        quantity = self.db.child('Stocks').child('daily').child('volume').get().val()
+        profit += tempPrice * quantity
+        return profit
+        
+        
+        
+    #Fixed this section to account for gains or losses, need to test to check if everything is correct  
+    def GainorLoss(self, db, stock, quanity, stockPrice):
         totalGain = 0
-        netGainorLoss = 0
+        netGain = 0
+        netLoss = 0
         CurrentPrice = 0
         tempData = self.db.child('Simulations').child(self.sim).child('Orders').get().val()
         data = {'name': self.name, 
@@ -66,13 +82,22 @@ class portfolio:
                 'avgStockPrice': self.avgStockPrice, 
                 }
         if quanity > 0:
-            tempPrice = self.db.child('Stocks').child('daily').child('closes').get().val()
-            CurrentPrice = self.db.child('Stocks').child('daily').child('closes').get.val()
-            for CurrentPrice in i:
-                netGainorLoss = (CurrentPrice[i+1] - tempPrice[i]) / (tempPrice[i]) * 100
-                return netGainorLoss
-        else: 
-            return -1
+            if totalGain > CurrentPrice:
+                tempPrice = self.db.child('Stocks').child('daily').child('closes').get().val()
+                #Need to fix this function
+                CurrentPrice = self.db.child('Stocks').child('daily').child('closes').get.val()
+                for CurrentPrice in i:
+                    netGainorLoss = (CurrentPrice[i+1] - tempPrice[i]) / (tempPrice[i]) * 100
+                    if netGainorLoss > 0:
+                        netLoss = "-" + netGainorLoss
+                        return netLoss
+                    else:
+                        netGain = netGainorLoss
+                        return netGain
+        
+        return -1
+                
+                        
                 
                 
      #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
@@ -89,17 +114,8 @@ class portfolio:
         }
         fundsUsed = intitialAmount - (tempPrice)(quantity)
         finalAmount = intitialAmount - fundsUsed
-        
-    #Deleted initial profit feature, this is going to be the new one
-    def get_profit(self, db, stock, quantity, avgstockPrice):
-        data = {'name' : self.name, 
-                'quantity': self.quantity, 
-                'avgStockPrice': self.avgStockPrice}
-        profit = 0
-        
 
-
-    def returns(quantity, price):
+    def returns(self, quantity, avgStockPrice, ):
         global portfolio, amount
         allocatedMoney = quantity * price
         endResult = endResult - allocatedMoney - transactionCost * allocatedMoney
