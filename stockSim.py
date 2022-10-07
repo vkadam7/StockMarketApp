@@ -1,5 +1,6 @@
 from mimetypes import init
 import numpy as np
+import firebase_admin
 
 ## doesThatStockExist
 #   Description: Checks to see if that stock exists in the database yet,
@@ -190,6 +191,7 @@ class Simulation:
                 'endDate': self.endDate,
                 'initialCash': self.initialCash,
                 'currentCash': self.initialCash,
+                'score': 0,
                 'Orders': []
             }
         self.db.child('Simulations').child(simName).set(data)
@@ -202,6 +204,8 @@ class Simulation:
     def finishSimulation(self):
         data = self.db.child('Simulations').child(self.simName).get().val()
         data['ongoing'] = False
+        percentChange = (data['currentCash'] - data['initialCash']) / data['initialCash']
+        data['score'] = percentChange * 100
         self.db.child('Simulations').child(self.simName).update(data)
 
 class User:
@@ -209,9 +213,12 @@ class User:
         self.db = db
         self.username = username
         self.userDataDocument = self.retrieve()
-        if self.data != 'This data entry does not exist':
+        if self.userDataDocument != 'This data entry does not exist':
             self.email = self.userDataDocument['Email']
             self.userID = self.userDataDocument['UserID']
+            self.description = self.userDataDocument['Description']
+            self.picture = self.userDataDocument['Picture']
+            self.experience = self.userDataDocument['Experience']
         else:
             print("This user does not exist")
 
@@ -221,8 +228,41 @@ class User:
         except:
             return 'This data entry does not exist'
 
-    def updateProfile(self, description, picture, experience):
-        return -1
+    def updateProfile(self, description="", picture="", experience=""):
+        if description == "":
+            description = self.description
+        if picture == "":
+            picture = self.picture
+        if experience == "":
+            experience = self.experience
+        self.updateDescription(description)
+        self.updatePicture(picture)
+        self.updateExperience(experience)
+
+    def updateDescription(self, description):
+        data = self.db.collection("Users").document(self.username)
+        data.update({ 'Description' : description })
+
+    def updatePicture(self, picture):
+        data = self.db.collection("Users").document(self.username)
+        data.update({ 'Picture' : picture })
+
+    def updateExperience(self, experience):
+        data = self.db.collection("Users").document(self.username)
+        data.update({ 'Experience' : experience })
+
+    def registerUser(db, username, email, name, userID, description="", picture="", experience=""):
+        data = {
+            'Email' : email,
+            'Name' : name,
+            'UserID' : userID,
+            'userName' : username,
+            'Description' : description,
+            'Picture' : picture,
+            'Experience' : experience
+        }
+        db.collection('Users').document(username).set(data) 
+
 
 class Order:
     def __init__(self, db, simulation, stock, user, index, buyOrSell, quantity, stockPrice):
