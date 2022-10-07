@@ -57,11 +57,25 @@ class portfolio:
     
     def get_profit(self, db, stock, quantity, stockPrice):
         profit = 0
-        current = 0
-        for price in reversed(stockPrice):
-            profit = stockPrice + current
-            profit = profit
-        return profit
+        
+    def Gain(self, db, stock, quanity, stockPrice):
+        totalGain = 0
+        netGain = 0
+        CurrentPrice = 0
+        tempData = self.db.child('Simulations').child(self.sim).child('Orders').get().val()
+        data = {'name': self.name, 
+                'quantity': self.quantity, 
+                'avgStockPrice': self.avgStockPrice, 
+                }
+        if quanity > 0:
+            tempPrice = self.db.child('Stocks').child('daily').child('closes').get().val()
+            CurrentPrice = self.db.child('Stocks').child('daily').child('closes').get.val()
+            
+            
+            
+        
+        
+            
 
     def returns(quantity, price):
         global portfolio, amount
@@ -75,7 +89,6 @@ class portfolio:
             investment[-1] += investment[-2]
         return -1
     
-        
         
     #Deletes a stock from the portfolio
     def delete(self, stock):
@@ -104,9 +117,3 @@ class portfolio:
         day = 0
         percent = 0
         AdjustClose = 0
-        
-        
-    
-            
-    
-    
