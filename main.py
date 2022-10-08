@@ -1,6 +1,6 @@
 from re import T
 from statistics import mean
-from flask import Flask, abort, session, render_template, request, redirect, url_for
+from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 from StockData import StockData, doesThatStockExist
 import pyrebase
 import firebase_admin
@@ -30,7 +30,7 @@ db1 = firebase.database()
 
 app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
-
+#Author: Miqdad Hafiz
 @app.route("/profile")
 def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
@@ -41,7 +41,8 @@ def profile():
         return render_template("profile.html", results = results)
     else:
         redirect(url_for("login"))
-#persons = {"logged_in": False,"uName": "", "uEmail": "", "uID": ""} may not need this, will see
+
+
 # Login
 #  This function allows the user to log into the app with correct credentials
 #  If correct users will be taken to the profile page
@@ -51,7 +52,6 @@ def profile():
 def login():
     if('user' in session): #to check if the user is logged in will change to profile page
         return redirect(url_for("profile"))
-        #return 'Hi, {}'.format(session['user'])
 
     if request.method == "POST":
         result = request.form
@@ -76,8 +76,19 @@ def register():
         result = request.form
         email = result["email"]
         Password = result["password"]
+        confirmPass = result["confirmPassw"]
         NameU = result["Unames"]
         UseN = result["username"]
+
+        doc = dbfire.collection('Users').document(UseN).get()
+        if doc.exists:
+            grabName = dbfire.collection('Users').where('userName', '==', UseN)
+            for docs in grabName.stream(): 
+                grabName = docs.to_dict()
+            uniqueName = grabName['userName']
+
+        else:
+            uniqueName = "usernameoktouse"
 
         # Variables for Password validation - Muneeb Khan
         digits = any(x.isdigit() for x in Password) # Digits will check for any digits in the password
@@ -95,13 +106,20 @@ def register():
         
         elif (specials == 0): # If the password doesn't have a special
                 flash("Password must contain at least 1 special character! (ie. !,@,#,$)")
+        
+        elif (Password != confirmPass): # If password and cofirm password don't match
+            flash("You're password do not match. Please enter the same password for both fields.")
+        
+        elif (uniqueName == UseN):
+            flash("Username is already taken. Please enter a valid username.") #check to see if username is taken
 
         else:
             try: ## Another way im trying to figure out the email verification part - Muneeb Khan
             # user = authen.send_email_verification(email['idToken'], Password)
                 #if authen.send_email_verification == True:
                 user = authen.create_user_with_email_and_password(email, Password)
-                dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
+                authen.send_email_verification(user['idToken'])
+                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 return redirect(url_for("login"))
             # else:
