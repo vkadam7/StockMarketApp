@@ -14,6 +14,10 @@
     padding:15px;
 }
 
+.login a{
+    text-decoration: none;
+}
+
 .navbar{
     background-color: rgb(53, 100, 106);
     justify-content: center;
@@ -49,7 +53,7 @@
 }
 
 body {
-    background-color: white;
+    background-color: rgb(240, 240, 240);
     color:black;
 }
 
@@ -59,9 +63,13 @@ h1{
 }
 
 .section1{
+    margin:auto;
+    width: 75%;
+    background-color: rgb(223, 223, 223);
     padding:5px;
     border-style:double;
     border-width: 15px,15px,15px,15px;
+    box-shadow: 0,2px;
 }
 
 .section1 h2{
@@ -74,8 +82,16 @@ h1{
     text-align:center;
 }
 
+.section1 a{
+    color:black;
+    text-decoration: none;
+    font-weight:bold;
+}
+
 .section2{
-    background-color:rgb(243, 243, 243);
+    margin:auto;
+    width: 75%;
+    background-color: rgb(223, 223, 223);
     padding:5px;
     border-style:double;
     border-width: 15px,15px,15px,15px;
@@ -92,7 +108,15 @@ h1{
     color:black;
 }
 
+.section2 a{
+    color:black;
+    text-decoration: none;
+    font-weight:bold;
+}
+
 .section3 {
+    margin:auto;
+    width: 75%;
     background-color: rgb(223, 223, 223);
     padding:5px;
     border-style:double;
@@ -110,8 +134,16 @@ h1{
     color:black;
 }
 
+.section3 a{
+    color:black;
+    text-decoration: none;
+    font-weight:bold;
+}
+
 .section4{
-    background-color: rgb(214, 214, 214);
+    margin:auto;
+    width: 75%;
+    background-color: rgb(223, 223, 223);
     padding:5px;
     border-style:double;
     border-width: 15px,15px,15px,15px;
@@ -128,7 +160,15 @@ h1{
     color:black;
 }
 
+.section4 a{
+    color:black;
+    text-decoration: none;
+    font-weight:bold;
+}
+
 .infopart1 {
+    margin:auto;
+    width: 75%;
     text-align: center;
     border-style: double;
     border-width: 5px 10px 5px 10px;
@@ -140,6 +180,8 @@ h1{
 }
 
 .infopart2 {
+    margin:auto;
+    width: 75%;
     text-align: center;
     border-style: double;
     display: block;
@@ -157,6 +199,8 @@ h1{
 }
 
 .infopart3 {
+    margin:auto;
+    width: 75%;
     text-align: center;
     text-align: center;
     border-style: double;
@@ -165,6 +209,8 @@ h1{
 }
 
 .infopart4 {
+    margin:auto;
+    width: 75%;
     text-align: center;
     border-style: double;
     border-width: 5px 10px 5px 10px;
@@ -172,8 +218,44 @@ h1{
 }
 
 .loginform {
+    margin: auto;
+    width: 40%;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
     text-align:center;
     justify-content: center;
+    box-shadow: 10px,8px,8px,grey;
+}
+
+.loginform form{
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    border-radius: 2px;
+    background-color: silver;
+}
+
+.loginform h3{
+    padding-bottom: 15px;
+    border-radius: 4px;
+}
+
+.loginform button{
+    color:black;
+    background-color:olive;
+    width:50%;
+    height:100%;
+    border-radius: 5px;
+}
+
+.loginform button :hover{
+    background-color: blue;
+}
+
+.loginform button :active{
+    background-color: red;
 }
 
 input[type=text] {
@@ -194,11 +276,61 @@ input[type=password] {
 .registerform {
     text-align:center;
     justify-content: center;
+    margin: auto;
+    width: 40%;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    text-align:center;
+    justify-content: center;
+}
+
+.registerform form{
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    border-radius: 2px;
+    background-color: silver;
+    box-shadow: 2px;
+}
+
+.registerform button{
+    color:black;
+    background-color:olive;
+    width:50%;
+    height:100%;
+    border-radius: 5px;
 }
 
 .passwordform {
     text-align:center;
     justify-content:center;
+    margin: auto;
+    width: 40%;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    text-align:center;
+    justify-content: center;
+}
+
+.passwordform form {
+    width: 100%;
+    height: 100%;
+    padding: 40px;
+    border-radius: 2px;
+    background-color: silver;
+    box-shadow: 2px;
+}
+
+.passwordform button {
+    color:black;
+    background-color:olive;
+    width:50%;
+    height:100%;
+    border-radius: 5px;
 }
 
 footer{
@@ -236,6 +368,8 @@ footer{
     border-style:double;
     border-width: 5px 10px 5px 10px;
     border-color:black;
+    width: 75%;
+    margin: auto;
 }
 
 .aboutuspart{
@@ -252,5 +386,10 @@ footer{
 
 .alert-pass {
     background-color: skyblue;
+    text-align: center;
+}
+
+.alert-fail {
+    background-color: orangered;
     text-align: center;
 }
