@@ -1,8 +1,13 @@
+from asyncio.windows_events import NULL
 from re import T
 from datetime import datetime
 from statistics import mean
-from flask import Flask, abort, session, render_template, request, redirect, url_for, flash
+from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
+from StockData import StockData, doesThatStockExist
+import pyrebase
+import firebase_admin
 from stockSim import StockData, User, Order, Simulation, doesThatStockExist
+
 from firebase_admin import firestore
 from firebase_admin import credentials
 import pandas as pd
@@ -31,7 +36,7 @@ db1 = firebase.database()
 
 app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
-
+#Author: Miqdad Hafiz
 @app.route("/profile")
 def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
@@ -42,7 +47,8 @@ def profile():
         return render_template("profile.html", results = results)
     else:
         redirect(url_for("login"))
-#persons = {"logged_in": False,"uName": "", "uEmail": "", "uID": ""} may not need this, will see
+
+
 # Login
 #  This function allows the user to log into the app with correct credentials
 #  If correct users will be taken to the profile page
@@ -52,7 +58,6 @@ def profile():
 def login():
     if('user' in session): #to check if the user is logged in will change to profile page
         return redirect(url_for("profile"))
-        #return 'Hi, {}'.format(session['user'])
 
     if request.method == "POST":
         result = request.form
@@ -62,6 +67,7 @@ def login():
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
             session['loginFlagPy'] = 1
+            session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
             flash("Log in succesful.", "pass")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
@@ -79,27 +85,50 @@ def register():
         result = request.form
         email = result["email"]
         Password = result["password"]
+        confirmPass = result["confirmPassw"]
         NameU = result["Unames"]
         UseN = result["username"]
+
+        doc = dbfire.collection('Users').document(UseN).get()
+        if doc.exists:
+            grabName = dbfire.collection('Users').where('userName', '==', UseN)
+            for docs in grabName.stream(): 
+                grabName = docs.to_dict()
+            uniqueName = grabName['userName']
+
+        else:
+            uniqueName = "usernameoktouse"
 
         # Variables for Password validation - Muneeb Khan
         digits = any(x.isdigit() for x in Password) # Digits will check for any digits in the password
         specials = any(x == '!' or x == '@' or x == '#' or x == '$' for x in Password) # Specials will check for any specials in the password
+        
         # If else conditions to check the password requirements - Muneeb Khan
-        if (len(Password) < 6 or len(Password) > 20 or digits == 0 or specials == 0): # If the password doesnt meet requirements
-
+        if (len(Password) < 6 or len(Password) > 20 or digits == 0 or specials == 0):
             flash("Invalid Password! must contain the following requirements: ")
             flash("6 characters minimum")
             flash("20 characters maximum")
             flash("at least 1 digit")
             flash("at least 1 special character ('!','@','#', or '$'")
+        
+        elif (Password != confirmPass): # If password and cofirm password don't match
+            flash("You're password do not match. Please enter the same password for both fields.")
+        
+        elif (uniqueName == UseN):
+            flash("Username is already taken. Please enter a valid username.") #check to see if username is taken
 
         else:
 
             try: 
                 user = authen.create_user_with_email_and_password(email, Password)
+
+                #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
+                authen.send_email_verification(user['idToken'])
+                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
+                flash("Account Created, you will now be redirected to verify your account" , "pass")
                 dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
                 flash("Account succesfully created, you may now login" , "pass")
+
                 return redirect(url_for("login"))
 
             except:
@@ -156,6 +185,7 @@ def PasswordRecovery():
 def logout():
     session.pop('user')
     session['loginFlagPy'] = 0
+    session['Simulation'] = NULL
     flash('logout succesful','pass')
     return redirect(url_for("login"))
 
@@ -166,6 +196,7 @@ def logout():
 def hello(name=None):
     session['loginFlagPy'] = 0
     return render_template('home.html')
+
 
 ## Route for Home page - Muneeb Khan
 @app.route("/home")
@@ -179,7 +210,6 @@ def home():
         return render_template("home.html", person = person)
     else:
         return render_template('home.html')
-
 
 ## Route for About us page - Muneeb Khan
 @app.route("/aboutus")
@@ -233,7 +263,7 @@ def stockSimForm():
 
 ## startSimulation
 #   Description: 
-@app.route("/simulation", methods=['POST', 'GET'])
+@app.route("/startSimulation", methods=['POST', 'GET'])
 def startSimulation():
     if request.method == 'POST':
         session['simulation'] = {
@@ -242,7 +272,19 @@ def startSimulation():
             'initialCash': request.form['initialCash']
         }
         session['currentCash'] = request.form['initialCash']
+        global sim
+        sim = Simulation(firebase.database(), session['user'], request.form['startDate'],
+                        request.form['endDate'], request.form['initialCash'])
+        sim.createSim()
         return render_template('simulation.html', person=session['user'])
+        
+@app.rout("/finishSimulation", methods=['POST', 'GET'])
+def finishSimulation():
+    sim.finishSimulation()
+
+@app.route("/orderForm/<option>", methods=['POST', 'GET'])
+def orderForm(option):
+    return -1
 
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
