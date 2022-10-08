@@ -12,7 +12,7 @@ db = firebase.databse()
 # This will be directly connected to the porfolio. 
 class dashboaard():
     
-    def __init__(self, db, user, startDate, endDate, ) -> None:
+    def __init__(self, db, user, startDate, endDate, ):
         self.firebase = db
         self.data = self.retrieve(self.ticker)
         if self.data != 'This data entry does not exist':
@@ -22,8 +22,11 @@ class dashboaard():
         
     
     
-    def UserInfo(username, db, self):
-       username = db. 
+    def UserInfo(self,username, name, db):
+       username = self.db.child('Users').child('Username').get().val()
+       name = self.db.child('Users').child('Name').get().val()
+       
+       
         
         
         
