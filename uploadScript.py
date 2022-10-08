@@ -6,18 +6,21 @@
 #   data for the specified stock
 #
 #   Author: Ian McNulty
-from main import firebase, app
 import csv
-import pyrebase
 import numpy as np
+from firebase_admin import firestore
+from firebase_admin import credentials
+import firebase_admin
 
-ticker = 'AMZN'
-name = 'Amazon.com, Inc'
-headquarters = 'Seattle, WA'
-listedAt = 'NASDAQGS'
-fileToOpen = 'stockdata/AMZN.csv'
+cred = credentials.Certificate("serviceAccountKey.json")
+app = firebase_admin.initialize_app(cred)
+db = firestore.client() #firestore database
 
-db = firebase.database()
+ticker = 'NFLX'
+name = "Netflix, Inc."
+headquarters = 'Los Gatos, CA'
+listedAt = 'NasdaqGS'
+fileToOpen = 'stockdata/NFLX.csv'
 
 file = open(fileToOpen)
 csvreader = csv.reader(file)
@@ -48,4 +51,4 @@ data = {
                 'lows': lowsD, 'closes': closesD, 'adjustedCloses': adjClosesD,
                 'volumes': volumesD}
 }
-db.child('Stocks').child(ticker).set(data)
+db.collection('Stocks').document(ticker).set(data)

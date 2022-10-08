@@ -27,8 +27,7 @@
                             <button>Start a simulation!</button>
                         </form>
                         <script type="text/javascript">
-                            var email = {{ session['user'] | safe}};
-                            if (email == '') 
+                            if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
                                 document.getElementById('stockSimStart').style.display = "none";
                         </script>
                     </li>

@@ -1,3 +1,4 @@
+from asyncio.windows_events import NULL
 from re import T
 from datetime import datetime
 from statistics import mean
@@ -66,6 +67,7 @@ def login():
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
             session['loginFlagPy'] = 1
+            session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
             flash("Log in succesful.", "pass")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
@@ -124,6 +126,7 @@ def register():
             try: 
                 user = authen.create_user_with_email_and_password(email, Password)
 
+                #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
                 authen.send_email_verification(user['idToken'])
                 dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
@@ -189,6 +192,7 @@ def PasswordRecovery():
 def logout():
     session.pop('user')
     session['loginFlagPy'] = 0
+    session['Simulation'] = NULL
     flash('logout succesful')
     return redirect(url_for("login"))
 
@@ -200,14 +204,12 @@ def hello(name=None):
     session['loginFlagPy'] = 0
     return render_template('home.html')
 
-
 @app.route("/home")
 def home():
     if('user' in session): #to check if the user is logged in will change to profile page
         return render_template("home.html", person = session['user'])
     else:
         return render_template('home.html')
-
 
 ## Route for About us and Information pages - Muneeb Khan
 @app.route("/aboutus")
@@ -245,7 +247,7 @@ def stockSimForm():
 
 ## startSimulation
 #   Description: 
-@app.route("/simulation", methods=['POST', 'GET'])
+@app.route("/startSimulation", methods=['POST', 'GET'])
 def startSimulation():
     if request.method == 'POST':
         session['simulation'] = {
@@ -254,7 +256,19 @@ def startSimulation():
             'initialCash': request.form['initialCash']
         }
         session['currentCash'] = request.form['initialCash']
+        global sim
+        sim = Simulation(firebase.database(), session['user'], request.form['startDate'],
+                        request.form['endDate'], request.form['initialCash'])
+        sim.createSim()
         return render_template('simulation.html', person=session['user'])
+        
+@app.rout("/finishSimulation", methods=['POST', 'GET'])
+def finishSimulation():
+    sim.finishSimulation()
+
+@app.route("/orderForm/<option>", methods=['POST', 'GET'])
+def orderForm(option):
+    return -1
 
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
