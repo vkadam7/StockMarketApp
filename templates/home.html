@@ -11,7 +11,7 @@
     <div class = "header">
         <h1>Welcome to StockSim: Learn How to Trade!</h1>
     </div>
-    {% if session['user'] %}
+    {% if session['loginFlagPy'] %}
     <div class = "login">
         <p>Hello {{person}} <a method = "POST" href = "logout">Logout</a></p>
     </div>
@@ -26,6 +26,15 @@
                 <li><a method = "POST" href = "home">Home</a></li>
                 <li><a method = "POST" href = "aboutus">About Us</a></li>
                 <li><a method = "POST" href = "information">Information</a></li>
+                <li class="stockSimStartButton">
+                    <form id="stockSimStart" action="/stockSimForm" method="post">
+                        <button>Start a simulation!</button>
+                    </form>
+                    <script type="text/javascript">
+                        if ({{ session['loginFlagPy'] }} == 0) 
+                            document.getElementById('stockSimStart').style.display = "none";
+                    </script>
+                </li>
             </ul>
         </nav>
         <form action="/stockSearch" method="post">
@@ -37,8 +46,9 @@
 </header>
 <body>
     <section>
-
         <div class = "section1">
+            <h2>Welcome</h2>
+
             <p>Welcome to our website where we will help with making your first investments,
             <br>
             as you know stock markets require experience in order to know which
@@ -67,7 +77,7 @@
         <div class = "section4">
             <h2>Become a member</h2>
             <p>If you havent already please <a method = "POST" href = "register ">click here</a> to register 
-            <br> to become a member of our website otherwise <a method = "POST" href = "login"> click here</a> to login
+            <br> to become a member, otherwise <a method = "POST" href = "login"> click here</a> to login
             </p>
         </div>
 

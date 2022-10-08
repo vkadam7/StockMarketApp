@@ -47,6 +47,7 @@
                 <label for = "confirmPass">Confirm your password</label>
                 <input type = "password" id = "confirmPassw" name ="confirmPassw" required>
                 <br>
+
                 {% with messages = get_flashed_messages() %}
                     {% if messages %}   
                         {% for message in messages %}

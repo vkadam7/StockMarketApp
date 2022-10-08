@@ -1,12 +1,17 @@
 from re import T
+from datetime import datetime
 from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 from StockData import StockData, doesThatStockExist
 import pyrebase
 import firebase_admin
+from stockSim import StockData, User, Order, Simulation, doesThatStockExist
+
 from firebase_admin import firestore
 from firebase_admin import credentials
 import pandas as pd
+import pyrebase
+import firebase_admin
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
@@ -34,9 +39,9 @@ app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 @app.route("/profile")
 def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
-       results = dbfire.collection('Users').where('Email', '==', session['user'])
-       for doc in results.stream(): 
-        results = doc.to_dict()
+        results = dbfire.collection('Users').where('Email', '==', session['user'])
+        for doc in results.stream(): 
+            results = doc.to_dict()
 
         return render_template("profile.html", results = results)
     else:
@@ -60,6 +65,7 @@ def login():
         try:
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
+            session['loginFlagPy'] = 1
             flash("Log in succesful.", "pass")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
@@ -68,7 +74,8 @@ def login():
     else:
         print("Landing on page")
         return render_template('login.html')
-
+    
+#Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
 def register():
     if request.method == "POST":
@@ -95,6 +102,7 @@ def register():
         specials = any(x == '!' or x == '@' or x == '#' or x == '$' for x in Password) # Specials will check for any specials in the password
 
         # If else conditions to check the password requirements - Muneeb Khan
+
         if (len(Password) < 6): # If the password is too short
                 flash("Password too short! Must be 6 characters min")
 
@@ -112,25 +120,31 @@ def register():
         
         elif (uniqueName == UseN):
             flash("Username is already taken. Please enter a valid username.") #check to see if username is taken
-
         else:
-            try: ## Another way im trying to figure out the email verification part - Muneeb Khan
-            # user = authen.send_email_verification(email['idToken'], Password)
-                #if authen.send_email_verification == True:
+            try: 
                 user = authen.create_user_with_email_and_password(email, Password)
+
                 authen.send_email_verification(user['idToken'])
                 dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
+                dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
+                flash("Account succesfully created, you may now login" , "pass")
+
                 return redirect(url_for("login"))
-            # else:
-            # print("incorrect token! please re-register")
-            # return redirect(url_for("register"))
 
             except:
                 flash("Invalid Registration" , "fail")
                 return redirect(url_for("register"))
           
     return render_template('register.html')   
+
+
+'''Viraj Kadam. Will include later on
+@app.route('/StockDefinitions')
+def stockDefinitions():
+    return render_template("StockDefinitions.html")'''
+
+## Attmept on Password recovery -Muneeb Khan NOT WORKING YET!
 
 ## Attempt on email verification function by Muneeb Khan (WIP!)
 @app.route('/verification', methods = ["POST" , "GET"])
@@ -151,6 +165,7 @@ def verification():
     return render_template("verification.html")
 
 ## Password Recovery Function by Muneeb Khan
+
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
 def PasswordRecovery():
     if request.method == "POST":
@@ -173,6 +188,7 @@ def PasswordRecovery():
 @app.route("/logout")
 def logout():
     session.pop('user')
+    session['loginFlagPy'] = 0
     flash('logout succesful')
     return redirect(url_for("login"))
 
@@ -181,6 +197,7 @@ def logout():
 #Author: Miqdad
 @app.route('/')
 def hello(name=None):
+    session['loginFlagPy'] = 0
     return render_template('home.html')
 
 
@@ -206,6 +223,38 @@ def information():
         return render_template("information.html", person = session['user'])
     else:
         return render_template('information.html')
+
+@app.route("/StockDefinitions")
+def StockDefinitions():
+    if('user' in session):
+        return render_template("StockDefinitions.html", person = session['user'])
+    else:
+        return render_template('StockDefinitions.html')
+
+## stockSim
+#   Description: Brings the logged in user to the stock sim start page, if the user
+#   isn't logged in, a 404 page error is given.
+#
+#   Author: Ian McNulty
+@app.route("/stockSimForm", methods=['POST'])
+def stockSimForm():
+    if 'user' in session:
+        return render_template('stockSimForm.html', person=session['user'])
+    else:
+        return redirect(url_for('fourOhFour'))
+
+## startSimulation
+#   Description: 
+@app.route("/simulation", methods=['POST', 'GET'])
+def startSimulation():
+    if request.method == 'POST':
+        session['simulation'] = {
+            'startDate': request.form['startDate'],
+            'endDate': request.form['endDate'],
+            'initialCash': request.form['initialCash']
+        }
+        session['currentCash'] = request.form['initialCash']
+        return render_template('simulation.html', person=session['user'])
 
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
@@ -291,6 +340,20 @@ def changeStockView():
 @app.route('/404Error')
 def fourOhFour():
     return render_template('404Error.html')
+
+@app.route('/portfolio')
+def Portfolio():
+    return render_template('portfolio.html')
+
+## Need to complete this setup route for the dashboard, will show up to the user once they have started the simulation. 
+@app.route('/dashboard')
+def Dashboard():
+    if 'user' in session:
+        return render_template('dashboard.html')
+
+@app.route('/')
+def method_name():
+    pass
     
 if __name__ == '__main__':
     app.run(debug=True)

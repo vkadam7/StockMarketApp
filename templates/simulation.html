@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html>
     <head>
         <meta class="UTF-8">
         <title>StockSim: Learn How To Trade</title>
@@ -8,12 +8,15 @@
         integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     </head>
     <header>
-        <div class = "header">
-            <h1>Welcome to StockSim: Learn How to Trade!</h1>
-        </div>
+        {% if session['user'] %}
         <div class = "login">
-                <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
+            <p>Hello {{person}} <a method = "POST" href = "logout">Logout</a></p>
         </div>
+        {% else %}
+        <div class = "login">
+            <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
+        </div>
+        {% endif %}
         <div class = "navbar">
             <nav>
                 <ul>
@@ -30,24 +33,23 @@
         </div>
     </header>
     <body>
-            <div class="passwordform">
-                <form method = "POST">                
-                        <label for="Email">Enter Email</label>
-                        <input type = "email" id = "email" name = "email" placeholder="ex: john123@sample.com" required>
-                        <br>
-                        {% with alerts = get_flashed_messages() %}
-                            {% for print in alerts %}
-                                <div class="alert" role="alert">
-                                    {{ print }}
-                                </div>
-                            {% endfor %}
-                        {% endwith %} 
-                        <br><br> 
-                        <button type="Submit">Submit</button>
-                </form>
-            </div>
-            <br>
-
+        <div class="stockList">
+            <h3>Available stocks:</h3>
+        </div>
+        <div class="portfolio">
+            <h3>Your holdings:</h3>
+            <table>
+                <tr>
+                    <th>Current Money:</th>
+                    <td>${{ session['currentCash'] }}</td>
+                </tr>
+                <tr>
+                    
+                </tr>
+            </table>
+        </div>
+        <div class="orderListButton">
+            <a href="orderList">Order History</a>
+        </div>
     </body>
-    <footer><p>Copyright 2022 by StockSim</p></footer>
 </html>
