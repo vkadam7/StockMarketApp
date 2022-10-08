@@ -31,8 +31,7 @@
                         <button>Start a simulation!</button>
                     </form>
                     <script type="text/javascript">
-                        var email = {{ session['user'] | safe}};
-                        if (email == '') 
+                        if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
                             document.getElementById('stockSimStart').style.display = "none";
                     </script>
                 </li>
@@ -71,9 +70,9 @@
 
             <div class = "aboutuspart">
                 <h2>The Team</h2>
-            <p>We are team of software engineers who also invest in stocks back when we started making investments in 
-            other sites such as robinhood, we were not sure where to begin but this gave us the motivation to help others 
-            who are in the same position as us by creating our own stock investment site.
+            <p>We are team of software engineers who also invest in stocks, Back in the days when we started making investments 
+            we used other sites such as robinhood, we were not even sure where to begin, but this gave us the motivation to help others 
+            who are in the same position as we were. Because of this we decided to create our own stock investment site.
             </p>
             </div>
 

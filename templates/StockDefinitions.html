@@ -26,8 +26,7 @@
                         <button>Start a simulation!</button>
                     </form>
                     <script type="text/javascript">
-                        var email = {{ session['user'] | safe}};
-                        if (email == '') 
+                        if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
                             document.getElementById('stockSimStart').style.display = "none";
                     </script>
                 </li>
@@ -43,7 +42,7 @@
 <body>
     <section>
         <div>
-            <h1>About Us</h1>
+            <h1>Definitions</h1>
         </div>
         <div class = "Buy">
         <p>When you buy a stock from a company, you ar buying a share of that company.

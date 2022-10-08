@@ -31,7 +31,7 @@
                         <button>Start a simulation!</button>
                     </form>
                     <script type="text/javascript">
-                        if ({{ session['loginFlagPy'] }} == 0) 
+                        if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
                             document.getElementById('stockSimStart').style.display = "none";
                     </script>
                 </li>
@@ -46,8 +46,9 @@
 </header>
 <body>
     <section>
-
         <div class = "section1">
+            <h2>Welcome</h2>
+
             <p>Welcome to our website where we will help with making your first investments,
             <br>
             as you know stock markets require experience in order to know which
@@ -76,7 +77,7 @@
         <div class = "section4">
             <h2>Become a member</h2>
             <p>If you havent already please <a method = "POST" href = "register ">click here</a> to register 
-            <br> to become a member of our website otherwise <a method = "POST" href = "login"> click here</a> to login
+            <br> to become a member, otherwise <a method = "POST" href = "login"> click here</a> to login
             </p>
         </div>
 
