@@ -88,11 +88,12 @@ def register():
         # If else conditions to check the password requirements - Muneeb Khan
         if (len(Password) < 6 or len(Password) > 20 or digits == 0 or specials == 0): # If the password doesnt meet requirements
 
-                flash("Invalid Password! must contain the following requirements: ")
-                flash("6 characters minimum")
-                flash("20 characters maximum")
-                flash("at least 1 digit")
-                flash("at least 1 special character ('!','@','#', or '$'")
+            flash("Invalid Password! must contain the following requirements: ")
+            flash("6 characters minimum")
+            flash("20 characters maximum")
+            flash("at least 1 digit")
+            flash("at least 1 special character ('!','@','#', or '$'")
+
         else:
 
             try: 
@@ -113,8 +114,6 @@ def register():
 def stockDefinitions():
     return render_template("StockDefinitions.html")'''
 
-## Attmept on Password recovery -Muneeb Khan NOT WORKING YET!
-
 ## Attempt on email verification function by Muneeb Khan (WIP!)
 @app.route('/verification', methods = ["POST" , "GET"])
 def verification():
@@ -134,7 +133,6 @@ def verification():
     return render_template("verification.html")
 
 ## Password Recovery Function by Muneeb Khan
-
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
 def PasswordRecovery():
     if request.method == "POST":
@@ -142,7 +140,7 @@ def PasswordRecovery():
         result = request.form
         email = result["email"]
         try:
-            user = authen.send_password_reset_email(email)
+            user = authen.send_password_reset_email(email) # Will send the notification to the provided email - Muneeb Khan
             flash("Password reset notification was sent to your email", "pass")
             return redirect(url_for("login"))
         except:
@@ -169,36 +167,55 @@ def hello(name=None):
     session['loginFlagPy'] = 0
     return render_template('home.html')
 
-
+## Route for Home page - Muneeb Khan
 @app.route("/home")
 def home():
-    if('user' in session): #to check if the user is logged in will change to profile page
-        return render_template("home.html", person = session['user'])
+    if('user' in session):
+        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+
+        for x in person.get():
+            person = x.to_dict()
+
+        return render_template("home.html", person = person)
     else:
         return render_template('home.html')
 
 
-## Route for About us and Information pages - Muneeb Khan
+## Route for About us page - Muneeb Khan
 @app.route("/aboutus")
 def aboutus():
-    if('user' in session): #to check if the user is logged in will change to profile page
-        person = dbfire.collection("Users").where("Name","==","session")
+    if('user' in session): 
+        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
 
-        return render_template("aboutus.html", person = session['user'])
+        for x in person.get():
+            person = x.to_dict()
+
+        return render_template("aboutus.html", person = person)
     else:
         return render_template('aboutus.html')
 
+## Route for Information Page - Muneeb Khan
 @app.route("/information")
 def information():
-    if('user' in session): #to check if the user is logged in will change to profile page
-        return render_template("information.html", person = session['user'])
+    if('user' in session):
+        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+
+        for x in person.get():
+            person = x.to_dict()
+
+        return render_template("information.html", person = person)
     else:
         return render_template('information.html')
 
 @app.route("/StockDefinitions")
 def StockDefinitions():
     if('user' in session):
-        return render_template("StockDefinitions.html", person = session['user'])
+        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+
+        for x in person.get():
+            person = x.to_dict()
+
+        return render_template("information.html", person = person)
     else:
         return render_template('StockDefinitions.html')
 

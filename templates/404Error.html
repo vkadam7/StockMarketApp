@@ -10,7 +10,7 @@
         <h1>404 Error: Webpage unavailable</h1>
         {% if session['user'] %}
         <div class = "login">
-            <p>Hello {{person}} <a method = "POST" href = "logout">Logout</a></p>
+            <p>Hello {{person['Name']}} <a method = "POST" href = "logout">Logout</a></p>
         </div>
         {% else %}
         <div class = "login">
@@ -24,6 +24,9 @@
                     <li><a method = "POST" href = "home">Home</a></li>
                     <li><a method = "POST" href = "aboutus">About Us</a></li>
                     <li><a method = "POST" href = "information">Information</a></li>
+                    {% if session['loginFlagPy'] %}
+                    <li><a method = "POST" href = "profile">Profile</a></li>
+                    {% endif %}
                     <li class="stockSimStartButton">
                         <form id="stockSimStart" action="/stockSimForm" method="post">
                             <button>Start a simulation!</button>

@@ -13,14 +13,13 @@
     <div class = "header">
         <h1>Welcome to StockSim: Learn How to Trade!</h1>
     </div>
-    <!--Will check if User is in Session, login and register buttons replaced by logout so user cannot access them while logged in. -Muneeb Khan-->
     {% if session['loginFlagPy'] %}
     <div class = "login">
-        <p>Hello {{person}} <a method = "POST" href = "logout"><button>Logout</button></a></p>
+        <p>Hello {{person['Name']}} <a method = "POST" href = "logout"><button>Logout</button></a></p>
     </div>
     {% else %}
     <div class = "login">
-        <p><a method = "POST" href = "login"><button>Login</button></a> or <a method = "POST" href = "register"><button>Register</button></a></p>
+        <p><a method = "POST" href = "login"><button>Login</button></a> <a method = "POST" href = "register"><button>Register</button></a></p>
     </div>
     {% endif %}
     <!--Navbar by Muneeb Khan-->
@@ -30,6 +29,9 @@
                 <li><a method = "POST" href = "home">Home</a></li>
                 <li><a method = "POST" href = "aboutus">About Us</a></li>
                 <li><a method = "POST" href = "information">Information</a></li>
+                {% if session['loginFlagPy'] %}
+                <li><a method = "POST" href = "profile">Profile</a></li>
+                {% endif %}
                 <li class="stockSimStartButton">
                     <form id="stockSimStart" action="/stockSimForm" method="post">
                         <button>Start a simulation!</button>
@@ -46,6 +48,7 @@
                     value="{{ request.form['searchTerm'] }}">
             <button>Search</button>
         </form>
+        
     </div>
 </header>
 <body>

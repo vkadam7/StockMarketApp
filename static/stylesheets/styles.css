@@ -53,7 +53,7 @@
 }
 
 body {
-    background-color: white;
+    background-color: rgb(240, 240, 240);
     color:black;
 }
 
@@ -63,9 +63,13 @@ h1{
 }
 
 .section1{
+    margin:auto;
+    width: 75%;
+    background-color: rgb(223, 223, 223);
     padding:5px;
     border-style:double;
     border-width: 15px,15px,15px,15px;
+    box-shadow: 0,2px;
 }
 
 .section1 h2{
@@ -78,8 +82,16 @@ h1{
     text-align:center;
 }
 
+.section1 a{
+    color:black;
+    text-decoration: none;
+    font-weight:bold;
+}
+
 .section2{
-    background-color:rgb(243, 243, 243);
+    margin:auto;
+    width: 75%;
+    background-color: rgb(223, 223, 223);
     padding:5px;
     border-style:double;
     border-width: 15px,15px,15px,15px;
@@ -96,7 +108,15 @@ h1{
     color:black;
 }
 
+.section2 a{
+    color:black;
+    text-decoration: none;
+    font-weight:bold;
+}
+
 .section3 {
+    margin:auto;
+    width: 75%;
     background-color: rgb(223, 223, 223);
     padding:5px;
     border-style:double;
@@ -114,8 +134,16 @@ h1{
     color:black;
 }
 
+.section3 a{
+    color:black;
+    text-decoration: none;
+    font-weight:bold;
+}
+
 .section4{
-    background-color: rgb(214, 214, 214);
+    margin:auto;
+    width: 75%;
+    background-color: rgb(223, 223, 223);
     padding:5px;
     border-style:double;
     border-width: 15px,15px,15px,15px;
@@ -132,7 +160,15 @@ h1{
     color:black;
 }
 
+.section4 a{
+    color:black;
+    text-decoration: none;
+    font-weight:bold;
+}
+
 .infopart1 {
+    margin:auto;
+    width: 75%;
     text-align: center;
     border-style: double;
     border-width: 5px 10px 5px 10px;
@@ -144,6 +180,8 @@ h1{
 }
 
 .infopart2 {
+    margin:auto;
+    width: 75%;
     text-align: center;
     border-style: double;
     display: block;
@@ -161,6 +199,8 @@ h1{
 }
 
 .infopart3 {
+    margin:auto;
+    width: 75%;
     text-align: center;
     text-align: center;
     border-style: double;
@@ -169,6 +209,8 @@ h1{
 }
 
 .infopart4 {
+    margin:auto;
+    width: 75%;
     text-align: center;
     border-style: double;
     border-width: 5px 10px 5px 10px;
@@ -184,6 +226,7 @@ h1{
     padding-right: 15px;
     text-align:center;
     justify-content: center;
+    box-shadow: 10px,8px,8px,grey;
 }
 
 .loginform form{
@@ -192,7 +235,6 @@ h1{
     padding: 40px;
     border-radius: 2px;
     background-color: silver;
-    box-shadow: 2px;
 }
 
 .loginform h3{
@@ -326,6 +368,8 @@ footer{
     border-style:double;
     border-width: 5px 10px 5px 10px;
     border-color:black;
+    width: 75%;
+    margin: auto;
 }
 
 .aboutuspart{
