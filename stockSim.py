@@ -213,7 +213,6 @@ class Simulation:
                 'Orders': []
             }
         self.db.child('Simulations').child(simName).set(data)
-        return 1
 
 class User:
     def __init__(self):

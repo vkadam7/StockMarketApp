@@ -11,9 +11,15 @@
     <div class = "header">
         <h1>Welcome to StockSim: Learn How to Trade!</h1>
     </div>
+    {% if session['user'] %}
     <div class = "login">
-            <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
+        <p>Hello {{person}} <a method = "POST" href = "logout">Logout</a></p>
     </div>
+    {% else %}
+    <div class = "login">
+        <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
+    </div>
+    {% endif %}
     <br>
     <div class = "navbar">
         <nav>
