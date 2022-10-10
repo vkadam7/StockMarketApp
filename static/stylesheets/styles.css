@@ -356,7 +356,13 @@ footer{
 }
 
 .stockSimStartButton {
-    text-align: center;
+    display: flex;
+    justify-content: center;
+}
+
+.buySellButtons {
+    display: flex;
+    justify-content: center;
 }
 
 .aboutusmain {

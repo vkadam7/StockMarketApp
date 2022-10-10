@@ -3,7 +3,6 @@ from re import T
 from datetime import datetime
 from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
-from StockData import StockData, doesThatStockExist
 import pyrebase
 import firebase_admin
 from stockSim import StockData, User, Order, Simulation, doesThatStockExist
@@ -263,20 +262,24 @@ def stockSimForm():
 
 ## startSimulation
 #   Description: 
-@app.route("/startSimulation", methods=['POST', 'GET'])
+@app.route("/startSimulation", methods=['POST'])
 def startSimulation():
-    if request.method == 'POST':
-        session['simulation'] = {
-            'startDate': request.form['startDate'],
-            'endDate': request.form['endDate'],
-            'initialCash': request.form['initialCash']
-        }
-        session['currentCash'] = request.form['initialCash']
-        global sim
-        sim = Simulation(firebase.database(), session['user'], request.form['startDate'],
-                        request.form['endDate'], request.form['initialCash'])
-        sim.createSim()
-        return render_template('simulation.html', person=session['user'])
+    try:
+        if request.method == 'POST':
+            session['simulation'] = {
+                'simStartDate': request.form['simStartDate'],
+                'simEndDate': request.form['simEndDate'],
+                'initialCash': request.form['initialCash']
+            }
+            session['currentCash'] = request.form['initialCash']
+            session['portfolioValue'] = request.form['initialCash']
+            simulation = Simulation(dbfire, session['user'], request.form['simStartDate'],
+                                    request.form['simEndDate'], request.form['initialCash'])
+            simulation.createSim()
+            return render_template('simulation.html', person=session['user'])
+    except KeyError:
+        print("KeyError occured: startSimulation")
+        return redirect(url_for('fourOhFour'))
         
 @app.rout("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
@@ -307,6 +310,7 @@ def stockSearch():
             else:
                 return redirect(url_for('fourOhFour'))
     except KeyError:
+        print("KeyError occured: stockSearch")
         return redirect(url_for('fourOhFour'))
     return redirect(url_for(request.url))
 
