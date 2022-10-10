@@ -1,3 +1,4 @@
+<!--Portfolio page by Viraj Kadam-->
 <!DOCTYPE html>
 <html>
     <head>
@@ -7,9 +8,19 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
     </head>
     <header>
-        <div class = "login">
-            <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
+        <div class = "header">
+            <h1>Welcome to StockSim: Learn How to Trade!</h1>
         </div>
+        {% if session['loginFlagPy'] %}
+        <div class = "login">
+            <p>Hello {{person['Name']}} <a method = "POST" href = "logout"><button>Logout</button></a></p>
+        </div>
+        {% else %}
+        <div class = "login">
+            <p><a method = "POST" href = "login"><button>Login</button></a> <a method = "POST" href = "register"><button>Register</button></a></p>
+        </div>
+        {% endif %}
+        <!--Navbar by Muneeb Khan-->
         <div class = "navbar">
             <nav>
                 <ul>
