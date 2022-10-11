@@ -16,6 +16,7 @@ import datetime as dt
 from datetime import date
 from pypfopt.discrete_allocation import DiscreteAllocation
 from pypfopt import expected_returns
+import matplotlib.pyplot as plt
 
 
 db = firebase.database()
@@ -96,10 +97,7 @@ class portfolio:
                         return netGain
         
         return -1
-                
-                        
-                
-                
+                           
      #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
     def funds_remaining(self, quantity, avgStockPrice):
         intitialAmount = 1000
@@ -115,17 +113,13 @@ class portfolio:
         fundsUsed = intitialAmount - (tempPrice)(quantity)
         finalAmount = intitialAmount - fundsUsed
 
-    def returns(self, quantity, avgStockPrice, ):
-        global portfolio, amount
-        allocatedMoney = quantity * price
-        endResult = endResult - allocatedMoney - transactionCost * allocatedMoney
-        portfolio += quantity
-        if investment == []:
-            investment.append(allocatedMoney)
-        else:
-            investment.append(allocatedMoney)
-            investment[-1] += investment[-2]
-        return -1
+    #Edited returns feature
+    def returns(self, quantity, avgStockPrice, AdjustClose):
+        returns = self.db.child('Stocks').child('daily').child('closes').get().val()
+        daily_returns = returns.pct_change()
+        print(daily_returns)
+        #monthly_returns =
+        
     
         
     #Deletes a stock from the portfolio
@@ -136,9 +130,7 @@ class portfolio:
                 return True
             except Error:
                  return False
-     
-        
-        
+           
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
     def percentChange(self,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
