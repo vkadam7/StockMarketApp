@@ -41,7 +41,7 @@ class portfolio:
     
     def retrieve(self, id):
         try:
-            return self.firebase.child("Stocks").child(id).get().val()
+            return self.firebase.collection("Stocks").document(id).get()
         except:
             return ''
 
@@ -54,7 +54,7 @@ class portfolio:
                 'avgStockPrice': self.avgStockPrice,
                 'totalPrice': self.totalPrice}
         
-        self.db.child('Stocks').child('name').get().val()
+        self.db.collection('Stocks').document('name').get()
         
         return -1
 
@@ -64,29 +64,30 @@ class portfolio:
                 'quantity': self.quantity, 
                 'avgStockPrice': self.avgStockPrice}
         profit = 0
-        tempPrice = self.db.child('Stocks').child('daily').child('closes').get().val()
-        quantity = self.db.child('Stocks').child('daily').child('volume').get().val()
+        tempPrice = self.db.collection('Stocks').document('daily').document('closes').get()
+        quantity = self.db.collection('Stocks').document('daily').document('volume').get()
         profit += tempPrice * quantity
         return profit
         
         
         
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
-    def GainorLoss(self, db, stock, quanity, stockPrice):
+    def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
         totalGain = 0
         netGain = 0
         netLoss = 0
         CurrentPrice = 0
-        tempData = self.db.child('Simulations').child(self.sim).child('Orders').get().val()
+        tempData = self.db.collection('Simulations').document(self.sim).document('Orders').get()
         data = {'name': self.name, 
                 'quantity': self.quantity, 
                 'avgStockPrice': self.avgStockPrice, 
                 }
         if quanity > 0:
             if totalGain > CurrentPrice:
-                tempPrice = self.db.child('Stocks').child('daily').child('closes').get().val()
+                tempPrice = self.db.collection('Simulations').document(simName).document('Stocks').document('prices').get()
                 #Need to fix this function
-                CurrentPrice = self.db.child('Stocks').child('daily').child('closes').get.val()
+                #CurrentPrice = self.db.collection('Stocks').document('daily').document('closes').get()
+                CurrentPrice = self.db.collection('Simulations').document(simName).document('Stocks').document('prices').get()
                 for CurrentPrice in i:
                     netGainorLoss = (CurrentPrice[i+1] - tempPrice[i]) / (tempPrice[i]) * 100
                     if netGainorLoss > 0:
@@ -105,7 +106,7 @@ class portfolio:
         fundsUsed = 0
         fundsRemainiing = 0
         quantity = 0
-        tempPrice = self.db.child('Stocks').child('daily').child('closes').get.val()
+        tempPrice = self.db.collection('Stocks').document('daily').document('closes').get()
         data = {'name': self.name,
                 'quantity': self.quantity, 
                 'avgStockPrice': self.avgStockPrice     
@@ -115,7 +116,7 @@ class portfolio:
 
     #Edited returns feature
     def returns(self, quantity, avgStockPrice, AdjustClose):
-        returns = self.db.child('Stocks').child('daily').child('closes').get().val()
+        returns = self.db.collection('Stocks').document('daily').document('closes').get()
         daily_returns = returns.pct_change()
         print(daily_returns)
         #monthly_returns =
@@ -139,9 +140,9 @@ class portfolio:
         percentIncrease = 0
         AdjustClose = 0
 
-        day = self.db.child('Stocks').child('daily').child('dates').get().val() # Day will get values of dates
-        newstockPrice = self.db.child('Stocks').child('daily').child('closes').get().val()
-        stockPrice = self.db.child('Stocks').child('daily').child('closes').get().val()
+        day = self.db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
+        newstockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
+        stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
 
         if quantity > 0:
             for stockPrice in day: 
