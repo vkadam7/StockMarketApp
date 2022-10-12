@@ -300,6 +300,8 @@ def orderForm():
 def orderCreate():
     session['orderQuantity'] = request.form['stockQuantity']
     session['orderPrice'] = round(session['orderQuantity'] * session['currentPrice'])
+    global order
+    order = Order(firebase, sim.simName, stock['ticker'], session['option'], session['orderQuantity'], session['currentPrice'])
     return redirect(url_for('orderConfirmation.html'))
 
 ## stockSearch

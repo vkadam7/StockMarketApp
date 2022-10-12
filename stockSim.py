@@ -348,12 +348,11 @@ class User:
         db.collection('Users').document(username).set(data) 
 
 class Order:
-    def __init__(self, db, simulation, stock, user, index, buyOrSell, quantity, stockPrice):
+    def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
         self.db = db
         self.sim = simulation
         self.stock = stock
-        self.user = user
-        self.dayOfPurchase = index
+        self.dayOfPurchase = datetime.datetime.now()
         self.option = buyOrSell
         self.quantity = quantity
         self.avgStockPrice = stockPrice
