@@ -28,15 +28,14 @@ totalMoney = 0
 port_list = []
 
 class portfolio:
-    def __init__(self, db, stock, user, index, buyOrSell, quantity, stockPrice):
-        self.db = db
+    def __init__(self, db, stock, user, index, buyOrSell, quantity, stockPrice, startDate, endDate, initialCash):
+        self.firebase = db
         self.stock = stock
         self.user = user
-        self.dayOfPurchase = index
-        self.option = buyOrSell
+        self.startDate = startDate
         self.quantity = quantity
-        self.avgStockPrice = stockPrice
-        self.totalPrice = quantity*stockPrice
+        self.initialCash = initialCash
+        self.stockPrice = stockPrice
         return -1
     
     def retrieve(self, id):
@@ -64,8 +63,8 @@ class portfolio:
                 'quantity': self.quantity, 
                 'avgStockPrice': self.avgStockPrice}
         profit = 0
-        tempPrice = self.db.collection('Stocks').document('daily').document('closes').get()
-        quantity = self.db.collection('Stocks').document('daily').document('volume').get()
+        tempPrice = self.db.collection('Simulations').document('daily').document('closes').get()
+        quantity = self.db.collection('Simulations').document('daily').document('volume').get()
         profit += tempPrice * quantity
         return profit
         
@@ -88,19 +87,23 @@ class portfolio:
                 #Need to fix this function
                 #CurrentPrice = self.db.collection('Stocks').document('daily').document('closes').get()
                 CurrentPrice = self.db.collection('Simulations').document(simName).document('Stocks').document('prices').get()
-                for CurrentPrice in i:
-                    netGainorLoss = (CurrentPrice[i+1] - tempPrice[i]) / (tempPrice[i]) * 100
-                    if netGainorLoss > 0:
+                day = self.db.collection('Stocks').document('daily').document('dates').get()
+                for CurrentPrice in day :
+                    netGainorLoss = (CurrentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
+                    if netGainorLoss > CurrentPrice:
                         netLoss = "-" + netGainorLoss
+                        print("Net loss" + netLoss )
                         return netLoss
+
                     else:
                         netGain = netGainorLoss
+                        print("Net Gain: " + netGain)
                         return netGain
         
         return -1
                            
      #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
-    def funds_remaining(self, quantity, avgStockPrice):
+    def funds_remaining(self):
         intitialAmount = 1000
         finalAmount = 0
         fundsUsed = 0
@@ -109,7 +112,13 @@ class portfolio:
         tempPrice = self.db.collection('Stocks').document('daily').document('closes').get()
         data = {'name': self.name,
                 'quantity': self.quantity, 
-                'avgStockPrice': self.avgStockPrice     
+                'avgStockPrice': self.avgStockPrice, 
+                'startDate': self.startDate,
+                'endDate': self.endDate,
+                'initialCash': self.initialCash,
+                'currentCash': self.initialCash,
+                'score': 0,
+                'Orders': []  
         }
         fundsUsed = intitialAmount - (tempPrice)(quantity)
         finalAmount = intitialAmount - fundsUsed
