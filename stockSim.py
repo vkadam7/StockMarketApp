@@ -198,8 +198,12 @@ class StockData:
                     newData.append(interp)
                 return {
                     'name':data['name'],
+                    'headquarters':data['headquarters'],
+                    'listedAt':data['listedAt'],
                     'dates':newDates,
-                    'prices':newData
+                    'prices':newData,
+                    'highs':data['highs'],
+                    'lows':data['lows']
                 }
         except:
             return 'This data entry does not exist'
@@ -257,6 +261,14 @@ class Simulation:
             index += 24
         index += (difference.seconds//3600)%24
         return index
+
+    def currentPriceOf(self, ticker):
+        data = self.db.collection('Simulations').document(self.simName).document('Stocks').document(ticker).get()
+        return data['prices'][self.whatTimeIsItRightNow()]
+
+    def retrieveStock(self, ticker):
+        stock = self.db.collection('Simulations').document(self.simName).document('Stocks').document(ticker).get()
+        return stock
 
     def addStocksToSim(self):
         tickerList = StockData.stockAvailability()

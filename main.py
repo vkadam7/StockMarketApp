@@ -66,7 +66,8 @@ def login():
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
             session['loginFlagPy'] = 1
-            session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
+            #session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
+            session['simulationFlag'] = False
             flash("Log in succesful.", "pass")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
@@ -273,6 +274,7 @@ def startSimulation():
             }
             session['currentCash'] = request.form['initialCash']
             session['portfolioValue'] = request.form['initialCash']
+            session['simulationFlag'] = True
             global sim
             sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
                                     request.form['simEndDate'], request.form['initialCash'])
@@ -283,13 +285,22 @@ def startSimulation():
         print("KeyError occured: startSimulation")
         return redirect(url_for('fourOhFour'))
         
-@app.rout("/finishSimulation", methods=['POST', 'GET'])
+@app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
+    session['simulationFlag'] = False
     sim.finishSimulation()
 
-@app.route("/orderForm/<option>", methods=['POST', 'GET'])
-def orderForm(option):
-    return -1
+@app.route("/orderForm", methods=['POST', 'GET'])
+def orderForm():
+    session['option'] = request.form['option']
+    session['currentPrice'] = sim.currentPriceOf(stock['ticker'])
+    return redirect(url_for('orderForm.html', stock=stock, option=session['option']))
+
+@app.route("/orderCreate", methods=['POST', 'GET'])
+def orderCreate():
+    session['orderQuantity'] = request.form['stockQuantity']
+    session['orderPrice'] = round(session['orderQuantity'] * session['currentPrice'])
+    return redirect(url_for('orderConfirmation.html'))
 
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
@@ -335,29 +346,43 @@ def displayStock(ticker):
     startDate = request.args['startDate']
     endDate = request.args['endDate']
     timespan = request.args['timespan']
-    stockData = StockData(firebase.database(), ticker)
-    global stock
-    stock = stockData.stockPageFactory()
-    stockMatrix = stockData.getData(startDate, endDate, timespan)
-    if stockMatrix != -1:
-        if timespan != 'hourly':
-            dates = [row[0] for row in stockMatrix]
-            avgs = [mean([row[2], row[3]]) for row in stockMatrix]
-            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+    if session['simulationFlag'] == False:
+        stockData = StockData(firebase.database(), ticker)
+        global stock
+        stock = stockData.stockPageFactory()
+        stockMatrix = stockData.getData(startDate, endDate, timespan)
+        if stockMatrix != -1:
+            if timespan != 'hourly':
+                dates = [row[0] for row in stockMatrix]
+                avgs = [mean([row[2], row[3]]) for row in stockMatrix]
+                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+            else:
+                dates = []
+                tempDates = [row[0] for row in stockMatrix]
+                for row in tempDates:
+                    for i in range(0, len(tempDates[0])):
+                        dates.append(row[i])
+                avgs = []
+                tempAvgs = [row[1] for row in stockMatrix]
+                for row in tempAvgs:
+                    for i in range(0, len(tempAvgs[0])):
+                        avgs.append(row[i])
+                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
         else:
-            dates = []
-            tempDates = [row[0] for row in stockMatrix]
-            for row in tempDates:
-                for i in range(0, len(tempDates[0])):
-                    dates.append(row[i])
-            avgs = []
-            tempAvgs = [row[1] for row in stockMatrix]
-            for row in tempAvgs:
-                for i in range(0, len(tempAvgs[0])):
-                    avgs.append(row[i])
-            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+            return displayStock(ticker)
     else:
-        return displayStock(ticker)
+        stockData = sim.retrieveStock(ticker)
+        global stock
+        stock = stockData
+        if stock != -1:
+            dates = []
+            prices = []
+            for i in range(0, sim.whatTimeIsItRightNow()):
+                dates.append(stock['dates'][i])
+                prices.append(stock['prices'][i])
+            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+        else:
+            return displayStock(ticker)
 
 ## changeStockView
 #   Description: Retrieves data from stockView page to determine how to change
