@@ -348,9 +348,9 @@ def displayStock(ticker):
     startDate = request.args['startDate']
     endDate = request.args['endDate']
     timespan = request.args['timespan']
+    global stock
     if session['simulationFlag'] == False:
         stockData = StockData(firebase.database(), ticker)
-        global stock
         stock = stockData.stockPageFactory()
         stockMatrix = stockData.getData(startDate, endDate, timespan)
         if stockMatrix != -1:
@@ -374,7 +374,6 @@ def displayStock(ticker):
             return displayStock(ticker)
     else:
         stockData = sim.retrieveStock(ticker)
-        global stock
         stock = stockData
         if stock != -1:
             dates = []
