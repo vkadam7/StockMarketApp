@@ -1,6 +1,7 @@
 from mimetypes import init
 import numpy as np
 import firebase_admin
+import datetime
 
 ## doesThatStockExist
 #   Description: Checks to see if that stock exists in the database yet,
@@ -25,9 +26,9 @@ class StockData:
     #
     #   Author: Ian McNulty
     def __init__(self, db, req):
-        self.firebase = db
+        self.db = db
         self.ticker = req
-        self.data = self.retrieve()
+        self.data = self.retrieve(self.db, self.ticker)
         if self.data != 'This data entry does not exist':
             self.name = self.data['name']
             self.headquarters = self.data['headquarters']
@@ -42,19 +43,6 @@ class StockData:
             self.volumes = tempData['volumes']
         else:
             print(self.data)
-
-    ## StockData retrieve
-    #   Description: Retrieves data from Firestore database according
-    #   to requested stock ID.
-    #
-    #   Inputs: id - Database key for requested stock.
-    #
-    #   Author: Ian McNulty
-    def retrieve(self):
-        try:
-            return self.firebase.collection("Stocks").document(self.ticker).get()
-        except:
-            return 'This data entry does not exist'
 
     ## StockData.getData
     #   Description: Retrieves data from start date to end date and produces
@@ -172,8 +160,52 @@ class StockData:
         }
         return stock
 
+    ## StockData retrieve
+    #   Description: Retrieves data from Firestore database according
+    #   to requested stock ID.
+    #
+    #   Inputs: id - Database key for requested stock.
+    #
+    #   Author: Ian McNulty
+    def retrieve(db, ticker, startDate="", endDate=""):
+        try:
+            if startDate == "":
+                return db.collection("Stocks").document(ticker).get()
+            else:
+                data = db.collection("Stocks").document(ticker).get()
+                dates = data['dates']
+                opens = data['opens']
+                closes = data['closes']
+                tempArr = np.array(dates)
+                startLoc = np.where(tempArr == startDate)
+                endLoc = np.where(tempArr == endDate)
+                newDates = []
+                newData = []
+                for i in range(startLoc[0][0], endLoc[0][0]+1):
+                    interp = np.interp(range(0,23),[0, 12, 23],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
+                    for j in range(0,len(interp)):
+                        tempArr = np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])])
+                        interp[j] += np.random.randn() * np.std(tempArr)
+                    date = dates[i]
+                    hourlyDates = []
+                    for i in range(0,24):
+                        if i < 10:
+                            tempDate = date + ' 0' + str(i) + ':00:00'
+                        else:
+                            tempDate = date + ' ' + str(i) + ':00:00'
+                        hourlyDates.append(tempDate)
+                    newDates.append(hourlyDates)
+                    newData.append(interp)
+                return {
+                    'name':data['name'],
+                    'dates':newDates,
+                    'prices':newData
+                }
+        except:
+            return 'This data entry does not exist'
+
     # Stock availability by Muneeb Khan
-    def stockAvailability(self):
+    def stockAvailability(db):
         #data = {
         #    "ticker": self.ticker,
         #    "name": self.name,
@@ -183,7 +215,7 @@ class StockData:
         #}
         tickers = []
 
-        tempData = self.firebase.child('Stocks').get().val()
+        tempData = db.collection('Stocks').get().val()
         for i in range(['name']):
             tickers.append(tempData[i])
 
@@ -191,35 +223,55 @@ class StockData:
         
 class Simulation:
     def __init__(self, db, user, startDate, endDate, initialCash):
-        self.firebase = db
+        self.db = db
         self.user = user
         self.startDate = startDate
         self.endDate = endDate
         self.initialCash = initialCash
+        self.stocks = []
 
     def createSim(self):
         count = len(self.db.collection('Simulations').get())
         simName = "Sim" + str(count+1)
         self.simName = simName
+        self.startTimestamp = datetime.datetime.now()
         data = {
-                'ongoing': True,
-                'user': self.user.email,
-                'startDate': self.startDate,
-                'endDate': self.endDate,
-                'initialCash': self.initialCash,
-                'currentCash': self.initialCash,
-                'score': 0,
-                'Orders': []
-            }
+            'ongoing': True,
+            'user': self.user,
+            'startDate': self.startDate,
+            'endDate': self.endDate,
+            'initialCash': self.initialCash,
+            'currentCash': self.initialCash,
+            'score': 0,
+            'startTimestamp': self.startTimestamp,
+            'Orders': [],
+            'Stocks': []
+        }
         self.db.collection('Simulations').document(simName).set(data)
 
+    def whatTimeIsItRightNow(self):
+        currentTime = datetime.datetime.now()
+        difference = currentTime - self.startTimestamp
+        index = -1
+        for i in range(0,difference.days):
+            index += 24
+        index += (difference.seconds//3600)%24
+        return index
+
+    def addStocksToSim(self):
+        tickerList = StockData.stockAvailability()
+        for ticker in tickerList:
+            tempData = StockData.retrieve(self.db, ticker, self.startDate, self.endDate)
+            self.stocks.append(tempData)
+            self.db.collection('Simulations').document(self.simName).document('Stocks').document(ticker).set(tempData)
+
     def updateCash(self, newAmount):
-        data = self.db.collection('Simulations').collection(self.simName).get()
+        data = self.db.collection('Simulations').document(self.simName).get()
         data['currentCash'] = newAmount
         self.db.collection('Simulations').document(self.simName).update(data)
 
     def finishSimulation(self):
-        data = self.db.collection('Simulations').collection(self.simName).get()
+        data = self.db.collection('Simulations').document(self.simName).get()
         data['ongoing'] = False
         percentChange = (data['currentCash'] - data['initialCash']) / data['initialCash']
         data['score'] = percentChange * 100
@@ -282,7 +334,6 @@ class User:
             'Experience' : experience
         }
         db.collection('Users').document(username).set(data) 
-
 
 class Order:
     def __init__(self, db, simulation, stock, user, index, buyOrSell, quantity, stockPrice):

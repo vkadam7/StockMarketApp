@@ -273,9 +273,11 @@ def startSimulation():
             }
             session['currentCash'] = request.form['initialCash']
             session['portfolioValue'] = request.form['initialCash']
-            simulation = Simulation(dbfire, session['user'], request.form['simStartDate'],
+            global sim
+            sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
                                     request.form['simEndDate'], request.form['initialCash'])
-            simulation.createSim()
+            sim.createSim()
+            sim.addStocksToSim()
             return render_template('simulation.html', person=session['user'])
     except KeyError:
         print("KeyError occured: startSimulation")
