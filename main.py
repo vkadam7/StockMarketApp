@@ -358,15 +358,27 @@ def fourOhFour():
 @app.route('/portfolio')
 def Portfolio():
     if('user' in session): #to check if the user is logged in will change to profile page
-        return render_template("portfolio.html", person = session['user'])
-    else:
-        return render_template('portfolio.html')
+        session['simulation'] = {
+            'startDate': request.form['startDate'],
+            'endDate': request.form['endDate'],
+            'initialCash': request.form['initialCash'],
+            'currentCash': request.form['currentCash']
+        }
+        session['currentCash'] = request.form['initialCash']
+        global sim
+        sim = Simulation(firebase.database(), session['user'], request.form['startDate'],
+                        request.form['endDate'], request.form['initialCash'], request.form['currentCash'] )
+        sim.createSim()
+        return render_template('simulation.html', person=session['user'])
+    else: 
+        return render_template('404Error.html')
+    
 
 ## Need to complete this setup route for the dashboard, will show up to the user once they have started the simulation. 
 @app.route('/dashboard')
 def Dashboard():
     if ('user' in session):
-        return render_template('dashboard.html')
+        return render_template('dashboard.html', person = session['user'])
     else:
         return render_template('404Error.html')
 

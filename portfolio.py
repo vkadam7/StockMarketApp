@@ -51,9 +51,7 @@ class portfolio:
                 'currentCash': self.initialCash,
                 'score': 0,
                 'Orders': [],
-                'profit': 0,
-                
-                
+                'profit': 0
             }
         self.db.collection('Simulations').document(simName).set(data)
         
@@ -189,3 +187,21 @@ class portfolio:
             return percentIncrease
         else:
             return -1
+        
+    
+    def displayInfo(self, close):
+        print("Percent Change: " + self.percentChange)
+        print("Returns: " + self.returns)
+        print("Amount Remaining: " + self.funds_remaining)
+        print("Profit: " + self.get_profit)
+        if (self.GainorLoss > self.db.collection('Stocks').document('daily').document('closes').get()):
+            print("Gains: +" + self.GainorLoss)
+            return
+        elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
+            print("Loss: -" + self.GainorLoss)
+            return
+        else:
+            return -1
+        
+        
+        
