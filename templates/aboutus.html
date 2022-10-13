@@ -1,3 +1,5 @@
+<!--About us page by Muneeb Khan-->
+<!--Updated by Muneeb and Viraj-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -11,21 +13,25 @@
     <div class = "header">
         <h1>Welcome to StockSim: Learn How to Trade!</h1>
     </div>
-    {% if session['user'] %}
+    {% if session['loginFlagPy'] %}
     <div class = "login">
-        <p>Hello {{person}} <a method = "POST" href = "logout">Logout</a></p>
+        <p>Hello {{person['Name']}} <a method = "POST" href = "logout"><button>Logout</button></a></p>
     </div>
     {% else %}
     <div class = "login">
-        <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
+        <p><a method = "POST" href = "login"><button>Login</button></a> <button><a method = "POST" href = "register">Register</a></button></p>
     </div>
     {% endif %}
+    <!--Navbar by Muneeb Khan-->
     <div class = "navbar">
         <nav>
             <ul>
                 <li><a method = "POST" href = "home">Home</a></li>
                 <li><a method = "POST" href = "aboutus">About Us</a></li>
                 <li><a method = "POST" href = "information">Information</a></li>
+                {% if session['loginFlagPy'] %}
+                <li><a method = "POST" href = "profile">Profile</a></li>
+                {% endif %}
                 <li class="stockSimStartButton">
                     <form id="stockSimStart" action="/stockSimForm" method="post">
                         <button>Start a simulation!</button>
@@ -82,6 +88,7 @@
     integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" 
     crossorigin="anonymous"></script>
 </body>
+<br>
 <footer><p>Copyright 2022 by StockSim</p></footer>
 
 </html>

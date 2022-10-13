@@ -172,6 +172,23 @@ class StockData:
         }
         return stock
 
+    # Stock availability by Muneeb Khan
+    def stockAvailability(self):
+        #data = {
+        #    "ticker": self.ticker,
+        #    "name": self.name,
+        #    "startDate": self.startDate,
+        #    "endDate": self.endDate,
+        #    "timespan": self.timespan
+        #}
+        tickers = []
+
+        tempData = self.firebase.child('Stocks').get().val()
+        for i in range(['name']):
+            tickers.append(tempData[i])
+
+        return tickers
+        
 class Simulation:
     def __init__(self, db, user, startDate, endDate, initialCash):
         self.firebase = db
@@ -264,7 +281,26 @@ class User:
             'Picture' : picture,
             'Experience' : experience
         }
-        db.collection('Users').document(username).set(data) 
+        db.collection('Users').document(username).set(data)
+
+    # User list by Muneeb Khan
+    def uesrlist(self,username, email, name, userID, description="", picture="", experience=""):
+        data = {
+            'Email' : email,
+            'userName' : username,
+            'Name' : name,
+            'UserID' : userID,
+            'Description' : description,
+            'Picture' : picture,
+            'Experience' : experience,
+        }
+        usernames = []
+
+        tempData = self.db.collection('Users').document(username)
+        for i in range(['Users']):
+            usernames.append(tempData[i])
+
+        return usernames
 
 
 class Order:
@@ -376,133 +412,4 @@ class Order:
                 return profit
             except IndexError:
                 return -2
-        else: return -1        
- 
-
-
-class portfolio:
-    
-    investment = []
-    portfolio = 0
-    transactionCost = 0.1
-    amount = 1000
-    totalMoney = 0
-    port_list = []
-    
-    #Author: Viraj Kadam
-    def __init__(self, db, stock, user, index, buyOrSell, quantity, stockPrice):
-        self.db = db
-        self.stock = stock
-        self.user = user
-        self.dayOfPurchase = index
-        self.option = buyOrSell
-        self.quantity = quantity
-        self.avgStockPrice = stockPrice
-        self.totalPrice = quantity*stockPrice
-        return -1
-    #Author: Viraj Kadam
-    #Retrievs the stocks the user has
-    def retrieve(self, id):
-        try:
-            return self.firebase.child("Stocks").child(id).get().val()
-        except:
-            return ''
-
-    #Viraj Kadam
-    #Retrieves the number of shares owned by the user
-    def get_shares_owned(self, db, stock, user, quantity, stockPrice):
-        self.stock = stock
-        data = {'name': self.name,
-                'dayOfPurchase': self.dayOfPurchase,
-                'quantity': self.quantity,
-                'avgStockPrice': self.avgStockPrice,
-                'totalPrice': self.totalPrice}
-        
-        self.db.child('Stocks').child('name').get().val()
-        
-        return -1
-
-
-    def get_profit(self, db, stock, quantity, avgstockPrice):
-        profit = 0
-        tempData = self.db.child('Simulations').child(self.sim).child('Orders').get().val()
-        
-        data = {'name' : self.name, 
-                'quantity': self.quantity, 
-                'avgStockPrice': self.avgStockPrice}
-        
-        
-        
-    #Fixed this section to account for gains or losses, need to test to check if everything is correct  
-    def GainorLoss(self, db, stock, quanity, stockPrice):
-        totalGain = 0
-        netGain = 0
-        netLoss = 0
-        CurrentPrice = 0
-        tempData = self.db.child('Simulations').child(self.sim).child('Orders').get().val()
-        data = {'name': self.name, 
-                'quantity': self.quantity, 
-                'avgStockPrice': self.avgStockPrice, 
-                }
-        if quanity > 0:
-            if totalGain > CurrentPrice:
-                tempPrice = self.db.child('Stocks').child('daily').child('closes').get().val()
-                CurrentPrice = self.db.child('Stocks').child('daily').child('closes').get.val()
-                for CurrentPrice in i:
-                    netGainorLoss = (CurrentPrice[i+1] - tempPrice[i]) / (tempPrice[i]) * 100 #Unsure if this is correct
-                    if netGainorLoss > 0:
-                        netLoss = "-" + netGainorLoss
-                        return netLoss
-                    else:
-                        netGain = netGainorLoss
-                        return netGain
-        
-        return -1
-                            
-     #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
-    def funds_remaining(self, quantity, avgStockPrice):
-        intitialAmount = 1000
-        finalAmount = 0
-        fundsUsed = 0
-        fundsRemainiing = 0
-        quantity = 0
-        tempPrice = self.db.child('Stocks').child('daily').child('closes').get.val()
-        data = {'name': self.name,
-                'quantity': self.quantity, 
-                'avgStockPrice': self.avgStockPrice     
-        }
-        fundsUsed = intitialAmount - (tempPrice)(quantity)
-        finalAmount = intitialAmount - fundsUsed
-
-    #Needs to be fixed
-    def returns(self, quantity, avgStockPrice, ):
-        global portfolio, amount
-        allocatedMoney = quantity * price
-        endResult = endResult - allocatedMoney - transactionCost * allocatedMoney
-        portfolio += quantity
-        if investment == []:
-            investment.append(allocatedMoney)
-        else:
-            investment.append(allocatedMoney)
-            investment[-1] += investment[-2]
-        return -1
-    
-        
-    #Deletes a stock from the portfolio
-    def delete(self, stock):
-            stock = stock.upper()
-            try:
-                self.portfolio.pop(stock)
-                return True
-            except Error:
-                 return False
-     
-        
-        
-    #Muneeb is working on this function
-   # def percentChange(quantity, stockPrice, day, percent, AdjustClose):
-      #  quantity = 0
-       # stockPrice = 0 
-        #day = 0
-        #percent = 0
-        #AdjustClose = 0
+        else: return -1

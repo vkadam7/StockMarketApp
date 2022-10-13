@@ -3,7 +3,6 @@ from re import T
 from datetime import datetime
 from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
-from StockData import StockData, doesThatStockExist
 import pyrebase
 import firebase_admin
 from stockSim import StockData, User, Order, Simulation, doesThatStockExist
@@ -67,7 +66,7 @@ def login():
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
             session['loginFlagPy'] = 1
-            session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
+            ## session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
             flash("Log in succesful.", "pass")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
@@ -102,27 +101,23 @@ def register():
         # Variables for Password validation - Muneeb Khan
         digits = any(x.isdigit() for x in Password) # Digits will check for any digits in the password
         specials = any(x == '!' or x == '@' or x == '#' or x == '$' for x in Password) # Specials will check for any specials in the password
-
-        # If else conditions to check the password requirements - Muneeb Khan
-
-        if (len(Password) < 6): # If the password is too short
-                flash("Password too short! Must be 6 characters min")
-
-        elif (len(Password) > 20): # If the password is too long
-                flash("Password is too long! Must be 20 characters maximum")
-
-        elif (digits == 0): # If the password doesn't have a digit
-                flash("Password must contain at least 1 digit!")
         
-        elif (specials == 0): # If the password doesn't have a special
-                flash("Password must contain at least 1 special character! (ie. !,@,#,$)")
+        # If else conditions to check the password requirements - Muneeb Khan
+        if (len(Password) < 6 or len(Password) > 20 or digits == 0 or specials == 0):
+            flash("Invalid Password! must contain the following requirements: ")
+            flash("6 characters minimum")
+            flash("20 characters maximum")
+            flash("at least 1 digit")
+            flash("at least 1 special character ('!','@','#', or '$'")
         
         elif (Password != confirmPass): # If password and cofirm password don't match
             flash("You're password do not match. Please enter the same password for both fields.")
         
         elif (uniqueName == UseN):
             flash("Username is already taken. Please enter a valid username.") #check to see if username is taken
+
         else:
+
             try: 
                 user = authen.create_user_with_email_and_password(email, Password)
 
@@ -147,8 +142,6 @@ def register():
 def stockDefinitions():
     return render_template("StockDefinitions.html")'''
 
-## Attmept on Password recovery -Muneeb Khan NOT WORKING YET!
-
 ## Attempt on email verification function by Muneeb Khan (WIP!)
 @app.route('/verification', methods = ["POST" , "GET"])
 def verification():
@@ -168,7 +161,6 @@ def verification():
     return render_template("verification.html")
 
 ## Password Recovery Function by Muneeb Khan
-
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
 def PasswordRecovery():
     if request.method == "POST":
@@ -176,7 +168,7 @@ def PasswordRecovery():
         result = request.form
         email = result["email"]
         try:
-            user = authen.send_password_reset_email(email)
+            user = authen.send_password_reset_email(email) # Will send the notification to the provided email - Muneeb Khan
             flash("Password reset notification was sent to your email", "pass")
             return redirect(url_for("login"))
         except:
@@ -193,7 +185,7 @@ def logout():
     session.pop('user')
     session['loginFlagPy'] = 0
     session['Simulation'] = NULL
-    flash('logout succesful')
+    flash('logout succesful','pass')
     return redirect(url_for("login"))
 
 #Home
@@ -204,32 +196,55 @@ def hello(name=None):
     session['loginFlagPy'] = 0
     return render_template('home.html')
 
+
+## Route for Home page - Muneeb Khan
 @app.route("/home")
 def home():
-    if('user' in session): #to check if the user is logged in will change to profile page
-        return render_template("home.html", person = session['user'])
+    if('user' in session):
+        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+
+        for x in person.get():
+            person = x.to_dict()
+
+        return render_template("home.html", person = person)
     else:
         return render_template('home.html')
 
-## Route for About us and Information pages - Muneeb Khan
+## Route for About us page - Muneeb Khan
 @app.route("/aboutus")
 def aboutus():
-    if('user' in session): #to check if the user is logged in will change to profile page
-        return render_template("aboutus.html", person = session['user'])
+    if('user' in session): 
+        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+
+        for x in person.get():
+            person = x.to_dict()
+
+        return render_template("aboutus.html", person = person)
     else:
         return render_template('aboutus.html')
 
+## Route for Information Page - Muneeb Khan
 @app.route("/information")
 def information():
-    if('user' in session): #to check if the user is logged in will change to profile page
-        return render_template("information.html", person = session['user'])
+    if('user' in session):
+        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+
+        for x in person.get():
+            person = x.to_dict()
+
+        return render_template("information.html", person = person)
     else:
         return render_template('information.html')
 
 @app.route("/StockDefinitions")
 def StockDefinitions():
     if('user' in session):
-        return render_template("StockDefinitions.html", person = session['user'])
+        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+
+        for x in person.get():
+            person = x.to_dict()
+
+        return render_template("information.html", person = person)
     else:
         return render_template('StockDefinitions.html')
 
@@ -247,22 +262,26 @@ def stockSimForm():
 
 ## startSimulation
 #   Description: 
-@app.route("/startSimulation", methods=['POST', 'GET'])
+@app.route("/startSimulation", methods=['POST'])
 def startSimulation():
-    if request.method == 'POST':
-        session['simulation'] = {
-            'startDate': request.form['startDate'],
-            'endDate': request.form['endDate'],
-            'initialCash': request.form['initialCash']
-        }
-        session['currentCash'] = request.form['initialCash']
-        global sim
-        sim = Simulation(firebase.database(), session['user'], request.form['startDate'],
-                        request.form['endDate'], request.form['initialCash'])
-        sim.createSim()
-        return render_template('simulation.html', person=session['user'])
+    try:
+        if request.method == 'POST':
+            session['simulation'] = {
+                'simStartDate': request.form['simStartDate'],
+                'simEndDate': request.form['simEndDate'],
+                'initialCash': request.form['initialCash']
+            }
+            session['currentCash'] = request.form['initialCash']
+            session['portfolioValue'] = request.form['initialCash']
+            simulation = Simulation(dbfire, session['user'], request.form['simStartDate'],
+                                    request.form['simEndDate'], request.form['initialCash'])
+            simulation.createSim()
+            return render_template('simulation.html', person=session['user'])
+    except KeyError:
+        print("KeyError occured: startSimulation")
+        return redirect(url_for('fourOhFour'))
         
-@app.rout("/finishSimulation", methods=['POST', 'GET'])
+@app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
     sim.finishSimulation()
 
@@ -291,6 +310,7 @@ def stockSearch():
             else:
                 return redirect(url_for('fourOhFour'))
     except KeyError:
+        print("KeyError occured: stockSearch")
         return redirect(url_for('fourOhFour'))
     return redirect(url_for(request.url))
 
@@ -349,6 +369,13 @@ def changeStockView():
         
         return redirect(url_for('.displayStock', ticker=stock['ticker'], startDate=request.form['startDate'], endDate=request.form['endDate'], timespan=request.form['timespan']))
     return -1
+
+@app.route("/stockAvailability",methods=['POST'])
+def stockAvailability():
+    if request.method == 'POST':
+        return redirect(url_for('stockDisplay.html',ticker=stock['ticker'],startDate="2021-09-08",endDate="2022-09-19",timespan="daily"))
+
+    return -1    
 
 ## 
 @app.route('/404Error')

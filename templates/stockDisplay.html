@@ -1,3 +1,4 @@
+<!--Stock Display page by Ian Mcnulty-->
 <!DOCTYPE html>
 <html>
     <head>
@@ -16,6 +17,7 @@
             <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
         </div>
         {% endif %}
+        <!--Navbar by Muneeb Khan-->
         <div class = "navbar">
             <nav>
                 <ul>
@@ -70,13 +72,13 @@
             <div class="stockUtilityBar">
                 <div class="stockUtilityBarIcon">
                     <h3>Starting Date:</h3>
-                    <input type="dateInput" name="startDate" placeholder="yyyy-mm-dd" 
-                        value="{{ request.form['startData'] }}">
+                    <input type="date" name="startDate" placeholder="yyyy-mm-dd" 
+                        value="{{ request.form['startDate'] }}">
                 </div>
                 <div class="stockUtilityBarIcon">
                     <h3>Ending Date:</h3>
-                    <input type="dateInput" name="endDate" placeholder="yyyy-mm-dd"
-                        value="{{ request.form['endData'] }}">
+                    <input type="date" name="endDate" placeholder="yyyy-mm-dd"
+                        value="{{ request.form['endDate'] }}">
                 </div>
                 <div class="stockUtilityBarIcon">
                     <h3>Timespan:</h3>
@@ -94,20 +96,21 @@
                 Buy sell features for the stock market simulator, will place here for now until plan for game is confirmed. Buttons will
                 only appear if user if logged in-->
                
-                <div class = "buysell">
-                    <button type = "submit">Buy</button>
-                    <button type = "submit">Sell</button>
-                    <script>
-                        var Display = $('.login').css.('display','block'):
-                        var noDisplay = $('.login').css.('display', 'none'): 
-                        if($('.notloggedin').css.('display') == 'none'){
-                            $(Display);
-                        }
-                        else
-                            $(noDisplay);               
-                    </script>    
-                </div>
-
+            </div>
+        </form>
+        <form action="/orderForm" method="post">
+            <div class="buySellButtons">
+                <button type = "submit" id="{{ request.form['option'] }}" value="Buy">Buy</button>
+                <button type = "submit" id="{{ request.form['option'] }}" value="Sell">Sell</button>
+                <script>
+                    var Display = $('.login').css.('display','block'):
+                    var noDisplay = $('.login').css.('display', 'none'): 
+                    if($('.notloggedin').css.('display') == 'none'){
+                        $(Display);
+                    }
+                    else
+                        $(noDisplay);               
+                </script>    
             </div>
         </form>
     </body>
