@@ -18,7 +18,10 @@
   <!-- Fixed navbar -->
   <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(33, 103, 42)">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">StockSim: Learn How to Trade</a>
+      <a class="navbar-brand" href="home">
+        <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
+        StockSim: Learn How to Trade
+      </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -33,18 +36,19 @@
           <li class="nav-item">
             <a class="nav-link" href="information">Information</a>
           </li>
+          {% if session['user'] %}
+          <li class="nav-item">
+            Hello {{person}} <a class = "nav-link" method = "POST" href = "logout"> Logout</a>
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class = "nav-link" method = "POST" href = "login">Login</a> 
+          </li>
+          <li class = "nav-item">
+            <a class = "nav-link" method = "POST" href = "register">Register</a>
+          </li>
+          {% endif %}
         </ul>
-
-        {% if session['user'] %}
-            <div class = "login">
-            Hello {{person}} <a class = "aLog" method = "POST" href = "logout"> Logout</a>
-            </div>
-            {% else %}
-            <div class = "login">
-            <a class = "aLog" method = "POST" href = "login">Login</a> or <a class = "aLog" method = "POST" href = "register">Register</a>
-            </div>
-        {% endif %}
-
         <form action="/stockSearch" method="post">
           <input type="search" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
