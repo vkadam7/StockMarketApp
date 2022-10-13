@@ -38,24 +38,48 @@ class portfolio:
         self.stockPrice = stockPrice
         return -1
     
+    def displayPortfolio(self):
+        count = len(self.db.collection('Simulations').get())
+        simName = "Sim" + str(count+1)
+        self.simName = simName
+        data = {
+                'ongoing': True,
+                'user': self.user.email,
+                'startDate': self.startDate,
+                'endDate': self.endDate,
+                'initialCash': self.initialCash,
+                'currentCash': self.initialCash,
+                'score': 0,
+                'Orders': [],
+                'profit': 0,
+                
+                
+            }
+        self.db.collection('Simulations').document(simName).set(data)
+        
+    
     def retrieve(self, id):
         try:
             return self.firebase.collection("Stocks").document(id).get()
         except:
             return ''
 
-    #Retrieves the number of shares owned by the user
-    def get_shares_owned(self, db, stock, user, quantity, stockPrice):
-        self.stock = stock
-        data = {'name': self.name,
-                'dayOfPurchase': self.dayOfPurchase,
-                'quantity': self.quantity,
-                'avgStockPrice': self.avgStockPrice,
-                'totalPrice': self.totalPrice}
+    #Retrieves the number of shares owned by the user, to be implemented once buy and sell features are finished. Will be coded in line with
+    #those feaures.
+    
+   # def get_shares_owned(self, db, stock, user, quantity, stockPrice):
+    #   self.stock = stock
+     #   data = {'name': self.name,
+      #          'dayOfPurchase': self.dayOfPurchase,
+       #         'quantity': self.quantity,
+        #        'avgStockPrice': self.avgStockPrice,
+         #       'totalPrice': self.totalPrice}
         
-        self.db.collection('Stocks').document('name').get()
+        #self.db.collection('Stocks').document('name').get()
         
-        return -1
+        #return -1
+        
+        
 
     #Returns profit from the simulator(Need to test and fix if needed )
     def get_profit(self, db, stock, quantity, avgstockPrice):
@@ -66,7 +90,7 @@ class portfolio:
         tempPrice = self.db.collection('Simulations').document('daily').document('closes').get()
         quantity = self.db.collection('Simulations').document('daily').document('volume').get()
         profit += tempPrice * quantity
-        return profit
+        return data[profit]
         
         
         
@@ -103,8 +127,7 @@ class portfolio:
         return -1
                            
      #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
-    def funds_remaining(self):
-        intitialAmount = 1000
+    def funds_remaining(self, initialAmount, finalAmount):
         finalAmount = 0
         fundsUsed = 0
         fundsRemainiing = 0
@@ -116,21 +139,26 @@ class portfolio:
                 'startDate': self.startDate,
                 'endDate': self.endDate,
                 'initialCash': self.initialCash,
-                'currentCash': self.initialCash,
+                'currentCash': 0,
                 'score': 0,
                 'Orders': []  
         }
-        fundsUsed = intitialAmount - (tempPrice)(quantity)
-        finalAmount = intitialAmount - fundsUsed
-
+       
+        if data ['currentCash'] == data['initialCash']:
+           return data['currentCash']
+        elif data['currentCash'] > data['initialCash']:
+            fundsUsed = data['currentCash'] - data['initialCash']
+            fundsRemainiing = fundsUsed
+            return fundsRemainiing
+        else: 
+            return -1
+        
     #Edited returns feature
     def returns(self, quantity, avgStockPrice, AdjustClose):
         returns = self.db.collection('Stocks').document('daily').document('closes').get()
         daily_returns = returns.pct_change()
         print(daily_returns)
-        #monthly_returns =
-        
-    
+       
         
     #Deletes a stock from the portfolio
     def delete(self, stock):
