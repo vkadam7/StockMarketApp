@@ -66,7 +66,7 @@ def login():
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
             session['loginFlagPy'] = 1
-            session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
+            ## session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
             flash("Log in succesful.", "pass")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
@@ -281,7 +281,7 @@ def startSimulation():
         print("KeyError occured: startSimulation")
         return redirect(url_for('fourOhFour'))
         
-@app.rout("/finishSimulation", methods=['POST', 'GET'])
+@app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
     sim.finishSimulation()
 

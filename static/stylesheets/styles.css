@@ -217,6 +217,42 @@ h1{
     background-color: bisque;
 }
 
+.definitionspart1{
+    margin:auto;
+    width: 75%;
+    text-align: center;
+    border-style: double;
+    border-width: 5px 10px 5px 10px;
+    background-color: bisque;
+}
+
+.definitionspart2{
+    margin:auto;
+    width: 75%;
+    text-align: center;
+    border-style: double;
+    border-width: 5px 10px 5px 10px;
+    background-color: bisque;
+}
+
+.definitionspart3{
+    margin:auto;
+    width: 75%;
+    text-align: center;
+    border-style: double;
+    border-width: 5px 10px 5px 10px;
+    background-color: bisque;
+}
+
+.definitionspart4{
+    margin:auto;
+    width: 75%;
+    text-align: center;
+    border-style: double;
+    border-width: 5px 10px 5px 10px;
+    background-color: bisque;
+}
+
 .loginform {
     margin: auto;
     width: 40%;
