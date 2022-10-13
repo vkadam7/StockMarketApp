@@ -58,39 +58,55 @@
         <div class = infomain>
             <div class = "infopart1">
                 <h2>What Should I Know?</h2>
-                     <p>With our information page we will provide several links to places we went to get a better knowledge of stock
+                    <p>With our information page we will provide several links to places we went to get a better knowledge of stock
                     <br>investments. Some users may learn different but we want ensure we can help all our users get a better understanding
-                    <br>If the information doesn't help then you may contact us directly and we willsee if we can provide better information.
+                    <br>If the information doesn't help then you may contact us directly by email and we will see if we can provide the
+                    service necessary.
                     </p>
             </div>
                     
             <div class = "infopart2">
                 <h2>The Basics of Stock Markets</h2>
                     <br>
-                    <p>Stocks are basically the shares of ownership in a company and stockholders have a fractional ownership of the company.
-                    <br>Stocks are typically listed as line graphs and they basically keep track of the stock price of the company overtime. It can show
-                     <br>the companies records by daily, monthly, and yearly.
-                     <br>
-                     Below is an example of a graph showing Googles shares for the past 6 years.
-                     <br>
-                     </p>
-                     <br>  
-                     <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = 300 height = 300 class = "stock" />
+                    <p>Stocks are basically the shares of ownership in a company and stockholders 
+                    <br>have a fractional ownership of the company. Stocks are typically listed as line graphs
+                    <br> and they basically keep track of the stock price of the company overtime. 
+                    <br>It can show the companies records by daily, monthly, and yearly.
+                    <br>
+                    Below is an example of a graph showing Googles shares for the past 6 years.
+                    <br>
+                    </p>
+                    <br>  
+                    <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = 300 height = 300 class = "stock" />
+                    <br>
+                    You may also search for stocks using the stock search bar on the top right hand corner.
+                    <br>You will taken to the stock display page and shown a graph of the companies shares 
+                    <br>over a selected time frame. There will be an option to choose the time frame from
+                    <br>the starting date to end date.
+                    <br>
              </div>
        
             <div class = "infopart3">
-                 <h2>How Should I Start Investing?</h2>
+                    <h2>How Should I Start Investing?</h2>
                      <p>The best way to start is to do paper trading which will allow users
                     <br>to buy and sell on a simulator without having to invest real money
                      <br>that way the user is practicing before they decide to invest real
                      <br>money. Paper trading is possible through opening a brokerage account
                     <br>which is the quickest method of buying stocks.    
                     </p>
+                    <br>
+                    <p>
+                    Our website gives users the option to buy or sell a stock. The users
+                    <br>will also have a portfolio page to show their records on how many orders they
+                    <br>have made, and how many wins and losses they have on the stock simulator.
+                    <br>We also have a leaderboards page to show all the users current records on 
+                    <br>the stock sim, so everyone will know who is leading.    
+                    </p>
             </div>
 
             <div class = "infopart4">
                  <h2>Defintions of Stocks?</h2>
-                 <p>To see some simple defintions of stocks click the button below</p>
+                 <p>To see some defintions of stocks, please click the button below</p>
                  <a method = "POST" href = "StockDefinitions">Stock Definitions</a>
             </div>
         </div>
@@ -100,6 +116,7 @@
     integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" 
     crossorigin="anonymous"></script>
 </body>
+<br>
 <footer><p>Copyright 2022 by StockSim</p></footer>
 
 </html>
