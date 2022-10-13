@@ -1,16 +1,17 @@
-<!--404 Error page by Ian Mcnulty-->
+<!--Simulation page by Ian Mcnulty-->
 <!DOCTYPE html>
 <html>
     <head>
+        <meta class="UTF-8">
+        <title>StockSim: Learn How To Trade</title>
         <link rel = "stylesheet" href = "/static/stylesheets/styles.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" 
         integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     </head>
     <header>
-        <h1>404 Error: Webpage unavailable</h1>
         {% if session['user'] %}
         <div class = "login">
-            <p>Hello {{person['Name']}} <a method = "POST" href = "logout">Logout</a></p>
+            <p>Hello {{person}} <a method = "POST" href = "logout">Logout</a></p>
         </div>
         {% else %}
         <div class = "login">
@@ -24,18 +25,6 @@
                     <li><a method = "POST" href = "home">Home</a></li>
                     <li><a method = "POST" href = "aboutus">About Us</a></li>
                     <li><a method = "POST" href = "information">Information</a></li>
-                    {% if session['loginFlagPy'] %}
-                    <li><a method = "POST" href = "profile">Profile</a></li>
-                    {% endif %}
-                    <li class="stockSimStartButton">
-                        <form id="stockSimStart" action="/stockSimForm" method="post">
-                            <button>Start a simulation!</button>
-                        </form>
-                        <script type="text/javascript">
-                            if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
-                                document.getElementById('stockSimStart').style.display = "none";
-                        </script>
-                    </li>
                 </ul>
             </nav>
             <form action="/stockSearch" method="post">
@@ -46,11 +35,23 @@
         </div>
     </header>
     <body>
-        <div>
-            The webpage you have searched for is not available, click the button below to return to the home menu!
+        <div class="stockList">
+            <h3>Available stocks:</h3>
         </div>
-        <div>
-            <button><a href="/">Return to Home</a></button>
+        <div class="portfolio">
+            <h3>Your holdings:</h3>
+            <table>
+                <tr>
+                    <th>Current Money:</th>
+                    <td>${{ session['currentCash'] }}</td>
+                </tr>
+                <tr>
+                    
+                </tr>
+            </table>
+        </div>
+        <div class="orderListButton">
+            <a href="orderList">Order History</a>
         </div>
     </body>
 </html>

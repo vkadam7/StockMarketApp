@@ -1,3 +1,4 @@
+<!--Stock Display page by Ian Mcnulty-->
 <!DOCTYPE html>
 <html>
     <head>
@@ -7,15 +8,31 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
     </head>
     <header>
+        {% if session['user'] %}
+        <div class = "login">
+            <p>Hello {{person}} <a method = "POST" href = "logout">Logout</a></p>
+        </div>
+        {% else %}
         <div class = "login">
             <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
         </div>
+        {% endif %}
+        <!--Navbar by Muneeb Khan-->
         <div class = "navbar">
             <nav>
                 <ul>
                     <li><a method = "POST" href = "home">Home</a></li>
                     <li><a method = "POST" href = "aboutus">About Us</a></li>
                     <li><a method = "POST" href = "information">Information</a></li>
+                    <li class="stockSimStartButton">
+                        <form id="stockSimStart" action="/stockSimForm" method="post">
+                            <button>Start a simulation!</button>
+                        </form>
+                        <script type="text/javascript">
+                            if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
+                                document.getElementById('stockSimStart').style.display = "none";
+                        </script>
+                    </li>
                 </ul>
             </nav>
             <form action="/stockSearch" method="post">
@@ -55,13 +72,13 @@
             <div class="stockUtilityBar">
                 <div class="stockUtilityBarIcon">
                     <h3>Starting Date:</h3>
-                    <input type="dateInput" name="startDate" placeholder="yyyy-mm-dd" 
-                        value="{{ request.form['startData'] }}">
+                    <input type="date" name="startDate" placeholder="yyyy-mm-dd" 
+                        value="{{ request.form['startDate'] }}">
                 </div>
                 <div class="stockUtilityBarIcon">
                     <h3>Ending Date:</h3>
-                    <input type="dateInput" name="endDate" placeholder="yyyy-mm-dd"
-                        value="{{ request.form['endData'] }}">
+                    <input type="date" name="endDate" placeholder="yyyy-mm-dd"
+                        value="{{ request.form['endDate'] }}">
                 </div>
                 <div class="stockUtilityBarIcon">
                     <h3>Timespan:</h3>
@@ -75,6 +92,25 @@
                 <div class="stockUtilityBarIcon">
                     <button type="submit">Show Range</button>
                 </div>
+                <!--Author: Viraj
+                Buy sell features for the stock market simulator, will place here for now until plan for game is confirmed. Buttons will
+                only appear if user if logged in-->
+               
+            </div>
+        </form>
+        <form action="/orderForm" method="post">
+            <div class="buySellButtons">
+                <button type = "submit" id="{{ request.form['option'] }}" value="Buy">Buy</button>
+                <button type = "submit" id="{{ request.form['option'] }}" value="Sell">Sell</button>
+                <script>
+                    var Display = $('.login').css.('display','block'):
+                    var noDisplay = $('.login').css.('display', 'none'): 
+                    if($('.notloggedin').css.('display') == 'none'){
+                        $(Display);
+                    }
+                    else
+                        $(noDisplay);               
+                </script>    
             </div>
         </form>
     </body>
