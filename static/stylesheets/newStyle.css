@@ -1,0 +1,125 @@
+main > .container {
+  padding: 60px 15px 0;
+}
+
+
+@media (min-width: 768px) {
+  .bd-placeholder-img-lg {
+    font-size: 3.5rem;
+  }
+  
+  .login{
+    width:fit-content;
+  }
+}
+
+body {
+  background-color: white;
+  color:black;
+}
+
+h1{
+  text-align: center;
+  font-size: large;
+}
+
+.section1 p{
+  font-size:large;
+  text-align:center;
+  padding-bottom:30px;
+  
+}
+
+.section2{
+  background-color:rgb(243, 243, 243);
+  padding:5px;
+}
+
+.section2 h2{
+  text-align: center;
+  color:black;
+}
+
+.section2 p{
+  text-align: center;
+  font-size:large;
+  color:black;
+}
+
+.section3 {
+  background-color: rgb(243, 243, 243);
+  padding:5px;
+}
+
+.section3 h2{
+  text-align:center;
+  color:black;
+}
+
+.section3 p{
+  text-align: center;
+  font-size:large;
+  color:black;
+}
+
+.section4{
+  background-color: rgb(243, 243, 243);
+  padding:10px;
+}
+
+.section4 h2{
+  text-align: center;
+  color:black;
+}
+
+.section4 p{
+  text-align: center;
+  font-size:large;
+  color:black;
+}
+footer{
+  text-align:center;
+  color:white;
+}
+
+/*
+.login{
+  background-color:white;
+  text-align:right;
+  justify-content: right;
+  padding:15px;
+  padding-left:10px;
+  color:rgb(33,103,42);
+  border-radius: 12px;
+  margin-right: 10px;
+}
+
+.aLog{
+  background-color:white;
+  color:rgb(33,103,42)
+}
+*/
+.logo{
+  display: block;
+  margin-left:auto;
+  margin-top: auto;
+  margin-right: auto;
+}
+.opener{
+  font-size:large;
+  text-align:center;
+  padding-bottom:30px; 
+}
+.Welcome{
+  font-size: 75px;
+  padding-bottom: auto;
+}
+
+.card {
+  margin:auto;
+  float:none;
+  margin-bottom: 40px;
+  border-radius: 2em;
+  text-align: center;
+  box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
