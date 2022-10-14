@@ -188,7 +188,7 @@ class portfolio:
         else:
             return -1
         
-    
+    #Display all information
     def displayInfo(self, close):
         print("Percent Change: " + self.percentChange)
         print("Returns: " + self.returns)
