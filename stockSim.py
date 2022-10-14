@@ -1,6 +1,9 @@
 from mimetypes import init
+from time import daylight
 import numpy as np
 import firebase_admin
+from firebase_admin import firestore
+from google.cloud.firestore import ArrayUnion
 import datetime
 
 ## doesThatStockExist
@@ -167,15 +170,16 @@ class StockData:
     #   Inputs: id - Database key for requested stock.
     #
     #   Author: Ian McNulty
-    def retrieve(db, ticker, startDate="", endDate=""):
+    def retrieve(db, ticker, simName="", startDate="", endDate=""):
         try:
             if startDate == "":
-                return db.collection("Stocks").document(ticker).get()
+                return db.collection("Stocks").document(ticker).get().to_dict()
             else:
-                data = db.collection("Stocks").document(ticker).get()
-                dates = data['dates']
-                opens = data['opens']
-                closes = data['closes']
+                data = db.collection("Stocks").document(ticker).get().to_dict()
+                dailys = data['daily']
+                dates = dailys['dates']
+                opens = dailys['opens']
+                closes = dailys['closes']
                 tempArr = np.array(dates)
                 startLoc = np.where(tempArr == startDate)
                 endLoc = np.where(tempArr == endDate)
@@ -194,18 +198,23 @@ class StockData:
                         else:
                             tempDate = date + ' ' + str(i) + ':00:00'
                         hourlyDates.append(tempDate)
-                    newDates.append(hourlyDates)
-                    newData.append(interp)
+                    for entry in hourlyDates:
+                        newDates.append(entry)
+                    for entry in interp.tolist():
+                        newData.append(entry)
                 return {
-                    'name':data['name'],
-                    'headquarters':data['headquarters'],
-                    'listedAt':data['listedAt'],
-                    'dates':newDates,
-                    'prices':newData,
-                    'highs':data['highs'],
-                    'lows':data['lows']
+                    'simulation':simName,
+                    'name': data['name'],
+                    'headquarters': data['headquarters'],
+                    'listedAt': data['listedAt'],
+                    'dates': newDates,
+                    'prices': newData,
+                    'opens': opens,
+                    'closes': closes,
+                    'highs': dailys['highs'],
+                    'lows': dailys['lows']
                 }
-        except:
+        except KeyError:
             return 'This data entry does not exist'
 
     # Stock availability by Muneeb Khan
@@ -219,9 +228,8 @@ class StockData:
         #}
         tickers = []
 
-        tempData = db.collection('Stocks').get().val()
-        for i in range(['name']):
-            tickers.append(tempData[i])
+        for entry in db.collection('Stocks').get():
+            tickers.append(entry.id)
 
         return tickers
         
@@ -247,9 +255,7 @@ class Simulation:
             'initialCash': self.initialCash,
             'currentCash': self.initialCash,
             'score': 0,
-            'startTimestamp': self.startTimestamp,
-            'Orders': [],
-            'Stocks': []
+            'startTimestamp': self.startTimestamp
         }
         self.db.collection('Simulations').document(simName).set(data)
 
@@ -263,19 +269,19 @@ class Simulation:
         return index
 
     def currentPriceOf(self, ticker):
-        data = self.db.collection('Simulations').document(self.simName).document('Stocks').document(ticker).get()
+        data = self.db.collection('IntradayStockData').document(ticker).get()
         return data['prices'][self.whatTimeIsItRightNow()]
 
     def retrieveStock(self, ticker):
-        stock = self.db.collection('Simulations').document(self.simName).document('Stocks').document(ticker).get()
+        stock = self.db.collection('IntradayStockData').document(ticker).get()
         return stock
 
     def addStocksToSim(self):
-        tickerList = StockData.stockAvailability()
+        tickerList = StockData.stockAvailability(self.db)
         for ticker in tickerList:
-            tempData = StockData.retrieve(self.db, ticker, self.startDate, self.endDate)
+            tempData = StockData.retrieve(self.db, ticker, self.simName, self.startDate, self.endDate)
             self.stocks.append(tempData)
-            self.db.collection('Simulations').document(self.simName).document('Stocks').document(ticker).set(tempData)
+            self.db.collection('IntradayStockData').document(ticker).set(tempData)
 
     def updateCash(self, newAmount):
         data = self.db.collection('Simulations').document(self.simName).get()

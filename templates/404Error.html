@@ -10,7 +10,7 @@
         <h1>404 Error: Webpage unavailable</h1>
         {% if session['user'] %}
         <div class = "login">
-            <p>Hello {{person['Name']}} <a method = "POST" href = "logout">Logout</a></p>
+            <p>Hello {{person}} <a method = "POST" href = "logout">Logout</a></p>
         </div>
         {% else %}
         <div class = "login">

@@ -265,7 +265,7 @@ def stockSimForm():
 #   Description: 
 @app.route("/startSimulation", methods=['POST'])
 def startSimulation():
-    try:
+    #try:
         if request.method == 'POST':
             session['simulation'] = {
                 'simStartDate': request.form['simStartDate'],
@@ -281,9 +281,9 @@ def startSimulation():
             sim.createSim()
             sim.addStocksToSim()
             return render_template('simulation.html', person=session['user'])
-    except KeyError:
-        print("KeyError occured: startSimulation")
-        return redirect(url_for('fourOhFour'))
+    #except KeyError:
+    #    print("KeyError occured: startSimulation")
+    #    return redirect(url_for('fourOhFour'))
         
 @app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
