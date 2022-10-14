@@ -89,8 +89,16 @@ class portfolio:
         quantity = self.db.collection('Simulations').document('daily').document('volume').get()
         profit += tempPrice * quantity
         return data[profit]
-        
-        
+    
+    #Displays amount of shares owned (To also be implemented later)
+    def weight(self, db, stock):
+        share = [self.quantity]
+        max_share = 1
+        for share in max_share:
+            if(self.quantity <= max_share and self.quantity >= 0):
+                return share[self.quantity]
+            else:
+                return -1   
         
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
     def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
@@ -165,7 +173,7 @@ class portfolio:
                 self.portfolio.pop(stock)
                 return True
             except Error:
-                 return False
+                return False
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
@@ -188,6 +196,9 @@ class portfolio:
         else:
             return -1
         
+    #def user_graph(self, db):
+        
+        
     #Display all information
     def displayInfo(self, close):
         print("Percent Change: " + self.percentChange)
@@ -202,6 +213,10 @@ class portfolio:
             return
         else:
             return -1
+        
+        print("Would you like to delete a stock: " + self.delete)
+        print("Retrive stocks: " + self.retrieve)
+        
         
         
         

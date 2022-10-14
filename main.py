@@ -381,8 +381,8 @@ def stockAvailability():
 @app.route('/404Error')
 def fourOhFour():
     return render_template('404Error.html')
-
-@app.route('/portfolio')
+#Author: Viraj Kadam
+@app.route('/displayInfo') #Retrieving info from portolio file
 def Portfolio():
     if('user' in session): #to check if the user is logged in will change to profile page
         session['simulation'] = {
