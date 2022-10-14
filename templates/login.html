@@ -43,7 +43,7 @@
                 <input type = "password" id = "password" name = "password" placeholder="Must be 6 characters minimum" required>
                 <p>Forgot your password? <a href = "PasswordRecovery">click here</a></p>
                 <br>
-            <!--   {% with alerts = get_flashed_messages() %}
+                <!--{% with alerts = get_flashed_messages() %}
                     {% for print in alerts %}
                         {% if print in get_flashed_messages(category_filter = ['pass']) %} 
                         <div class="alert-pass" role="alert">
@@ -63,11 +63,11 @@
                         {% for message in messages %}
                         <div class ="alert alert-warning alert-dismissible" role="alert">
                             {{ message }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true"></span></button>
                         </div>
                         {% endfor %} 
                     {% endif %} 
-                {% endwith %} 
+                {% endwith %}
                 <br><br> 
                 <button type = "submit">Submit</button>
                 <p>Not yet registered? <a href = "register">click here</a> to sign up</p>
