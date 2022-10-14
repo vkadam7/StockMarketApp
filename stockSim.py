@@ -351,7 +351,26 @@ class User:
             'Picture' : picture,
             'Experience' : experience
         }
-        db.collection('Users').document(username).set(data) 
+        db.collection('Users').document(username).set(data)
+
+    # User list by Muneeb Khan
+    def uesrlist(self,username, email, name, userID, description="", picture="", experience=""):
+        data = {
+            'Email' : email,
+            'userName' : username,
+            'Name' : name,
+            'UserID' : userID,
+            'Description' : description,
+            'Picture' : picture,
+            'Experience' : experience,
+        }
+        usernames = []
+
+        tempData = self.db.collection('Users').document(username)
+        for i in range(['Users']):
+            usernames.append(tempData[i])
+
+        return usernames
 
 class Order:
     def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
@@ -462,3 +481,18 @@ class Order:
             except IndexError:
                 return -2
         else: return -1
+
+    # List of Orders by Muneeb Khan
+    def orderlist(self, stock, user, index):
+        data = {
+            'stock' : stock,
+            'user' : user,
+            'index' : index,
+        }
+        orders = []
+
+        tempData = self.db.collection('Stocks').document(stock)
+        for i in range(['Stocks']):
+            orders.append(tempData[i])
+
+        return orders

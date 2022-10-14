@@ -40,10 +40,10 @@
             <h3>Just need to enter some details to get the simulation started!</h3>
             <form action="/startSimulation" method="post">
                 <label for="dateInput">Starting Date of Simulation:</label>
-                <input type="dateInput"  name="simStartDate" value="{{ request.form['simStartDate'] }}" placeholder="yyyy-mm-dd">  
+                <input type="date"  name="simStartDate" value="{{ request.form['simStartDate'] }}" placeholder="yyyy-mm-dd">  
                 <br>
                 <label for="dateInput">Ending Date of Simulation:</label>
-                <input type="dateInput" name="simEndDate" value="{{ request.form['simEndDate'] }}" placeholder="yyyy-mm-dd">
+                <input type="date" name="simEndDate" value="{{ request.form['simEndDate'] }}" placeholder="yyyy-mm-dd">
                 <br>
                 <label for="Money">Starting Cash for Simulation:</label>
                 <input type="Money" name="initialCash" value="{{ request.form['initialCash'] }}" placeholder="Enter an amount...">
