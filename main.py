@@ -201,7 +201,7 @@ def hello(name=None):
 @app.route("/home")
 def home():
     if('user' in session):
-        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+        person = dbfire.collection('Users').where('Email', '==', session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
 
         for x in person.get():
             person = x.to_dict()
@@ -214,7 +214,7 @@ def home():
 @app.route("/aboutus")
 def aboutus():
     if('user' in session): 
-        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+        person = dbfire.collection('Users').where('Email', '==', session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
 
         for x in person.get():
             person = x.to_dict()
@@ -227,7 +227,7 @@ def aboutus():
 @app.route("/information")
 def information():
     if('user' in session):
-        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+        person = dbfire.collection('Users').where('Email', '==', session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
 
         for x in person.get():
             person = x.to_dict()
@@ -239,12 +239,12 @@ def information():
 @app.route("/StockDefinitions")
 def StockDefinitions():
     if('user' in session):
-        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+        person = dbfire.collection('Users').where('Email', '==', session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
 
         for x in person.get():
             person = x.to_dict()
 
-        return render_template("information.html", person = person)
+        return render_template("StockDefinitions.html", person = person)
     else:
         return render_template('StockDefinitions.html')
 
