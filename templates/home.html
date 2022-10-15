@@ -1,3 +1,6 @@
+<!--Home page by Muneeb Khan-->
+<!--Updated by Muneeb, Miqdad, and Viraj-->
+<!--CSS Updated by Miqdad and integrated by Muneeb-->
 <!doctype html>
 <html lang="en" class="h-100">
   <head>
@@ -34,7 +37,13 @@
           </li>
           {% if session['user'] %}
           <li class="nav-item">
-            Hello {{person}} <a class = "nav-link" method = "POST" href = "logout"> Logout</a>
+            <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
+          </li>
+          <li class="nav-item">
+            Hello {{person['Name']}}
+          </li>
+          <li class="nav-item">
+            <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
           {% else %}
           <li class="nav-item">
@@ -44,6 +53,16 @@
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
           {% endif %}
+          <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
+          <li class="nav-item"> <!--Old list name was StockSimStartButton-->
+            <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
+                <button>Start a simulation!</button>
+            </form>
+            <script type="text/javascript">
+                if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
+                    document.getElementById('stockSimStart').style.display = "none";
+            </script>
+          </li>
         </ul>
         <form action="/stockSearch" method="post">
           <input type="search" name="searchTerm" placeholder="Find a stock..."
