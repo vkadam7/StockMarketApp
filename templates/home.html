@@ -34,7 +34,7 @@
           </li>
           {% if session['user'] %}
           <li class="nav-item">
-            Hello {{person}} <a class = "nav-link" method = "POST" href = "logout"> Logout</a>
+            Hello {{person['Name']}} <a class = "nav-link" method = "POST" href = "logout"> Logout</a>
           </li>
           {% else %}
           <li class="nav-item">

@@ -31,7 +31,7 @@ config = {
 
 firebase = pyrebase.initialize_app(config)
 authen = firebase.auth()
-db1 = firebase.database()
+db1 = dbfire
 
 app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
@@ -291,15 +291,15 @@ def finishSimulation():
     sim.finishSimulation()
 
 @app.route("/orderForm", methods=['POST', 'GET'])
-def orderForm():
+def orderFormFill():
     session['option'] = request.form['option']
-    session['currentPrice'] = sim.currentPriceOf(stock['ticker'])
-    return redirect(url_for('orderForm.html', stock=stock, option=session['option']))
+    session['currentPrice'] = round(sim.currentPriceOf(stock['ticker']), 2)
+    return render_template('orderForm.html', stock=stock, option=session['option'])
 
 @app.route("/orderCreate", methods=['POST', 'GET'])
 def orderCreate():
     session['orderQuantity'] = request.form['stockQuantity']
-    session['orderPrice'] = round(session['orderQuantity'] * session['currentPrice'])
+    session['orderPrice'] = round(int(session['orderQuantity']) * session['currentPrice'], 2)
     global order
     order = Order(firebase, sim.simName, stock['ticker'], session['option'], session['orderQuantity'], session['currentPrice'])
     return redirect(url_for('orderConfirmation.html'))
@@ -320,7 +320,7 @@ def orderCreate():
 def stockSearch():
     try:
         if request.method == 'POST':
-            if doesThatStockExist(firebase.database(), request.form["searchTerm"]):
+            if doesThatStockExist(dbfire, request.form["searchTerm"]):
                 return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-19", timespan="daily"))
             else:
                 return redirect(url_for('fourOhFour'))
@@ -350,7 +350,7 @@ def displayStock(ticker):
     timespan = request.args['timespan']
     global stock
     if session['simulationFlag'] == False:
-        stockData = StockData(firebase.database(), ticker)
+        stockData = StockData(dbfire, ticker)
         stock = stockData.stockPageFactory()
         stockMatrix = stockData.getData(startDate, endDate, timespan)
         if stockMatrix != -1:
@@ -374,7 +374,8 @@ def displayStock(ticker):
             return displayStock(ticker)
     else:
         stockData = sim.retrieveStock(ticker)
-        stock = stockData
+        for entry in stockData:
+            stock = entry.to_dict()
         if stock != -1:
             dates = []
             prices = []

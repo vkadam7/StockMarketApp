@@ -203,16 +203,13 @@ class StockData:
                     for entry in interp.tolist():
                         newData.append(entry)
                 return {
-                    'simulation':simName,
+                    'simulation': simName,
                     'name': data['name'],
+                    'ticker': ticker,
                     'headquarters': data['headquarters'],
                     'listedAt': data['listedAt'],
                     'dates': newDates,
-                    'prices': newData,
-                    'opens': opens,
-                    'closes': closes,
-                    'highs': dailys['highs'],
-                    'lows': dailys['lows']
+                    'prices': newData
                 }
         except KeyError:
             return 'This data entry does not exist'
@@ -255,7 +252,8 @@ class Simulation:
             'initialCash': self.initialCash,
             'currentCash': self.initialCash,
             'score': 0,
-            'startTimestamp': self.startTimestamp
+            'startTimestamp': self.startTimestamp,
+            'intradayStockDataTableKey': ''
         }
         self.db.collection('Simulations').document(simName).set(data)
 
@@ -263,17 +261,20 @@ class Simulation:
         currentTime = datetime.datetime.now()
         difference = currentTime - self.startTimestamp
         index = -1
-        for i in range(0,difference.days):
+        for i in range(0,difference.days+1):
             index += 24
         index += (difference.seconds//3600)%24
         return index
 
     def currentPriceOf(self, ticker):
-        data = self.db.collection('IntradayStockData').document(ticker).get()
-        return data['prices'][self.whatTimeIsItRightNow()]
+        data = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
+        for entry in data:
+            fin = entry.to_dict()
+            print(fin['prices'][self.whatTimeIsItRightNow()])
+        return fin['prices'][self.whatTimeIsItRightNow()]
 
     def retrieveStock(self, ticker):
-        stock = self.db.collection('IntradayStockData').document(ticker).get()
+        stock = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
         return stock
 
     def addStocksToSim(self):
@@ -281,7 +282,7 @@ class Simulation:
         for ticker in tickerList:
             tempData = StockData.retrieve(self.db, ticker, self.simName, self.startDate, self.endDate)
             self.stocks.append(tempData)
-            self.db.collection('IntradayStockData').document(ticker).set(tempData)
+            self.db.collection('IntradayStockData').add(tempData)
 
     def updateCash(self, newAmount):
         data = self.db.collection('Simulations').document(self.simName).get()
