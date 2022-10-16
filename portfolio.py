@@ -20,12 +20,6 @@ import matplotlib.pyplot as plt
 
 
 db = firebase.database()
-investment = []
-portfolio = 0
-transactionCost = 0.1
-amount = 1000
-totalMoney = 0
-port_list = []
 
 class portfolio:
     def __init__(self, db, stock, user, index, buyOrSell, quantity, stockPrice, startDate, endDate, initialCash):
@@ -39,7 +33,7 @@ class portfolio:
         return -1
     
     def displayPortfolio(self):
-        count = len(self.db.collection('Simulations').get())
+        count = len(self.db.collection('Simulations').get(id))
         simName = "Sim" + str(count+1)
         self.simName = simName
         data = {
