@@ -98,12 +98,25 @@ class portfolio:
         
         
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
-    def percentChange(quantity, stockPrice, day, percent, AdjustClose):
+    #Updated by Muneeb Khan
+    def percentChange(self,db,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
+
         quantity = 0
-        stockPrice = 0 
-        day = 0
-        percent = 0
+        percentIncrease = 0
         AdjustClose = 0
+
+        day = db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
+        newstockPrice = db.collection('Stocks').document('daily').document('closes').get()
+        stockPrice = db.collection('Stocks').document('daily').document('closes').get()
+
+        if quantity > 0:
+            for stockPrice in day: 
+                increase = newstockPrice[day+1] - stockPrice[day]
+                    
+            percentIncrease = (increase/stockPrice) * 100
+            return percentIncrease
+        else:
+            return -1
         
         
     

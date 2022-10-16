@@ -1,4 +1,5 @@
 from asyncio.windows_events import NULL
+from collections import UserList
 from re import T
 from datetime import datetime
 from statistics import mean
@@ -404,6 +405,26 @@ def stockAvailability():
         return redirect(url_for('stockDisplay.html',ticker=stock['ticker'],startDate="2021-09-08",endDate="2022-09-19",timespan="daily"))
 
     return -1    
+
+#Testing the User list
+#Will remove after successful test - Muneeb Khan
+@app.route("/Userlist",methods=['POST','GET'])
+def userlists():
+    if request.method == 'POST':
+        userlist = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+        for x in userlist.get():
+            userlist = x.to_dict()
+        return render_template('Userlist.html',userlist = userlist)
+
+#Testing the Order list
+#Will remove after successful test - Muneeb Khan
+@app.route("/orderList",methods=['POST','GET'])
+def orderlists():
+    if request.method == 'POST':
+        orderlist = dbfire.collection('Orders') # This will have the username show on webpage when logged in - Muneeb Khan
+        for x in orderlist.get():
+            orderlist = x.to_dict()
+        return render_template('orderList.html',orderlist = orderlist)
 
 ## 
 @app.route('/404Error')

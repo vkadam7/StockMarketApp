@@ -366,10 +366,8 @@ class User:
         }
         usernameslist = []
 
-        tempData = db.collection('Users').document(username).get(data)
-        for i in range(['Users']):
-            usernameslist.append(tempData[i])
-            print("\n")
+        for entry in db.collection('Users').document(username).get(data):
+            usernameslist.append(entry.id)
 
         return usernameslist
 
