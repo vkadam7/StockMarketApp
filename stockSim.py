@@ -6,19 +6,6 @@ from firebase_admin import firestore
 from google.cloud.firestore import ArrayUnion
 import datetime
 
-## doesThatStockExist
-#   Description: Checks to see if that stock exists in the database yet,
-#   according to the ID (ticker)
-#
-#   Inputs: db - Link to the database
-#   ticker - stock ticker to be searched for in database
-#
-#   Author: Ian McNulty
-def doesThatStockExist(db, searchTerm):
-    tempData = db.collection('Stocks').document(searchTerm).get() 
-    if tempData != None:
-        return True
-
 class StockData:
     ## StockData __init__
     #   Description: Initiates a StockData object with Database and 
@@ -142,12 +129,12 @@ class StockData:
         else:
             return False
             
-    ## stockPageFactory
+    ## stockJSON
     #   Description: Returns a dictionary of values to be used with the stockView
     #   HTML template
     #
     #   Author: Ian McNulty
-    def stockPageFactory(self):
+    def stockJSON(self):
         stock = {
             "ticker": self.ticker,
             "name": self.name,
@@ -215,7 +202,7 @@ class StockData:
             return 'This data entry does not exist'
 
     # Stock availability by Muneeb Khan
-    def stockAvailability(db):
+    def stockList(db):
         #data = {
         #    "ticker": self.ticker,
         #    "name": self.name,
@@ -229,6 +216,19 @@ class StockData:
             tickers.append(entry.id)
 
         return tickers
+
+    ## stockSearch
+    #   Description: Checks to see if that stock exists in the database yet,
+    #   according to the ID (ticker)
+    #
+    #   Inputs: db - Link to the database
+    #   ticker - stock ticker to be searched for in database
+    #
+    #   Author: Ian McNulty
+    def stockSearch(db, searchTerm):
+        tempData = db.collection('Stocks').document(searchTerm).get() 
+        if tempData != None:
+            return True
         
 class Simulation:
     def __init__(self, db, user, startDate, endDate, initialCash):
@@ -278,7 +278,7 @@ class Simulation:
         return stock
 
     def addStocksToSim(self):
-        tickerList = StockData.stockAvailability(self.db)
+        tickerList = StockData.stockListt(self.db)
         for ticker in tickerList:
             tempData = StockData.retrieve(self.db, ticker, self.simName, self.startDate, self.endDate)
             self.stocks.append(tempData)
@@ -355,7 +355,7 @@ class User:
         db.collection('Users').document(username).set(data)
 
     # User list by Muneeb Khan
-    def uesrlist(self,username, email, name, userID, description="", picture="", experience=""):
+    def userlist(self,username, email, name, userID, description="", picture="", experience=""):
         data = {
             'Email' : email,
             'userName' : username,

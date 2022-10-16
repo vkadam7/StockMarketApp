@@ -5,7 +5,7 @@ from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
 import firebase_admin
-from stockSim import StockData, User, Order, Simulation, doesThatStockExist
+from stockSim import StockData, User, Order, Simulation
 
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -310,7 +310,7 @@ def orderCreate():
 #   Input: request.form['searchTerm'] - string input given by the user to 
 #   search for a stock
 #
-#   Referenced: doesThatStockExist(db, string) - searchs the database for
+#   Referenced: StockData.stockSearch(db, string) - searchs the database for
 #   the given string to see if it matchs an entry ID
 #   displayStock(ticker) - renders the webpage for the searched for stock
 #   ticker (if found)
@@ -320,7 +320,7 @@ def orderCreate():
 def stockSearch():
     try:
         if request.method == 'POST':
-            if doesThatStockExist(dbfire, request.form["searchTerm"]):
+            if StockData.stockSearch(dbfire, request.form["searchTerm"]):
                 return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-19", timespan="daily"))
             else:
                 return redirect(url_for('fourOhFour'))
@@ -351,7 +351,7 @@ def displayStock(ticker):
     global stock
     if session['simulationFlag'] == False:
         stockData = StockData(dbfire, ticker)
-        stock = stockData.stockPageFactory()
+        stock = stockData.stockJSON()
         stockMatrix = stockData.getData(startDate, endDate, timespan)
         if stockMatrix != -1:
             if timespan != 'hourly':
