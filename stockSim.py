@@ -354,19 +354,17 @@ class User:
         db.collection('Users').document(username).set(data)
 
     # User list by Muneeb Khan
-    def uesrlist(db,username, email, name, userID, description="", picture="", experience=""):
+    def userList(self):
         data = {
-            'Email' : email,
-            'userName' : username,
-            'Name' : name,
-            'UserID' : userID,
-            'Description' : description,
-            'Picture' : picture,
-            'Experience' : experience,
+            'Email' : self.email,
+            'userName' : self.username,
+            'Name' : self.name,
+            'UserID' : self.userID,
         }
+
         usernameslist = []
 
-        for entry in db.collection('Users').document(username).get(data):
+        for entry in self.db.collection('Users').document(self.username).get(data):
             usernameslist.append(entry.id)
 
         return usernameslist
@@ -482,21 +480,20 @@ class Order:
         else: return -1
 
     # List of Orders by Muneeb Khan
-    def orderlist(db, sim, stock, user, index,quantity,stockPrice):
+    def orderList(self):
         data = {
-            'sim' : sim,
-            'stock' : stock,
-            'user' : user,
-            'index' : index,
-            'quantity' : quantity,
-            'avgStockPrice' : stockPrice
-        }
+            'validity': True,
+            'ticker': self.stock.ticker,
+            'dayOfPurchase': self.dayOfPurchase,
+            'buyOrSell': self.buyOrSell,
+            'quantity': self.quantity,
+            'avgStockPrice': self.avgStockPrice,
+            'totalPrice': self.totalPrice
+            }
         orderslist = []
 
-        tempData = db.collection('Stocks').document(stock).get(data)
-        for i in range(['Stocks']):
-            orderslist.append(tempData[i])
-            print ("\n")
+        for entry in self.db.collection('Simulations').document(self.sim).document('Orders').get(data):
+            orderslist.append(entry.id)
 
         return orderslist
 

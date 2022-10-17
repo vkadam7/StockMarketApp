@@ -408,13 +408,17 @@ def stockAvailability():
 
 #Testing the User list
 #Will remove after successful test - Muneeb Khan
-@app.route("/Userlist",methods=['POST','GET'])
+@app.route("/Userlist")
 def userlists():
-    if request.method == 'POST':
-        userlist = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
-        for x in userlist.get():
-            userlist = x.to_dict()
-        return render_template('Userlist.html',userlist = userlist)
+    if ('user' in session):
+        try:
+            newuserlist = User.userList(firebase.database())
+            for x in newuserlist.get():
+                newuserlist = x.to_dict
+
+            return redirect(url_for('Userlist.html',newuserlist = newuserlist))
+        except:
+            return redirect(url_for('404Error.html'))
 
 #Testing the Order list
 #Will remove after successful test - Muneeb Khan
