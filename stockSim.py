@@ -502,13 +502,6 @@ class Order:
 
         return orderslist
 
-        # All variables for Order class
-        # self.db = db
-        # self.sim = simulation
-        # self.stock = stock
-        # self.user = user
-        # self.dayOfPurchase = index
-        # self.option = buyOrSell
-        # self.quantity = quantity
-        # self.avgStockPrice = stockPrice
-        # self.totalPrice = quantity*stockPrice
+        return orders
+    
+    
