@@ -278,7 +278,7 @@ class Simulation:
         return stock
 
     def addStocksToSim(self):
-        tickerList = StockData.stockListt(self.db)
+        tickerList = StockData.stockList(self.db)
         for ticker in tickerList:
             tempData = StockData.retrieve(self.db, ticker, self.simName, self.startDate, self.endDate)
             self.stocks.append(tempData)
