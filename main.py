@@ -1,5 +1,4 @@
 from asyncio.windows_events import NULL
-from crypt import methods
 from re import T
 from datetime import datetime
 from statistics import mean

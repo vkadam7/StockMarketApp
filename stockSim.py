@@ -696,10 +696,10 @@ class portfolio:
         print("Returns: " + self.returns)
         print("Amount Remaining: " + self.funds_remaining)
         print("Profit: " + self.get_profit)
-        if (self.GainorLoss > self.db.collection('').document('daily').document('closes').get()):
+        if (self.GainorLoss > self.db.collection('IntraDayStockData').document('prices').get()):
             print("Gains: +" + self.GainorLoss)
             return
-        elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
+        elif (self.GainorLoss < self.db.collection('IntraDayStockData').document('prices').get()):
             print("Loss: -" + self.GainorLoss)
             return
         else:
