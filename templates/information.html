@@ -1,105 +1,172 @@
 <!--Information Page by Muneeb Khan-->
 <!--Updated by Muneeb and Viraj-->
-<!DOCTYPE html>
-<html>
-<head>
-    <meta class="UTF-8">
-    <title>StockSim: Learn How To Trade</title>
-    <link rel = "stylesheet" href = "/static/stylesheets/styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" 
-    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-</head>
+<!--CSS Updated by Miqdad and integrated by Muneeb-->
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    <meta charset="utf-8">
+    <title>StockSim: Learn How to Trade</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel = "stylesheet" href = "/static/stylesheets/newStyle.css">
+    <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="d-flex flex-column h-100">
+    
 <header>
-    <div class = "header">
-        <h1>Welcome to StockSim: Learn How to Trade!</h1>
-    </div>
-    {% if session['loginFlagPy'] %}
-    <div class = "login">
-        <p>Hello {{person['Name']}} <a method = "POST" href = "logout"><button>Logout</button></a></p>
-    </div>
-    {% else %}
-    <div class = "login">
-        <p><a method = "POST" href = "login"><button>Login</button></a> <a method = "POST" href = "register"><button>Register</button></a></p>
-    </div>
-    {% endif %}
-    <!--Navbar by Muneeb Khan-->
-    <div class = "navbar">
-        <nav>
-            <ul>
-                <li><a method = "POST" href = "home">Home</a></li>
-                <li><a method = "POST" href = "aboutus">About Us</a></li>
-                <li><a method = "POST" href = "information">Information</a></li>
-                {% if session['loginFlagPy'] %}
-                <li><a method = "POST" href = "profile">Profile</a></li>
-                {% endif %}
-                <li class="stockSimStartButton">
-                    <form id="stockSimStart" action="/stockSimForm" method="post">
-                        <button>Start a simulation!</button>
-                    </form>
-                    <script type="text/javascript">
-                        if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
-                            document.getElementById('stockSimStart').style.display = "none";
-                    </script>
-                </li>
-            </ul>
-        </nav>
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(33, 103, 42)">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="information">
+        <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
+        StockSim: Learn How to Trade
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item">
+            <a class="nav-link" href="home">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="aboutus">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="information">Information</a>
+          </li>
+          {% if session['user'] %}
+          <li class="nav-item">
+            <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
+          </li>
+          <li class="nav-item">
+            Hello {{person['Name']}}
+          </li>
+          <li class="nav-item">
+            <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class = "nav-link" method = "POST" href = "login">Login</a> 
+          </li>
+          <li class = "nav-item">
+            <a class = "nav-link" method = "POST" href = "register">Register</a>
+          </li>
+          {% endif %}
+          <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
+          <li class="nav-item"> <!--Old list name was StockSimStartButton-->
+            <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
+                <button>Start a simulation!</button>
+            </form>
+            <script type="text/javascript">
+                if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
+                    document.getElementById('stockSimStart').style.display = "none";
+            </script>
+        </li>
+        </ul>
         <form action="/stockSearch" method="post">
-            <input type="search" name="searchTerm" placeholder="Find a stock..."
-                    value="{{ request.form['searchTerm'] }}">
-            <button>Search</button>
-        </form>
+          <input type="search" name="searchTerm" placeholder="Find a stock..."
+                  value="{{ request.form['searchTerm'] }}">
+          <button>Search</button>
+      </form>
+      </div>
+
     </div>
+  </nav>
 </header>
+
+<br><br><br><br><br><br>
+
 <body class = "info">
     <section>
         <div>
             <h1>Information</h1>
         </div>
         <div class = infomain>
-            <div class = "infopart1">
-                <h2>What Should I Know?</h2>
-                     <p>With our information page we will provide several links to places we went to get a better knowledge of stock
-                    <br>investments. Some users may learn different but we want ensure we can help all our users get a better understanding
-                    <br>If the information doesn't help then you may contact us directly and we willsee if we can provide better information.
-                    </p>
-            </div>
-                    
-            <div class = "infopart2">
-                <h2>The Basics of Stock Markets</h2>
-                    <br>
-                    <p>Stocks are basically the shares of ownership in a company and stockholders have a fractional ownership of the company.
-                    <br>Stocks are typically listed as line graphs and they basically keep track of the stock price of the company overtime. It can show
-                     <br>the companies records by daily, monthly, and yearly.
-                     <br>
-                     Below is an example of a graph showing Googles shares for the past 6 years.
-                     <br>
-                     </p>
-                     <br>  
-                     <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = 300 height = 300 class = "stock" />
-             </div>
-       
-            <div class = "infopart3">
-                 <h2>How Should I Start Investing?</h2>
-                     <p>The best way to start is to do paper trading which will allow users
-                    <br>to buy and sell on a simulator without having to invest real money
-                     <br>that way the user is practicing before they decide to invest real
-                     <br>money. Paper trading is possible through opening a brokerage account
-                    <br>which is the quickest method of buying stocks.    
-                    </p>
-            </div>
+            <div class = "card w-75">
+              <div class = "card-header">
+              <h2>What Should I Know?</h2>
+              </div>
+                <div class = "card-">
+                    <h5 class = "card-text">
+                      With our information page we will provide several source links to places we went 
+                      to get a better knowledge of stock investments. Some users may learn different but 
+                      we want ensure we can help all our users get a better understanding.
+                 <br> If the information doesn't help then you may contact us directly by email and we will 
+                      see if we can provide the service necessary.
+                    </h5>
+                </div>
+              <br>
 
-            <div class = "infopart4">
-                 <h2>Defintions of Stocks?</h2>
-                 <p>To see some simple defintions of stocks click the button below</p>
-                 <a method = "POST" href = "StockDefinitions">Stock Definitions</a>
-            </div>
+              <div class = "card-header">
+              <h2>The Basics of Stock Markets</h2>
+              </div>
+                  <div class = "card-">
+                    <h5 class = "card-text">
+                      Stocks are basically the shares of ownership in a company and stockholders 
+                      have a fractional ownership of the company. Stocks are typically listed as line graphs
+                      and they basically keep track of the stock price of the company overtime. 
+                      It can show the companies records by daily, monthly, and yearly.
+                      <br>
+                      <br>
+                      Below is an example of a graph showing Googles shares for the past 6 years.
+                      <br>
+                      <br>  
+                      <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = 300 height = 300 class = "stock" />
+                      <br>
+                      <br>
+                      You may also search for stocks using the stock search bar on the top right hand corner.
+                      You will taken to the stock display page and shown a graph of the companies shares 
+                      over a selected time frame. There will be an option to choose the time frame from
+                      the starting date to end date.
+                      <br>
+                    </h5>
+                  </div>
+                <br>
+
+              <div class = "card-header">
+              <h2>How Should I Start Investing?</h2>
+              </div>
+                  <div class = "card-">
+                    <h5 class = "card-text">
+                    The best way to start is to do paper trading which will allow users
+                    to buy and sell on a simulator without having to invest real money
+                    that way the user is practicing before they decide to invest. 
+                    Paper trading is possible through opening a brokerage account
+                    which is the quickest method of buying stocks.
+                    <br>
+                    <br>
+                    Our website gives users the option to buy or sell a stock. The users
+                    will also have a portfolio page to show their records on how many orders they
+                    have made, and how many wins and losses they have on the stock simulator.
+                    <br>
+                    <br>
+                    We also have a leaderboards page to show all the users current records on 
+                    the stock sim, so users will know who is leading with investments and who is behind.
+                    The purpose of the leaderboard is to make our simluator more competitive.  
+                    </h5>
+                  </div>
+                <br>
+
+                <div class = "card-header">
+                <h2>Defintions of Stocks?</h2>
+                </div>
+                 <div class = "card-">
+                  <h5 class = "card-text">To see some defintions of stocks, please click the button below
+                  <br><a method = "POST" href = "StockDefinitions">Stock Definitions</a>
+                  </h5>
+                 </div>
+             </div>
         </div>
 
     </section>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js" 
-    integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8" 
-    crossorigin="anonymous"></script>
+      <footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
+        <div class="container">
+          <span>Copyright 2022 by StockSim</span>
+        </div>
+      </footer>
+      
+      <script src="/static/jsStyle/bootstrap.bundle.min.js"></script>
 </body>
-<footer><p>Copyright 2022 by StockSim</p></footer>
 
 </html>

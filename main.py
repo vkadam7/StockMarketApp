@@ -1,4 +1,5 @@
 from asyncio.windows_events import NULL
+from crypt import methods
 from re import T
 from datetime import datetime
 from statistics import mean
@@ -66,7 +67,7 @@ def login():
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
             session['loginFlagPy'] = 1
-            session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
+            ## session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
             flash("Log in succesful.", "pass")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
@@ -200,7 +201,7 @@ def hello(name=None):
 @app.route("/home")
 def home():
     if('user' in session):
-        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+        person = dbfire.collection('Users').where('Email', '==', session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
 
         for x in person.get():
             person = x.to_dict()
@@ -213,7 +214,7 @@ def home():
 @app.route("/aboutus")
 def aboutus():
     if('user' in session): 
-        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+        person = dbfire.collection('Users').where('Email', '==', session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
 
         for x in person.get():
             person = x.to_dict()
@@ -226,7 +227,7 @@ def aboutus():
 @app.route("/information")
 def information():
     if('user' in session):
-        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+        person = dbfire.collection('Users').where('Email', '==', session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
 
         for x in person.get():
             person = x.to_dict()
@@ -238,12 +239,12 @@ def information():
 @app.route("/StockDefinitions")
 def StockDefinitions():
     if('user' in session):
-        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+        person = dbfire.collection('Users').where('Email', '==', session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
 
         for x in person.get():
             person = x.to_dict()
 
-        return render_template("information.html", person = person)
+        return render_template("StockDefinitions.html", person = person)
     else:
         return render_template('StockDefinitions.html')
 
@@ -380,16 +381,54 @@ def stockAvailability():
 @app.route('/404Error')
 def fourOhFour():
     return render_template('404Error.html')
-
-@app.route('/portfolio')
+#Author: Viraj Kadam
+@app.route('/displayInfo') #Retrieving info from portolio file
 def Portfolio():
-    return render_template('portfolio.html')
+    if('user' in session): #to check if the user is logged in will change to profile page
+        session['simulation'] = {
+            'startDate': request.form['startDate'],
+            'endDate': request.form['endDate'],
+            'initialCash': request.form['initialCash'],
+            'currentCash': request.form['currentCash']
+        }
+        session['currentCash'] = request.form['initialCash']
+        global sim
+        sim = Simulation(firebase.database(), session['user'], request.form['startDate'],
+                        request.form['endDate'], request.form['initialCash'], request.form['currentCash'] )
+        sim.createSim()
+        return render_template('simulation.html', person=session['user'])
+    else: 
+        return render_template('404Error.html')
+    
 
 ## Need to complete this setup route for the dashboard, will show up to the user once they have started the simulation. 
 @app.route('/dashboard')
 def Dashboard():
-    if 'user' in session:
-        return render_template('dashboard.html')
+    if ('user' in session):
+        return render_template('dashboard.html', person = session['user'])
+    else:
+        return render_template('404Error.html')
+
+#Author: Viraj Kadam   
+#Updates user profile  
+class User(Flaskform):
+    #picture =  
+    description = StringField('Description')
+    experience = StringField('Experience')
+    submit = SubmitField("Submit")   
+    
+@app.route('/update/<int:id>', methods = ['GET', 'POST'])
+def update():
+    updateinfo = User.query.get(id)
+    if request.method == 'POST':
+        update.description = request.form('Description')
+        update.experience = request.form('Experience')
+        try:
+            db.session.commit()
+            flash("User profile updates")
+            return render_template('profile.html')
+        except:
+            flash("Error, unable to update your profile")
 
 @app.route('/')
 def method_name():
