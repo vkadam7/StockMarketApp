@@ -125,7 +125,6 @@ def register():
                 authen.send_email_verification(user['idToken'])
                 dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
-                dbfire.collection('Users').add({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
                 flash("Account succesfully created, you may now login" , "pass")
 
                 return redirect(url_for("login"))
@@ -281,7 +280,7 @@ def startSimulation():
         print("KeyError occured: startSimulation")
         return redirect(url_for('fourOhFour'))
         
-@app.rout("/finishSimulation", methods=['POST', 'GET'])
+@app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
     sim.finishSimulation()
 
