@@ -96,10 +96,6 @@ class portfolio:
         
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
     def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
-        totalGain = 0
-        netGain = 0
-        netLoss = 0
-        CurrentPrice = 0
         tempData = self.db.collection('Simulations').document(self.sim).document('Orders').get()
         data = {'name': self.name, 
                 'quantity': self.quantity, 
@@ -110,8 +106,9 @@ class portfolio:
                 tempPrice = self.db.collection('Simulations').document(simName).document('Stocks').document('prices').get()
                 #Need to fix this function
                 #CurrentPrice = self.db.collection('Stocks').document('daily').document('closes').get()
-                CurrentPrice = self.db.collection('Simulations').document(simName).document('Stocks').document('prices').get()
-                day = self.db.collection('Stocks').document('daily').document('dates').get()
+                CurrentPrice = self.db.collection('Simulations').document(simName).document('currentCash').document('prices').get()
+                #day = self.db.collection('Stocks').document('daily').document('dates').get()
+                day = self.db.collection('IntradayStockData').document('dates').get()
                 for CurrentPrice in day :
                     netGainorLoss = (CurrentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
                     if netGainorLoss > CurrentPrice:
@@ -161,13 +158,10 @@ class portfolio:
        
         
     #Deletes a stock from the portfolio
-    def delete(self, stock):
-            stock = stock.upper()
-            try:
-                self.portfolio.pop(stock)
-                return True
-            except Error:
-                return False
+   ##        stock = stock.upper()
+    #          return True
+    #        except Error:
+     #           return False
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
@@ -195,7 +189,8 @@ class portfolio:
         AdjustClose = 0
 
         day = self.db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
-        newstockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
+       #Need more inquiry
+       # newstockPrice = self.db.collection('IntradayStockData').document('daily').document('closes').get()
         stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
 
         if quantity > 0:
@@ -215,7 +210,7 @@ class portfolio:
         print("Returns: " + self.returns)
         print("Amount Remaining: " + self.funds_remaining)
         print("Profit: " + self.get_profit)
-        if (self.GainorLoss > self.db.collection('Stocks').document('daily').document('closes').get()):
+        if (self.GainorLoss > self.db.collection('').document('daily').document('closes').get()):
             print("Gains: +" + self.GainorLoss)
             return
         elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
