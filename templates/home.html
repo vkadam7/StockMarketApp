@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <title>StockSim: Learn How to Trade</title>
 
-    <!-- Bootstrap core CSS -->
+    <!-- Bootstrap -->
     <link rel = "stylesheet" href = "/static/stylesheets/newStyle.css">
     <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
   </head>
@@ -40,7 +40,7 @@
             <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
           </li>
           <li class="nav-item">
-            Hello {{person['Name']}}
+            Hello {{session['user']}}
           </li>
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
@@ -82,19 +82,13 @@
 <!-- Begin page content -->
 <main>
     
-    <img class = "logo" src = "/static/stockLogo.png" alt = "stock symbol" width = "350" height = "300">
+    <img class = "logo" src = "/static/stockLogo.png" alt = "stock symbol" width = "350" height = "300"></img>
 
-    
         <div class = "section1">
             <h1 class = "Welcome">Welcome to StockSim</h1>
         </div>
 
         <div class = "opener">
-        <p> A website where we will help with making your first investments,
-    
-        <div class = "section1">
-            <h1>Welcome</h1>
-
             <p>Welcome to our website where we will help with making your first investments,
             <br>
             as you know stock markets require experience in order to know which
@@ -109,7 +103,8 @@
                 <img class = "logo" src = "/static/questionLogo.png" alt = "question symbol" width = "50" height = "50">
                 <h4> About us</h4>
             </div>
-            <div class = "card-">
+
+            <div class = "card-body>
                 <h5 class = "card-text">
                      To learn more about our page, 
                 <br> 

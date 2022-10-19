@@ -98,10 +98,10 @@
                
             </div>
         </form>
-        <form id='buySellButtons' action="/orderForm" method="post">
+        <form action="/orderForm" method="post">
             <div class="buySellButtons">
-                <button type = "submit" name="option" value="{{ request.form['option'] }}">Buy</button>
-                <button type = "submit" name="option" value="{{ request.form['option'] }}">Sell</button>
+                <button type = "submit" name="option" value="Buy">Buy</button>
+                <button type = "submit" name="option" value="Sell">Sell</button>
                 <script>
                     var Display = $('.login').css.('display','block'):
                     var noDisplay = $('.login').css.('display', 'none'): 
