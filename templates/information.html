@@ -48,7 +48,7 @@
           <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
           <li class="nav-item"> <!--Old list name was StockSimStartButton-->
             <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
-              <button class = "stockSimStartButtonStyle" type = "button" >Start a simulation!</button>
+              <button class = "stockSimStartButtonStyle">Start a simulation!</button>
             </form>
             <script type="text/javascript">
               if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
@@ -67,7 +67,7 @@
         <form action="/stockSearch" method="post">
           <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
-          <button class = "stockSearchButton" type = "button">Search</button>
+          <button class = "stockSearchButton">Search</button>
       </form>
       </div>
 
