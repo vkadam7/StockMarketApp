@@ -330,6 +330,7 @@ def orderConfirm():
         order.buyOrder()
     else:
         order.sellOrder()
+    session['currentCash'] = Simulation.retrieveCurrentCash(dbfire, session['simName'])
 
     return render_template('simulation.html', person=session['user'])
     
