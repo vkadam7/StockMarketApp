@@ -320,6 +320,12 @@ class SimulationFactory:
     def __init__(self, db, email):
         self.simulation = Simulation.retrieveOngoing(db, email)
 
+    def existenceCheck(db, email):
+        if len(db.collection('Simulations').where('ongoing','==','True').where('user','==',email).stream()) == 0:
+            return False
+        else:
+            return True
+
 class User:
     def __init__(self, db, username):
         self.db = db
