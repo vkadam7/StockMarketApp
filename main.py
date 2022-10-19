@@ -66,11 +66,13 @@ def login():
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
             session['loginFlagPy'] = 1
-            session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
+            #session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
             flash("Log in succesful.", "pass")
+            print("Login successful.")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
             flash("Failed to log in", "fail")
+            print("login failed.")
             return redirect(url_for("login"))
     else:
         print("Landing on page")
