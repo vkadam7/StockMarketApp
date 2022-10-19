@@ -100,8 +100,8 @@
         </form>
         <form action="/orderForm" method="post">
             <div class="buySellButtons">
-                <button type = "submit" id="{{ request.form['option'] }}" value="Buy">Buy</button>
-                <button type = "submit" id="{{ request.form['option'] }}" value="Sell">Sell</button>
+                <button type = "submit" name="option" value="Buy">Buy</button>
+                <button type = "submit" name="option" value="Sell">Sell</button>
                 <script>
                     var Display = $('.login').css.('display','block'):
                     var noDisplay = $('.login').css.('display', 'none'): 
@@ -112,6 +112,10 @@
                         $(noDisplay);               
                 </script>    
             </div>
-        </form>
+        </form>  
+        <script type="text/javascript">
+            if ({{ session['simulationFlag'] }} == False) 
+                document.getElementById('buySellButtons').style.display = "none";
+        /script>
     </body>
 </html>

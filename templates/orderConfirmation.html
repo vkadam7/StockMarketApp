@@ -13,7 +13,6 @@
     </div>
     {% if session['user'] %}
     <div class = "login">
-        <p>Hello {{person}} <a method = "POST" href = "logout">Logout</a></p>
     </div>
     {% else %}
     <div class = "login">
@@ -39,15 +38,16 @@
     </div>
 </header>
 <body>
-    <form action="orderCreate" method="post">
-        <h3>{{ session['option'] }} order for {{ stock['name'] }}</h3>
-        <br>
-        <p>Price: {{ session['currentPrice'] }}</p>
-        <br>
-        <label for="quantity">Quantity:</label>
-        <input type="quantity" name="stockQuantity" value="{{ request.form['stockQuantity'] }}">
-        <br>
-        <button>Create Order</button>
+    <form action="orderConfirm" method="post">
+    <h3>{{ session['option'] }} order for {{ stock['name'] }}</h3>
+    <br>
+    <p>Price: {{ stock['currentPrice'] }}</p>
+    <br>
+    <p>Quantity: {{ session['orderQuantity'] }}</p>
+    <br>
+    <p>Total Price: {{ session['orderPrice'] }}</p>
+    <b>
+    <button>Confirm Order</button>
     </form>
 </body>
 <footer><p>Copyright 2022 by StockSim</p></footer>
