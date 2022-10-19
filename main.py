@@ -1,5 +1,6 @@
 from asyncio.windows_events import NULL
-from re import T
+#from crypt import methods
+#from re import T
 from datetime import datetime
 from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
@@ -62,7 +63,8 @@ def login():
         result = request.form
         email = result["email"]
         passw = result["password"]
-        session['email'] = email
+        #session['email'] = email
+        session['simulationFlag'] = False
         try:
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
@@ -193,17 +195,19 @@ def logout():
 #Author: Miqdad
 @app.route('/')
 def hello(name=None):
-    if('user' in session):
-        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
-
-        for x in person.get():
-            person = x.to_dict()
-
-        session['loginFlagPy'] = 1
+    #if('user' in session):
+    #    person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+    #
+    #    for x in person.get():
+    #        person = x.to_dict()
+    #
+        session['loginFlagPy'] = 0
+        session['simulationFlag'] = False
         
-        return render_template("home.html", person = person)
-    else:
-        return render_template('home.html')
+        return render_template("home.html")
+    #else:
+    #   session['simulationFlag'] = False
+    #    return render_template('home.html')
 
 ## Route for Home page - Muneeb Khan
 @app.route("/home")
@@ -274,6 +278,7 @@ def stockSimForm():
 def startSimulation():
     try:
         if request.method == 'POST':
+            session['simulationFlag'] = True
             session['simulation'] = {
                 'simStartDate': request.form['simStartDate'],
                 'simEndDate': request.form['simEndDate'],
@@ -311,7 +316,11 @@ def orderCreate():
 def orderConfirm():
     order = Order(dbfire, session['simName'], session['stock'], 
                     session['option'], session['orderQuantity'], session['currentPrice'])
-    order.buyOrder()
+    if session['option'] == 'Buy':
+        order.buyOrder()
+    else:
+        order.sellOrder()
+
     return render_template('simulation.html', person=session['user'])
     
 ## stockSearch
@@ -331,7 +340,7 @@ def stockSearch():
     try:
         if request.method == 'POST':
             if StockData.stockSearch(dbfire, request.form["searchTerm"]):
-                return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-19", timespan="daily"))
+                return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-16", timespan="daily"))
             else:
                 return redirect(url_for('fourOhFour'))
     except KeyError:
@@ -358,13 +367,13 @@ def displayStock(ticker):
     startDate = request.args['startDate']
     endDate = request.args['endDate']
     timespan = request.args['timespan']
-    stockData = StockData(firebase.database(), ticker)
     global stock
     if session['simulationFlag'] == False:
         stockData = StockData(dbfire, ticker)
         stock = stockData.stockJSON()
         session['stock'] = stock
         stockMatrix = stockData.getData(startDate, endDate, timespan)
+        #print(stockMatrix)
         if stockMatrix != -1:
             if timespan != 'hourly':
                 dates = [row[0] for row in stockMatrix]
@@ -456,25 +465,27 @@ def Dashboard():
 #Author: Viraj Kadam   
 #Updates user profile  
 #class User(Flaskform):
- #   #picture =  
-  ###submit = SubmitField("Submit")   
+    #picture =  
+#    description = StringField('Description')
+#    experience = StringField('Experience')
+#    submit = SubmitField("Submit")   
     
-@app.route('/update/<int:id>', methods = ['GET', 'POST'])
-def update():
-    updateinfo = User.query.get(id)
-    if request.method == 'POST':
-        update.description = request.form('Description')
-        update.experience = request.form('Experience')
-        try:
-            db.session.commit()
-            flash("User profile updates")
-            return render_template('profile.html')
-        except:
-            flash("Error, unable to update your profile")
+#@app.route('/update/<int:id>', methods = ['GET', 'POST'])
+#def update():
+#   updateinfo = User.query.get(id)
+#   if request.method == 'POST':
+#        update.description = request.form('Description')
+#        update.experience = request.form('Experience')
+#        try:
+#            db.session.commit()
+#            flash("User profile updates")
+#            return render_template('profile.html')
+#        except:
+#            flash("Error, unable to update your profile")
 
-@app.route('/')
-def method_name():
-    pass
+#@app.route('/')
+#def method_name():
+#    pass
     
 if __name__ == '__main__':
     app.run(debug=True)
