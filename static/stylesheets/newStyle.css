@@ -122,6 +122,35 @@ footer{
   border-radius: 2em;
   text-align: center;
   box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  padding: 5px;
+}
+
+.stockSearchBar {
+  padding: 5px;
+  border-radius: 5px;
+  display: flex;
+}
+
+.stockSearchButton {
+  background-color: #0d6efd;
+  border-color:#0d6efd;
+  padding:5px;
+  display: flex;
+  color: white;
+  border-radius: 5px;
+}
+
+.stockUtilityBar {
+  display: table;
+  text-align: center;
+  vertical-align: middle;
+  width: 100%;
+  height: 10%;
+}
+
+.stockUtilityBarIcon {
+  display: table-cell;
+  height: auto;
 }
 
 .divider:after,
@@ -141,3 +170,15 @@ background: #eee;
   justify-content: center;
 }
 
+.stockSimStartButtonStyle {
+  background-color: #0d6efd;
+  border-color:#0d6efd;
+  padding:5px;
+  color: white;
+  border-radius: 5px;
+}
+
+.buySellButtons {
+  display: flex;
+  justify-content: center;
+}

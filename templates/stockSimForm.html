@@ -13,7 +13,7 @@
     
 <header>
   <!-- Fixed navbar -->
-  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(33, 103, 42)">
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(15, 158, 230)">
     <div class="container-fluid">
       <a class="navbar-brand" href="StockDefinitions">
         <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
@@ -53,9 +53,9 @@
           {% endif %}
         </ul>
         <form action="/stockSearch" method="post">
-          <input type="search" name="searchTerm" placeholder="Find a stock..."
+          <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
-          <button>Search</button>
+          <button class = "stockSearchButton" type = "button">Search</button>
       </form>
       </div>
 

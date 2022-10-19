@@ -228,5 +228,3 @@ class portfolio:
         print("Retrive stocks: " + self.retrieve)
         
         
-        
-        
