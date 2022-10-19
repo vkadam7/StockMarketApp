@@ -1,11 +1,12 @@
 from mimetypes import init
 from time import daylight
 import numpy as np
+import pandas as pd
 import firebase_admin
 from firebase_admin import firestore
 from google.cloud.firestore import ArrayUnion
 import datetime
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 
 class StockData:

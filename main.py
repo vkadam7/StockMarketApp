@@ -5,7 +5,7 @@ from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
 import firebase_admin
-from stockSim import SimulationFactory, StockData, User, Order, Simulation
+from stockSim import SimulationFactory, StockData, User, Order, Simulation, portfolio
 
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -423,6 +423,7 @@ def stockAvailability():
 @app.route('/404Error')
 def fourOhFour():
     return render_template('404Error.html')
+
 #Author: Viraj Kadam
 @app.route('/displayInfo') #Retrieving info from portolio file
 def Portfolio():
@@ -434,6 +435,7 @@ def Portfolio():
             'currentCash': request.form['currentCash']
         }
         session['currentCash'] = request.form['initialCash']
+        session['']
         global sim
         sim = Simulation(firebase.database(), session['user'], request.form['startDate'],
                         request.form['endDate'], request.form['initialCash'], request.form['currentCash'] )
