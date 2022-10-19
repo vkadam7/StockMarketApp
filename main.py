@@ -288,7 +288,7 @@ def startSimulation():
             }
             session['currentCash'] = request.form['initialCash']
             session['portfolioValue'] = request.form['initialCash']
-            simulation = Simulation(dbfire, session['user'], request.form['simStartDate'],
+            sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
                                     request.form['simEndDate'], request.form['initialCash'])
             sim.createSim()
             sim.addStocksToSim()
@@ -305,7 +305,7 @@ def finishSimulation():
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
     session['option'] = request.form['option']
-    session['currentPrice'] = round(SimulationFactory(dbfire, session['email']).simulation.currentPriceOf(stock['ticker']), 2)
+    session['currentPrice'] = round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
     return render_template('orderForm.html', stock=session['stock'], option=session['option'])
 
 @app.route("/orderCreate", methods=['POST', 'GET'])
@@ -396,14 +396,14 @@ def displayStock(ticker):
         else:
             return displayStock(ticker)
     else:
-        stockData = SimulationFactory(dbfire, session['email']).simulation.retrieveStock(ticker)
+        stockData = SimulationFactory(dbfire, session['user']).simulation.retrieveStock(ticker)
         for entry in stockData:
             stock = entry.to_dict()
             session['stock'] = stock
         if stock != -1:
             dates = []
             prices = []
-            for i in range(0, SimulationFactory(dbfire, session['email']).simulation.whatTimeIsItRightNow()):
+            for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
                 dates.append(stock['dates'][i])
                 prices.append(stock['prices'][i])
             return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
