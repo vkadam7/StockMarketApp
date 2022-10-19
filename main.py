@@ -63,7 +63,7 @@ def login():
         result = request.form
         email = result["email"]
         passw = result["password"]
-        session['email'] = email
+        #session['email'] = email
         session['simulationFlag'] = False
         try:
             user = authen.sign_in_with_email_and_password(email,passw)
@@ -195,19 +195,19 @@ def logout():
 #Author: Miqdad
 @app.route('/')
 def hello(name=None):
-    if('user' in session):
-        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
-
-        for x in person.get():
-            person = x.to_dict()
-
-        session['loginFlagPy'] = 1
+    #if('user' in session):
+    #    person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
+    #
+    #    for x in person.get():
+    #        person = x.to_dict()
+    #
+        session['loginFlagPy'] = 0
         session['simulationFlag'] = False
         
-        return render_template("home.html", person = person)
-    else:
-        session['simulationFlag'] = False
-        return render_template('home.html')
+        return render_template("home.html")
+    #else:
+    #   session['simulationFlag'] = False
+    #    return render_template('home.html')
 
 ## Route for Home page - Muneeb Khan
 @app.route("/home")
