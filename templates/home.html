@@ -15,7 +15,7 @@
     
 <header>
   <!-- Fixed navbar -->
-  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(33, 103, 42)">
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(15, 158, 230)">
     <div class="container-fluid">
       <a class="navbar-brand" href="home">
         <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
@@ -45,6 +45,16 @@
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
+          <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
+          <li class="nav-item"> <!--Old list name was StockSimStartButton-->
+            <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
+              <button class = "stockSimStartButtonStyle" type = "button" >Start a simulation!</button>
+            </form>
+            <script type="text/javascript">
+              if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
+                document.getElementById('stockSimStart').style.display = "none";
+            </script>
+          </li>
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -53,21 +63,11 @@
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
           {% endif %}
-          <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
-          <li class="nav-item"> <!--Old list name was StockSimStartButton-->
-            <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
-                <button>Start a simulation!</button>
-            </form>
-            <script type="text/javascript">
-                if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
-                    document.getElementById('stockSimStart').style.display = "none";
-            </script>
-          </li>
         </ul>
         <form action="/stockSearch" method="post">
-          <input type="search" name="searchTerm" placeholder="Find a stock..."
+          <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
-          <button>Search</button>
+          <button class = "stockSearchButton" type = "button">Search</button>
       </form>
       </div>
 
@@ -100,9 +100,11 @@
     
         <div class = "card w-50">
             <div class = "card-header">
-                <h4> About us </h4>
+                <img class = "logo" src = "/static/questionLogo.png" alt = "question symbol" width = "50" height = "50">
+                <h4> About us</h4>
             </div>
-            <div class = "card-body">
+
+            <div class = "card-body>
                 <h5 class = "card-text">
                      To learn more about our page, 
                 <br> 
@@ -113,6 +115,7 @@
 
         <div class = "card w-50">
             <div class = "card-header">
+               <img class = "logo" src = "/static/infoLogo.png" alt = "info symbol" width = "50" height = "50">
                <h4> Information </h4>
             </div>
             <div class = "card-body">
@@ -126,6 +129,7 @@
 
         <div class = "card w-50">
             <div class = "card-header">
+                <img class = "logo" src = "/static/registerLogo.png" alt = "register symbol" width = "50" height = "50">
                 <h4>Become a Member</h4>
             </div>
             <div class = "card-body">
@@ -140,7 +144,7 @@
       
 </main>
 
-<footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
+<footer class="footer mt-auto py-3" style = "background-color:rgb(15, 158, 230)">
   <div class="container">
     <span>Copyright 2022 by StockSim</span>
   </div>
