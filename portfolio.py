@@ -156,26 +156,26 @@ class portfolio:
        
         
     #Deletes a stock from the portfolio
-   ##        stock = stock.upper()
+    #       stock = stock.upper()
     #          return True
     #        except Error:
      #           return False
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
-    #def percentChange(self,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
+    def percentChange(self,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
 
-     #   quantity = 0
-      #  percentIncrease = 0
-       # AdjustClose = 0
+        quantity = 0
+        percentIncrease = 0
+        AdjustClose = 0
 
-#        day = self.db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
- ##      stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
+        day = self.db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
+        stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
 
-   #     if quantity > 0:
-    ##           increase = newstockPrice[day+1] - stockPrice[day]
+        if quantity > 0:
+            increase = newstockPrice[day+1] - stockPrice[day]
                     
-      ###    return -1
+        return -1
         
         
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
@@ -198,8 +198,20 @@ class portfolio:
             percentIncrease = (increase/stockPrice) * 100
             return percentIncrease
         else:
-            return -1        
-    #def user_graph(self, db):
+            return -1     
+        
+    #Author: Viraj Kadam    
+    #Graph of user stocks   (Need buy and sell info)
+    def user_graph(self, db):
+        prices = self.db.collection('IntradayStockData').document('prices').get()
+        dates = self.db.collection('IntradayStockData').document('dates').get
+        for x in prices:
+            plt.plot(x[dates][prices])
+            
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.show
+            
         
         
     #Display all information
@@ -207,18 +219,19 @@ class portfolio:
         print("Percent Change: " + self.percentChange)
         print("Returns: " + self.returns)
         print("Amount Remaining: " + self.funds_remaining)
+       
         print("Profit: " + self.get_profit)
         if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
             print("Gains: +" + self.GainorLoss)
-            return
         elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
             print("Loss: -" + self.GainorLoss)
-            return
-        else:
-            return -1
         
         print("Would you like to delete a stock: " + self.delete)
         print("Retrive stocks: " + self.retrieve)
+        
+        
+        print("Your stock display: ")
+        print(self.user_graph)
         
         
         
