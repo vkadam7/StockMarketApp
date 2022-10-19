@@ -411,11 +411,9 @@ def Dashboard():
 
 #Author: Viraj Kadam   
 #Updates user profile  
-class User(Flaskform):
-    #picture =  
-    description = StringField('Description')
-    experience = StringField('Experience')
-    submit = SubmitField("Submit")   
+#class User(Flaskform):
+ #   #picture =  
+  ###submit = SubmitField("Submit")   
     
 @app.route('/update/<int:id>', methods = ['GET', 'POST'])
 def update():
