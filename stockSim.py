@@ -405,7 +405,7 @@ class Order:
     def buyOrder(self):
         if self.option == 'Buy':
             count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
-            orderName = self.stock['ticker'] + str(count)
+            orderName = self.sim + self.stock['ticker'] + str(count)
             data = {
                 'sold': False,
                 'simulation': self.sim,
@@ -423,7 +423,7 @@ class Order:
         if self.option == 'Sell':
             if self.doTheyOwnThat():
                 count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
-                orderName = self.stock['ticker'] + str(count)
+                orderName = self.sim + self.stock['ticker'] + str(count)
                 data = {
                     'simulation': self.sim,
                     'ticker': self.stock['ticker'],
@@ -441,15 +441,15 @@ class Order:
         ownageFlag = False
         for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).get():
             print(entry)
-            temp = entry.to_list()
-            quantityOwned += temp['quantity']
+            temp = entry.to_dict()
+            quantityOwned += int(temp['quantity'])
 
-        if quantityOwned <= self.quantity:
+        if quantityOwned <= int(self.quantity):
             ownageFlag = True
         
         if ownageFlag:
             for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream():
-                entry.update({'sold' : True})
+                self.db.collection('Orders').document(entry.id).update({'sold' : True})
             return ownageFlag
         
         return ownageFlag
