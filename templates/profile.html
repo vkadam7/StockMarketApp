@@ -64,7 +64,7 @@
           {% endif %}
         </ul>
         <form action="/stockSearch" method="post">
-          <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+          <input class = "stockSearchBar" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
           <button class = "stockSearchButton">Search</button>>
       </form>
@@ -93,7 +93,7 @@
         User ID: {{results['UserID']}}
     </h1>
 
-    <h1>Update Profile <a href = "update.html"> </h1>
+    <h1><a href = "update.html">Update Profile </a></h1>
     <br>
  <!--  {% with alerts = get_flashed_messages() %}
         {% for print in alerts %}
