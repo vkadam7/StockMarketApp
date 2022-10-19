@@ -42,7 +42,7 @@
     <form action="orderCreate" method="post">
         <h3>{{ session['option'] }} order for {{ stock['name'] }}</h3>
         <br>
-        <p>Price: {{ stock['currentPrice'] }}</p>
+        <p>Price: {{ session['currentPrice'] }}</p>
         <br>
         <label for="quantity">Quantity:</label>
         <input type="quantity" name="stockQuantity" value="{{ request.form['stockQuantity'] }}">

@@ -6,7 +6,7 @@ from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
 import firebase_admin
-from stockSim import StockData, User, Order, Simulation, doesThatStockExist
+from stockSim import SimulationFactory, StockData, User, Order, Simulation
 
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -32,7 +32,7 @@ config = {
 
 firebase = pyrebase.initialize_app(config)
 authen = firebase.auth()
-db1 = firebase.database()
+db1 = dbfire
 
 app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
@@ -63,6 +63,7 @@ def login():
         result = request.form
         email = result["email"]
         passw = result["password"]
+        session['email'] = email
         try:
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
@@ -193,9 +194,17 @@ def logout():
 #Author: Miqdad
 @app.route('/')
 def hello(name=None):
-    session['loginFlagPy'] = 0
-    return render_template('home.html')
+    if('user' in session):
+        person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
 
+        for x in person.get():
+            person = x.to_dict()
+
+        session['loginFlagPy'] = 1
+        
+        return render_template("home.html", person = person)
+    else:
+        return render_template('home.html')
 
 ## Route for Home page - Muneeb Khan
 @app.route("/home")
@@ -275,7 +284,9 @@ def startSimulation():
             session['portfolioValue'] = request.form['initialCash']
             simulation = Simulation(dbfire, session['user'], request.form['simStartDate'],
                                     request.form['simEndDate'], request.form['initialCash'])
-            simulation.createSim()
+            sim.createSim()
+            sim.addStocksToSim()
+            session['simName'] = sim.simName
             return render_template('simulation.html', person=session['user'])
     except KeyError:
         print("KeyError occured: startSimulation")
@@ -285,17 +296,32 @@ def startSimulation():
 def finishSimulation():
     sim.finishSimulation()
 
-@app.route("/orderForm/<option>", methods=['POST', 'GET'])
-def orderForm(option):
-    return -1
+@app.route("/orderForm", methods=['POST', 'GET'])
+def orderFormFill():
+    session['option'] = request.form['option']
+    session['currentPrice'] = round(SimulationFactory(dbfire, session['email']).simulation.currentPriceOf(stock['ticker']), 2)
+    return render_template('orderForm.html', stock=session['stock'], option=session['option'])
 
+@app.route("/orderCreate", methods=['POST', 'GET'])
+def orderCreate():
+    session['orderQuantity'] = request.form['stockQuantity']
+    session['orderPrice'] = round(int(session['orderQuantity']) * session['currentPrice'], 2)
+    return render_template('orderConfirmation.html', stock=session['stock'], option=session['option'])
+
+@app.route("/orderConfirm", methods=['POST', 'GET'])
+def orderConfirm():
+    order = Order(dbfire, session['simName'], session['stock'], 
+                    session['option'], session['orderQuantity'], session['currentPrice'])
+    order.buyOrder()
+    return render_template('simulation.html', person=session['user'])
+    
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
 #
 #   Input: request.form['searchTerm'] - string input given by the user to 
 #   search for a stock
 #
-#   Referenced: doesThatStockExist(db, string) - searchs the database for
+#   Referenced: StockData.stockSearch(db, string) - searchs the database for
 #   the given string to see if it matchs an entry ID
 #   displayStock(ticker) - renders the webpage for the searched for stock
 #   ticker (if found)
@@ -305,7 +331,7 @@ def orderForm(option):
 def stockSearch():
     try:
         if request.method == 'POST':
-            if doesThatStockExist(firebase.database(), request.form["searchTerm"]):
+            if StockData.stockSearch(dbfire, request.form["searchTerm"]):
                 return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-19", timespan="daily"))
             else:
                 return redirect(url_for('fourOhFour'))
@@ -335,27 +361,44 @@ def displayStock(ticker):
     timespan = request.args['timespan']
     stockData = StockData(firebase.database(), ticker)
     global stock
-    stock = stockData.stockPageFactory()
-    stockMatrix = stockData.getData(startDate, endDate, timespan)
-    if stockMatrix != -1:
-        if timespan != 'hourly':
-            dates = [row[0] for row in stockMatrix]
-            avgs = [mean([row[2], row[3]]) for row in stockMatrix]
-            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+    if session['simulationFlag'] == False:
+        stockData = StockData(dbfire, ticker)
+        stock = stockData.stockJSON()
+        session['stock'] = stock
+        stockMatrix = stockData.getData(startDate, endDate, timespan)
+        if stockMatrix != -1:
+            if timespan != 'hourly':
+                dates = [row[0] for row in stockMatrix]
+                avgs = [mean([row[2], row[3]]) for row in stockMatrix]
+                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+            else:
+                dates = []
+                tempDates = [row[0] for row in stockMatrix]
+                for row in tempDates:
+                    for i in range(0, len(tempDates[0])):
+                        dates.append(row[i])
+                avgs = []
+                tempAvgs = [row[1] for row in stockMatrix]
+                for row in tempAvgs:
+                    for i in range(0, len(tempAvgs[0])):
+                        avgs.append(row[i])
+                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
         else:
-            dates = []
-            tempDates = [row[0] for row in stockMatrix]
-            for row in tempDates:
-                for i in range(0, len(tempDates[0])):
-                    dates.append(row[i])
-            avgs = []
-            tempAvgs = [row[1] for row in stockMatrix]
-            for row in tempAvgs:
-                for i in range(0, len(tempAvgs[0])):
-                    avgs.append(row[i])
-            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
+            return displayStock(ticker)
     else:
-        return displayStock(ticker)
+        stockData = SimulationFactory(dbfire, session['email']).simulation.retrieveStock(ticker)
+        for entry in stockData:
+            stock = entry.to_dict()
+            session['stock'] = stock
+        if stock != -1:
+            dates = []
+            prices = []
+            for i in range(0, SimulationFactory(dbfire, session['email']).simulation.whatTimeIsItRightNow()):
+                dates.append(stock['dates'][i])
+                prices.append(stock['prices'][i])
+            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+        else:
+            return displayStock(ticker)
 
 ## changeStockView
 #   Description: Retrieves data from stockView page to determine how to change
