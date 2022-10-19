@@ -19,7 +19,7 @@ class StockData:
     def __init__(self, db, req):
         self.db = db
         self.ticker = req
-        self.data = self.retrieve(self.db, self.ticker)
+        self.data = StockData.retrieve(self.db, self.ticker)
         if self.data != 'This data entry does not exist':
             self.name = self.data['name']
             self.headquarters = self.data['headquarters']
@@ -47,8 +47,11 @@ class StockData:
         try:
             dataMatrix = []
             tempArr = np.array(self.dates)
+            #print(tempArr)
             startLoc = np.where(tempArr == start)
             endLoc = np.where(tempArr == end)
+            #print(startLoc)
+            #print(endLoc)
             tempOpens = []
             tempCloses = []
             tempHighs = []
@@ -95,7 +98,7 @@ class StockData:
                                     self.volumes[i]])
             return dataMatrix
         except IndexError:
-            print("One of the selected dates are unavailable")
+            #print("One of the selected dates are unavailable")
             return -1
 
     ## checkDate
@@ -161,6 +164,7 @@ class StockData:
     def retrieve(db, ticker, simName="", startDate="", endDate=""):
         try:
             if startDate == "":
+                #print(db.collection("Stocks").document(ticker).get().to_dict())
                 return db.collection("Stocks").document(ticker).get().to_dict()
             else:
                 data = db.collection("Stocks").document(ticker).get().to_dict()

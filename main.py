@@ -1,6 +1,6 @@
 from asyncio.windows_events import NULL
-from crypt import methods
-from re import T
+#from crypt import methods
+#from re import T
 from datetime import datetime
 from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
@@ -64,6 +64,7 @@ def login():
         email = result["email"]
         passw = result["password"]
         session['email'] = email
+        session['simulationFlag'] = False
         try:
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
@@ -201,9 +202,11 @@ def hello(name=None):
             person = x.to_dict()
 
         session['loginFlagPy'] = 1
+        session['simulationFlag'] = False
         
         return render_template("home.html", person = person)
     else:
+        session['simulationFlag'] = False
         return render_template('home.html')
 
 ## Route for Home page - Muneeb Khan
@@ -275,6 +278,7 @@ def stockSimForm():
 def startSimulation():
     try:
         if request.method == 'POST':
+            session['simulationFlag'] = True
             session['simulation'] = {
                 'simStartDate': request.form['simStartDate'],
                 'simEndDate': request.form['simEndDate'],
@@ -336,7 +340,7 @@ def stockSearch():
     try:
         if request.method == 'POST':
             if StockData.stockSearch(dbfire, request.form["searchTerm"]):
-                return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-19", timespan="daily"))
+                return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-16", timespan="daily"))
             else:
                 return redirect(url_for('fourOhFour'))
     except KeyError:
@@ -363,13 +367,13 @@ def displayStock(ticker):
     startDate = request.args['startDate']
     endDate = request.args['endDate']
     timespan = request.args['timespan']
-    stockData = StockData(firebase.database(), ticker)
     global stock
     if session['simulationFlag'] == False:
         stockData = StockData(dbfire, ticker)
         stock = stockData.stockJSON()
         session['stock'] = stock
         stockMatrix = stockData.getData(startDate, endDate, timespan)
+        #print(stockMatrix)
         if stockMatrix != -1:
             if timespan != 'hourly':
                 dates = [row[0] for row in stockMatrix]
@@ -458,28 +462,28 @@ def Dashboard():
 
 #Author: Viraj Kadam   
 #Updates user profile  
-class User(Flaskform):
+#class User(Flaskform):
     #picture =  
-    description = StringField('Description')
-    experience = StringField('Experience')
-    submit = SubmitField("Submit")   
+#    description = StringField('Description')
+#    experience = StringField('Experience')
+#    submit = SubmitField("Submit")   
     
-@app.route('/update/<int:id>', methods = ['GET', 'POST'])
-def update():
-    updateinfo = User.query.get(id)
-    if request.method == 'POST':
-        update.description = request.form('Description')
-        update.experience = request.form('Experience')
-        try:
-            db.session.commit()
-            flash("User profile updates")
-            return render_template('profile.html')
-        except:
-            flash("Error, unable to update your profile")
+#@app.route('/update/<int:id>', methods = ['GET', 'POST'])
+#def update():
+#   updateinfo = User.query.get(id)
+#   if request.method == 'POST':
+#        update.description = request.form('Description')
+#        update.experience = request.form('Experience')
+#        try:
+#            db.session.commit()
+#            flash("User profile updates")
+#            return render_template('profile.html')
+#        except:
+#            flash("Error, unable to update your profile")
 
-@app.route('/')
-def method_name():
-    pass
+#@app.route('/')
+#def method_name():
+#    pass
     
 if __name__ == '__main__':
     app.run(debug=True)
