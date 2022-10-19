@@ -490,7 +490,7 @@ class Order:
                 sellOrderData = {
                     'validity': True,
                     'simulation': self.sim,
-                    'ticker': self.stock.ticker,
+                    'ticker': self.stock['ticker'],
                     'dayOfPurchase': self.dayOfPurchase,
                     'buyOrSell': 'sell',
                     'quantity': self.quantity,

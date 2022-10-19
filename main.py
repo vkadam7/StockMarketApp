@@ -312,7 +312,11 @@ def orderCreate():
 def orderConfirm():
     order = Order(dbfire, session['simName'], session['stock'], 
                     session['option'], session['orderQuantity'], session['currentPrice'])
-    order.buyOrder()
+    if session['option'] == 'Buy':
+        order.buyOrder()
+    else:
+        order.sellOrder()
+
     return render_template('simulation.html', person=session['user'])
     
 ## stockSearch
