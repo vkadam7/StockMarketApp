@@ -15,9 +15,9 @@
     
 <header>
   <!-- Fixed navbar -->
-  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(33, 103, 42)">
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(15, 158, 230)">
     <div class="container-fluid">
-      <a class="navbar-brand" href="home">
+      <a class="navbar-brand" href="aboutus">
         <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
         StockSim: Learn How to Trade
       </a>
@@ -45,6 +45,16 @@
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
+          <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
+          <li class="nav-item"> <!--Old list name was StockSimStartButton-->
+            <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
+              <button class = "stockSimStartButtonStyle" type = "button" >Start a simulation!</button>
+            </form>
+            <script type="text/javascript">
+              if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
+                document.getElementById('stockSimStart').style.display = "none";
+            </script>
+          </li>
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -53,21 +63,12 @@
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
           {% endif %}
-          <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
-          <li class="nav-item"> <!--Old list name was StockSimStartButton-->
-            <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
-                <button>Start a simulation!</button>
-            </form>
-            <script type="text/javascript">
-                if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
-                    document.getElementById('stockSimStart').style.display = "none";
-            </script>
         </li>
         </ul>
         <form action="/stockSearch" method="post">
-          <input type="search" name="searchTerm" placeholder="Find a stock..."
+          <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
-          <button>Search</button>
+          <button class = "stockSearchButton" type = "button" >Search</button>
       </form>
       </div>
 
@@ -82,21 +83,22 @@
             <h1>About Us</h1>
         </div>
         <div class = "container-fluid">
-            <div class ="card w-25 d-flex justify-content-center">
+            <div class ="card w-50 d-flex justify-content-left" style="padding: 20px;">
             <div class = "card-header">
+                <img class = "logo" src = "/static/stockLogo.png" alt = "stock symbol" width = "50" height = "50">
                 <h2>The Company</h2>
             </div>
             <div class = "card-">
-            <h5 class = "card-text">Founded in 2022 the Stocksim team are dedicated to helping users that are new
+            <h5 class = "card-text"> Founded in 2022 the Stocksim team are dedicated to helping users that are new
             to the stock market industry but are looking to start somewhere and want to
             learn.
             </h5>
             </div>
             </div>
-            
 
-            <div class = "card w-25 d-flex justify-content-center">
+            <div class = "card w-50 d-flex justify-content-left" style="padding: 20px;">
             <div class = "card-header">
+                <img class = "logo" src = "/static/goalLogo.png" alt = "goal symbol" width = "50" height = "50">
                 <h2>Our Goal</h2>
             </div>
             <div class = "card-">
@@ -107,8 +109,9 @@
             </div>
             </div>
 
-            <div class = "card w-25 d-flex justify-content-center">
+            <div class = "card w-50 d-flex justify-content-left" style="padding: 20px;">
             <div class = "card-header">
+                <img class = "logo" src = "/static/groupLogo.png" alt = "stock symbol" width = "50" height = "50">
                 <h2>The Team</h2>
             </div>
             <div class = "card-">  
@@ -121,7 +124,7 @@
         </div>
         </div>
     </main>
-    <footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
+    <footer class="footer mt-auto py-3" style = "background-color:rgb(15, 158, 230)">
         <div class="container">
           <span>Copyright 2022 by StockSim</span>
         </div>
