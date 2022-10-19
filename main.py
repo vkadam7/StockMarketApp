@@ -236,7 +236,8 @@ def information():
 
         return render_template("information.html", person = person)
     else:
-        return render_template('information.html')
+        flash("Sorry you must be logged in to view that page.")
+        return redirect(url_for("login"))
 
 @app.route("/StockDefinitions")
 def StockDefinitions():
@@ -248,7 +249,8 @@ def StockDefinitions():
 
         return render_template("StockDefinitions.html", person = person)
     else:
-        return render_template('StockDefinitions.html')
+        flash("Sorry you must be logged in to view that page.")
+        return redirect(url_for("login"))
 
 ## stockSim
 #   Description: Brings the logged in user to the stock sim start page, if the user
@@ -267,6 +269,7 @@ def stockSimForm():
 @app.route("/startSimulation", methods=['POST'])
 def startSimulation():
     #try:
+    if ('user' in session):
         if request.method == 'POST':
             session['simulation'] = {
                 'simStartDate': request.form['simStartDate'],
@@ -282,6 +285,9 @@ def startSimulation():
             sim.createSim()
             sim.addStocksToSim()
             return render_template('simulation.html', person=session['user'])
+    else:
+        flash("Sorry you must be logged in to view that page.")
+        return redirect(url_for("login"))
     #except KeyError:
     #    print("KeyError occured: startSimulation")
     #    return redirect(url_for('fourOhFour'))
@@ -319,16 +325,20 @@ def orderCreate():
 #   Author: Ian McNulty
 @app.route('/stockSearch', methods=['POST', 'GET'])
 def stockSearch():
-    try:
-        if request.method == 'POST':
-            if doesThatStockExist(firebase.database(), request.form["searchTerm"]):
-                return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-19", timespan="daily"))
-            else:
-                return redirect(url_for('fourOhFour'))
-    except KeyError:
-        print("KeyError occured: stockSearch")
-        return redirect(url_for('fourOhFour'))
-    return redirect(url_for(request.url))
+    if ('user' in session):
+        try:
+            if request.method == 'POST':
+                if doesThatStockExist(firebase.database(), request.form["searchTerm"]):
+                    return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-19", timespan="daily"))
+                else:
+                    return redirect(url_for('fourOhFour'))
+        except KeyError:
+            print("KeyError occured: stockSearch")
+            return redirect(url_for('fourOhFour'))
+        return redirect(url_for(request.url))
+    else:
+        flash("Sorry you must be logged in to view that page.")
+        return redirect(url_for("login"))
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
