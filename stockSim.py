@@ -7,18 +7,6 @@ from google.cloud.firestore import ArrayUnion
 import datetime
 import matplotlib as plt
 
-## doesThatStockExist
-#   Description: Checks to see if that stock exists in the database yet,
-#   according to the ID (ticker)
-#
-#   Inputs: db - Link to the database
-#   ticker - stock ticker to be searched for in database
-#
-#   Author: Ian McNulty
-def doesThatStockExist(db, searchTerm):
-    tempData = db.collection('Stocks').document(searchTerm).get() 
-    if tempData != None:
-        return True
 
 class StockData:
     ## StockData __init__
@@ -143,12 +131,12 @@ class StockData:
         else:
             return False
             
-    ## stockPageFactory
+    ## stockJSON
     #   Description: Returns a dictionary of values to be used with the stockView
     #   HTML template
     #
     #   Author: Ian McNulty
-    def stockPageFactory(self):
+    def stockJSON(self):
         stock = {
             "ticker": self.ticker,
             "name": self.name,
@@ -204,22 +192,19 @@ class StockData:
                     for entry in interp.tolist():
                         newData.append(entry)
                 return {
-                    'simulation':simName,
+                    'simulation': simName,
                     'name': data['name'],
+                    'ticker': ticker,
                     'headquarters': data['headquarters'],
                     'listedAt': data['listedAt'],
                     'dates': newDates,
-                    'prices': newData,
-                    'opens': opens,
-                    'closes': closes,
-                    'highs': dailys['highs'],
-                    'lows': dailys['lows']
+                    'prices': newData
                 }
         except KeyError:
             return 'This data entry does not exist'
 
     # Stock availability by Muneeb Khan
-    def stockAvailability(db):
+    def stockList(db):
         #data = {
         #    "ticker": self.ticker,
         #    "name": self.name,
@@ -233,6 +218,19 @@ class StockData:
             tickers.append(entry.id)
 
         return tickers
+
+    ## stockSearch
+    #   Description: Checks to see if that stock exists in the database yet,
+    #   according to the ID (ticker)
+    #
+    #   Inputs: db - Link to the database
+    #   ticker - stock ticker to be searched for in database
+    #
+    #   Author: Ian McNulty
+    def stockSearch(db, searchTerm):
+        tempData = db.collection('Stocks').document(searchTerm).get() 
+        if tempData != None:
+            return True
         
 class Simulation:
     def __init__(self, db, user, startDate, endDate, initialCash):
@@ -256,7 +254,7 @@ class Simulation:
             'initialCash': self.initialCash,
             'currentCash': self.initialCash,
             'score': 0,
-            'startTimestamp': self.startTimestamp
+            'startTimestamp': self.startTimestamp,
         }
         self.db.collection('Simulations').document(simName).set(data)
 
@@ -264,25 +262,28 @@ class Simulation:
         currentTime = datetime.datetime.now()
         difference = currentTime - self.startTimestamp
         index = -1
-        for i in range(0,difference.days):
+        for i in range(0,difference.days+1):
             index += 24
         index += (difference.seconds//3600)%24
         return index
 
     def currentPriceOf(self, ticker):
-        data = self.db.collection('IntradayStockData').document(ticker).get()
-        return data['prices'][self.whatTimeIsItRightNow()]
+        data = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
+        for entry in data:
+            fin = entry.to_dict()
+            print(fin['prices'][self.whatTimeIsItRightNow()])
+        return fin['prices'][self.whatTimeIsItRightNow()]
 
     def retrieveStock(self, ticker):
-        stock = self.db.collection('IntradayStockData').document(ticker).get()
+        stock = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
         return stock
 
     def addStocksToSim(self):
-        tickerList = StockData.stockAvailability(self.db)
+        tickerList = StockData.stockList(self.db)
         for ticker in tickerList:
             tempData = StockData.retrieve(self.db, ticker, self.simName, self.startDate, self.endDate)
             self.stocks.append(tempData)
-            self.db.collection('IntradayStockData').document(ticker).set(tempData)
+            self.db.collection('IntradayStockData').add(tempData)
 
     def updateCash(self, newAmount):
         data = self.db.collection('Simulations').document(self.simName).get()
@@ -297,7 +298,24 @@ class Simulation:
         self.db.collection('Simulations').document(self.sim).update(data)
 
     def retrieveOngoing(db, email):
-        return db.collection('Simulations').where('ongoing','==',True).where('user','==',email)
+        for query in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream():
+            id = query.id
+            entry = query.to_dict()
+
+        tempSim = Simulation(db, email, entry['startDate'], entry['endDate'], entry['initialCash'])
+        tempSim.simName = id
+        tempSim.startTimestamp = datetime.datetime.fromtimestamp(entry['startTimestamp'].timestamp())
+        tempSim.currentCash = entry['currentCash']
+        tempSim.stocks = []
+        for entry in db.collection('IntradayStockData').where('simulation','==',id).stream():
+            temp = entry.to_dict()
+            tempSim.stocks.append(temp)
+
+        return tempSim
+
+class SimulationFactory:
+    def __init__(self, db, email):
+        self.simulation = Simulation.retrieveOngoing(db, email)
 
 class User:
     def __init__(self, db, username):
@@ -355,7 +373,7 @@ class User:
         db.collection('Users').document(username).set(data)
 
     # User list by Muneeb Khan
-    def uesrlist(db,username, email, name, userID, description="", picture="", experience=""):
+    def userlist(db,username, email, name, userID, description="", picture="", experience=""):
         data = {
             'Email' : email,
             'userName' : username,
@@ -383,34 +401,35 @@ class Order:
         self.option = buyOrSell
         self.quantity = quantity
         self.avgStockPrice = stockPrice
-        self.totalPrice = quantity*stockPrice
+        self.totalPrice = float(quantity)*stockPrice
 
     def buyOrder(self):
-        if self.option == 'buy':
-            count = len(self.db.collection('Simulations').document(self.sim).document('Orders').get())
-            orderName = self.ticker + str(count)
+        if self.option == 'Buy':
+            count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
+            orderName = self.stock['ticker'] + str(count)
             data = {
                 'validity': True,
-                'ticker': self.stock.ticker,
+                'simulation': self.sim,
+                'ticker': self.stock['ticker'],
                 'dayOfPurchase': self.dayOfPurchase,
                 'buyOrSell': 'buy',
                 'quantity': self.quantity,
                 'avgStockPrice': self.avgStockPrice,
                 'totalPrice': self.totalPrice
             }
-            self.db.collection('Simulations').document(self.sim).document('Orders').document(orderName).set(data)
+            self.db.collection('Orders').document(orderName).set(data)
         else: return -1
 
     def sellOrder(self):
-        if self.option == 'sell':
+        if self.option == 'Sell':
             tempInitialQuant = self.quantity
-            tempData = self.db.collection('Simulations').document(self.sim).document('Orders').get()
+            tempData = self.db.collection('Orders').document(orderName).get().to_dict()
             listOfChangedOrders = []
             partialOrderFlag = False
             try:
                 i = 0
                 while tempInitialQuant > 0:
-                    orderName = self.ticker + chr(i)
+                    orderName = self.stock['ticker'] + chr(i)
                     tempOrder = tempData[orderName]
                     if tempOrder['validity'] == 'true':
                         if tempOrder['buyOrSell'] == 'buy':
@@ -427,11 +446,12 @@ class Order:
                 totalPrices = []
                 #stockPrices = []
                 for order in listOfChangedOrders:
-                    tempOrder = self.db.collection('Simulations').document(self.sim).document('Orders').document(order).get()
+                    tempOrder = self.db.collection('Orders').document(order).get().to_dict()
                     totalPrices.append(tempOrder['totalPrice'])
                     #stockPrices.append(tempOrder['avgStockPrice'])
                     updatedOrder = {
                         'validity': False,
+                        'simulation': self.sim,
                         'ticker': tempOrder['ticker'],
                         'dayOfPurchase': tempOrder['dayOfPurchase'],
                         'buyOrSell': 'buy',
@@ -439,13 +459,14 @@ class Order:
                         'avgStockPrice': tempOrder['avgStockPrice'],
                         'totalPrice': tempOrder['totalPrice']
                     }
-                    self.db.collection('Simulations').document(self.sim).document('Orders').document(order).update(updatedOrder)
+                    self.db.ccollection('Orders').document(order).update(updatedOrder)
                 if partialOrderFlag:
-                    finalOrder = self.db.collection('Simulations').document(self.sim).document('Orders').document(finalOrderName).get()
+                    finalOrder = self.db.collection('Orders').document(finalOrderName).get().to_dict()
                     totalPrices.append(finalOrder['totalPrice'])
                     #stockPrices.append(finalOrder['avgStockPrice'])
                     updatedFinalOrderOriginal = {
                         'validity': False,
+                        'simulation': self.sim,
                         'ticker': finalOrder['ticker'],
                         'dayOfPurchase': finalOrder['dayOfPurchase'],
                         'buyOrSell': 'buy',
@@ -453,9 +474,10 @@ class Order:
                         'avgStockPrice': finalOrder['avgStockPrice'],
                         'totalPrice': finalOrder['totalPrice']
                     }
-                    self.db.collection('Simulations').document(self.sim).document('Orders').document(order).update(updatedFinalOrderOriginal)
+                    self.db.collection('Orders').document(order).update(updatedFinalOrderOriginal).to_dict()
                     updatedFinalOrderNew = {
                         'validity': True,
+                        'simulation': self.sim,
                         'ticker': finalOrder['ticker'],
                         'dayOfPurchase': finalOrder['dayOfPurchase'],
                         'buyOrSell': 'buy',
@@ -463,11 +485,12 @@ class Order:
                         'avgStockPrice': finalOrder['avgStockPrice'],
                         'totalPrice': finalOrder['totalPrice']
                     }
-                    count = len(self.db.collection('Simulations').document(self.sim).document('Orders').get())
+                    count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
                     orderName = finalOrder['ticker'] + chr(count)
-                    self.db.collection('Simulations').document(self.sim).document('Orders').document(orderName).set(updatedFinalOrderNew)
+                    self.db.collection('Orders').document(orderName).set(updatedFinalOrderNew)
                 sellOrderData = {
                     'validity': True,
+                    'simulation': self.sim,
                     'ticker': self.stock.ticker,
                     'dayOfPurchase': self.dayOfPurchase,
                     'buyOrSell': 'sell',
@@ -475,9 +498,9 @@ class Order:
                     'avgStockPrice': self.avgStockPrice,
                     'totalPrice': self.totalPrice
                 }
-                count = len(self.db.collection('Simulations').document(self.sim).document('Orders').get())
-                orderName = self.ticker + chr(count)
-                self.db.collection('Simulations').document(self.sim).document('Orders').document(orderName).set(sellOrderData)
+                count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
+                orderName = self.stock['ticker'] + chr(count)
+                self.db.collection('Orders').document(orderName).set(sellOrderData)
                 profit = sum(totalPrices) - self.totalPrice
                 return profit
             except IndexError:
