@@ -372,7 +372,7 @@ class User:
         db.collection('Users').document(username).set(data)
 
     # User list by Muneeb Khan
-    def userlist(self,username, email, name, userID, description="", picture="", experience=""):
+    def userlist(db,username, email, name, userID, description="", picture="", experience=""):
         data = {
             'Email' : email,
             'userName' : username,
@@ -382,13 +382,14 @@ class User:
             'Picture' : picture,
             'Experience' : experience,
         }
-        usernames = []
+        usernameslist = []
 
-        tempData = self.db.collection('Users').document(username)
+        tempData = db.collection('Users').document(username).get(data)
         for i in range(['Users']):
-            usernames.append(tempData[i])
+            usernameslist.append(tempData[i])
+            print("\n")
 
-        return usernames
+        return usernameslist
 
 class Order:
     def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
@@ -506,16 +507,24 @@ class Order:
         else: return -1
 
     # List of Orders by Muneeb Khan
-    def orderlist(self, stock, user, index):
+    def orderlist(db, sim, stock, user, index,quantity,stockPrice):
         data = {
+            'sim' : sim,
             'stock' : stock,
             'user' : user,
             'index' : index,
+            'quantity' : quantity,
+            'avgStockPrice' : stockPrice
         }
-        orders = []
+        orderslist = []
 
-        tempData = self.db.collection('Stocks').document(stock)
+        tempData = db.collection('Stocks').document(stock).get(data)
         for i in range(['Stocks']):
-            orders.append(tempData[i])
+            orderslist.append(tempData[i])
+            print ("\n")
+
+        return orderslist
 
         return orders
+    
+    

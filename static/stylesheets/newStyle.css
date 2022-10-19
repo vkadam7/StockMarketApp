@@ -123,3 +123,21 @@ footer{
   text-align: center;
   box-shadow: 0 5px 10px rgba(0,0,0,.2);
 }
+
+.divider:after,
+.divider:before {
+content: "";
+flex: 1;
+height: 1px;
+background: #eee;
+}
+.footer{
+  flex-shrink: 0;
+}
+
+
+.stockSimStartButton {
+  display: flex;
+  justify-content: center;
+}
+

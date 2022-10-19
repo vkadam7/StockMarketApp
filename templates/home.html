@@ -1,10 +1,13 @@
+<!--Home page by Muneeb Khan-->
+<!--Updated by Muneeb, Miqdad, and Viraj-->
+<!--CSS Updated by Miqdad and integrated by Muneeb-->
 <!doctype html>
 <html lang="en" class="h-100">
   <head>
     <meta charset="utf-8">
     <title>StockSim: Learn How to Trade</title>
 
-    <!-- Bootstrap core CSS -->
+    <!-- Bootstrap -->
     <link rel = "stylesheet" href = "/static/stylesheets/newStyle.css">
     <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
   </head>
@@ -34,7 +37,13 @@
           </li>
           {% if session['user'] %}
           <li class="nav-item">
-            Hello {{person['Name']}} <a class = "nav-link" method = "POST" href = "logout"> Logout</a>
+            <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
+          </li>
+          <li class="nav-item">
+            Hello {{person['Name']}}
+          </li>
+          <li class="nav-item">
+            <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
           {% else %}
           <li class="nav-item">
@@ -44,6 +53,16 @@
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
           {% endif %}
+          <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
+          <li class="nav-item"> <!--Old list name was StockSimStartButton-->
+            <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
+                <button>Start a simulation!</button>
+            </form>
+            <script type="text/javascript">
+                if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
+                    document.getElementById('stockSimStart').style.display = "none";
+            </script>
+          </li>
         </ul>
         <form action="/stockSearch" method="post">
           <input type="search" name="searchTerm" placeholder="Find a stock..."
@@ -63,19 +82,13 @@
 <!-- Begin page content -->
 <main>
     
-    <img class = "logo" src = "/static/stockLogo.png" alt = "stock symbol" width = "350" height = "300">
+    <img class = "logo" src = "/static/stockLogo.png" alt = "stock symbol" width = "350" height = "300"></img>
 
-    
         <div class = "section1">
             <h1 class = "Welcome">Welcome to StockSim</h1>
         </div>
 
         <div class = "opener">
-        <p> A website where we will help with making your first investments,
-    
-        <div class = "section1">
-            <h1>Welcome</h1>
-
             <p>Welcome to our website where we will help with making your first investments,
             <br>
             as you know stock markets require experience in order to know which
@@ -89,8 +102,7 @@
             <div class = "card-header">
                 <h4> About us </h4>
             </div>
-            <div class = "card-
-            ">
+            <div class = "card-body">
                 <h5 class = "card-text">
                      To learn more about our page, 
                 <br> 
