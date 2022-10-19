@@ -306,17 +306,17 @@ def finishSimulation():
 def orderFormFill():
     session['option'] = request.form['option']
     session['currentPrice'] = round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
-    return render_template('orderForm.html', stock=session['stock'], option=session['option'])
+    return render_template('orderForm.html', stock=stock, option=session['option'])
 
 @app.route("/orderCreate", methods=['POST', 'GET'])
 def orderCreate():
     session['orderQuantity'] = request.form['stockQuantity']
     session['orderPrice'] = round(int(session['orderQuantity']) * session['currentPrice'], 2)
-    return render_template('orderConfirmation.html', stock=session['stock'], option=session['option'])
+    return render_template('orderConfirmation.html', stock=stock, option=session['option'])
 
 @app.route("/orderConfirm", methods=['POST', 'GET'])
 def orderConfirm():
-    order = Order(dbfire, session['simName'], session['stock'], 
+    order = Order(dbfire, session['simName'], stock, 
                     session['option'], session['orderQuantity'], session['currentPrice'])
     if session['option'] == 'Buy':
         order.buyOrder()
@@ -373,7 +373,7 @@ def displayStock(ticker):
     if session['simulationFlag'] == False:
         stockData = StockData(dbfire, ticker)
         stock = stockData.stockJSON()
-        session['stock'] = stock
+        #session['stock'] = stock
         stockMatrix = stockData.getData(startDate, endDate, timespan)
         #print(stockMatrix)
         if stockMatrix != -1:
@@ -399,7 +399,7 @@ def displayStock(ticker):
         stockData = SimulationFactory(dbfire, session['user']).simulation.retrieveStock(ticker)
         for entry in stockData:
             stock = entry.to_dict()
-            session['stock'] = stock
+            #session['stock'] = stock
         if stock != -1:
             dates = []
             prices = []
@@ -446,7 +446,7 @@ def Portfolio():
         }
         session['currentCash'] = request.form['initialCash']
         global sim
-        sim = Simulation(firebase.database(), session['user'], request.form['startDate'],
+        sim = Simulation(dbfire, session['user'], request.form['startDate'],
                         request.form['endDate'], request.form['initialCash'], request.form['currentCash'] )
         sim.createSim()
         return render_template('simulation.html', person=session['user'])
