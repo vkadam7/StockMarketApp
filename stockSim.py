@@ -288,11 +288,6 @@ class Simulation:
             self.stocks.append(tempData)
             self.db.collection('IntradayStockData').add(tempData)
 
-    def updateCash(self, newAmount):
-        data = self.db.collection('Simulations').document(self.simName).get()
-        data['currentCash'] = newAmount
-        self.db.collection('Simulations').document(self.simName).update(data)
-
     def finishSimulation(self):
         data = self.db.collection('Simulations').document(self.simName).get()
         data['ongoing'] = False
@@ -315,6 +310,16 @@ class Simulation:
             tempSim.stocks.append(temp)
 
         return tempSim
+    
+    def updateCash(db, sim, delta):
+        data = db.collection('Simulations').document(sim).get().to_dict()
+        currentCash = data['currentCash']
+        newCurrentCash = float(currentCash) + float(delta)
+        db.collection('Simulations').document(sim).update({'currentCash' : newCurrentCash})
+
+    def retrieveCurrentCash(db, sim):
+        data = db.collection('Simulations').document(sim).get().to_dict()
+        return data['currentCash']
 
 class SimulationFactory:
     def __init__(self, db, email):
@@ -423,6 +428,7 @@ class Order:
                 'totalPrice': self.totalPrice
             }
             self.db.collection('Orders').document(orderName).set(data)
+            Simulation.updateCash(self.db, self.sim, float(self.totalPrice) * -1)
         else: return -1
 
     def sellOrder(self):
@@ -440,6 +446,7 @@ class Order:
                     'totalPrice': self.totalPrice
                 }
                 self.db.collection('Orders').document(orderName).set(data)
+                Simulation.updateCash(self.db, self.sim, self.totalPrice)
         else: return -1
 
     def doTheyOwnThat(self):
