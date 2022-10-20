@@ -105,7 +105,9 @@
                         {% for message in messages %}
                         <div class ="alert alert-warning alert-dismissible" role="alert">
                             {{ message }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">×</span>
+                            </button>
                         </div>
                         {% endfor %} 
                     {% endif %} 
