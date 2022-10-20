@@ -1,5 +1,6 @@
 from asyncio.windows_events import NULL
 #from crypt import methods
+#from crypt import methods
 #from re import T
 from datetime import datetime
 from statistics import mean
@@ -286,7 +287,7 @@ def startSimulation():
             }
             session['currentCash'] = request.form['initialCash']
             session['portfolioValue'] = request.form['initialCash']
-            simulation = Simulation(dbfire, session['user'], request.form['simStartDate'],
+            sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
                                     request.form['simEndDate'], request.form['initialCash'])
             sim.createSim()
             sim.addStocksToSim()
@@ -434,7 +435,7 @@ def fourOhFour():
     return render_template('404Error.html')
 
 #Author: Viraj Kadam
-@app.route('/displayInfo') #Retrieving info from portolio file
+@app.route('/displayInfo', methods=['POST']) #Retrieving info from portolio file
 def Portfolio():
     if('user' in session): #to check if the user is logged in will change to profile page
         session['simulation'] = {
