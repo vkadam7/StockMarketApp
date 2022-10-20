@@ -30,7 +30,7 @@
             <form action="/stockSearch" method="post">
                 <input type="search" name="searchTerm" placeholder="Find a stock..."
                         value="{{ request.form['searchTerm'] }}">
-                <button>Search</button>
+            <button class = "stockSearchButton">Search</button>
             </form>
         </div>
     </header>
@@ -44,11 +44,10 @@
                 <tr>
                     <th>Current Money:</th>
                     <td>${{ session['currentCash'] }}</td>
-                    <th>Quantity</th>
-                    <td>${{session['quantity']}}</td>
-                    <!--<td>${{session['name']}}</td>-->
-                    <th>Profit</th>
-                    <td>${{session['profit']}}</td>
+                    <td>${{ session['quantity'] }}</td>
+                    <td>${{ session['name'] }}</td>
+                    <td>${{ session['profit'] }}</td>
+                    <td>${{ session['funds_remaining'] }}</td>
                 </tr>
                 <tr>
             </table>

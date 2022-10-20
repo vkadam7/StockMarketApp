@@ -230,9 +230,5 @@ class portfolio:
         print("Retrive stocks: " + self.retrieve)
         
         
-        print("Your stock display: ")
-        print(self.user_graph)
-        
-        
         
         
