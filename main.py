@@ -310,6 +310,29 @@ def startSimulation():
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
         
+
+@app.route("/simulation", methods=['POST', 'GET'])
+def goToSimulation():
+    if ('user' in session):
+        try:
+            if request.method == 'POST':
+                session['simulationFlag'] = 1
+                print("line 320")
+                sim = SimulationFactory(dbfire, session['user']).simulation
+                session['currentCash'] = sim.currentCash
+                print("line 323")
+                session['portfolioValue'] = sim.initialCash
+                print("line 325")
+                session['simName'] = sim.simName
+                print("line 327")
+                return render_template('simulation.html', person=session['user'])
+        except KeyError:
+            print("KeyError occured: startSimulation")
+            return redirect(url_for('fourOhFour'))
+    else:
+        flash("Sorry you must be logged in to view that page.")
+        return redirect(url_for("login"))
+        
 @app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
     sim.finishSimulation()

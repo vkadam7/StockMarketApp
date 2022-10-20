@@ -314,6 +314,7 @@ class Simulation:
         tempSim.simName = id
         tempSim.startTimestamp = datetime.datetime.fromtimestamp(entry['startTimestamp'].timestamp())
         tempSim.currentCash = entry['currentCash']
+        tempSim.initialCash = entry['initialCash']
         tempSim.stocks = []
         for entry in db.collection('IntradayStockData').where('simulation','==',id).stream():
             temp = entry.to_dict()
