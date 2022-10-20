@@ -1,57 +1,54 @@
 <!--Stock Display page by Ian Mcnulty-->
-<!DOCTYPE html>
-<html>
-    <head>
-        <link rel = "stylesheet" href = "/static/stylesheets/styles.css">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" 
-        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    <meta charset="utf-8">
+    <title>StockSim: Learn How to Trade</title>
+
+    <!-- Bootstrap -->
+    <link rel = "stylesheet" href = "/static/stylesheets/newStyle.css">
+    <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
     </head>
     <header>
-        {% if session['user'] %}
-        <div class = "login">
-            <p>Hello {{person}} <a method = "POST" href = "logout">Logout</a></p>
-        </div>
-        {% else %}
-        <div class = "login">
-            <p><a method = "POST" href = "login">Login</a> or <a method = "POST" href = "register">Register</a></p>
-        </div>
-        {% endif %}
-        <!--Navbar by Muneeb Khan-->
-        <div class = "navbar">
-            <nav>
-                <ul>
-                    <li><a method = "POST" href = "home">Home</a></li>
-                    <li><a method = "POST" href = "aboutus">About Us</a></li>
-                    <li><a method = "POST" href = "information">Information</a></li>
-                    <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
-                        <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
-                          <button class = "stockSimStartButtonStyle" id="stockSimButton">Start a simulation!</button>
-                        </form>
-                        <script type="text/javascript">
-                          if ({{ session['loginFlagPy'] }} == 0 || {{ session['simulationFlag'] }} == 1 ) { 
-                            document.getElementById('stockSimButton').style.display = "none";
-                          }
-                        </script>
-                      </li>
-                      <li>
-                        <form id="nav-link" action="/simulation" method="post"> 
-                          <button class = "stockSimStartButtonStyle" id="goToSim">Go to Current Sim!</button>
-                        </form>
-                        <script type="text/javascript">
-                          if ({{ session['simulationFlag'] }} == 0 ) { 
-                            document.getElementById('goToSim').style.display = "none";
-                          }
-                        </script>  
-                      </li>
+
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(33, 103, 42)">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="home">
+                <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
+                StockSim: Learn How to Trade
+              </a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                  <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="home">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="aboutus">About Us</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="information">Information</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class = "nav-link" method = "POST" href = "profile"> Profile</a>
+                  </li> 
+                  <li class="nav-item">
+                    <a class = "nav-link" method = "POST" href = "logout"> Logout</a>
+                  </li>  
                 </ul>
-            </nav>
-            <form action="/stockSearch" method="post">
-                <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
-                        value="{{ request.form['searchTerm'] }}">
-                <button class = "stockSearchButton">Search</button>
-            </form>
-        </div>
+                <form action="/stockSearch" method="post">
+                  <input type="search" name="searchTerm" placeholder="Find a stock..."
+                          value="{{ request.form['searchTerm'] }}">
+                  <button>Search</button>
+              </form>
+              </div>
+        
+            </div>
+          </nav>
+
     </header>
     <body>
         <div class="stockDisplay">
@@ -79,40 +76,43 @@
                 });
             </script>
         </div>        
-        <form action="/changeView" method="post">
-            <div class="stockUtilityBar">
-                <div class="stockUtilityBarIcon">
-                    <h3>Starting Date:</h3>
-                    <input type="date" name="startDate" placeholder="yyyy-mm-dd" 
+        
+        <form action="/changeView" method="post" style = "padding-left: 30px;">
+            <div class = "row justify-content-center">
+            <div class = "form-row align-items-center">
+                <div class = "form-group col-md-6">
+                    <label for = "startDate">Starting Date:</label>
+                    <input type="date" class = "form-control" name="startDate" placeholder="yyyy-mm-dd" 
                         value="{{ request.form['startDate'] }}">
                 </div>
-                <div class="stockUtilityBarIcon">
-                    <h3>Ending Date:</h3>
-                    <input type="date" name="endDate" placeholder="yyyy-mm-dd"
+                <div class = "form-group col-md-6">
+                    <label for = "endDate">Ending Date:</label>
+                    <input type="date" class = "form-control" name="endDate" placeholder="yyyy-mm-dd"
                         value="{{ request.form['endDate'] }}">
                 </div>
-                <div class="stockUtilityBarIcon">
-                    <h3>Timespan:</h3>
-                    <select name="timespan" value="{{ request.form['timespan'] }}">
+            </div>
+            <div class = "form-row align-items-center">
+                <div class = "form-group col-md-6">
+                    <label for = "timespan">Timespan:</label>
+                    <select class = "form-control" name="timespan" value="{{ request.form['timespan'] }}">
                         <option value="hourly">Hourly prices</option>
                         <option value="daily">Daily prices</option>
                         <option value="weekly">Weekly prices</option>
                         <option value="monthly">Monthly prices</option>
                     </select>
                 </div>
-                <div class="stockUtilityBarIcon">
-                    <button type="submit">Show Range</button>
-                </div>
-                <!--Author: Viraj
-                Buy sell features for the stock market simulator, will place here for now until plan for game is confirmed. Buttons will
-                only appear if user if logged in-->
-               
             </div>
+            </div>
+            <br>
+            
+                <button type="submit" class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Show Ranges</button>
+            
         </form>
-        <form action="/orderForm" method="post">
-            <div class="buySellButtons">
-                <button type = "submit" name="option" value="Buy">Buy</button>
-                <button type = "submit" name="option" value="Sell">Sell</button>
+        <br>
+
+        <form action="/orderForm" method="post" style = "padding-left: 30px;">
+                <button  class="btn btn btn-lg" name="option" value="Buy" style = "color:rgb(33, 103, 42);background-color:antiquewhite;">Buy</button>
+                <button  class="btn btn btn-lg" name="option" value="Sell" style = "color:rgb(33, 103, 42);background-color: antiquewhite;">Sell</button>
                 <script>
                     var Display = $('.login').css.('display','block'):
                     var noDisplay = $('.login').css.('display', 'none'): 
@@ -122,11 +122,20 @@
                     else
                         $(noDisplay);               
                 </script>    
-            </div>
+            
         </form>  
         <script type="text/javascript">
             if ({{ session['simulationFlag'] }} == False) 
                 document.getElementById('buySellButtons').style.display = "none";
-        /script>
+        </script>
     </body>
+<br><br>
+
+    <footer class="footer mt-5 py-3" style = "background-color:rgb(33, 103, 42)">
+    <div class="container">
+      <span>Copyright 2022 by StockSim</span>
+    </div>
+  </footer>
+
+  <script src="/static/jsStyle/bootstrap.bundle.min.js"></script>
 </html>
