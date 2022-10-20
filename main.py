@@ -309,6 +309,7 @@ def startSimulation():
 @app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
     sim.finishSimulation()
+    session['simulationFlag'] = False
 
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
