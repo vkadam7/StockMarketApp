@@ -44,16 +44,6 @@
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
-          <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
-          <li class="nav-item"> <!--Old list name was StockSimStartButton-->
-            <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
-              <button class = "stockSimStartButtonStyle" type = "button" >Start a simulation!</button>
-            </form>
-            <script type="text/javascript">
-              if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
-                document.getElementById('stockSimStart').style.display = "none";
-            </script>
-          </li>
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -64,9 +54,9 @@
           {% endif %}
         </ul>
         <form action="/stockSearch" method="post">
-          <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+          <input class = "stockSearchBar" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
-          <button class = "stockSearchButton" type = "button">Search</button>
+          <button class = "stockSearchButton">Search</button>>
       </form>
       </div>
 
@@ -93,7 +83,7 @@
         User ID: {{results['UserID']}}
     </h1>
 
-    <h1>Update Profile <a href = "update.html"> </h1>
+    <h1><a href = "update.html">Update Profile </a></h1>
     <br>
  <!--  {% with alerts = get_flashed_messages() %}
         {% for print in alerts %}
@@ -110,22 +100,37 @@
         {% endwith %}  Keep this an alternative - Muneeb Khan
     <br>
     </h1> -->
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}   
-                        {% for message in messages %}
-                        <div class ="alert alert-warning alert-dismissible" role="alert">
-                            {{ message }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
-                        </div>
-                        {% endfor %} 
-                    {% endif %} 
-                {% endwith %} 
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}   
+        {% for message in messages %}
+        <div class ="alert alert-warning alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        {% endfor %} 
+      {% endif %} 
+    {% endwith %} 
 
     </h1>     
     <div class="stockSimStartButton">
-        <form id="stockSimStart" action="/stockSimForm" method="post">
-          <button class = "stockSimStartButtonStyle" type = "button" >Start a simulation!</button>
+        <form id="stockSimButton" action="/stockSimForm" method="post">
+          <button class = "stockSimStartButtonStyle">Start a simulation!</button>
         </form>
+        <script type="text/javascript">
+          if ({{ session['simulationFlag'] }} == 1 ) { 
+            document.getElementById('stockSimButton').style.display = "none";
+          }
+        </script>
+        <form id="stockSimStart" action="/simulation" method="post"> 
+              <button class = "stockSimStartButtonStyle" id="goToSim">Go to Current Sim!</button>
+            </form>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('goToSim').style.display = "none";
+              }
+            </script> 
     </div>
 
     <footer class="footer mt-auto py-3" style = "background-color:rgb(15, 158, 230)">

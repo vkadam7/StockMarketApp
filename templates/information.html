@@ -46,14 +46,25 @@
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
           <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
-          <li class="nav-item"> <!--Old list name was StockSimStartButton-->
+          <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
             <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
-              <button class = "stockSimStartButtonStyle" type = "button" >Start a simulation!</button>
+              <button class = "stockSimStartButtonStyle" id="stockSimButton">Start a simulation!</button>
             </form>
             <script type="text/javascript">
-              if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
-                document.getElementById('stockSimStart').style.display = "none";
+              if ({{ session['loginFlagPy'] }} == 0 || {{ session['simulationFlag'] }} == 1 ) { 
+                document.getElementById('stockSimButton').style.display = "none";
+              }
             </script>
+          </li>
+          <li>
+            <form id="nav-link" action="/simulation" method="post"> 
+              <button class = "stockSimStartButtonStyle" id="goToSim">Go to Current Sim!</button>
+            </form>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('goToSim').style.display = "none";
+              }
+            </script>  
           </li>
           {% else %}
           <li class="nav-item">
@@ -67,7 +78,7 @@
         <form action="/stockSearch" method="post">
           <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
-          <button class = "stockSearchButton" type = "button">Search</button>
+          <button class = "stockSearchButton">Search</button>
       </form>
       </div>
 
@@ -112,7 +123,7 @@
                       Below is an example of a graph showing Googles shares for the past 6 years.
                       <br>
                       <br>  
-                      <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = 300 height = 300 class = "stock" />
+                      <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = "90%" height = "90%" display = "d-flex" class = "stock" />
                       <br>
                       <br>
                       You may also search for stocks using the stock search bar on the top right hand corner.
@@ -141,14 +152,14 @@
                     <br>
                     <br>
                     <br>
-                    <iframe width = "480" height = "320" src = "https://www.youtube.com/watch?v=cNkZf7TRwA4autoplay=1control=1"></iframe>
+                    <iframe width = "480" height = "320" display = "d-flex" src = "https://www.youtube.com/embed/cNkZf7TRwA4"></iframe>
                     <br>
                     <br>
                     <br>
                     Below is another video which shows a basic example of the stock market
                     <br>
                     <br>
-                    <iframe width = "480" height = "320" src = "https://www.youtube.com/watch?v=p7HKvqRI_Boautoplay=1control=1"></iframe> 
+                    <iframe width = "480" height = "320" display = "d-flex" src = "https://www.youtube.com/embed/p7HKvqRI_Bo"></iframe> 
                     <br>
                     <br>
                     <br>
