@@ -125,6 +125,11 @@ footer{
   padding: 5px;
 }
 
+.card-text a{
+  color: black;
+  font-style: bold;
+}
+
 .stockSearchBar {
   padding: 5px;
   border-radius: 5px;

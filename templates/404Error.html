@@ -45,14 +45,25 @@
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
           <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
-          <li class="nav-item"> <!--Old list name was StockSimStartButton-->
+          <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
             <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
-              <button class = "stockSimStartButtonStyle">Start a simulation!</button>
+              <button class = "stockSimStartButtonStyle" id="stockSimButton">Start a simulation!</button>
             </form>
             <script type="text/javascript">
-              if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
-                document.getElementById('stockSimStart').style.display = "none";
+              if ({{ session['loginFlagPy'] }} == 0 || {{ session['simulationFlag'] }} == 1 ) { 
+                document.getElementById('stockSimButton').style.display = "none";
+              }
             </script>
+          </li>
+          <li>
+            <form id="nav-link" action="/simulation" method="post"> 
+              <button class = "stockSimStartButtonStyle" id="goToSim">Go to Current Sim!</button>
+            </form>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('goToSim').style.display = "none";
+              }
+            </script>  
           </li>
           {% else %}
           <li class="nav-item">

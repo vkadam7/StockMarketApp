@@ -46,14 +46,25 @@
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
           <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
-          <li class="nav-item"> <!--Old list name was StockSimStartButton-->
+          <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
             <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
-              <button class = "stockSimStartButtonStyle" >Start a simulation!</button>
+              <button class = "stockSimStartButtonStyle" id="stockSimButton">Start a simulation!</button>
             </form>
             <script type="text/javascript">
-              if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
-                document.getElementById('stockSimStart').style.display = "none";
+              if ({{ session['loginFlagPy'] }} == 0 || {{ session['simulationFlag'] }} == 1 ) { 
+                document.getElementById('stockSimButton').style.display = "none";
+              }
             </script>
+          </li>
+          <li>
+            <form id="nav-link" action="/simulation" method="post"> 
+              <button class = "stockSimStartButtonStyle" id="goToSim">Go to Current Sim!</button>
+            </form>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('goToSim').style.display = "none";
+              }
+            </script>  
           </li>
           {% else %}
           <li class="nav-item">
@@ -104,7 +115,7 @@
                 <h4> About us</h4>
             </div>
 
-            <div class = "card-body>
+            <div class = "card-body">
                 <h5 class = "card-text">
                      To learn more about our page, 
                 <br> 
@@ -120,8 +131,8 @@
             </div>
             <div class = "card-body">
                 <h5 class = "card-text">
-                     To check out information page,
-                <br><a method = "POST" href = "information">click this link</a> to learn more about stock investments before you start.
+                  To check out our information page please, <a method = "POST" href = "information">click this link</a> 
+                    <br> to learn more about stock investments before you start. You will need to be registered before accessing our page.
                 </h5>
             </div>
         </div>
@@ -135,9 +146,22 @@
             <div class = "card-body">
                 <h5 class = "card-text">
                     <p>If you haven't already please <a method = "POST" href = "register ">click this link</a> to register 
-                        <br> to become a member of our website otherwise <a method = "POST" href = "login"> click this link to</a> to login
+                        <br> to become a member of our website, otherwise if you are already registered
+                        <br> please<a method = "POST" href = "login"> click this link to</a> to login.
                 </h5>
             </div>
+        </div>
+        <div class = "card w-50">
+            <div class = "card-header">
+                <img class = "logo" src = "/static/stockLogo.png" alt = "stock symbol" width = "50" height = "50">
+                <h4>Search for stocks</h4>
+            </div>
+            <div class = "card-body">
+                <h5 class = "card-text">
+                    <p>If you would like to search for some stocks, please use our stock search bar on the top right 
+                        <br> of the page. You will need to be logged in to use our search feature.
+                </h5>
+            </div>    
 
         </div>
       
