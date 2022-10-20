@@ -33,6 +33,9 @@
                     <a class="nav-link" href="information">Information</a>
                   </li>
                   <li class="nav-item">
+                    <a class = "nav-link" method = "POST" href = "profile"> Profile</a>
+                  </li> 
+                  <li class="nav-item">
                     <a class = "nav-link" method = "POST" href = "logout"> Logout</a>
                   </li>  
                 </ul>
@@ -108,9 +111,8 @@
         <br>
 
         <form action="/orderForm" method="post" style = "padding-left: 30px;">
-            <div class="buySellButtons">
-                <button type="button" class="btn btn btn-lg" name="option" value="Buy" style = "color:rgb(33, 103, 42);background-color:antiquewhite;">Buy</button>
-                <button type="button" class="btn btn btn-lg" name="option" value="Sell" style = "color:rgb(33, 103, 42);background-color: antiquewhite;">Sell</button>
+                <button  class="btn btn btn-lg" name="option" value="Buy" style = "color:rgb(33, 103, 42);background-color:antiquewhite;">Buy</button>
+                <button  class="btn btn btn-lg" name="option" value="Sell" style = "color:rgb(33, 103, 42);background-color: antiquewhite;">Sell</button>
                 <script>
                     var Display = $('.login').css.('display','block'):
                     var noDisplay = $('.login').css.('display', 'none'): 
@@ -120,7 +122,7 @@
                     else
                         $(noDisplay);               
                 </script>    
-            </div>
+            
         </form>  
         <script type="text/javascript">
             if ({{ session['simulationFlag'] }} == False) 
