@@ -187,3 +187,8 @@ background: #eee;
   display: flex;
   justify-content: center;
 }
+
+.centering{
+  border: 3px;
+  text-align: center;
+}
