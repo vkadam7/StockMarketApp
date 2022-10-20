@@ -289,9 +289,9 @@ class Simulation:
             self.db.collection('IntradayStockData').add(tempData)
 
     def finishSimulation(self):
-        data = self.db.collection('Simulations').document(self.simName).get()
+        data = self.db.collection('Simulations').document(self.simName).get().to_dict()
         data['ongoing'] = False
-        percentChange = (data['currentCash'] - data['initialCash']) / data['initialCash']
+        percentChange = (float(data['currentCash']) - float(data['initialCash'])) / float(data['initialCash'])
         data['score'] = percentChange * 100
         self.db.collection('Simulations').document(self.simName).update(data)
 
