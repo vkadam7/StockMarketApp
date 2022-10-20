@@ -1,4 +1,5 @@
 from mimetypes import init
+from queue import Empty
 from time import daylight
 import numpy as np
 import firebase_admin
@@ -47,11 +48,8 @@ class StockData:
         try:
             dataMatrix = []
             tempArr = np.array(self.dates)
-            #print(tempArr)
             startLoc = np.where(tempArr == start)
             endLoc = np.where(tempArr == end)
-            #print(startLoc)
-            #print(endLoc)
             tempOpens = []
             tempCloses = []
             tempHighs = []
@@ -59,6 +57,12 @@ class StockData:
             tempAdjCloses = []
             tempVolumes = []
             tempDate = start
+            if not startLoc:
+                startLoc[0][0] = 0
+                print(self.ticker + " only partially available for this period")
+            if not endLoc:
+                endLoc[0][0] = len(self.dates) - 1
+                print(self.ticker + " only partially available for this period")
             for i in range(startLoc[0][0], endLoc[0][0]+1):
                 if timespan == 'monthly' or timespan == 'weekly':
                     if self.checkDate(i, timespan):
@@ -177,7 +181,20 @@ class StockData:
                 endLoc = np.where(tempArr == endDate)
                 newDates = []
                 newData = []
-                for i in range(startLoc[0][0], endLoc[0][0]+1):
+                print(ticker)
+                print(startLoc)
+                print(endLoc)
+                if startLoc[0].size == 0:
+                    a = 0
+                    print(ticker + " only partially available for this period, startDate")
+                else:
+                    a = startLoc[0][0]
+                if endLoc[0].size == 0:
+                    b = len(dates) - 1
+                    print(ticker + " only partially available for this period, endDate")
+                else:
+                    b = endLoc[0][0]
+                for i in range(a, b+1):
                     interp = np.interp(range(0,23),[0, 12, 23],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
                     for j in range(0,len(interp)):
                         tempArr = np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])])
@@ -259,6 +276,7 @@ class Simulation:
             'score': 0,
             'startTimestamp': self.startTimestamp,
         }
+        self.addStocksToSim()
         self.db.collection('Simulations').document(simName).set(data)
 
     def whatTimeIsItRightNow(self):
@@ -288,15 +306,10 @@ class Simulation:
             self.stocks.append(tempData)
             self.db.collection('IntradayStockData').add(tempData)
 
-    def updateCash(self, newAmount):
-        data = self.db.collection('Simulations').document(self.simName).get()
-        data['currentCash'] = newAmount
-        self.db.collection('Simulations').document(self.simName).update(data)
-
     def finishSimulation(self):
-        data = self.db.collection('Simulations').document(self.simName).get()
+        data = self.db.collection('Simulations').document(self.simName).get().to_dict()
         data['ongoing'] = False
-        percentChange = (data['currentCash'] - data['initialCash']) / data['initialCash']
+        percentChange = (float(data['currentCash']) - float(data['initialCash'])) / float(data['initialCash'])
         data['score'] = percentChange * 100
         self.db.collection('Simulations').document(self.simName).update(data)
 
@@ -309,16 +322,34 @@ class Simulation:
         tempSim.simName = id
         tempSim.startTimestamp = datetime.datetime.fromtimestamp(entry['startTimestamp'].timestamp())
         tempSim.currentCash = entry['currentCash']
+        tempSim.initialCash = entry['initialCash']
         tempSim.stocks = []
         for entry in db.collection('IntradayStockData').where('simulation','==',id).stream():
             temp = entry.to_dict()
             tempSim.stocks.append(temp)
 
         return tempSim
+    
+    def updateCash(db, sim, delta):
+        data = db.collection('Simulations').document(sim).get().to_dict()
+        currentCash = data['currentCash']
+        newCurrentCash = float(currentCash) + float(delta)
+        db.collection('Simulations').document(sim).update({'currentCash' : newCurrentCash})
+
+    def retrieveCurrentCash(db, sim):
+        data = db.collection('Simulations').document(sim).get().to_dict()
+        return data['currentCash']
 
 class SimulationFactory:
     def __init__(self, db, email):
         self.simulation = Simulation.retrieveOngoing(db, email)
+
+    def existenceCheck(db, email):
+        array = [entry for entry in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream()]
+        if len(array) == 0:
+            return False
+        else:
+            return True
 
 class User:
     def __init__(self, db, username):
@@ -376,22 +407,18 @@ class User:
         db.collection('Users').document(username).set(data)
 
     # User list by Muneeb Khan
-    def userlist(db,username, email, name, userID, description="", picture="", experience=""):
+    def userList(self):
         data = {
-            'Email' : email,
-            'userName' : username,
-            'Name' : name,
-            'UserID' : userID,
-            'Description' : description,
-            'Picture' : picture,
-            'Experience' : experience,
+            'Email' : self.email,
+            'userName' : self.username,
+            'Name' : self.name,
+            'UserID' : self.userID,
         }
+
         usernameslist = []
 
-        tempData = db.collection('Users').document(username).get(data)
-        for i in range(['Users']):
-            usernameslist.append(tempData[i])
-            print("\n")
+        for entry in self.db.collection('Users').document(self.username).get(data):
+            usernameslist.append(entry.id)
 
         return usernameslist
 
@@ -409,7 +436,7 @@ class Order:
     def buyOrder(self):
         if self.option == 'Buy':
             count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
-            orderName = self.stock['ticker'] + str(count)
+            orderName = self.sim + self.stock['ticker'] + str(count)
             data = {
                 'sold': False,
                 'simulation': self.sim,
@@ -421,13 +448,14 @@ class Order:
                 'totalPrice': self.totalPrice
             }
             self.db.collection('Orders').document(orderName).set(data)
+            Simulation.updateCash(self.db, self.sim, float(self.totalPrice) * -1)
         else: return -1
 
     def sellOrder(self):
         if self.option == 'Sell':
             if self.doTheyOwnThat():
                 count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
-                orderName = self.stock['ticker'] + str(count)
+                orderName = self.sim + self.stock['ticker'] + str(count)
                 data = {
                     'simulation': self.sim,
                     'ticker': self.stock['ticker'],
@@ -438,42 +466,53 @@ class Order:
                     'totalPrice': self.totalPrice
                 }
                 self.db.collection('Orders').document(orderName).set(data)
+                Simulation.updateCash(self.db, self.sim, self.totalPrice)
         else: return -1
 
     def doTheyOwnThat(self):
         quantityOwned = 0
         ownageFlag = False
         for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).get():
-            print(entry)
-            temp = entry.to_list()
-            quantityOwned += temp['quantity']
+            temp = entry.to_dict()
+            quantityOwned += int(temp['quantity'])
 
-        if quantityOwned <= self.quantity:
+        if quantityOwned <= int(self.quantity):
             ownageFlag = True
         
         if ownageFlag:
+            for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).where('partiallySold','==',True).stream():
+                temp = entry.to_dict()
+                if quantityOwned - int(temp['newQuantity']) >= 0:
+                    self.db.collection('Orders').document(entry.id).update({'sold' : True})
+                    quantityOwned -= int(temp['newQuantity'])
+                else:
+                    self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['newQuantity']) - quantityOwned)})
             for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream():
-                entry.update({'sold' : True})
+                temp = entry.to_dict()
+                if quantityOwned - int(temp['quantity']) >= 0:
+                    self.db.collection('Orders').document(entry.id).update({'sold' : True})
+                    quantityOwned -= int(temp['quantity'])
+                else:
+                    self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['quantity']) - quantityOwned)})
             return ownageFlag
         
         return ownageFlag
 
     # List of Orders by Muneeb Khan
-    def orderlist(db, sim, stock, user, index,quantity,stockPrice):
+    def orderList(self):
         data = {
-            'sim' : sim,
-            'stock' : stock,
-            'user' : user,
-            'index' : index,
-            'quantity' : quantity,
-            'avgStockPrice' : stockPrice
-        }
+            'validity': True,
+            'ticker': self.stock.ticker,
+            'dayOfPurchase': self.dayOfPurchase,
+            'buyOrSell': self.buyOrSell,
+            'quantity': self.quantity,
+            'avgStockPrice': self.avgStockPrice,
+            'totalPrice': self.totalPrice
+            }
         orderslist = []
 
-        tempData = db.collection('Stocks').document(stock).get(data)
-        for i in range(['Stocks']):
-            orderslist.append(tempData[i])
-            print ("\n")
+        for entry in self.db.collection('Simulations').document(self.sim).document('Orders').get(data):
+            orderslist.append(entry.id)
 
         return orderslist
 

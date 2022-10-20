@@ -15,7 +15,7 @@
     
 <header>
   <!-- Fixed navbar -->
-  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(33, 103, 42)">
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(15, 158, 230)">
     <div class="container-fluid">
       <a class="navbar-brand" href="information">
         <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
@@ -45,6 +45,27 @@
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
+          <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
+          <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
+            <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
+              <button class = "stockSimStartButtonStyle" id="stockSimButton">Start a simulation!</button>
+            </form>
+            <script type="text/javascript">
+              if ({{ session['loginFlagPy'] }} == 0 || {{ session['simulationFlag'] }} == 1 ) { 
+                document.getElementById('stockSimButton').style.display = "none";
+              }
+            </script>
+          </li>
+          <li>
+            <form id="nav-link" action="/simulation" method="post"> 
+              <button class = "stockSimStartButtonStyle" id="goToSim">Go to Current Sim!</button>
+            </form>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('goToSim').style.display = "none";
+              }
+            </script>  
+          </li>
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -53,21 +74,11 @@
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
           {% endif %}
-          <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
-          <li class="nav-item"> <!--Old list name was StockSimStartButton-->
-            <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
-                <button>Start a simulation!</button>
-            </form>
-            <script type="text/javascript">
-                if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
-                    document.getElementById('stockSimStart').style.display = "none";
-            </script>
-        </li>
         </ul>
         <form action="/stockSearch" method="post">
-          <input type="search" name="searchTerm" placeholder="Find a stock..."
+          <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
-          <button>Search</button>
+          <button class = "stockSearchButton">Search</button>
       </form>
       </div>
 
@@ -83,7 +94,7 @@
             <h1>Information</h1>
         </div>
         <div class = infomain>
-            <div class = "card w-75">
+            <div class = "card w-75 d-flex justify-content-left" style= "padding: 20px;">
               <div class = "card-header">
               <h2>What Should I Know?</h2>
               </div>
@@ -112,7 +123,7 @@
                       Below is an example of a graph showing Googles shares for the past 6 years.
                       <br>
                       <br>  
-                      <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = 300 height = 300 class = "stock" />
+                      <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = "90%" height = "90%" display = "d-flex" class = "stock" />
                       <br>
                       <br>
                       You may also search for stocks using the stock search bar on the top right hand corner.
@@ -136,6 +147,22 @@
                     which is the quickest method of buying stocks.
                     <br>
                     <br>
+                    <br>
+                    Below is a video which shows a basic example of paper trading
+                    <br>
+                    <br>
+                    <br>
+                    <iframe width = "480" height = "320" display = "d-flex" src = "https://www.youtube.com/embed/cNkZf7TRwA4"></iframe>
+                    <br>
+                    <br>
+                    <br>
+                    Below is another video which shows a basic example of the stock market
+                    <br>
+                    <br>
+                    <iframe width = "480" height = "320" display = "d-flex" src = "https://www.youtube.com/embed/p7HKvqRI_Bo"></iframe> 
+                    <br>
+                    <br>
+                    <br>
                     Our website gives users the option to buy or sell a stock. The users
                     will also have a portfolio page to show their records on how many orders they
                     have made, and how many wins and losses they have on the stock simulator.
@@ -156,11 +183,34 @@
                   <br><a method = "POST" href = "StockDefinitions">Stock Definitions</a>
                   </h5>
                  </div>
+                <br>
+
+                <div class = "card-header">
+                <h2>Sources?</h2>
+                </div>
+                 <div class = "card-">
+                  <h5 class = "card-text">We have sources below of where you may find further information
+                  <br>on stocks.
+                  </h5>
+                 </div>
+                <br>
+
+                <div class = "card-header">
+                <h2>How can I test my knowledge?</h2>
+                </div>
+                 <div class = "card-">
+                  <h5 class = "card-text">We have a 10 question quiz below you may take to test your knowledge
+                  <br>of stocks. The questions will relate to what was discussed on this page and the definitions
+                  <br>page.
+                  <br><p></p>
+                  </h5>
+                 </div>
+                <br>
              </div>
         </div>
 
     </section>
-      <footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
+      <footer class="footer mt-auto py-3" style = "background-color:rgb(15, 158, 230)">
         <div class="container">
           <span>Copyright 2022 by StockSim</span>
         </div>

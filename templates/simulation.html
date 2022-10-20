@@ -30,7 +30,7 @@
             <form action="/stockSearch" method="post">
                 <input type="search" name="searchTerm" placeholder="Find a stock..."
                         value="{{ request.form['searchTerm'] }}">
-                <button>Search</button>
+            <button class = "stockSearchButton">Search</button>
             </form>
         </div>
     </header>
@@ -56,6 +56,10 @@
         </div>
         <div class="orderListButton">
             <a href="orderList">Order History</a>
-        </div>
+        <form action="/finishSimulation">
+           </div>  
+                <button>Finish the Simulation</button>
+            </div>
+        </form>
     </body>
 </html>
