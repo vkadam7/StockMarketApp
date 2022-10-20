@@ -43,7 +43,7 @@
                   <input type="search" name="searchTerm" placeholder="Find a stock..."
                           value="{{ request.form['searchTerm'] }}">
                   <button>Search</button>
-              </form>
+                </form>
               </div>
         
             </div>
@@ -62,7 +62,7 @@
         
             <div class="container">
               <div class="row justify-content-center" style = "margin-left: 40%;margin-right: 20%;">
-            <form>
+            <form action="/startSimulation" method="post">
               <div class = "form-row align-items-center" style = "box-sizing: 0;">
                 <div class = "form-group col-md-5">
                   <label for="dateInput">Starting Date of Simulation:</label>
