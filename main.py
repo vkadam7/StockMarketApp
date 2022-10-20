@@ -343,12 +343,16 @@ def orderConfirm():
     order = Order(dbfire, session['simName'], stock, 
                     session['option'], session['orderQuantity'], session['currentPrice'])
     if session['option'] == 'Buy':
-        order.buyOrder()
+        flag = order.buyOrder()
     else:
-        order.sellOrder()
-    session['currentCash'] = Simulation.retrieveCurrentCash(dbfire, session['simName'])
-
-    return render_template('simulation.html', person=session['user'])
+        flag = order.sellOrder()
+    if flag == 1:
+        session['currentCash'] = Simulation.retrieveCurrentCash(dbfire, session['simName'])
+        return render_template('simulation.html', person=session['user'])
+    elif session['option'] == 'Buy' and flag == -1:
+        flash("Insufficient funds to complete purchase")
+    elif session['option'] == 'Sell' and flag == -1:
+        flash("Insufficient shares to complete sale")
     
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user

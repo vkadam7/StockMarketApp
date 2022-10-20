@@ -532,21 +532,23 @@ class Order:
 
     def buyOrder(self):
         if self.option == 'Buy':
-            count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
-            orderName = self.sim + self.stock['ticker'] + str(count)
-            data = {
-                'sold': False,
-                'simulation': self.sim,
-                'ticker': self.stock['ticker'],
-                'dayOfPurchase': self.dayOfPurchase,
-                'buyOrSell': 'Buy',
-                'quantity': self.quantity,
-                'avgStockPrice': self.avgStockPrice,
-                'totalPrice': self.totalPrice
-            }
-            self.db.collection('Orders').document(orderName).set(data)
-            Simulation.updateCash(self.db, self.sim, float(self.totalPrice) * -1)
-        else: return -1
+            if self.doTheyHaveEnoughMoney():
+                count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
+                orderName = self.sim + self.stock['ticker'] + str(count)
+                data = {
+                    'sold': False,
+                    'simulation': self.sim,
+                    'ticker': self.stock['ticker'],
+                    'dayOfPurchase': self.dayOfPurchase,
+                    'buyOrSell': 'Buy',
+                    'quantity': self.quantity,
+                    'avgStockPrice': self.avgStockPrice,
+                    'totalPrice': self.totalPrice
+                }
+                self.db.collection('Orders').document(orderName).set(data)
+                Simulation.updateCash(self.db, self.sim, float(self.totalPrice) * -1)
+                return 1
+            else: return -1
 
     def sellOrder(self):
         if self.option == 'Sell':
@@ -564,7 +566,17 @@ class Order:
                 }
                 self.db.collection('Orders').document(orderName).set(data)
                 Simulation.updateCash(self.db, self.sim, self.totalPrice)
-        else: return -1
+                return 1
+            else: return -1
+
+    def doTheyHaveEnoughMoney(self):
+        enoughFlag = False
+
+        currentCash = int(self.db.collection('Simulations').document(self.sim).get().to_dict()['currentCash'])
+        if currentCash >= self.totalPrice:
+            enoughFlag = True
+
+        return enoughFlag
 
     def doTheyOwnThat(self):
         quantityOwned = 0
