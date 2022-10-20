@@ -280,31 +280,31 @@ def stockSimForm():
 #   Description: 
 @app.route("/startSimulation", methods=['POST'])
 def startSimulation():
-if ('user' in session):
-    try:
-        if request.method == 'POST':
-            session['simulationFlag'] = True
-            session['simulation'] = {
-                'simStartDate': request.form['simStartDate'],
-                'simEndDate': request.form['simEndDate'],
-                'initialCash': request.form['initialCash']
-            }
-            session['currentCash'] = request.form['initialCash']
-            session['portfolioValue'] = request.form['initialCash']
-            sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
-                                    request.form['simEndDate'], request.form['initialCash'])
-            sim.createSim()
-            sim.addStocksToSim()
-            session['simName'] = sim.simName
-            return render_template('simulation.html', person=session['user'])
+    if ('user' in session):
+        try:
+            if request.method == 'POST':
+                session['simulationFlag'] = True
+                session['simulation'] = {
+                    'simStartDate': request.form['simStartDate'],
+                    'simEndDate': request.form['simEndDate'],
+                    'initialCash': request.form['initialCash']
+                }
+                session['currentCash'] = request.form['initialCash']
+                session['portfolioValue'] = request.form['initialCash']
+                sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
+                                        request.form['simEndDate'], request.form['initialCash'])
+                sim.createSim()
+                sim.addStocksToSim()
+                session['simName'] = sim.simName
+                return render_template('simulation.html', person=session['user'])
 
 
-    except KeyError:
-        print("KeyError occured: startSimulation")
-        return redirect(url_for('fourOhFour'))
-else:
-    flash("Sorry you must be logged in to view that page.")
-    return redirect(url_for("login"))
+        except KeyError:
+            print("KeyError occured: startSimulation")
+            return redirect(url_for('fourOhFour'))
+    else:
+        flash("Sorry you must be logged in to view that page.")
+        return redirect(url_for("login"))
         
 @app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
@@ -347,20 +347,20 @@ def orderConfirm():
 #   Author: Ian McNulty
 @app.route('/stockSearch', methods=['POST', 'GET'])
 def stockSearch():
-if ('user' in session):
-    try:
-        if request.method == 'POST':
-            if StockData.stockSearch(dbfire, request.form["searchTerm"]):
-                return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-16", timespan="daily"))
-            else:
-                return redirect(url_for('fourOhFour'))
-    except KeyError:
-        print("KeyError occured: stockSearch")
-        return redirect(url_for('fourOhFour'))
-    return redirect(url_for(request.url))
-else:
-    flash("Sorry you must be logged in to view that page.")
-    return redirect(url_for("login"))
+    if ('user' in session):
+        try:
+            if request.method == 'POST':
+                if StockData.stockSearch(dbfire, request.form["searchTerm"]):
+                    return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-16", timespan="daily"))
+                else:
+                    return redirect(url_for('fourOhFour'))
+        except KeyError:
+            print("KeyError occured: stockSearch")
+            return redirect(url_for('fourOhFour'))
+        return redirect(url_for(request.url))
+    else:
+        flash("Sorry you must be logged in to view that page.")
+        return redirect(url_for("login"))
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
@@ -447,29 +447,26 @@ def stockAvailability():
 @app.route("/Userlist")
 def userlists():
     if ('user' in session):
-        try:
-            newuserlist = User.userList(firebase.database())
-            for x in newuserlist.get():
-                newuserlist = x.to_dict
+       # try:
+            newuserlist = User.userList(dbfire)
 
             return redirect(url_for('Userlist.html',newuserlist = newuserlist))
-        except:
-            return redirect(url_for('404Error.html'))
+       # except:
+        #    return redirect(url_for('fourOhFour'))
 
 #Testing the Order list
 #Will remove after successful test - Muneeb Khan
-@app.route("/orderList",methods=['POST','GET'])
+@app.route("/orderList")
 def orderlists():
-    if request.method == 'POST':
-        orderlist = dbfire.collection('Orders') # This will have the username show on webpage when logged in - Muneeb Khan
-        for x in orderlist.get():
-            orderlist = x.to_dict()
-        return render_template('orderList.html',orderlist = orderlist)
+    if ('user' in session):
+        orderlist = Order.orderList(dbfire) # This will have the username show on webpage when logged in - Muneeb Khan
+
+        return redirect(url_for('orderList.html',orderlist = orderlist))
 
 ## 
 @app.route('/404Error')
 def fourOhFour():
-    return render_template('404Error.html')
+    return render_template('404Error.html',person = session['user'])
 #Author: Viraj Kadam
 @app.route('/displayInfo') #Retrieving info from portolio file
 def Portfolio():
