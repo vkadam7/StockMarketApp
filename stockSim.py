@@ -377,16 +377,16 @@ class User:
 
     # User list by Muneeb Khan
     def userList(self):
-        data = {
-            'Email' : self.email,
-            'userName' : self.username,
-            'Name' : self.name,
-            'UserID' : self.userID,
-        }
+        # data = {
+        #     'Email' : self.email,
+        #     'userName' : self.username,
+        #     'Name' : self.name,
+        #     'UserID' : self.userID,
+        # }
 
         usernameslist = []
 
-        for entry in self.db.collection('Users').document(self.username).get(data):
+        for entry in self.db.collection('Users').document('Users').get():
             usernameslist.append(entry.id)
 
         return usernameslist
@@ -456,18 +456,18 @@ class Order:
 
     # List of Orders by Muneeb Khan
     def orderList(self):
-        data = {
-            'validity': True,
-            'ticker': self.stock.ticker,
-            'dayOfPurchase': self.dayOfPurchase,
-            'buyOrSell': self.buyOrSell,
-            'quantity': self.quantity,
-            'avgStockPrice': self.avgStockPrice,
-            'totalPrice': self.totalPrice
-            }
+        # data = {
+        #     'validity': True,
+        #     'ticker': self.stock.ticker,
+        #     'dayOfPurchase': self.dayOfPurchase,
+        #     'buyOrSell': self.buyOrSell,
+        #     'quantity': self.quantity,
+        #     'avgStockPrice': self.avgStockPrice,
+        #     'totalPrice': self.totalPrice
+        #     }
         orderslist = []
 
-        for entry in self.db.collection('Simulations').document(self.sim).document('Orders').get(data):
+        for entry in self.db.collection('Simulations').document('Simulations').get():
             orderslist.append(entry.id)
 
         return orderslist
