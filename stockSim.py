@@ -1,4 +1,5 @@
 from mimetypes import init
+from queue import Empty
 from time import daylight
 import numpy as np
 import firebase_admin
@@ -47,11 +48,8 @@ class StockData:
         try:
             dataMatrix = []
             tempArr = np.array(self.dates)
-            #print(tempArr)
             startLoc = np.where(tempArr == start)
             endLoc = np.where(tempArr == end)
-            #print(startLoc)
-            #print(endLoc)
             tempOpens = []
             tempCloses = []
             tempHighs = []
@@ -59,6 +57,9 @@ class StockData:
             tempAdjCloses = []
             tempVolumes = []
             tempDate = start
+            if startLoc[0][0] == Empty:
+                startLoc[0][0] = 0
+                print(self.ticker + " only partially available for this period")
             for i in range(startLoc[0][0], endLoc[0][0]+1):
                 if timespan == 'monthly' or timespan == 'weekly':
                     if self.checkDate(i, timespan):
@@ -177,6 +178,9 @@ class StockData:
                 endLoc = np.where(tempArr == endDate)
                 newDates = []
                 newData = []
+                if startLoc[0][0] == Empty:
+                    startLoc[0][0] = 0
+                    print(ticker + " only partially available for this period")
                 for i in range(startLoc[0][0], endLoc[0][0]+1):
                     interp = np.interp(range(0,23),[0, 12, 23],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
                     for j in range(0,len(interp)):
@@ -453,7 +457,6 @@ class Order:
         quantityOwned = 0
         ownageFlag = False
         for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).get():
-            print(entry)
             temp = entry.to_dict()
             quantityOwned += int(temp['quantity'])
 
@@ -461,8 +464,20 @@ class Order:
             ownageFlag = True
         
         if ownageFlag:
+            for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).where('partiallySold','==',True).stream():
+                temp = entry.to_dict()
+                if quantityOwned - int(temp['newQuantity']) >= 0:
+                    self.db.collection('Orders').document(entry.id).update({'sold' : True})
+                    quantityOwned -= int(temp['newQuantity'])
+                else:
+                    self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['newQuantity']) - quantityOwned)})
             for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream():
-                self.db.collection('Orders').document(entry.id).update({'sold' : True})
+                temp = entry.to_dict()
+                if quantityOwned - int(temp['quantity']) >= 0:
+                    self.db.collection('Orders').document(entry.id).update({'sold' : True})
+                    quantityOwned -= int(temp['quantity'])
+                else:
+                    self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['quantity']) - quantityOwned)})
             return ownageFlag
         
         return ownageFlag
