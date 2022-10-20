@@ -57,10 +57,10 @@ class StockData:
             tempAdjCloses = []
             tempVolumes = []
             tempDate = start
-            if startLoc[0][0] == Empty:
+            if not startLoc:
                 startLoc[0][0] = 0
                 print(self.ticker + " only partially available for this period")
-            if endLoc[0][0] == Empty:
+            if not endLoc:
                 endLoc[0][0] = len(self.dates) - 1
                 print(self.ticker + " only partially available for this period")
             for i in range(startLoc[0][0], endLoc[0][0]+1):
@@ -181,13 +181,20 @@ class StockData:
                 endLoc = np.where(tempArr == endDate)
                 newDates = []
                 newData = []
-                if startLoc[0][0] == Empty:
-                    startLoc[0][0] = 0
-                    print(ticker + " only partially available for this period")
-                if endLoc[0][0] == Empty:
-                    endLoc[0][0] = len(dates) - 1
-                    print(ticker + " only partially available for this period")
-                for i in range(startLoc[0][0], endLoc[0][0]+1):
+                print(ticker)
+                print(startLoc)
+                print(endLoc)
+                if startLoc[0].size == 0:
+                    a = 0
+                    print(ticker + " only partially available for this period, startDate")
+                else:
+                    a = startLoc[0][0]
+                if endLoc[0].size == 0:
+                    b = len(dates) - 1
+                    print(ticker + " only partially available for this period, endDate")
+                else:
+                    b = endLoc[0][0]
+                for i in range(a, b+1):
                     interp = np.interp(range(0,23),[0, 12, 23],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
                     for j in range(0,len(interp)):
                         tempArr = np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])])
@@ -269,6 +276,7 @@ class Simulation:
             'score': 0,
             'startTimestamp': self.startTimestamp,
         }
+        self.addStocksToSim()
         self.db.collection('Simulations').document(simName).set(data)
 
     def whatTimeIsItRightNow(self):

@@ -203,19 +203,10 @@ def logout():
 #Author: Miqdad
 @app.route('/')
 def hello(name=None):
-    #if('user' in session):
-    #    person = dbfire.collection('Users') # This will have the username show on webpage when logged in - Muneeb Khan
-    #
-    #    for x in person.get():
-    #        person = x.to_dict()
-    #
-        session['loginFlagPy'] = 0
-        #session['simulationFlag'] = False
-        
-        return render_template("home.html")
-    #else:
-    #   session['simulationFlag'] = False
-    #    return render_template('home.html')
+    session['loginFlagPy'] = 0
+    session['simulationFlag'] = 0
+    
+    return render_template("home.html")
 
 ## Route for Home page - Muneeb Khan
 @app.route("/home")
@@ -300,31 +291,28 @@ def startSimulation():
                 sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
                                         request.form['simEndDate'], request.form['initialCash'])
                 sim.createSim()
-                sim.addStocksToSim()
                 session['simName'] = sim.simName
                 return render_template('simulation.html', person=session['user'])
         except KeyError:
             print("KeyError occured: startSimulation")
             return redirect(url_for('fourOhFour'))
+        except IndexError:
+            print("Index Error occured: " + str(IndexError))
+            return render_template('stockSimForm.html', person=session['user'])
     else:
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
         
-
 @app.route("/simulation", methods=['POST', 'GET'])
 def goToSimulation():
     if ('user' in session):
         try:
             if request.method == 'POST':
                 session['simulationFlag'] = 1
-                print("line 320")
                 sim = SimulationFactory(dbfire, session['user']).simulation
                 session['currentCash'] = sim.currentCash
-                print("line 323")
                 session['portfolioValue'] = sim.initialCash
-                print("line 325")
                 session['simName'] = sim.simName
-                print("line 327")
                 return render_template('simulation.html', person=session['user'])
         except KeyError:
             print("KeyError occured: startSimulation")
