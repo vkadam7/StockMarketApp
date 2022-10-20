@@ -494,11 +494,12 @@ def fourOhFour():
 def Portfolio():
     if('user' in session): #to check if the user is logged in will change to profile page
         sim = portfolio(dbfire, session['user']).displayInfo
+       
+    return render_template('simulation.html', sim = sim)
+  
         
     #line 318  
-    
-    return render_template('simulation.html')
-    
+
 
 ## Need to complete this setup route for the dashboard, will show up to the user once they have started the simulation. 
 @app.route('/dashboard')
