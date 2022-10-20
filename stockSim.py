@@ -60,6 +60,9 @@ class StockData:
             if startLoc[0][0] == Empty:
                 startLoc[0][0] = 0
                 print(self.ticker + " only partially available for this period")
+            if endLoc[0][0] == Empty:
+                endLoc[0][0] = len(self.dates) - 1
+                print(self.ticker + " only partially available for this period")
             for i in range(startLoc[0][0], endLoc[0][0]+1):
                 if timespan == 'monthly' or timespan == 'weekly':
                     if self.checkDate(i, timespan):
@@ -180,6 +183,9 @@ class StockData:
                 newData = []
                 if startLoc[0][0] == Empty:
                     startLoc[0][0] = 0
+                    print(ticker + " only partially available for this period")
+                if endLoc[0][0] == Empty:
+                    endLoc[0][0] = len(dates) - 1
                     print(ticker + " only partially available for this period")
                 for i in range(startLoc[0][0], endLoc[0][0]+1):
                     interp = np.interp(range(0,23),[0, 12, 23],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
