@@ -36,6 +36,10 @@ db1 = dbfire
 
 app.secret_key = "aksjdkajsbfjadhvbfjabhsdk"
 
+def sessionFlagCheck(loginFlag, simFlag):
+    print("loginFlag is: " + str(loginFlag))
+    print("simulationFlag is: " + str(simFlag))
+
 #Author: Miqdad Hafiz
 @app.route("/profile")
 def profile():
@@ -63,20 +67,22 @@ def login():
         result = request.form
         email = result["email"]
         passw = result["password"]
-        #session['email'] = email
-        session['simulationFlag'] = False
-        try:
-            user = authen.sign_in_with_email_and_password(email,passw)
-            session['user'] = email
-            session['loginFlagPy'] = 1
-            #session['Simulation'] = Simulation.retrieveOngoing(dbfire, email)
-            flash("Log in succesful.", "pass")
-            print("Login successful.")
-            return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
-        except:
-            flash("Failed to log in", "fail")
-            print("login failed.")
-            return redirect(url_for("login"))
+        #try:
+        user = authen.sign_in_with_email_and_password(email,passw)
+        session['user'] = email
+        session['loginFlagPy'] = 1
+        if SimulationFactory.existenceCheck(dbfire, email):
+            session['simulationFlag'] = 1
+        else:
+            session['simulationFlag'] = 0
+        sessionFlagCheck(session['loginFlagPy'], session['simulationFlag'])
+        flash("Log in succesful.", "pass")
+        print("Login successful.")
+        return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
+        #except:
+        #    flash("Failed to log in", "fail")
+        #    print("login failed.")
+        #    return redirect(url_for("login"))
     else:
         print("Landing on page")
         return render_template('login.html')
@@ -188,7 +194,7 @@ def PasswordRecovery():
 def logout():
     session.pop('user')
     session['loginFlagPy'] = 0
-    session['Simulation'] = NULL
+    session['simulationFlag'] = 0
     flash('logout succesful','pass')
     return redirect(url_for("login"))
 
@@ -204,7 +210,7 @@ def hello(name=None):
     #        person = x.to_dict()
     #
         session['loginFlagPy'] = 0
-        session['simulationFlag'] = False
+        #session['simulationFlag'] = False
         
         return render_template("home.html")
     #else:
@@ -283,7 +289,7 @@ def startSimulation():
     if ('user' in session):
         try:
             if request.method == 'POST':
-                session['simulationFlag'] = True
+                session['simulationFlag'] = 1
                 session['simulation'] = {
                     'simStartDate': request.form['simStartDate'],
                     'simEndDate': request.form['simEndDate'],
@@ -297,8 +303,6 @@ def startSimulation():
                 sim.addStocksToSim()
                 session['simName'] = sim.simName
                 return render_template('simulation.html', person=session['user'])
-
-
         except KeyError:
             print("KeyError occured: startSimulation")
             return redirect(url_for('fourOhFour'))
@@ -309,7 +313,7 @@ def startSimulation():
 @app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
     sim.finishSimulation()
-    session['simulationFlag'] = False
+    session['simulationFlag'] = 0
 
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
@@ -384,7 +388,7 @@ def displayStock(ticker):
     endDate = request.args['endDate']
     timespan = request.args['timespan']
     global stock
-    if session['simulationFlag'] == False:
+    if session['simulationFlag'] == 0:
         stockData = StockData(dbfire, ticker)
         stock = stockData.stockJSON()
         #session['stock'] = stock

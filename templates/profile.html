@@ -44,16 +44,6 @@
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
-          <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
-          <li class="nav-item"> <!--Old list name was StockSimStartButton-->
-            <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
-              <button class = "stockSimStartButtonStyle">Start a simulation!</button>
-            </form>
-            <script type="text/javascript">
-              if ({{ session['loginFlagPy'] }} == 0 || {{ session['Simulation'] }} != null ) 
-                document.getElementById('stockSimStart').style.display = "none";
-            </script>
-          </li>
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -123,9 +113,22 @@
 
     </h1>     
     <div class="stockSimStartButton">
-        <form id="stockSimStart" action="/stockSimForm" method="post">
+        <form id="stockSimButton" action="/stockSimForm" method="post">
           <button class = "stockSimStartButtonStyle">Start a simulation!</button>
         </form>
+        <script type="text/javascript">
+          if ({{ session['simulationFlag'] }} == 1 ) { 
+            document.getElementById('stockSimButton').style.display = "none";
+          }
+        </script>
+        <form id="stockSimStart" action="/simulation" method="post"> 
+              <button class = "stockSimStartButtonStyle" id="goToSim">Go to Current Sim!</button>
+            </form>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('goToSim').style.display = "none";
+              }
+            </script> 
     </div>
 
     <footer class="footer mt-auto py-3" style = "background-color:rgb(15, 158, 230)">

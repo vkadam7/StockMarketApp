@@ -336,7 +336,8 @@ class SimulationFactory:
         self.simulation = Simulation.retrieveOngoing(db, email)
 
     def existenceCheck(db, email):
-        if len(db.collection('Simulations').where('ongoing','==','True').where('user','==',email).stream()) == 0:
+        array = [entry for entry in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream()]
+        if len(array) == 0:
             return False
         else:
             return True
