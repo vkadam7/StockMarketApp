@@ -52,21 +52,25 @@
 
 
 <body>
+    <br><br><br>
+    <div class = "centering">
+    <h3>{{ session['option'] }} order for {{ stock['name'] }}</h3>
+    
+    <br>
     <form action="orderCreate" method="post">
-        <h3>{{ session['option'] }} order for {{ stock['name'] }}</h3>
-        <br>
-        <p>Price: {{ session['currentPrice'] }}</p>
+        <h4>Price: {{ session['currentPrice'] }} </h4>
         <br>
         <label for="quantity">Quantity:</label>
         <input type="quantity" name="stockQuantity" value="{{ request.form['stockQuantity'] }}">
-        <br>
-        <button>Create Order</button>
+        <br><br>
+        <button class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Create Order</button>
     </form>
 </body>
+</div>
 
 <br><br>
 
-    <footer class="footer mt-5 py-3" style = "background-color:rgb(33, 103, 42)">
+    <footer class="footer mt-5 py-3 fixed-bottom" style = "background-color:rgb(33, 103, 42)">
     <div class="container">
       <span>Copyright 2022 by StockSim</span>
     </div>

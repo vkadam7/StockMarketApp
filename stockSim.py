@@ -506,18 +506,22 @@ class User:
         db.collection('Users').document(username).set(data)
 
     # User list by Muneeb Khan
-    def userList(self):
-        data = {
-            'Email' : self.email,
-            'userName' : self.username,
-            'Name' : self.name,
-            'UserID' : self.userID,
-        }
+    def userList(db):
+        # data = {
+        #     'Email' : self.email,
+        #     'userName' : self.username,
+        #     'Name' : self.name,
+        #     'UserID' : self.userID,
+        # }
 
-        usernameslist = []
+        # The usernames list function will loop through the usernames in firebase and store each one
+        # under the usernameslist [] array. - Muneeb Khan
+        usernameslist = [] # Set userlist 
 
-        for entry in self.db.collection('Users').document(self.username).get(data):
-            usernameslist.append(entry.id)
+        for entry in db.collection('Users').stream(): # To loop through usernames in firebase
+            temp = entry.to_dict()
+            name = temp['Name']
+            usernameslist.append(name)
 
         return usernameslist
 
@@ -598,20 +602,25 @@ class Order:
         return ownageFlag
 
     # List of Orders by Muneeb Khan
-    def orderList(self):
-        data = {
-            'validity': True,
-            'ticker': self.stock.ticker,
-            'dayOfPurchase': self.dayOfPurchase,
-            'buyOrSell': self.buyOrSell,
-            'quantity': self.quantity,
-            'avgStockPrice': self.avgStockPrice,
-            'totalPrice': self.totalPrice
-            }
+    def orderList(db):
+        # data = {
+        #     'validity': True,
+        #     'ticker': self.stock.ticker,
+        #     'dayOfPurchase': self.dayOfPurchase,
+        #     'buyOrSell': self.buyOrSell,
+        #     'quantity': self.quantity,
+        #     'avgStockPrice': self.avgStockPrice,
+        #     'totalPrice': self.totalPrice
+        #     }
+
+        # The order list function will loop through the orders in firebase and store each one
+        # under the ordernameslist [] array. - Muneeb Khan
         orderslist = []
 
-        for entry in self.db.collection('Simulations').document(self.sim).document('Orders').get(data):
-            orderslist.append(entry.id)
+        for entry in db.collection('IntradayStockData').stream(): # To loop through the users orders
+            temp = entry.to_dict()
+            orders = temp['prices']
+            orderslist.append(temp)
 
         return orderslist
 
