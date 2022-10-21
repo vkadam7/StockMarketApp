@@ -602,23 +602,37 @@ class Order:
     # List of Orders by Muneeb Khan
     def orderList(db):
         # data = {
-        #     'validity': True,
-        #     'ticker': self.stock.ticker,
-        #     'dayOfPurchase': self.dayOfPurchase,
-        #     'buyOrSell': self.buyOrSell,
-        #     'quantity': self.quantity,
-        #     'avgStockPrice': self.avgStockPrice,
-        #     'totalPrice': self.totalPrice
-        #     }
+        #      'validity': True,
+        #      'dayOfPurchase': db.dayOfPurchase,
+        #      'quantity': db.quantity,
+        #      'avgStockPrice': db.avgStockPrice,
+        #      'totalPrice': db.totalPrice
+        #      }
 
         # The order list function will loop through the orders in firebase and store each one
         # under the ordernameslist [] array. - Muneeb Khan
         orderslist = []
 
-        for entry in db.collection('IntradayStockData').stream(): # To loop through the users orders
+        for entry in db.collection('Orders').stream(): # To loop through the users orders
             temp = entry.to_dict()
-            orders = temp['prices']
-            orderslist.append(temp)
+            avgprice = temp['avgStockPrice']
+            buyorsell = temp['buyOrSell']
+            day = temp['dayOfPurchase']
+            quantity = temp['quantity']
+            simulat = temp['simulation']
+            sold = temp['sold']
+            ticker = temp['ticker']
+            totalPrice = temp['totalPrice']
+
+            orderslist.append(avgprice)
+            orderslist.append(buyorsell)
+            orderslist.append(day)
+            orderslist.append(quantity)
+            orderslist.append(simulat)
+            orderslist.append(sold)
+            orderslist.append(ticker)
+            orderslist.append(totalPrice)
+            print(orderslist)
 
         return orderslist
 
