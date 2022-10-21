@@ -467,7 +467,7 @@ def userlists():
        # try:
             newuserlist = User.userList(dbfire)
 
-            return redirect(url_for('Userlist.html',newuserlist = newuserlist))
+            return render_template('Userlist.html',newuserlist = newuserlist)
        # except:
         #    return redirect(url_for('fourOhFour'))
 
