@@ -492,10 +492,26 @@ def fourOhFour():
 #Author: Viraj Kadam
 @app.route('/displayInfo', methods=['POST']) #Retrieving info from portolio file
 def Portfolio():
-    if('user' in session): #to check if the user is logged in will change to profile page
-        sim = portfolio(dbfire, session['user']).displayInfo
-       
-    return render_template('simulation.html', sim = sim)
+    if ('user' in session):
+        if request.method == 'POST':
+                session['simulationFlag'] = 1
+                #session['simulation'] = {
+                #    'simStartDate': request.form['simStartDate'],
+                #    'simEndDate': request.form['simEndDate'],
+                #   'initialCash': request.form['initialCash',]
+                #    ''
+                #}
+                session['portfolio'] = {
+                    'Profit': portfolio.get_profit,
+                    'Funds_remaining': portfolio.funds_remaining,
+                    'initialCash': request.form['initialCash'],
+                }
+    
+                sim = portfolio(dbfire, session['user'], portfolio.get_profit,
+                                        portfolio.funds_remaining, request.form['initialCash'])
+                sim.displayInfo
+                session['simName'] = sim.simName
+                return render_template('simulation.html', person=session['user'])
   
         
     #line 318  
