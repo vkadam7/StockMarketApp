@@ -501,8 +501,8 @@ def Portfolio():
                 
                 
                 session['portfolio'] = {
-                    'Profit': Portfolio.get_profit,
-                    'Funds_remaining': Portfolio.funds_remaining,
+                    'Profit': portfolio.get_profit,
+                    'Funds_remaining': portfolio.funds_remaining,
                     'initialCash': request.form['initialCash'],
                     'currentCash': Simulation['currentCash'],
                     
@@ -510,8 +510,8 @@ def Portfolio():
     
               
                 #sim.displayInfo
-                session['simName'] = sim.simName
-                return render_template('simulation.html')
+                #session['simName'] = sim.simName
+                return render_template('simulation.html', portfolio=portfolio)
   
         
     #line 318  

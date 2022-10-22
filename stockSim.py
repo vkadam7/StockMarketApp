@@ -627,19 +627,19 @@ class Order:
         return orders
  
 class portfolio:
-    def __init__(self, db, stock, user, buyOrSell, quantity, stockPrice, startDate, simulation, initialCash):
+    def __init__(self, db, stock, user, quantity, stockPrice, startDate, simulation, initialCash, totalPrice, profit):
         self.firebase = db
         self.stock = stock
         self.user = user
         self.startDate = startDate
         self.quantity = quantity
+        self.totalPrice = float(quantity)*stockPrice
         self.initialCash = initialCash
         self.stockPrice = stockPrice
         self.sim = simulation 
         self.dayofPurchase = datetime.datetime.now()
-        return -1
     
-    def retrieve(self, id):
+    def retrieve(self, stock):
         stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
         return stockRetrieved
         
@@ -669,8 +669,8 @@ class portfolio:
                 'avgStockPrice': self.avgStockPrice}
         
         if Order.buyOrder == True:
-             tempPrice = self.db.collection('Simulations').document('daily').document('closes').get()
-             quantity = self.db.collection('Simulations').document('daily').document('volume').get()
+             tempPrice = self.db.collection('Orders').document('avgStockPrice').get()
+             quantity = self.db.collection('Orders').document('quantity').get()
         
              profit += tempPrice * quantity
              return profit
@@ -678,7 +678,7 @@ class portfolio:
             tempPrice = self.db.collection('Simulations').document('daily').document('closes').get()
             quantity = self.db.collection('Simulations').document('daily').document('volume').get()
         
-            profit += tempPrice * quantity
+            profit -= tempPrice * quantity
             return profit
         
         return profit
@@ -730,7 +730,7 @@ class portfolio:
         fundsUsed = 0
         fundsRemainiing = 0
         quantity = 0
-        tempPrice = self.db.collection('Stocks').document('daily').document('closes').get()
+        #tempPrice = self.db.collection('Stocks').document('daily').document('closes').get()
         data = {'name': self.name,
                 'quantity': self.quantity, 
                 'avgStockPrice': self.avgStockPrice, 
@@ -739,10 +739,10 @@ class portfolio:
                 'initialCash': self.initialCash,
                 'currentCash': 0,
                 'score': 0,
-                'Orders': []  
+                'fundsRemainiing': 0
         }
         
-           
+        #if simulation is ongoing function(Needs to be added)
         if Order.buyOrder == True:
             if data['currentCash'] == data['initialCash']:
                 return data['currentCash']
@@ -757,6 +757,8 @@ class portfolio:
                 fundsUsed = data['currentCash'] - data['initialCash']
                 fundsRemainiing = fundsUsed
                 return fundsRemainiing
+            
+        return fundsRemainiing
         
         
        
