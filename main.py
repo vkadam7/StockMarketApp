@@ -485,6 +485,8 @@ def orderlists():
 @app.route('/404Error')
 def fourOhFour():
     return render_template('404Error.html',person = session['user'])
+
+
 #Author: Viraj Kadam
 @app.route('/portfolio', methods=['POST', "GET"]) #Retrieving info from portolio file
 def Portfolio():
@@ -500,18 +502,25 @@ def Portfolio():
                                 portfolio.funds_remaining, request.form['initialCash'])
                 
                 
-                session['portfolio'] = {
-                    'Profit': portfolio.get_profit,
-                    'Funds_remaining': portfolio.funds_remaining,
-                    'initialCash': request.form['initialCash'],
-                    'currentCash': Simulation['currentCash'],
+               # session['portfolio'] = {
+               #    'Profit': portfolio.get_profit,
+               #     'Funds_remaining': portfolio.funds_remaining,
+               #     'initialCash': request.form['initialCash'],
+               #     'currentCash': Simulation['currentCash'],
                     
-                }
+              #  }
+              
+                #session['portfolio'] = {
+                #  'Profit': request.form['profit'], 
+                #  'currentCash': request.form['currentCash'], 
+                #  'initialCash': request.form['initialCash']
+                #}
+                session['Profit']: portfolio.get_profit
     
               
                 #sim.displayInfo
                 #session['simName'] = sim.simName
-                return render_template('simulation.html', portfolio=portfolio)
+                return render_template('simulation.html')
   
         
     #line 318  
