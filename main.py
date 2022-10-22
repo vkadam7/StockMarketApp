@@ -2,6 +2,8 @@ from asyncio.windows_events import NULL
 #from crypt import methods
 #from re import T
 from datetime import datetime
+import math
+from operator import mod
 from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
@@ -10,7 +12,7 @@ from stockSim import SimulationFactory, StockData, User, Order, Simulation
 
 from firebase_admin import firestore
 from firebase_admin import credentials
-import pandas as pd
+import numpy as np
 import pyrebase
 import firebase_admin
 
@@ -351,8 +353,10 @@ def orderConfirm():
         return render_template('simulation.html', person=session['user'])
     elif session['option'] == 'Buy' and flag == -1:
         flash("Insufficient funds to complete purchase")
+        return render_template('orderForm.html', stock=stock, option=session['option'])
     elif session['option'] == 'Sell' and flag == -1:
         flash("Insufficient shares to complete sale")
+        return render_template('orderForm.html', stock=stock, option=session['option'])
     
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
@@ -372,7 +376,10 @@ def stockSearch():
         try:
             if request.method == 'POST':
                 if StockData.stockSearch(dbfire, request.form["searchTerm"]):
-                    return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-16", timespan="daily"))
+                    if session['simulationFlag'] == 1:
+                        return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-16", timespan="hourly"))
+                    else:
+                        return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-16", timespan="daily"))
                 else:
                     return redirect(url_for('fourOhFour'))
         except KeyError:
@@ -426,22 +433,41 @@ def displayStock(ticker):
                     for i in range(0, len(tempAvgs[0])):
                         avgs.append(row[i])
                 return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
-        else:
-            return displayStock(ticker)
+        #else:
+        #    return displayStock(ticker)
     else:
         stockData = SimulationFactory(dbfire, session['user']).simulation.retrieveStock(ticker)
-        for entry in stockData:
-            stock = entry.to_dict()
-            #session['stock'] = stock
-        if stock != -1:
-            dates = []
-            prices = []
-            for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
-                dates.append(stock['dates'][i])
-                prices.append(stock['prices'][i])
-            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
-        else:
-            return displayStock(ticker)
+        if timespan != 'hourly':
+            if timespan == 'daily':
+                for entry in stockData:
+                    stock = entry.to_dict()
+                if stock != -1:
+                    dates = []
+                    prices = []
+                    avgPrice = []
+                for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
+                    avgPrice.append(stock['prices'][i])
+                    if i % 7 == 1:
+                        prices.append(mean(avgPrice))
+                        print(mean(avgPrice))
+                        dates.append(stock['dates'][i][0:10])
+                        print(stock['dates'][i][0:10])
+                        avgPrice = []
+                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+        else: 
+            for entry in stockData:
+                stock = entry.to_dict()
+                #session['stock'] = stock
+            if stock != -1:
+                dates = []
+                prices = []
+                for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
+                    dates.append(stock['dates'][i])
+                    prices.append(stock['prices'][i])
+                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+        #else:
+        #    return displayStock(ticker)
+    return redirect(url_for('fourOhFour'))
 
 ## changeStockView
 #   Description: Retrieves data from stockView page to determine how to change
