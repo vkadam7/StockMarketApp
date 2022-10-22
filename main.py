@@ -476,6 +476,7 @@ def userlists():
 @app.route("/orderList")
 def orderlists():
     if ('user' in session):
+
             orderlist = Order.orderList(dbfire) # This will have the username show on webpage when logged in - Muneeb Khan
 
             return render_template('orderList.html',orderlist = orderlist)

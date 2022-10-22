@@ -505,12 +505,12 @@ class User:
 
     # User list by Muneeb Khan
     def userList(db):
-        # data = {
+        #data = {
         #     'Email' : self.email,
         #     'userName' : self.username,
         #     'Name' : self.name,
         #     'UserID' : self.userID,
-        # }
+        #}
 
         # The usernames list function will loop through the usernames in firebase and store each one
         # under the usernameslist [] array. - Muneeb Khan
@@ -520,6 +520,7 @@ class User:
             temp = entry.to_dict()
             name = temp['Name']
             usernameslist.append(name)
+        print(usernameslist)
 
         return usernameslist
 
@@ -602,37 +603,38 @@ class Order:
     # List of Orders by Muneeb Khan
     def orderList(db):
         # data = {
-        #      'validity': True,
-        #      'dayOfPurchase': db.dayOfPurchase,
-        #      'quantity': db.quantity,
-        #      'avgStockPrice': db.avgStockPrice,
-        #      'totalPrice': db.totalPrice
-        #      }
+        #       'validity': True,
+        #       'dayOfPurchase': db.dayOfPurchase,
+        #       'quantity': db.quantity,
+        #       'avgStockPrice': db.avgStockPrice,
+        #       'totalPrice': db.totalPrice
+        #       }
 
         # The order list function will loop through the orders in firebase and store each one
         # under the ordernameslist [] array. - Muneeb Khan
         orderslist = []
 
-        for entry in db.collection('Orders').stream(): # To loop through the users orders
-            temp = entry.to_dict()
-            avgprice = temp['avgStockPrice']
-            buyorsell = temp['buyOrSell']
-            day = temp['dayOfPurchase']
-            quantity = temp['quantity']
-            simulat = temp['simulation']
-            sold = temp['sold']
-            ticker = temp['ticker']
-            totalPrice = temp['totalPrice']
 
-            orderslist.append(avgprice)
-            orderslist.append(buyorsell)
-            orderslist.append(day)
-            orderslist.append(quantity)
-            orderslist.append(simulat)
-            orderslist.append(sold)
-            orderslist.append(ticker)
-            orderslist.append(totalPrice)
-            print(orderslist)
+        for entry in db.collection('Orders').stream(): # To loop through the users orders
+             temp = entry.to_dict()
+             avgprice = temp['avgStockPrice']
+            #  buyorsell = temp['buyOrSell']
+            #  day = temp['dayOfPurchase']
+            #  quantity = temp['quantity']
+            #  simulat = temp['simulation']
+            #  #sold = temp['sold']
+            #  ticker = temp['ticker']
+            #  totalPrice = temp['totalPrice']
+
+             orderslist.append(avgprice)
+            #  orderslist.append(buyorsell)
+            #  orderslist.append(day)
+            #  orderslist.append(quantity)
+            #  orderslist.append(simulat)
+            #  #orderslist.append(sold)
+            #  orderslist.append(ticker)
+            #  orderslist.append(totalPrice)
+            # print(orderslist)
 
         return orderslist
 
