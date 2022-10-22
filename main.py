@@ -375,11 +375,12 @@ def stockSearch():
     if ('user' in session):
         try:
             if request.method == 'POST':
-                if StockData.stockSearch(dbfire, request.form["searchTerm"]):
+                check = StockData.stockSearch(dbfire, request.form["searchTerm"])
+                if check[0]:
                     if session['simulationFlag'] == 1:
-                        return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-16", timespan="hourly"))
+                        return redirect(url_for('displayStock', ticker=check[1], startDate="2021-09-08", endDate="2022-09-16", timespan="hourly"))
                     else:
-                        return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-16", timespan="daily"))
+                        return redirect(url_for('displayStock', ticker=check[1], startDate="2021-09-08", endDate="2022-09-16", timespan="daily"))
                 else:
                     return redirect(url_for('fourOhFour'))
         except KeyError:

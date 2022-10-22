@@ -1,6 +1,7 @@
 from ast import Constant
 from mimetypes import init
 from queue import Empty
+from re import search
 from this import d
 from time import daylight
 import numpy as np
@@ -345,9 +346,22 @@ class StockData:
     #
     #   Author: Ian McNulty
     def stockSearch(db, searchTerm):
-        tempData = db.collection('Stocks').document(searchTerm).get() 
-        if tempData != None:
-            return True
+        tempData1 = db.collection('Stocks').document(searchTerm).get() 
+        if tempData1 != None:
+            return True, searchTerm
+
+        stocksDB = db.collection('Stocks')
+        for entry in stocksDB.stream():
+            temp = entry.to_dict()
+            ticker = temp['ticker'].lower()
+            name = temp['name'].lower()
+            tempSearchTerm = searchTerm.lower()
+            if tempSearchTerm == ticker:
+                return True, ticker.upper()
+            if tempSearchTerm in name:
+                return True, ticker.upper()
+
+        return False, -1
         
 class Simulation:
     def __init__(self, db, user, startDate, endDate, initialCash):
