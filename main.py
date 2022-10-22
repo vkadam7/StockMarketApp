@@ -486,28 +486,32 @@ def orderlists():
 def fourOhFour():
     return render_template('404Error.html',person = session['user'])
 #Author: Viraj Kadam
-@app.route('/displayInfo', methods=['POST']) #Retrieving info from portolio file
+@app.route('/portfolio', methods=['POST', "GET"]) #Retrieving info from portolio file
 def Portfolio():
     if ('user' in session):
-        if request.method == 'POST':
+    
                 session['simulationFlag'] = 1
-                #session['simulation'] = {
-                #    'simStartDate': request.form['simStartDate'],
-                #    'simEndDate': request.form['simEndDate'],
-                #   'initialCash': request.form['initialCash',]
-                #    ''
-                #}
+                session['simulation'] = {
+                    'simStartDate': request.form['simStartDate'],
+                    'simEndDate': request.form['simEndDate'],
+                    'initialCash': request.form['initialCash',]
+                }
+                Portfolio = portfolio(dbfire, session['user'], portfolio.get_profit,
+                                portfolio.funds_remaining, request.form['initialCash'])
+                
+                
                 session['portfolio'] = {
-                    'Profit': portfolio.get_profit,
-                    'Funds_remaining': portfolio.funds_remaining,
+                    'Profit': Portfolio.get_profit,
+                    'Funds_remaining': Portfolio.funds_remaining,
                     'initialCash': request.form['initialCash'],
+                    'currentCash': Simulation['currentCash'],
+                    
                 }
     
-                sim = portfolio(dbfire, session['user'], portfolio.get_profit,
-                                portfolio.funds_remaining, request.form['initialCash'])
-                sim.displayInfo
+              
+                #sim.displayInfo
                 session['simName'] = sim.simName
-                return render_template('simulation.html', person=session['user'])
+                return render_template('simulation.html')
   
         
     #line 318  

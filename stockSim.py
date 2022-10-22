@@ -1,4 +1,4 @@
-from ast import Constant
+from ast import Constant, Or
 from mimetypes import init
 from queue import Empty
 from this import d
@@ -663,24 +663,37 @@ class portfolio:
 
     #Returns profit from the simulator(Need to test and fix if needed )
     def get_profit(self, db, stock, quantity, avgstockPrice):
+        profit = 0
         data = {'name' : self.name, 
                 'quantity': self.quantity, 
                 'avgStockPrice': self.avgStockPrice}
-        profit = 0
-        tempPrice = self.db.collection('Simulations').document('daily').document('closes').get()
-        quantity = self.db.collection('Simulations').document('daily').document('volume').get()
-        profit += tempPrice * quantity
+        
+        if Order.buyOrder == True:
+             tempPrice = self.db.collection('Simulations').document('daily').document('closes').get()
+             quantity = self.db.collection('Simulations').document('daily').document('volume').get()
+        
+             profit += tempPrice * quantity
+             return profit
+        elif Order.sellOrder == True:
+            tempPrice = self.db.collection('Simulations').document('daily').document('closes').get()
+            quantity = self.db.collection('Simulations').document('daily').document('volume').get()
+        
+            profit += tempPrice * quantity
+            return profit
+        
         return profit
+        
+       
     
     #Displays amount of shares owned (To also be implemented later)
-    def weight(self, db, stock):
-        share = [self.quantity]
-        max_share = 1
-        for share in max_share:
-            if(self.quantity <= max_share and self.quantity >= 0):
-                return share[self.quantity]
-            else:
-                return -1   
+    #def weight(self, db, stock):
+    #    share = [self.quantity]
+    #    max_share = 1
+    #    for share in max_share:
+    #        if(self.quantity <= max_share and self.quantity >= 0):
+     #           return share[self.quantity]
+    #        else:
+    #            return -1   
         
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
     def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
@@ -728,16 +741,26 @@ class portfolio:
                 'score': 0,
                 'Orders': []  
         }
-       
-        if data ['currentCash'] == data['initialCash']:
-           return data['currentCash']
-        elif data['currentCash'] > data['initialCash']:
-            fundsUsed = data['currentCash'] - data['initialCash']
-            fundsRemainiing = fundsUsed
-            return fundsRemainiing
-        else: 
-            return -1
         
+           
+        if Order.buyOrder == True:
+            if data['currentCash'] == data['initialCash']:
+                return data['currentCash']
+            elif data['currentCash'] > data['initialCash']:
+                fundsUsed = data['currentCash'] - data['initialCash']
+                fundsRemainiing = fundsUsed
+                return fundsRemainiing
+        elif Order.sellOrder == True:
+            if data['currentCash'] == data['initialCash']:
+                return data['currentCash']
+            elif data['currentCash'] > data['initialCash']:
+                fundsUsed = data['currentCash'] - data['initialCash']
+                fundsRemainiing = fundsUsed
+                return fundsRemainiing
+        
+        
+       
+       
     #Edited returns feature
     def returns(self, quantity, avgStockPrice, AdjustClose):
         returns = self.db.collection('Stocks').document('daily').document('closes').get()
