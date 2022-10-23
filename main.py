@@ -498,7 +498,7 @@ def userlists():
        # try:
             newuserlist = User.userList(dbfire)
 
-            return redirect(url_for('Userlist.html',newuserlist = newuserlist))
+            return render_template('Userlist.html',newuserlist = newuserlist)
        # except:
         #    return redirect(url_for('fourOhFour'))
 
@@ -507,9 +507,10 @@ def userlists():
 @app.route("/orderList")
 def orderlists():
     if ('user' in session):
-        orderlist = Order.orderList(dbfire) # This will have the username show on webpage when logged in - Muneeb Khan
 
-        return redirect(url_for('orderList.html',orderlist = orderlist))
+            orderlist = Order.orderList(dbfire) # This will have the username show on webpage when logged in - Muneeb Khan
+
+            return render_template('orderList.html',orderlist = orderlist)
 
 ## 
 @app.route('/404Error')

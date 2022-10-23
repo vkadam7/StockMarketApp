@@ -519,12 +519,12 @@ class User:
 
     # User list by Muneeb Khan
     def userList(db):
-        # data = {
+        #data = {
         #     'Email' : self.email,
         #     'userName' : self.username,
         #     'Name' : self.name,
         #     'UserID' : self.userID,
-        # }
+        #}
 
         # The usernames list function will loop through the usernames in firebase and store each one
         # under the usernameslist [] array. - Muneeb Khan
@@ -534,8 +534,10 @@ class User:
             temp = entry.to_dict()
             name = temp['Name']
             usernameslist.append(name)
+        print(usernameslist)
+        return (usernameslist) 
 
-        return usernameslist
+        
 
 class Order:
     def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
@@ -638,28 +640,29 @@ class Order:
         return ownageFlag
 
     # List of Orders by Muneeb Khan
-    def orderList(db):
-        # data = {
-        #     'validity': True,
-        #     'ticker': self.stock.ticker,
-        #     'dayOfPurchase': self.dayOfPurchase,
-        #     'buyOrSell': self.buyOrSell,
-        #     'quantity': self.quantity,
-        #     'avgStockPrice': self.avgStockPrice,
-        #     'totalPrice': self.totalPrice
-        #     }
+    def orderList(self):
+        quantityOwned = 0
+        ownageFlag = True
+        data = {
+                'simulation': self.sim,
+                'ticker': self.stock['ticker'],
+                'dayOfPurchase': self.dayOfPurchase,
+                'buyOrSell': self.buyOrSell,
+                'quantity': self.quantity,
+                'avgStockPrice': self.avgStockPrice,
+                'totalPrice': self.totalPrice
+            }
 
         # The order list function will loop through the orders in firebase and store each one
         # under the ordernameslist [] array. - Muneeb Khan
         orderslist = []
 
-        for entry in db.collection('IntradayStockData').stream(): # To loop through the users orders
-            temp = entry.to_dict()
-            orders = temp['prices']
-            orderslist.append(temp)
-
-        return orderslist
-
-        return orders
-    
+        if ownageFlag == True:
+            for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('buyOrSell','==','Sell').where('sold','==',False).where('sold','==',True).where('ticker','==',self.stock['ticker']).stream(): # To loop through the users orders
+                temp = entry.to_dict()
+                orderslist.append(temp)
+                print(orderslist)
+                return orderslist
+        else:
+            return -1
     

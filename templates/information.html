@@ -90,11 +90,11 @@
             <h1>Information</h1>
         </div>
         <div class = infomain>
-            <div class = "card w-75 d-flex justify-content-left" style= "padding: 20px;">
+            <div class = "card w-75 d-flex justify-content-left" style= "padding-top: 20px; padding-bottom: 20px;">
               <div class = "card-header">
               <h2>What Should I Know?</h2>
               </div>
-                <div class = "card-">
+                <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
                     <h5 class = "card-text">
                       With our information page we will provide several source links to places we went 
                       to get a better knowledge of stock investments. Some users may learn different but 
@@ -105,10 +105,10 @@
                 </div>
               <br>
 
-              <div class = "card-header">
-              <h2>The Basics of Stock Markets</h2>
-              </div>
-                  <div class = "card-">
+
+                  <div class = "card-body">
+                    <h2>The Basics of Stock Markets</h2>
+                    <br>
                     <h5 class = "card-text">
                       Stocks are basically the shares of ownership in a company and stockholders 
                       have a fractional ownership of the company. Stocks are typically listed as line graphs
@@ -122,7 +122,7 @@
                       <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = "90%" height = "90%" display = "d-flex" class = "stock" />
                       <br>
                       <br>
-                      You may also search for stocks using the stock search bar on the top right hand corner.
+                      You may also search for stocks using our stock search bar on the top right hand corner.
                       You will taken to the stock display page and shown a graph of the companies shares 
                       over a selected time frame. There will be an option to choose the time frame from
                       the starting date to end date.
@@ -131,10 +131,10 @@
                   </div>
                 <br>
 
-              <div class = "card-header">
-              <h2>How Should I Start Investing?</h2>
-              </div>
-                  <div class = "card-">
+
+                  <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
+                    <h2>How Should I Start Investing?</h2>
+                    <br>  
                     <h5 class = "card-text">
                     The best way to start is to do paper trading which will allow users
                     to buy and sell on a simulator without having to invest real money
@@ -159,11 +159,24 @@
                     <br>
                     <br>
                     <br>
-                    Our website gives users the option to buy or sell a stock. The users
-                    will also have a portfolio page to show their records on how many orders they
-                    have made, and how many wins and losses they have on the stock simulator.
+                    Another good video from TD Ameritrade also shows a basic example of investments.
                     <br>
                     <br>
+                    <iframe width = "480" height = "320" display = "d-flex" src = "https://www.youtube.com/embed/hE2NsJGpEq4"></iframe> 
+                    <br>
+                    <br>
+                    <br>
+                    Our website gives users the option to start a stock simulation. The users
+                    will have the option to choose the starting and end dates and their initial
+                    starting cash for the simulator.
+                    <br><br>
+                    During the simulation, the users will have the option to buy a stock from the company
+                    they have searched and will be asked the quantity of how much they would like to purchase.
+                    The users will also have the option to sell a current stock they own.
+                    <br><br>
+                    The users will also have a portfolio page to keep track of their records on how many orders they
+                    have bought and sold and how many wins and losses they had on the simulator.
+                    <br><br>
                     We also have a leaderboards page to show all the users current records on 
                     the stock sim, so users will know who is leading with investments and who is behind.
                     The purpose of the leaderboard is to make our simluator more competitive.  
@@ -171,36 +184,44 @@
                   </div>
                 <br>
 
-                <div class = "card-header">
-                <h2>Defintions of Stocks?</h2>
-                </div>
-                 <div class = "card-">
+
+                <div class = "card-body">
+                  <h2>Defintions of Stocks?</h2>
+                  <br>
                   <h5 class = "card-text">To see some defintions of stocks, please click the button below
-                  <br><a method = "POST" href = "StockDefinitions">Stock Definitions</a>
+                    <br><br>
+                    <a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "StockDefinitions">StockDefinitions</a>
                   </h5>
-                 </div>
+                </div>
                 <br>
 
-                <div class = "card-header">
-                <h2>Sources?</h2>
-                </div>
-                 <div class = "card-">
+                <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
+                  <h2>Sources?</h2>
+                  <br>
                   <h5 class = "card-text">We have sources below of where you may find further information
                   <br>on stocks.
+                  <br><br>
+                  <br>Below is a link to the Investor.gov website which also gives basic information on stocks.
+                  <br><a href = https://www.investor.gov/introduction-investing/investing-basics/investment-products/stocks>Visit Investor.gov</a>
+                  <br><br>
+                  <br>Another good site to learn basic information would be the Washington state department of financial institutions
+                  <br><a href = https://dfi.wa.gov/financial-education/information/basics-investing-stocks>Visit DFI.gov</a>
                   </h5>
-                 </div>
+                </div>
                 <br>
 
-                <div class = "card-header">
-                <h2>How can I test my knowledge?</h2>
-                </div>
-                 <div class = "card-">
-                  <h5 class = "card-text">We have a 10 question quiz below you may take to test your knowledge
+                <div class = "card-body">
+                  <h2>Quiz?</h2>
+                  <br>
+                  <h5 class = "card-text">We have a 10 question quiz you may take to test your knowledge
                   <br>of stocks. The questions will relate to what was discussed on this page and the definitions
-                  <br>page.
-                  <br><p></p>
+                  <br>page. Once you fully understand the terms of stocks. You are ready to make investments.
+                  <br>Click the button below to begin the quiz.
+                  <br>
+                  <br>
+                  <a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST">Take the quiz</a>
                   </h5>
-                 </div>
+                </div>
                 <br>
              </div>
         </div>
