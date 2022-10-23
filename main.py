@@ -3,6 +3,8 @@ from asyncio.windows_events import NULL
 #from crypt import methods
 #from re import T
 from datetime import datetime
+import math
+from operator import mod
 from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
@@ -11,7 +13,7 @@ from stockSim import SimulationFactory, StockData, User, Order, Simulation, port
 
 from firebase_admin import firestore
 from firebase_admin import credentials
-import pandas as pd
+import numpy as np
 import pyrebase
 import firebase_admin
 
@@ -344,12 +346,18 @@ def orderConfirm():
     order = Order(dbfire, session['simName'], stock, 
                     session['option'], session['orderQuantity'], session['currentPrice'])
     if session['option'] == 'Buy':
-        order.buyOrder()
+        flag = order.buyOrder()
     else:
-        order.sellOrder()
-    session['currentCash'] = Simulation.retrieveCurrentCash(dbfire, session['simName'])
-
-    return render_template('simulation.html', person=session['user'])
+        flag = order.sellOrder()
+    if flag == 1:
+        session['currentCash'] = Simulation.retrieveCurrentCash(dbfire, session['simName'])
+        return render_template('simulation.html', person=session['user'])
+    elif session['option'] == 'Buy' and flag == -1:
+        flash("Insufficient funds to complete purchase")
+        return render_template('orderForm.html', stock=stock, option=session['option'])
+    elif session['option'] == 'Sell' and flag == -1:
+        flash("Insufficient shares to complete sale")
+        return render_template('orderForm.html', stock=stock, option=session['option'])
     
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
@@ -368,8 +376,12 @@ def stockSearch():
     if ('user' in session):
         try:
             if request.method == 'POST':
-                if StockData.stockSearch(dbfire, request.form["searchTerm"]):
-                    return redirect(url_for('displayStock', ticker=request.form["searchTerm"], startDate="2021-09-08", endDate="2022-09-16", timespan="daily"))
+                check = StockData.stockSearch(dbfire, request.form["searchTerm"])
+                if check[0]:
+                    if session['simulationFlag'] == 1:
+                        return redirect(url_for('displayStock', ticker=check[1], startDate="2021-09-08", endDate="2022-09-16", timespan="hourly"))
+                    else:
+                        return redirect(url_for('displayStock', ticker=check[1], startDate="2021-09-08", endDate="2022-09-16", timespan="daily"))
                 else:
                     return redirect(url_for('fourOhFour'))
         except KeyError:
@@ -423,22 +435,41 @@ def displayStock(ticker):
                     for i in range(0, len(tempAvgs[0])):
                         avgs.append(row[i])
                 return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
-        else:
-            return displayStock(ticker)
+        #else:
+        #    return displayStock(ticker)
     else:
         stockData = SimulationFactory(dbfire, session['user']).simulation.retrieveStock(ticker)
-        for entry in stockData:
-            stock = entry.to_dict()
-            #session['stock'] = stock
-        if stock != -1:
-            dates = []
-            prices = []
-            for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
-                dates.append(stock['dates'][i])
-                prices.append(stock['prices'][i])
-            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
-        else:
-            return displayStock(ticker)
+        if timespan != 'hourly':
+            if timespan == 'daily':
+                for entry in stockData:
+                    stock = entry.to_dict()
+                if stock != -1:
+                    dates = []
+                    prices = []
+                    avgPrice = []
+                for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
+                    avgPrice.append(stock['prices'][i])
+                    if i % 7 == 1:
+                        prices.append(mean(avgPrice))
+                        print(mean(avgPrice))
+                        dates.append(stock['dates'][i][0:10])
+                        print(stock['dates'][i][0:10])
+                        avgPrice = []
+                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+        else: 
+            for entry in stockData:
+                stock = entry.to_dict()
+                #session['stock'] = stock
+            if stock != -1:
+                dates = []
+                prices = []
+                for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
+                    dates.append(stock['dates'][i])
+                    prices.append(stock['prices'][i])
+                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+        #else:
+        #    return displayStock(ticker)
+    return redirect(url_for('fourOhFour'))
 
 ## changeStockView
 #   Description: Retrieves data from stockView page to determine how to change
@@ -468,7 +499,7 @@ def userlists():
        # try:
             newuserlist = User.userList(dbfire)
 
-            return redirect(url_for('Userlist.html',newuserlist = newuserlist))
+            return render_template('Userlist.html',newuserlist = newuserlist)
        # except:
         #    return redirect(url_for('fourOhFour'))
 
@@ -477,9 +508,10 @@ def userlists():
 @app.route("/orderList")
 def orderlists():
     if ('user' in session):
-        orderlist = Order.orderList(dbfire) # This will have the username show on webpage when logged in - Muneeb Khan
 
-        return redirect(url_for('orderList.html',orderlist = orderlist))
+            orderlist = Order.orderList(dbfire) # This will have the username show on webpage when logged in - Muneeb Khan
+
+            return render_template('orderList.html',orderlist = orderlist)
 
 ## 
 @app.route('/404Error')

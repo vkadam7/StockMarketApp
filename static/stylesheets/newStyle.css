@@ -23,6 +23,11 @@ h1{
   font-size: large;
 }
 
+h3{
+  text-align: center;
+  font-size: large;
+}
+
 .section1 p{
   font-size:large;
   text-align:center;
@@ -125,9 +130,10 @@ footer{
   padding: 5px;
 }
 
+
 .card-text a{
   color: black;
-  font-style: bold;
+  text-align: center;
 }
 
 .stockSearchBar {
@@ -139,6 +145,42 @@ footer{
 .stockSearchButton {
   background-color: #0d6efd;
   border-color:#0d6efd;
+  padding:5px;
+  display: flex;
+  color: white;
+  border-radius: 5px;
+}
+
+.aboutUsButton {
+  background-color: #b5c205;
+  border-color:#b5c205;
+  padding:5px;
+  display: flex;
+  color: white;
+  border-radius: 5px;
+}
+
+.infoButton{
+  background-color: #b5c205;
+  border-color:#b5c205;
+  padding:5px;
+  display: flex;
+  color: white;
+  border-radius: 5px;
+}
+
+.loginButton{
+  background-color: #b5c205;
+  border-color:#b5c205;
+  padding:5px;
+  display: flex;
+  color: white;
+  border-radius: 5px;
+}
+
+.registerButton{
+  background-color: #b5c205;
+  border-color:#b5c205;
   padding:5px;
   display: flex;
   color: white;
@@ -191,4 +233,8 @@ background: #eee;
 .centering{
   border: 3px;
   text-align: center;
+}
+
+.logo{
+  opacity: 0.8;
 }

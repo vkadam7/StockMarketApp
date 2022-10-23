@@ -1,6 +1,7 @@
 from ast import Constant, Or
 from mimetypes import init
 from queue import Empty
+from re import search
 from this import d
 from time import daylight
 import numpy as np
@@ -145,13 +146,13 @@ class StockData:
                     tempAdjCloses.append(self.adjCloses[i])
                     tempVolumes.append(self.volumes[i])
                 elif timespan == 'hourly':
-                    interp = np.interp(range(0,7),[0, 4, 7],[self.opens[i], np.mean([self.opens[i], self.closes[i]]), self.closes[i]])
+                    interp = np.interp(range(0,8),[0, 4, 8],[self.opens[i], np.mean([self.opens[i], self.closes[i]]), self.closes[i]])
                     for j in range(0,len(interp)):
                         tempArr = np.array([self.opens[i], self.closes[i], np.mean([self.opens[i], self.closes[i]])])
                         interp[j] += np.random.randn() * np.std(tempArr)
                     date = self.dates[i]
                     hourlyDates = []
-                    for i in range(9,16):
+                    for i in range(9,17):
                         if i < 10:
                             tempDate = date + ' 0' + str(i) + ':00:00'
                         else:
@@ -347,9 +348,22 @@ class StockData:
     #
     #   Author: Ian McNulty
     def stockSearch(db, searchTerm):
-        tempData = db.collection('Stocks').document(searchTerm).get() 
-        if tempData != None:
-            return True
+        tempData1 = db.collection('Stocks').document(searchTerm).get() 
+        if tempData1 != None:
+            return True, searchTerm
+
+        stocksDB = db.collection('Stocks')
+        for entry in stocksDB.stream():
+            temp = entry.to_dict()
+            ticker = temp['ticker'].lower()
+            name = temp['name'].lower()
+            tempSearchTerm = searchTerm.lower()
+            if tempSearchTerm == ticker:
+                return True, ticker.upper()
+            if tempSearchTerm in name:
+                return True, ticker.upper()
+
+        return False, -1
         
 class Simulation:
     def __init__(self, db, user, startDate, endDate, initialCash):
@@ -382,8 +396,8 @@ class Simulation:
         currentTime = datetime.datetime.now()
         difference = currentTime - self.startTimestamp
         index = -1
-        for i in range(0,difference.days+1):
-            index += 24
+        for i in range(0,difference.days):
+            index += 8
         index += (difference.seconds//3600)%24
         return index
 
@@ -507,12 +521,12 @@ class User:
 
     # User list by Muneeb Khan
     def userList(db):
-        # data = {
+        #data = {
         #     'Email' : self.email,
         #     'userName' : self.username,
         #     'Name' : self.name,
         #     'UserID' : self.userID,
-        # }
+        #}
 
         # The usernames list function will loop through the usernames in firebase and store each one
         # under the usernameslist [] array. - Muneeb Khan
@@ -522,8 +536,10 @@ class User:
             temp = entry.to_dict()
             name = temp['Name']
             usernameslist.append(name)
+        print(usernameslist)
+        return (usernameslist) 
 
-        return usernameslist
+        
 
 class Order:
     def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
@@ -538,25 +554,27 @@ class Order:
 
     def buyOrder(self):
         if self.option == 'Buy':
-            count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
-            orderName = self.sim + self.stock['ticker'] + str(count)
-            data = {
-                'sold': False,
-                'simulation': self.sim,
-                'ticker': self.stock['ticker'],
-                'dayOfPurchase': self.dayOfPurchase,
-                'buyOrSell': 'Buy',
-                'quantity': self.quantity,
-                'avgStockPrice': self.avgStockPrice,
-                'totalPrice': self.totalPrice
-            }
-            self.db.collection('Orders').document(orderName).set(data)
-            Simulation.updateCash(self.db, self.sim, float(self.totalPrice) * -1)
-        else: return -1
+            if self.doTheyHaveEnoughMoney():
+                count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
+                orderName = self.sim + self.stock['ticker'] + str(count)
+                data = {
+                    'sold': False,
+                    'simulation': self.sim,
+                    'ticker': self.stock['ticker'],
+                    'dayOfPurchase': self.dayOfPurchase,
+                    'buyOrSell': 'Buy',
+                    'quantity': self.quantity,
+                    'avgStockPrice': self.avgStockPrice,
+                    'totalPrice': self.totalPrice
+                }
+                self.db.collection('Orders').document(orderName).set(data)
+                Simulation.updateCash(self.db, self.sim, float(self.totalPrice) * -1)
+                return 1
+            else: return -1
 
     def sellOrder(self):
         if self.option == 'Sell':
-            if self.doTheyOwnThat():
+            if self.doTheyOwnThat() == True:
                 count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
                 orderName = self.sim + self.stock['ticker'] + str(count)
                 data = {
@@ -570,267 +588,83 @@ class Order:
                 }
                 self.db.collection('Orders').document(orderName).set(data)
                 Simulation.updateCash(self.db, self.sim, self.totalPrice)
-        else: return -1
+                return 1
+            else: return -1
+
+    def doTheyHaveEnoughMoney(self):
+        enoughFlag = False
+
+        currentCash = int(self.db.collection('Simulations').document(self.sim).get().to_dict()['currentCash'])
+        if currentCash >= self.totalPrice:
+            enoughFlag = True
+
+        return enoughFlag
 
     def doTheyOwnThat(self):
         quantityOwned = 0
         ownageFlag = False
+        partialFlag = False
         for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).get():
             temp = entry.to_dict()
-            quantityOwned += int(temp['quantity'])
+            if temp.get('newQuantity') != None:
+                quantityOwned += int(temp['newQuantity'])
+                partialFlag = True
+            else:
+                quantityOwned += int(temp['quantity'])
 
-        if quantityOwned <= int(self.quantity):
+        print(quantityOwned)
+        if quantityOwned >= int(self.quantity):
             ownageFlag = True
         
+        amountToSell = int(self.quantity)
         if ownageFlag:
-            for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).where('partiallySold','==',True).stream():
-                temp = entry.to_dict()
-                if quantityOwned - int(temp['newQuantity']) >= 0:
-                    self.db.collection('Orders').document(entry.id).update({'sold' : True})
-                    quantityOwned -= int(temp['newQuantity'])
-                else:
-                    self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['newQuantity']) - quantityOwned)})
-            for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream():
-                temp = entry.to_dict()
-                if quantityOwned - int(temp['quantity']) >= 0:
-                    self.db.collection('Orders').document(entry.id).update({'sold' : True})
-                    quantityOwned -= int(temp['quantity'])
-                else:
-                    self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['quantity']) - quantityOwned)})
+            while amountToSell > 0:
+                if partialFlag == True:
+                    for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).where('partiallySold','==',True).stream():
+                        temp = entry.to_dict()
+                        print("Difference is: " + str(amountToSell) + "-" + str(temp['newQuantity']) + "=" + str(amountToSell - int(temp['newQuantity'])))
+                        if amountToSell - int(temp['newQuantity']) >= 0:
+                            self.db.collection('Orders').document(entry.id).update({'sold' : True, 'newQuantity' : 0})
+                            amountToSell -= int(temp['newQuantity'])
+                        else:
+                            self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['newQuantity']) - amountToSell)})
+                for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream():
+                    temp = entry.to_dict()
+                    print("Difference is: " + str(amountToSell) + "-" + temp['quantity'] + "=" + str(amountToSell - int(temp['quantity'])))
+                    if amountToSell - int(temp['quantity']) >= 0:
+                        self.db.collection('Orders').document(entry.id).update({'sold' : True})
+                        amountToSell -= int(temp['quantity'])
+                    else:
+                        self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['quantity']) - amountToSell)})
+
             return ownageFlag
         
         return ownageFlag
 
     # List of Orders by Muneeb Khan
-    def orderList(db):
-        # data = {
-        #     'validity': True,
-        #     'ticker': self.stock.ticker,
-        #     'dayOfPurchase': self.dayOfPurchase,
-        #     'buyOrSell': self.buyOrSell,
-        #     'quantity': self.quantity,
-        #     'avgStockPrice': self.avgStockPrice,
-        #     'totalPrice': self.totalPrice
-        #     }
+    def orderList(self):
+        quantityOwned = 0
+        ownageFlag = True
+        data = {
+                'simulation': self.sim,
+                'ticker': self.stock['ticker'],
+                'dayOfPurchase': self.dayOfPurchase,
+                'buyOrSell': self.buyOrSell,
+                'quantity': self.quantity,
+                'avgStockPrice': self.avgStockPrice,
+                'totalPrice': self.totalPrice
+            }
 
         # The order list function will loop through the orders in firebase and store each one
         # under the ordernameslist [] array. - Muneeb Khan
         orderslist = []
 
-        for entry in db.collection('IntradayStockData').stream(): # To loop through the users orders
-            temp = entry.to_dict()
-            orders = temp['prices']
-            orderslist.append(temp)
-
-        return orderslist
-
-        return orders
- 
-class portfolio:
-    def __init__(self, db, stock, user, quantity, stockPrice, startDate, simulation, initialCash, totalPrice, profit, fundsRemaining,
-                 currentCash):
-        self.firebase = db
-        self.stock = stock
-        self.user = user
-        self.startDate = startDate
-        self.quantity = quantity
-        self.totalPrice = float(quantity)*stockPrice
-        self.initialCash = initialCash
-        self.stockPrice = stockPrice
-        self.sim = simulation 
-        self.fundsRemaining = fundsRemaining
-        self.dayofPurchase = datetime.datetime.now()
-        self.currentCash = currentCash
-        self.profit = profit
-    
-    def retrieve(self, stock):
-        stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
-        return stockRetrieved
-        
-
-    #Retrieves the number of shares owned by the user, to be implemented once buy and sell features are finished. Will be coded in line with
-    #those feaures.
-    
-   # def get_shares_owned(self, db, stock, user, quantity, stockPrice):
-    #   self.stock = stock
-     #   data = {'name': self.name,
-      #          'dayOfPurchase': self.dayOfPurchase,
-       #         'quantity': self.quantity,
-        #        'avgStockPrice': self.avgStockPrice,
-         #       'totalPrice': self.totalPrice}
-        
-        #self.db.collection('Stocks').document('name').get()
-        
-        #return -1
-        
-        
-
-    #Returns profit from the simulator(Need to test and fix if needed )
-    def get_profit(self, db, stock, quantity, avgstockPrice):
-        profit = 0
-        data = {'name' : self.name, 
-                'quantity': self.quantity, 
-                'avgStockPrice': self.avgStockPrice}
-        
-        if Order.buyOrder == True:
-             tempPrice = self.db.collection('Order').document('avgStockPrice').get()
-             quantity = self.db.collection('Orders').document('quantity').get()
-        
-             profit += tempPrice * quantity
-             db.collection('Simulations').document(sim).update({'profit' : profit})
-        elif Order.sellOrder == True:
-            tempPrice = self.db.collection('Simulations').document('daily').document('closes').get()
-            quantity = self.db.collection('Simulations').document('daily').document('volume').get()
-        
-            profit -= tempPrice * quantity
-            db.collection('Simulations').document(sim).update({'profit' : profit})
-        
-        return profit
-        
-       
-    
-    #Displays amount of shares owned (To also be implemented later)
-    #def weight(self, db, stock):
-    #    share = [self.quantity]
-    #    max_share = 1
-    #    for share in max_share:
-    #        if(self.quantity <= max_share and self.quantity >= 0):
-     #           return share[self.quantity]
-    #        else:
-    #            return -1   
-        
-    #Fixed this section to account for gains or losses, need to test to check if everything is correct  
-    def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
-        #tempData = self.db.collection('Simulations').document(self.sim).document('Orders').get()
-        data = {'name': self.name, 
-                'quantity': self.quantity, 
-                'avgStockPrice': self.avgStockPrice, 
-                }
-        currentCash = self.db.collection('Simulations').document(self.sim).document('currentCash').get()
-        currentPrice = Simulation.currentPriceOf
-        
-        if quanity > 0:    
-            if currentCash > currentPrice:
-                tempPrice = self.db.collection('Simulations').document(simName).document('Stocks').document('prices').get()
-                #Need to fix this function
-                #CurrentPrice = self.db.collection('Stocks').document('daily').document('closes').get()
-                CurrentPrice = self.db.collection('Simulations').document(simName).document('currentCash').document('prices').get()
-                #day = self.db.collection('Stocks').document('daily').document('dates').get()
-                day = self.db.collection('IntradayStockData').document('dates').get()
-                for CurrentPrice in day :
-                    netGainorLoss = (CurrentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
-                    if netGainorLoss > CurrentPrice:
-                        netLoss = "-" + netGainorLoss
-                        print("Net loss" + netLoss )
-                        return netLoss
-                    else:
-                        netGain = netGainorLoss
-                        print("Net Gain: " + netGain)
-                        return netGain
-                if Order.buyOrder == True:
-                    netGainorLoss = (CurrentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
-                    return netGainorLoss
-                elif Order.sellOrder == True:
-                    netGainorLoss = (CurrentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
-                    return netGainorLoss
-                        
-        return -1
-                           
-     #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
-    def funds_remaining(self, initialAmount, finalAmount):
-        finalAmount = 0
-        fundsUsed = 0
-        fundsRemainiing = 0
-        quantity = 0
-        #tempPrice = self.db.collection('Stocks').document('daily').document('closes').get()
-        data = {'name': self.name,
-                'quantity': self.quantity, 
-                'avgStockPrice': self.avgStockPrice, 
-                'startDate': self.startDate,
-                'endDate': self.endDate,
-                'initialCash': self.initialCash,
-                'currentCash': self.currentCash,
-                'score': 0,
-                'fundsRemainiing': 0
-        }
-        
-        #if simulation is ongoing function(Needs to be added)
-        if Order.buyOrder == True:
-            if data['currentCash'] == data['initialCash']:
-                return data['currentCash']
-            elif data['currentCash'] > data['initialCash']:
-                fundsUsed = data['currentCash'] - data['initialCash']
-                fundsRemainiing = fundsUsed
-                return fundsRemainiing
-        elif Order.sellOrder == True:
-            if data['currentCash'] == data['initialCash']:
-                return data['currentCash']
-            elif data['currentCash'] > data['initialCash']:
-                fundsUsed = data['currentCash'] - data['initialCash']
-                fundsRemainiing = fundsUsed
-                return fundsRemainiing
-             
-     
-    #Edited returns feature
-    def returns(self, quantity, avgStockPrice, AdjustClose):
-        returns = self.db.collection('Stocks').document('daily').document('closes').get()
-        daily_returns = returns.pct_change()
-        print(daily_returns)
-       
-   
-    #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
-    #Updated by Muneeb Khan
-    def percentChange(self,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
-
-        quantity = 0
-        percentIncrease = 0
-        AdjustClose = 0
-
-        day = self.db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
-       #Need more inquiry
-        newstockPrice = self.db.collection('IntradayStockData').document('daily').document('closes').get()
-        stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
-
-        if quantity > 0:
-            for stockPrice in day: 
-                increase = newstockPrice[day+1] - stockPrice[day]
-                    
-            percentIncrease = (increase/stockPrice) * 100
-            return percentIncrease
+        if ownageFlag == True:
+            for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('buyOrSell','==','Sell').where('sold','==',False).where('sold','==',True).where('ticker','==',self.stock['ticker']).stream(): # To loop through the users orders
+                temp = entry.to_dict()
+                orderslist.append(temp)
+                print(orderslist)
+                return orderslist
         else:
-            return -1     
-        
-    #Graph of user stocks   (Need buy and sell info)
-    #Fully implemented for prototype 3
-    def user_graph(self, db):
-        prices = self.db.collection('IntradayStockData').document('prices').get()
-        dates = self.db.collection('IntradayStockData').document('dates').get
-        for x in prices:
-            plt.plot(x[dates][prices])
-            
-        plt.xlabel('Date')
-        plt.ylabel('Price')
-        plt.show
-        print(plt.show)
-        
-        
-    #Display all information
-    def displayInfo(self, close):
-        print(self.percentChange)
-        print(self.returns)
-        print(self.funds_remaining)
-       
-        print(self.get_profit)
-        if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
-            print("Gains: +" + self.GainorLoss)
-        elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
-            print("Loss: -" + self.GainorLoss)
-        
-        print("Would you like to delete a stock: " + self.delete)
-        print("Retrive stocks: " + self.retrieve)
-        
-        
-        print("Your stock display: ")
-        print(user_graph)
-        
-         
+            return -1
+    
