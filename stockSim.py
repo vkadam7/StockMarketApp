@@ -659,12 +659,180 @@ class Order:
         # under the ordernameslist [] array. - Muneeb Khan
         orderslist = []
 
-        if ownageFlag == True:
-            for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('buyOrSell','==','Sell').where('sold','==',False).where('sold','==',True).where('ticker','==',self.stock['ticker']).stream(): # To loop through the users orders
-                temp = entry.to_dict()
-                orderslist.append(temp)
-                print(orderslist)
-                return orderslist
-        else:
-            return -1
+        for entry in self.db.collection('IntradayStockData').stream(): # To loop through the users orders
+            temp = entry.to_dict()
+            orders = temp['prices']
+            orderslist.append(temp)
+
+        return orderslist
+
+        return orders
     
+class portfolio:
+    def __init__(self, db, stock, user, quantity, stockPrice, startDate, simulation, initialCash, totalPrice, profit, fundsRemaining,
+                 currentCash):
+            self.firebase = db
+            self.stock = stock
+            self.user = user
+            self.initialCash = initialCash
+            self.stockPrice = stockPrice
+            self.sim = simulation 
+            self.fundsRemaining = fundsRemaining
+            self.dayofPurchase = datetime.datetime.now()
+            self.currentCash = currentCash
+            self.profit = profit      
+    
+    def retrieve(self, id):
+        stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
+        return stockRetrieved
+
+    #Returns profit from the simulator(Need to test and fix if needed )
+    def get_profit(self, db, stock, quantity, avgstockPrice):
+        data = {'name' : self.name, 
+                'quantity': self.quantity, 
+                'avgStockPrice': self.avgStockPrice}
+        profit = 0
+        quantity = self.db.collection('Orders').document('quantity').get()
+        if Order.buyOrder() == True:
+            tempPrice = self.db.collection('Order').document('avgStockPrice').get()
+            quantity = self.db.collection('Orders').document('quantity').get()
+            profit += tempPrice * quantity
+            return profit
+        elif Order.sellOrder() == True:
+            tempPrice = self.db.collection('Order').document('avgStockPrice').get()
+            quantity = self.db.collection('Orders').document('quantity').get()
+            profit -= tempPrice * quantity
+            return profit
+            
+    #Displays amount of shares owned (To also be implemented later)
+    def weight(self, db, stock):
+        share = [self.quantity]
+        max_share = 1
+        for share in max_share:
+            if(self.quantity <= max_share and self.quantity >= 0):
+                return share[self.quantity]
+            else:
+                return -1   
+        
+    #Fixed this section to account for gains or losses, need to test to check if everything is correct  
+    def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
+          #tempData = self.db.collection('Simulations').document(self.sim).document('Orders').get()
+        data = {'name': self.name, 
+                'quantity': self.quantity, 
+                'avgStockPrice': self.avgStockPrice, 
+                }
+        currentCash = self.db.collection('Simulations').document(self.sim).document('currentCash').get()
+        currentPrice = Simulation.currentPriceOf
+        day = datetime()
+
+        if quanity > 0:    
+            if currentCash > currentPrice:
+                tempPrice = self.db.collection('Simulations').document(simName).document('Stocks').document('prices').get()
+                #Need to fix this function
+                #CurrentPrice = self.db.collection('Stocks').document('daily').document('closes').get
+                
+                netLoss = "-" + netGainorLoss
+                print("Net loss" + netLoss )
+                return netLoss
+            else:
+                netGain = netGainorLoss
+                print("Net Gain: " + netGain)
+                return netGain
+        if Order.buyOrder == True:
+                netGainorLoss = (currentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
+                return netGainorLoss
+        elif Order.sellOrder == True:
+                 netGainorLoss = (currentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
+                 return netGainorLoss
+
+      
+                           
+     #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
+    def funds_remaining(self, initialAmount, finalAmount):
+        finalAmount = 0
+        fundsUsed = 0
+        fundsRemainiing = 0
+        quantity = 0
+        tempPrice = self.db.collection('Stocks').document('daily').document('closes').get()
+        data = {'name': self.name,
+                'quantity': self.quantity, 
+                'avgStockPrice': self.avgStockPrice, 
+                'startDate': self.startDate,
+                'endDate': self.endDate,
+                'initialCash': self.initialCash,
+                'currentCash': 0,
+                'score': 0,
+                'Orders': []  
+        }
+    
+        
+        if Order.buyOrder() == True:
+            if data ['currentCash'] == data['initialCash']:
+                return data['currentCash']
+            elif data['currentCash'] > data['initialCash']:
+                 fundsUsed = data['currentCash'] - data['initialCash']
+                 fundsRemainiing = fundsUsed
+                 return fundsRemainiing
+        elif Order.sellOrder():
+            if data ['currentCash'] == data['initialCash']:
+                return data['currentCash']
+            elif data['currentCash'] > data['initialCash']:
+                 fundsUsed = data['currentCash'] - data['initialCash']
+                 fundsRemainiing = fundsUsed
+                 return fundsRemainiing
+       
+        
+    #Edited returns feature
+    def returns(self, quantity, avgStockPrice, AdjustClose):
+        returns = self.db.collection('Stocks').document('daily').document('closes').get()
+        daily_returns = returns.pct_change()
+        print(daily_returns)
+       
+           
+    #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
+    #Updated by Muneeb Khan
+    def percentChange(self,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
+
+        quantity = 0
+        percentIncrease = 0
+        AdjustClose = 0
+
+        day = self.db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
+       #Need more inquiry
+       # newstockPrice = self.db.collection('IntradayStockData').document('daily').document('closes').get()
+        stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
+
+        if quantity > 0:
+            for stockPrice in day: 
+                increase = newstockPrice[day+1] - stockPrice[day]
+                    
+            percentIncrease = (increase/stockPrice) * 100
+            return percentIncrease
+        else:
+            return -1     
+        
+    #Author: Viraj Kadam    
+    #Graph of user stocks   (Need buy and sell info)
+    def user_graph(self, db):
+        prices = self.db.collection('IntradayStockData').document('prices').get()
+        dates = self.db.collection('IntradayStockData').document('dates').get
+        for x in prices:
+            plt.plot(x[dates][prices])
+            
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.show
+            
+        
+        
+    #Display all information
+    def displayInfo(self, close):
+        print(self.percentChange)
+        print(self.returns)
+        print(self.funds_remaining)
+
+        print(self.get_profit)
+        if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
+            print("Gains: +" + self.GainorLoss)
+        elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
+            return
