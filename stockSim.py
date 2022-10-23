@@ -1,6 +1,7 @@
 from ast import Constant
 from mimetypes import init
 from queue import Empty
+from re import search
 from this import d
 from time import daylight
 import numpy as np
@@ -143,13 +144,13 @@ class StockData:
                     tempAdjCloses.append(self.adjCloses[i])
                     tempVolumes.append(self.volumes[i])
                 elif timespan == 'hourly':
-                    interp = np.interp(range(0,7),[0, 4, 7],[self.opens[i], np.mean([self.opens[i], self.closes[i]]), self.closes[i]])
+                    interp = np.interp(range(0,8),[0, 4, 8],[self.opens[i], np.mean([self.opens[i], self.closes[i]]), self.closes[i]])
                     for j in range(0,len(interp)):
                         tempArr = np.array([self.opens[i], self.closes[i], np.mean([self.opens[i], self.closes[i]])])
                         interp[j] += np.random.randn() * np.std(tempArr)
                     date = self.dates[i]
                     hourlyDates = []
-                    for i in range(9,16):
+                    for i in range(9,17):
                         if i < 10:
                             tempDate = date + ' 0' + str(i) + ':00:00'
                         else:
@@ -345,9 +346,22 @@ class StockData:
     #
     #   Author: Ian McNulty
     def stockSearch(db, searchTerm):
-        tempData = db.collection('Stocks').document(searchTerm).get() 
-        if tempData != None:
-            return True
+        tempData1 = db.collection('Stocks').document(searchTerm).get() 
+        if tempData1 != None:
+            return True, searchTerm
+
+        stocksDB = db.collection('Stocks')
+        for entry in stocksDB.stream():
+            temp = entry.to_dict()
+            ticker = temp['ticker'].lower()
+            name = temp['name'].lower()
+            tempSearchTerm = searchTerm.lower()
+            if tempSearchTerm == ticker:
+                return True, ticker.upper()
+            if tempSearchTerm in name:
+                return True, ticker.upper()
+
+        return False, -1
         
 class Simulation:
     def __init__(self, db, user, startDate, endDate, initialCash):
@@ -380,8 +394,8 @@ class Simulation:
         currentTime = datetime.datetime.now()
         difference = currentTime - self.startTimestamp
         index = -1
-        for i in range(0,difference.days+1):
-            index += 24
+        for i in range(0,difference.days):
+            index += 8
         index += (difference.seconds//3600)%24
         return index
 
@@ -536,25 +550,27 @@ class Order:
 
     def buyOrder(self):
         if self.option == 'Buy':
-            count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
-            orderName = self.sim + self.stock['ticker'] + str(count)
-            data = {
-                'sold': False,
-                'simulation': self.sim,
-                'ticker': self.stock['ticker'],
-                'dayOfPurchase': self.dayOfPurchase,
-                'buyOrSell': 'Buy',
-                'quantity': self.quantity,
-                'avgStockPrice': self.avgStockPrice,
-                'totalPrice': self.totalPrice
-            }
-            self.db.collection('Orders').document(orderName).set(data)
-            Simulation.updateCash(self.db, self.sim, float(self.totalPrice) * -1)
-        else: return -1
+            if self.doTheyHaveEnoughMoney():
+                count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
+                orderName = self.sim + self.stock['ticker'] + str(count)
+                data = {
+                    'sold': False,
+                    'simulation': self.sim,
+                    'ticker': self.stock['ticker'],
+                    'dayOfPurchase': self.dayOfPurchase,
+                    'buyOrSell': 'Buy',
+                    'quantity': self.quantity,
+                    'avgStockPrice': self.avgStockPrice,
+                    'totalPrice': self.totalPrice
+                }
+                self.db.collection('Orders').document(orderName).set(data)
+                Simulation.updateCash(self.db, self.sim, float(self.totalPrice) * -1)
+                return 1
+            else: return -1
 
     def sellOrder(self):
         if self.option == 'Sell':
-            if self.doTheyOwnThat():
+            if self.doTheyOwnThat() == True:
                 count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
                 orderName = self.sim + self.stock['ticker'] + str(count)
                 data = {
@@ -568,33 +584,55 @@ class Order:
                 }
                 self.db.collection('Orders').document(orderName).set(data)
                 Simulation.updateCash(self.db, self.sim, self.totalPrice)
-        else: return -1
+                return 1
+            else: return -1
+
+    def doTheyHaveEnoughMoney(self):
+        enoughFlag = False
+
+        currentCash = int(self.db.collection('Simulations').document(self.sim).get().to_dict()['currentCash'])
+        if currentCash >= self.totalPrice:
+            enoughFlag = True
+
+        return enoughFlag
 
     def doTheyOwnThat(self):
         quantityOwned = 0
         ownageFlag = False
+        partialFlag = False
         for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).get():
             temp = entry.to_dict()
-            quantityOwned += int(temp['quantity'])
+            if temp.get('newQuantity') != None:
+                quantityOwned += int(temp['newQuantity'])
+                partialFlag = True
+            else:
+                quantityOwned += int(temp['quantity'])
 
-        if quantityOwned <= int(self.quantity):
+        print(quantityOwned)
+        if quantityOwned >= int(self.quantity):
             ownageFlag = True
         
+        amountToSell = int(self.quantity)
         if ownageFlag:
-            for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).where('partiallySold','==',True).stream():
-                temp = entry.to_dict()
-                if quantityOwned - int(temp['newQuantity']) >= 0:
-                    self.db.collection('Orders').document(entry.id).update({'sold' : True})
-                    quantityOwned -= int(temp['newQuantity'])
-                else:
-                    self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['newQuantity']) - quantityOwned)})
-            for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream():
-                temp = entry.to_dict()
-                if quantityOwned - int(temp['quantity']) >= 0:
-                    self.db.collection('Orders').document(entry.id).update({'sold' : True})
-                    quantityOwned -= int(temp['quantity'])
-                else:
-                    self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['quantity']) - quantityOwned)})
+            while amountToSell > 0:
+                if partialFlag == True:
+                    for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).where('partiallySold','==',True).stream():
+                        temp = entry.to_dict()
+                        print("Difference is: " + str(amountToSell) + "-" + str(temp['newQuantity']) + "=" + str(amountToSell - int(temp['newQuantity'])))
+                        if amountToSell - int(temp['newQuantity']) >= 0:
+                            self.db.collection('Orders').document(entry.id).update({'sold' : True, 'newQuantity' : 0})
+                            amountToSell -= int(temp['newQuantity'])
+                        else:
+                            self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['newQuantity']) - amountToSell)})
+                for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream():
+                    temp = entry.to_dict()
+                    print("Difference is: " + str(amountToSell) + "-" + temp['quantity'] + "=" + str(amountToSell - int(temp['quantity'])))
+                    if amountToSell - int(temp['quantity']) >= 0:
+                        self.db.collection('Orders').document(entry.id).update({'sold' : True})
+                        amountToSell -= int(temp['quantity'])
+                    else:
+                        self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['quantity']) - amountToSell)})
+
             return ownageFlag
         
         return ownageFlag
