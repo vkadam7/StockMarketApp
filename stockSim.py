@@ -677,13 +677,13 @@ class portfolio:
              quantity = self.db.collection('Orders').document('quantity').get()
         
              profit += tempPrice * quantity
-             return profit
+             db.collection('Simulations').document(sim).update({'profit' : profit})
         elif Order.sellOrder == True:
             tempPrice = self.db.collection('Simulations').document('daily').document('closes').get()
             quantity = self.db.collection('Simulations').document('daily').document('volume').get()
         
             profit -= tempPrice * quantity
-            return profit
+            db.collection('Simulations').document(sim).update({'profit' : profit})
         
         return profit
         
@@ -811,6 +811,7 @@ class portfolio:
         plt.xlabel('Date')
         plt.ylabel('Price')
         plt.show
+        print(plt.show)
         
         
     #Display all information
@@ -830,6 +831,6 @@ class portfolio:
         
         
         print("Your stock display: ")
-        print(self.user_graph)
+        print(user_graph)
         
-        
+         
