@@ -296,9 +296,9 @@ def startSimulation():
                 sim.createSim()
                 session['simName'] = sim.simName
 
-                Portfolio = portfolio(dbfire, session['user'], session['stock'])
+                Portfolio = portfolio(dbfire, session['user'], session['ticker'], session['simName'], session['initialCash'])
 
-                return render_template('simulation.html', person=session['user'])
+                return render_template('simulation.html', person=session['user'], pf=Portfolio)
         except KeyError:
             print("KeyError occured: startSimulation")
             return redirect(url_for('fourOhFour'))
