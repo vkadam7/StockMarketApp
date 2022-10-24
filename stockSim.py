@@ -5,6 +5,7 @@ from re import search
 from this import d
 from time import daylight
 import numpy as np
+import pandas as pd
 import firebase_admin
 from firebase_admin import firestore
 from google.cloud.firestore import ArrayUnion
@@ -532,12 +533,11 @@ class User:
 
         for entry in db.collection('Users').stream(): # To loop through usernames in firebase
             temp = entry.to_dict()
-            name = temp['Name']
-            usernameslist.append(name)
-        print(usernameslist)
-        return (usernameslist) 
+            usernameslist.append([temp['userName']])
 
-        
+        df = pd.DataFrame(usernameslist, columns=['userName'])
+        print(df)
+        return df                       
 
 class Order:
     def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
@@ -640,29 +640,31 @@ class Order:
         return ownageFlag
 
     # List of Orders by Muneeb Khan
-    def orderList(self):
+    def orderList(db):
         quantityOwned = 0
         ownageFlag = True
-        data = {
-                'simulation': self.sim,
-                'ticker': self.stock['ticker'],
-                'dayOfPurchase': self.dayOfPurchase,
-                'buyOrSell': self.buyOrSell,
-                'quantity': self.quantity,
-                'avgStockPrice': self.avgStockPrice,
-                'totalPrice': self.totalPrice
-            }
+        # data = {
+        #         'simulation': self.sim,
+        #         'ticker': self.stock['ticker'],
+        #         'dayOfPurchase': self.dayOfPurchase,
+        #         'buyOrSell': self.buyOrSell,
+        #         'quantity': self.quantity,
+        #         'avgStockPrice': self.avgStockPrice,
+        #         'totalPrice': self.totalPrice
+        #     }
 
         # The order list function will loop through the orders in firebase and store each one
         # under the ordernameslist [] array. - Muneeb Khan
         orderslist = []
 
         if ownageFlag == True:
-            for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('buyOrSell','==','Sell').where('sold','==',False).where('sold','==',True).where('ticker','==',self.stock['ticker']).stream(): # To loop through the users orders
+            for entry in db.collection('Orders').stream(): # To loop through the users orders
                 temp = entry.to_dict()
-                orderslist.append(temp)
-                print(orderslist)
-                return orderslist
+                orderslist.append([temp['avgStockPrice'],temp['buyOrSell'],temp['dayOfPurchase'],temp['quantity'],temp['simulation'],temp['ticker'],temp['totalPrice']])
+            
+            df = pd.DataFrame(orderslist, columns=['avgStockPrice','buyOrSell','dayOfPurchase','quantity','simulation','ticker','totalPrice'])
+            print(df)
+            return df
         else:
             return -1
     
