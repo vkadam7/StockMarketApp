@@ -295,6 +295,9 @@ def startSimulation():
                                         request.form['simEndDate'], request.form['initialCash'])
                 sim.createSim()
                 session['simName'] = sim.simName
+
+                Portfolio = portfolio(dbfire, session['user'], session['stock'])
+
                 return render_template('simulation.html', person=session['user'])
         except KeyError:
             print("KeyError occured: startSimulation")
@@ -326,7 +329,7 @@ def goToSimulation():
         
 @app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
-    sim.finishSimulation()
+    #sim.finishSimulation()
     session['simulationFlag'] = 0
 
 @app.route("/orderForm", methods=['POST', 'GET'])
@@ -411,6 +414,7 @@ def displayStock(ticker):
     startDate = request.args['startDate']
     endDate = request.args['endDate']
     timespan = request.args['timespan']
+    session['ticker'] = ticker
     global stock
     if session['simulationFlag'] == 0:
         stockData = StockData(dbfire, ticker)
@@ -524,13 +528,13 @@ def fourOhFour():
 def Portfolio():
     if ('user' in session):
     
-            session['simulationFlag'] = 1
-            session['simulation'] = {
+                session['simulationFlag'] = 1
+                session['simulation'] = {
                     'simStartDate': request.form['simStartDate'],
                     'simEndDate': request.form['simEndDate'],
                     'initialCash': request.form['initialCash',]
                 }
-            Portfolio = portfolio(dbfire, session['user'], portfolio.get_profit,
+                Portfolio = portfolio(dbfire, session['user'], portfolio.get_profit,
                                 portfolio.funds_remaining, request.form['initialCash'])
                 
                 
@@ -538,23 +542,21 @@ def Portfolio():
                #    'Profit': portfolio.get_profit,
                #     'Funds_remaining': portfolio.funds_remaining,
                #     'initialCash': request.form['initialCash'],
-               #     'currentCash': Simulation['currentCash'], 
+               #     'currentCash': Simulation['currentCash'],
+                    
               #  }
               
-            session['portfolio'] = {
-                  'Profit': request.form['profit'], 
-                  'currentCash': request.form['currentCash'], 
-                  'initialCash': request.form['initialCash']
-                }
-            #session['Profit']: flash(portfolio.get_profit)
-            session['Funds_remaining']: portfolio.funds_remaining(dbfire, initialAmount = session['portfolioValue'], finalAmount = session['currentCash'])
-            session['Profit']: portfolio.get_profit(dbfire, quantity=session['quantity'], )
-            session['GainorLoss']: portfolio.percentChange(dbfire)
+                #session['portfolio'] = {
+                #  'Profit': request.form['profit'], 
+                #  'currentCash': request.form['currentCash'], 
+                #  'initialCash': request.form['initialCash']
+                #}
+                session['Profit']: portfolio.get_profit
     
               
                 #sim.displayInfo
                 #session['simName'] = sim.simName
-            return render_template('simulation.html')
+                return render_template('simulation.html')
   
         
     #line 318  
