@@ -1,0 +1,137 @@
+<!--Information Page by Muneeb Khan-->
+<!--Updated by Muneeb and Viraj-->
+<!--CSS Updated by Miqdad and integrated by Muneeb-->
+<!doctype html>
+<html lang="en" class="h-100">
+  <head>
+    <meta charset="utf-8">
+    <title>StockSim: Learn How to Trade</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel = "stylesheet" href = "/static/stylesheets/newStyle.css">
+    <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body class="d-flex flex-column h-100">
+    
+<header>
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(33, 103, 42)">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="information">
+        <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
+        StockSim: Learn How to Trade
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item">
+            <a class="nav-link" href="home">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="aboutus">About Us</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="information">Information</a>
+          </li>
+          {% if session['user'] %}
+          <li class="nav-item">
+            <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
+          </li>
+          <li class="nav-item">
+            <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
+          </li>
+          <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
+            <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
+              <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Start a simulation!</button>
+            </form>
+            <script type="text/javascript">
+              if ({{ session['loginFlagPy'] }} == 0 || {{ session['simulationFlag'] }} == 1 ) { 
+                document.getElementById('stockSimButton').style.display = "none";
+              }
+            </script>
+          </li>
+          <li>
+            <form id="nav-link" action="/simulation" method="post"> 
+              <button class = "btn btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="goToSim">Go to Current Sim!</button>
+            </form>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('goToSim').style.display = "none";
+              }
+            </script>  
+          </li>
+          {% else %}
+          <li class="nav-item">
+            <a class = "nav-link" method = "POST" href = "login">Login</a> 
+          </li>
+          <li class = "nav-item">
+            <a class = "nav-link" method = "POST" href = "register">Register</a>
+          </li>
+        {% endif %}
+          <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
+        </ul>
+        <form action="/stockSearch" method="post">
+                  <input type="search" name="searchTerm" placeholder="Find a stock..."
+                          value="{{ request.form['searchTerm'] }}">
+                  <button>Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<br><br><br><br><br><br>
+
+<body class = "info">
+    <section>
+        <div>
+            <h1>Information</h1>
+        </div>
+        <div class = infomain>
+            <div class = "card w-75 d-flex justify-content-left" style= "padding-top: 20px; padding-bottom: 20px;">
+              <div class = "card-header">
+              <h2>Graph Pictures</h2>
+              </div>
+                <div class = "card-body">
+                    <h5 class = "card-text">
+                        The following page shows examples of stock graphs.
+                        The first graph below is an example of Googles shares overtime.
+                        <br><br>
+                        <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = "90%" height = "90%" display = "d-flex" class = "stock" />
+                        <br><br>
+                    </h5>
+                </div> 
+
+                <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
+                      <h5 class = "card-text">
+                        Another graph example below shows Amazons shares overtime.
+                        <br><br>
+                        <img src = "{{url_for('static', filename='Graphexample2.jpg')}}" width = "90%" height = "90%" display = "d-flex" class = "stock" />
+                        <br><br>
+                      </h5>
+                </div>
+
+                <div class = "card-body">
+                      <h5 class = "card-text">
+                        Stock graphs may also display as bar grahps, here is Ford's stocks for example in a bar graph
+                        <br><br>
+                        <img src = "{{url_for('static', filename='Graphexample3.jpg')}}" width = "90%" height = "90%" display = "d-flex" class = "stock" />
+                      </h5>
+                </div>
+
+             </div>
+        </div>
+
+    </section>
+      <footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
+        <div class="container">
+          <span>Copyright 2022 by StockSim</span>
+        </div>
+      </footer>
+      
+      <script src="/static/jsStyle/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -265,6 +265,20 @@ def StockDefinitions():
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
 
+# Route for Graph pictures page - Muneeb Khan
+@app.route("/graphPictures")
+def graphPictures():
+    if('user' in session):
+        person = dbfire.collection('Users').where('Email', '==', session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
+
+        for x in person.get():
+            person = x.to_dict()
+
+        return render_template("graphPictures.html", person = person)
+    else:
+        flash("Sorry you must be logged in to view that page.")
+        return redirect(url_for("login"))
+
 ## stockSim
 #   Description: Brings the logged in user to the stock sim start page, if the user
 #   isn't logged in, a 404 page error is given.
@@ -296,7 +310,11 @@ def startSimulation():
                                         request.form['simEndDate'], request.form['initialCash'])
                 sim.createSim()
                 session['simName'] = sim.simName
-                return render_template('simulation.html', person=session['user'])
+                #if ('user' in session):
+                #    portfoliolist = portfolio(dbfire, stock, session['user'], session['simName'], session['initialCash'])
+                #    session['Profit'] = portfolio.get_profit()
+                #    session['cashUsed'] =int(session['portfolioValue'] - session['currentCash'])               
+                #return render_template('simulation.html', person=session['user'], profit = session['Profit'])
         except KeyError:
             print("KeyError occured: startSimulation")
             return redirect(url_for('fourOhFour'))
@@ -317,6 +335,12 @@ def goToSimulation():
                 session['currentCash'] = sim.currentCash
                 session['portfolioValue'] = sim.initialCash
                 session['simName'] = sim.simName
+                #if ('user' in session):
+                #    portfoliolist = portfolio(dbfire, stock, session['user'], session['simName'], session['initialCash']).
+                #    session['Profit'] = portfolio.get_profit()
+                #    session['cashUsed'] =int(session['portfolioValue'] - session['currentCash'])               
+                #    return render_template('simulation.html', person=session['user'], profit = session['Profit'])
+                
                 return render_template('simulation.html', person=session['user'])
         except KeyError:
             print("KeyError occured: startSimulation")
@@ -527,8 +551,10 @@ def fourOhFour():
 
 
 #Author: Viraj Kadam
-@app.route("/simulation") #Retrieving info from portolio file
-def Portfolio():
+#Update: Portfolio is now located in (/startSimulation) route
+
+#@app.route("/startSimulation") #Retrieving info from portolio file
+#def Portfolio():
     #if ('user' in session):
     #    try:
     #        if request.method == 'POST':
@@ -557,9 +583,12 @@ def Portfolio():
     #line 318  
     
     
-    if('user' in session):
-        portfolioList = portfolio.portfolioList(dbfire)
-        return render_template('simulation.html', portfolioList = portfolioList)
+   # if'user' in session:
+    #    portfoliolist = portfolio.portfolioList(dbfire)
+     #   session['Profit'] = portfolio.get_profit()
+      #  session['cashUsed'] = session['portfolioValue'] - session['currentCash']
+        
+       # return render_template('simulation.html', portfoliolist = portfoliolist)
 
 
 ## Need to complete this setup route for the dashboard, will show up to the user once they have started the simulation. 

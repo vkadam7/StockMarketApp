@@ -93,30 +93,34 @@
                 <th>Initial Money: </th>
                 <td> $ {{session['portfolioValue']}}</td>
               </tr>
-                <tr>
-                    <th>Current Money: </th>
-                    <td>${{ session['currentCash'] }}</td>
-                </tr>
-                <tr>
-                    <th>Money Used: </th>  
-                    <td>{{ session['cashUsed'] }}</td>
-                </tr>  
-                <tr>
-                    <th>Name: </th>
-                    <td>{{ session['user'] }}</td>
-                </tr>
-                <tr>
-                  <th> Profit: </th>
-                  <td> {{session ['Profit'] }}</td>
-                </tr>
-                <tr>
-                  <th> Gain/Loss: </th>
-                  <td> {{session['NetGainorLoss']}}
+              <tr>
+                  <th>Current Money: </th>
+                  <td>${{ session['currentCash'] }}</td>
+              </tr>
+              <tr>
+                <th>Money Used: </th>  
+                <td>{{ session['cashUsed'] }}</td>
+              </tr>  
+              <tr>
+                <th>Name: </th>
+                <td>{{ session['user'] }}</td>
+              </tr>
+              <tr>
+                <th> Profit: </th>
+                <td> {{session ['Profit'] }}</td>
+              </tr>
+              <tr>
+                <th> Gain/Loss: </th>
+                <td> {{session['NetGainorLoss']}}</td>
+              </tr>
             </table>
 
             <h3> Your Information: </h3>
-            <br> {% for Portfolio in portfolioList%}
-            {{portfolioList}}
+            <br> 
+            {% for orders in portfoliolist%}
+
+            {{portfoliolist}}
+
             {%endfor%}
           </br>
         </div>
