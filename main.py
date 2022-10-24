@@ -506,29 +506,27 @@ def stockAvailability():
 @app.route("/Userlist")
 def userlists():
     if ('user' in session):
-        try:
-            newuserlist = User.userList(firebase.database())
-            for x in newuserlist.get():
-                newuserlist = x.to_dict
+       # try:
+            newuserlist = User.userList(dbfire)
 
-            return redirect(url_for('Userlist.html',newuserlist = newuserlist))
-        except:
-            return redirect(url_for('404Error.html'))
+            return render_template('Userlist.html',newuserlist = newuserlist)
+       # except:
+        #    return redirect(url_for('fourOhFour'))
 
 #Testing the Order list
 #Will remove after successful test - Muneeb Khan
-@app.route("/orderList",methods=['POST','GET'])
+@app.route("/orderList")
 def orderlists():
-    if request.method == 'POST':
-        orderlist = dbfire.collection('Orders') # This will have the username show on webpage when logged in - Muneeb Khan
-        for x in orderlist.get():
-            orderlist = x.to_dict()
-        return render_template('orderList.html',orderlist = orderlist)
+    if ('user' in session):
+
+            orderlist = Order.orderList(dbfire) # This will have the username show on webpage when logged in - Muneeb Khan
+
+            return render_template('orderList.html',orderlist = orderlist)
 
 ## 
 @app.route('/404Error')
 def fourOhFour():
-    return render_template('404Error.html')
+    return render_template('404Error.html',person = session['user'])
 #Author: Viraj Kadam
 @app.route('/displayInfo') #Retrieving info from portolio file
 def Portfolio():
