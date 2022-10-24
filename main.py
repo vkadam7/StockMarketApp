@@ -524,13 +524,13 @@ def fourOhFour():
 def Portfolio():
     if ('user' in session):
     
-                session['simulationFlag'] = 1
-                session['simulation'] = {
+            session['simulationFlag'] = 1
+            session['simulation'] = {
                     'simStartDate': request.form['simStartDate'],
                     'simEndDate': request.form['simEndDate'],
                     'initialCash': request.form['initialCash',]
                 }
-                Portfolio = portfolio(dbfire, session['user'], portfolio.get_profit,
+            Portfolio = portfolio(dbfire, session['user'], portfolio.get_profit,
                                 portfolio.funds_remaining, request.form['initialCash'])
                 
                 
@@ -538,21 +538,23 @@ def Portfolio():
                #    'Profit': portfolio.get_profit,
                #     'Funds_remaining': portfolio.funds_remaining,
                #     'initialCash': request.form['initialCash'],
-               #     'currentCash': Simulation['currentCash'],
-                    
+               #     'currentCash': Simulation['currentCash'], 
               #  }
               
-                #session['portfolio'] = {
-                #  'Profit': request.form['profit'], 
-                #  'currentCash': request.form['currentCash'], 
-                #  'initialCash': request.form['initialCash']
-                #}
-                session['Profit']: portfolio.get_profit
+            session['portfolio'] = {
+                  'Profit': request.form['profit'], 
+                  'currentCash': request.form['currentCash'], 
+                  'initialCash': request.form['initialCash']
+                }
+            #session['Profit']: flash(portfolio.get_profit)
+            session['Funds_remaining']: portfolio.funds_remaining(dbfire, initialAmount = session['portfolioValue'], finalAmount = session['currentCash'])
+            session['Profit']: portfolio.get_profit(dbfire, quantity=session['quantity'], )
+            session['GainorLoss']: portfolio.percentChange(dbfire)
     
               
                 #sim.displayInfo
                 #session['simName'] = sim.simName
-                return render_template('simulation.html')
+            return render_template('simulation.html')
   
         
     #line 318  

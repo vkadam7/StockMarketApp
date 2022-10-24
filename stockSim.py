@@ -724,6 +724,9 @@ class portfolio:
         currentCash = self.db.collection('Simulations').document(self.sim).document('currentCash').get()
         currentPrice = Simulation.currentPriceOf
         day = datetime()
+        
+        
+        stocksOwned = self.db.collection('Orders').document(self.sim).document('ticker')
 
         if quanity > 0:    
             if currentCash > currentPrice:
@@ -760,12 +763,11 @@ class portfolio:
                 'startDate': self.startDate,
                 'endDate': self.endDate,
                 'initialCash': self.initialCash,
-                'currentCash': 0,
+                'currentCash': self.currentCash,
                 'score': 0,
                 'Orders': []  
         }
-    
-        
+
         if Order.buyOrder() == True:
             if data ['currentCash'] == data['initialCash']:
                 return data['currentCash']
@@ -793,7 +795,7 @@ class portfolio:
     #Updated by Muneeb Khan
     def percentChange(self,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
 
-        quantity = 0
+        
         percentIncrease = 0
         AdjustClose = 0
 
@@ -801,13 +803,14 @@ class portfolio:
        #Need more inquiry
        # newstockPrice = self.db.collection('IntradayStockData').document('daily').document('closes').get()
         stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
-
-        if quantity > 0:
-            for stockPrice in day: 
-                increase = newstockPrice[day+1] - stockPrice[day]
-                    
-            percentIncrease = (increase/stockPrice) * 100
-            return percentIncrease
+        stock=  self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream()
+        quantity = self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('quantity', '==', self.stock['quantity']).stream()
+        for i in stock:
+             if quantity > 0:
+                for stockPrice in day: 
+                    increase = newstockPrice[day+1] - stockPrice[day]
+                percentIncrease = (increase/stockPrice) * 100
+                return percentIncrease
         else:
             return -1     
         
@@ -815,7 +818,7 @@ class portfolio:
     #Graph of user stocks   (Need buy and sell info)
     def user_graph(self, db):
         prices = self.db.collection('IntradayStockData').document('prices').get()
-        dates = self.db.collection('IntradayStockData').document('dates').get
+        dates = self.db.collection('IntradayStockData').document('dates').get()
         for x in prices:
             plt.plot(x[dates][prices])
             
