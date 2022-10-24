@@ -310,11 +310,11 @@ def startSimulation():
                                         request.form['simEndDate'], request.form['initialCash'])
                 sim.createSim()
                 session['simName'] = sim.simName
-                #if ('user' in session):
-                #    portfoliolist = portfolio(dbfire, stock, session['user'], session['simName'], session['initialCash'])
-                #    session['Profit'] = portfolio.get_profit()
-                #    session['cashUsed'] =int(session['portfolioValue'] - session['currentCash'])               
-                #return render_template('simulation.html', person=session['user'], profit = session['Profit'])
+                if ('user' in session):
+                    portfoliolist = portfolio(dbfire, stock, session['user'], session['simName'], session['initialCash'])
+                    session['Profit'] = portfolio.get_profit()
+                    session['cashUsed'] =int(session['portfolioValue'] - session['currentCash'])               
+                return render_template('simulation.html', person=session['user'], profit = session['Profit'])
         except KeyError:
             print("KeyError occured: startSimulation")
             return redirect(url_for('fourOhFour'))
