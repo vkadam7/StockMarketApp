@@ -87,10 +87,10 @@
         
         <h3>Order list</h3>
         <br>
-        <p> {{orderlist}}</p>
+        {% for orders in orderlist%}
+          {{orderlist}}
+        {% endfor %}
         <br>
-        <br>
-
     <footer class="footer mt-auto py-3" style = "background-color:rgb(15, 158, 230)">
         <div class="container">
             <span>Copyright 2022 by StockSim</span>
