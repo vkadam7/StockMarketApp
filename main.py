@@ -4,6 +4,7 @@ from asyncio.windows_events import NULL
 from datetime import datetime
 import math
 from operator import mod
+import re
 from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
@@ -282,19 +283,24 @@ def startSimulation():
     if ('user' in session):
         try:
             if request.method == 'POST':
-                session['simulationFlag'] = 1
-                session['simulation'] = {
-                    'simStartDate': request.form['simStartDate'],
-                    'simEndDate': request.form['simEndDate'],
-                    'initialCash': request.form['initialCash']
-                }
-                session['currentCash'] = request.form['initialCash']
-                session['portfolioValue'] = request.form['initialCash']
-                sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
-                                        request.form['simEndDate'], request.form['initialCash'])
-                sim.createSim()
-                session['simName'] = sim.simName
-                return render_template('simulation.html', person=session['user'])
+                pattern = re.compile("^\d+(.\d{1,2})?$")
+                if pattern.match(request.form['initialCash']):
+                    session['simulationFlag'] = 1
+                    session['simulation'] = {
+                        'simStartDate': request.form['simStartDate'],
+                        'simEndDate': request.form['simEndDate'],
+                        'initialCash': request.form['initialCash']
+                    }
+                    session['currentCash'] = request.form['initialCash']
+                    session['portfolioValue'] = request.form['initialCash']
+                    sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
+                                            request.form['simEndDate'], request.form['initialCash'])
+                    sim.createSim()
+                    session['simName'] = sim.simName
+                    return render_template('simulation.html', person=session['user'])
+                else:
+                    flash("Please enter a valid cash amount.")
+                    return render_template('stockSimForm.html', person=session['user'])
         except KeyError:
             print("KeyError occured: startSimulation")
             return redirect(url_for('fourOhFour'))
@@ -336,9 +342,13 @@ def orderFormFill():
 
 @app.route("/orderCreate", methods=['POST', 'GET'])
 def orderCreate():
-    session['orderQuantity'] = request.form['stockQuantity']
-    session['orderPrice'] = round(int(session['orderQuantity']) * session['currentPrice'], 2)
-    return render_template('orderConfirmation.html', stock=stock, option=session['option'])
+    if request.form['stockQuantity'].isnumeric():
+        session['orderQuantity'] = request.form['stockQuantity']
+        session['orderPrice'] = round(int(session['orderQuantity']) * session['currentPrice'], 2)
+        return render_template('orderConfirmation.html', stock=stock, option=session['option'])
+    else:
+        flash("Please enter a valid quantity amount")
+        return render_template('orderForm.html', stock=stock, option=session['option'])
 
 @app.route("/orderConfirm", methods=['POST', 'GET'])
 def orderConfirm():
@@ -349,6 +359,7 @@ def orderConfirm():
     else:
         flag = order.sellOrder()
     if flag == 1:
+        flash("Order Complete!")
         session['currentCash'] = Simulation.retrieveCurrentCash(dbfire, session['simName'])
         return render_template('simulation.html', person=session['user'])
     elif session['option'] == 'Buy' and flag == -1:
