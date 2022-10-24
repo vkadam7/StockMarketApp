@@ -87,12 +87,13 @@
             <h3>Your holdings:</h3>
             <table>
                 <tr>
-                    <th>Current Money:</th>
-                    <td>${{ session['currentCash'] }}</td>
-                    <td>${{ session['quantity'] }}</td>
-                    <td>${{ session['name'] }}</td>
-                    <td>${{ session['profit'] }}</td>
-                    <td>${{ session['funds_remaining'] }}</td>
+                    <th>Starting Amount: </th>
+                    <td>${{ session['portfolioValue'] }}</td>
+                </tr>
+                <tr>
+                  <th>Current Amount: </th>
+                  <td>$ {{session['currentCash']}}</td>
+                
                 </tr>
                 <tr>
                     
