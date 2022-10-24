@@ -81,6 +81,18 @@
                 <br>
                 <button>Start Simulation!</button>
             </form>
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}   
+              {% for message in messages %}
+              <div class ="alert alert-warning alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              {% endfor %} 
+              {% endif %} 
+            {% endwith %} 
         </div>
         <footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
             <div class="container">
