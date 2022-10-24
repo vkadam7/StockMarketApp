@@ -2,6 +2,7 @@ from ast import Constant, Or
 from mimetypes import init
 from queue import Empty
 from re import search
+from statistics import mean
 from this import d
 from time import daylight
 import numpy as np
@@ -641,6 +642,9 @@ class Order:
         
         return ownageFlag
 
+    def retrieve(db, sim, ticker):
+        return db.collections('Orders').where('simulation','==',sim).where('ticker','==',ticker).stream()
+
     # List of Orders by Muneeb Khan
     def orderList(self):
         quantityOwned = 0
@@ -669,50 +673,69 @@ class Order:
         return orders
     
 class portfolio:
-    def __init__(self, db, stock, user, quantity, stockPrice, startDate, simulation, initialCash, totalPrice, profit, fundsRemaining,
-                 currentCash):
+    def __init__(self, db, stock, user, simulation, initialCash):
             self.firebase = db
             self.stock = stock
             self.user = user
             self.initialCash = initialCash
-            self.stockPrice = stockPrice
             self.sim = simulation 
-            self.fundsRemaining = fundsRemaining
-            self.dayofPurchase = datetime.datetime.now()
-            self.currentCash = currentCash
-            self.profit = profit      
+            #self.fundsRemaining = fundsRemaining
+            #self.dayofPurchase = datetime.datetime.now()
+            self.currentCash = Simulation.retrieveCurrentCash(db, simulation)
+            self.orderList = Order.retrieve(db, stock, user)
     
-    def retrieve(self, id):
-        stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
-        return stockRetrieved
+    #def retrieve(self, id):
+    #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
+    #    return stockRetrieved
 
+    #round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
     #Returns profit from the simulator(Need to test and fix if needed )
-    def get_profit(self, db, stock, quantity, avgstockPrice):
-        data = {'name' : self.name, 
-                'quantity': self.quantity, 
-                'avgStockPrice': self.avgStockPrice}
-        profit = 0
-        quantity = self.db.collection('Orders').document('quantity').get()
-        if Order.buyOrder() == True:
-            tempPrice = self.db.collection('Order').document('avgStockPrice').get()
-            quantity = self.db.collection('Orders').document('quantity').get()
-            profit += tempPrice * quantity
-            return profit
-        elif Order.sellOrder() == True:
-            tempPrice = self.db.collection('Order').document('avgStockPrice').get()
-            quantity = self.db.collection('Orders').document('quantity').get()
-            profit -= tempPrice * quantity
-            return profit
+    def get_profit(self):
+        currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
+        prices = []
+        amountOfSharesOwned = 0
+        for entry in self.orderList:
+            temp = entry.to_dict()
+            prices.append(temp['totalPrice'])
+            if temp.get('newQuantity') != None:
+                amountOfSharesOwned += temp['newQuantity']
+            else:
+                amountOfSharesOwned += temp['quantity']
+        avgPriceOfOrders = mean(prices)
+        currentValueOfShares = currentPriceOfStock * amountOfSharesOwned
+        return round(currentValueOfShares - avgPriceOfOrders, 2)
+
+        #profit = 0
+        #quantity = self.db.collection('Orders').document('quantity').get()
+        #if Order.buyOrder() == True:
+        #    tempPrice = self.db.collection('Order').document('avgStockPrice').get()
+        #    quantity = self.db.collection('Orders').document('quantity').get()
+        #    profit += tempPrice * quantity
+        #    return profit
+        #elif Order.sellOrder() == True:
+        #    tempPrice = self.db.collection('Order').document('avgStockPrice').get()
+        #    quantity = self.db.collection('Orders').document('quantity').get()
+        #    profit -= tempPrice * quantity
+        #    return profit
             
     #Displays amount of shares owned (To also be implemented later)
-    def weight(self, db, stock):
-        share = [self.quantity]
-        max_share = 1
-        for share in max_share:
-            if(self.quantity <= max_share and self.quantity >= 0):
-                return share[self.quantity]
+    def weight(self):
+        quantity = 0
+        for entry in self.orderList:
+            temp = entry.to_dict()
+            if temp.get('newQuantity') != None:
+                quantity += temp['newQuantity']
             else:
-                return -1   
+                quantity += temp['quantity']
+        return quantity
+
+        #share = [self.quantity]
+        #max_share = 1
+        #for share in max_share:
+        #    if(self.quantity <= max_share and self.quantity >= 0):
+        #        return share[self.quantity]
+        #    else:
+        #        return -1   
         
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
     def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
