@@ -83,7 +83,7 @@
         <div class="stockList">
             <h3>Available stocks:</h3>
         </div>
-        <div class = session{'portfolio'}>
+        <div class = {{ session['portfolio'] }}>
             <h3>Your holdings:</h3>
             <table>
               <tr>
@@ -106,12 +106,6 @@
                   <th>Profit: </th>
                   <td> ${{ session['Profit'] }}</td>
                 </tr>
-                <tr>
-                    <th>Amount Remaining: </th> 
-                    <td>${{ session['Funds_remaining']}}</td>
-                </tr>
-                
-                <tr>
             </table>
         </div>
         <div class="orderListButton">

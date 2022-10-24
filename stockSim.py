@@ -11,7 +11,6 @@ import firebase_admin
 from firebase_admin import firestore
 from google.cloud.firestore import ArrayUnion
 import datetime
-import matplotlib.pyplot as plt
 
 DAYS_IN_MONTH = {
     1 : 31,
@@ -737,6 +736,16 @@ class portfolio:
         #    else:
         #        return -1   
         
+
+    #
+    #
+    #
+    #
+    # I dont think this is necessary - Ian
+    #               |
+    #               |
+    #               |
+    #               V
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
     def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
           #tempData = self.db.collection('Simulations').document(self.sim).document('Orders').get()
@@ -772,7 +781,15 @@ class portfolio:
                  return netGainorLoss
 
       
-                           
+    #
+    #
+    #
+    #
+    # Calculated by: self.currentCash = Simulation.retrieveCurrentCash(db, simulation)
+    #               |
+    #               |
+    #               |
+    #               V                     
      #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
     def funds_remaining(self, initialAmount, finalAmount):
         finalAmount = 0
@@ -839,15 +856,15 @@ class portfolio:
         
     #Author: Viraj Kadam    
     #Graph of user stocks   (Need buy and sell info)
-    def user_graph(self, db):
-        prices = self.db.collection('IntradayStockData').document('prices').get()
-        dates = self.db.collection('IntradayStockData').document('dates').get()
-        for x in prices:
-            plt.plot(x[dates][prices])
-            
-        plt.xlabel('Date')
-        plt.ylabel('Price')
-        plt.show
+    #def user_graph(self, db):
+    #   prices = self.db.collection('IntradayStockData').document('prices').get()
+    #    dates = self.db.collection('IntradayStockData').document('dates').get()
+    #    for x in prices:
+    #        plt.plot(x[dates][prices])
+    #        
+    #    plt.xlabel('Date')
+    #    plt.ylabel('Price')
+    #    plt.show
             
         
         
