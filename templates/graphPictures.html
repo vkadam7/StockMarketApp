@@ -94,20 +94,33 @@
               <div class = "card-header">
               <h2>Graph Pictures</h2>
               </div>
-                <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
+                <div class = "card-body">
                     <h5 class = "card-text">
-                        Below is an example of Googles shares overtime.
+                        The following page shows examples of stock graphs.
+                        The first graph below is an example of Googles shares overtime.
                         <br><br>
                         <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = "90%" height = "90%" display = "d-flex" class = "stock" />
                         <br><br>
-                        Another example below shows Amazons shares overtime.
-                        <br><br>
-                        
                     </h5>
-                </div>
-              <br>
+                </div> 
 
-                <br>
+                <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
+                      <h5 class = "card-text">
+                        Another graph example below shows Amazons shares overtime.
+                        <br><br>
+                        <img src = "{{url_for('static', filename='Graphexample2.jpg')}}" width = "90%" height = "90%" display = "d-flex" class = "stock" />
+                        <br><br>
+                      </h5>
+                </div>
+
+                <div class = "card-body">
+                      <h5 class = "card-text">
+                        Stock graphs may also display as bar grahps, here is Ford's stocks for example in a bar graph
+                        <br><br>
+                        <img src = "{{url_for('static', filename='Graphexample3.jpg')}}" width = "90%" height = "90%" display = "d-flex" class = "stock" />
+                      </h5>
+                </div>
+
              </div>
         </div>
 

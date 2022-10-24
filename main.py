@@ -263,6 +263,20 @@ def StockDefinitions():
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
 
+# Route for Graph pictures page - Muneeb Khan
+@app.route("/graphPictures")
+def graphPictures():
+    if('user' in session):
+        person = dbfire.collection('Users').where('Email', '==', session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
+
+        for x in person.get():
+            person = x.to_dict()
+
+        return render_template("graphPictures.html", person = person)
+    else:
+        flash("Sorry you must be logged in to view that page.")
+        return redirect(url_for("login"))
+
 ## stockSim
 #   Description: Brings the logged in user to the stock sim start page, if the user
 #   isn't logged in, a 404 page error is given.
