@@ -39,6 +39,9 @@
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
+          <li class="nav-item">
+            Hello {{person['Name']}}
+          </li>
           <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
             <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
               <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Start a simulation!</button>
@@ -83,41 +86,55 @@
         <div class="stockList">
             <h3>Available stocks:</h3>
         </div>
-        <div class = {{ session['portfolio'] }}>
+        <div class = {{session['Portfolio'] }}>
             <h3>Your holdings:</h3>
             <table>
               <tr>
                 <th>Initial Money: </th>
-                <td> $ {{session['initialCash']}}</td>
+                <td> $ {{session['portfolioValue']}}</td>
               </tr>
                 <tr>
                     <th>Current Money: </th>
                     <td>${{ session['currentCash'] }}</td>
                 </tr>
                 <tr>
-                    <th>Quantity: </th>  
-                    <td>{{ session['quantity'] }}</td>
+                    <th>Money Used: </th>  
+                    <td>{{ session['cashUsed'] }}</td>
                 </tr>  
                 <tr>
                     <th>Name: </th>
                     <td>{{ session['user'] }}</td>
                 </tr>
                 <tr>
-                  <th>Profit: </th>
-                  <td> ${{ session['Profit'] }}</td>
+                  <th> Profit: </th>
+                  <td> {{session ['Profit'] }}</td>
                 </tr>
+                <tr>
+                  <th> Gain/Loss: </th>
+                  <td> {{session['NetGainorLoss']}}
             </table>
+
+            <h3> Your Information: </h3>
+            <br> {% for Portfolio in portfolioList%}
+            {{portfolioList}}
+            {%endfor%}
+          </br>
         </div>
         <div class="orderListButton">
             <a href="orderList">Order History</a>
-        </div>
-        <form action="/finishSimulation">
-           <div>  
-                <button>Finish the Simulation</button>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}   
+            {% for message in messages %}
+            <div class ="alert alert-warning alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-        
-        </form>
-    
+            {% endfor %} 
+        {% endif %} 
+        {% endwith %} 
+
     </body>
     <br><br>
     

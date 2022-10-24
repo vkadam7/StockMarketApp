@@ -5,6 +5,7 @@ from re import search
 from statistics import mean
 from this import d
 from time import daylight
+from main import orderlists
 import numpy as np
 import pandas as pd
 import firebase_admin
@@ -833,7 +834,7 @@ class portfolio:
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
-    def percentChange(self,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
+    def percentChange(self, quantity, stockPrice, newstockPrice, day):
 
         
         percentIncrease = 0
@@ -869,13 +870,19 @@ class portfolio:
         
         
     #Display all information
-    def displayInfo(self, close):
-        print(self.percentChange)
-        print(self.returns)
-        print(self.funds_remaining)
-
-        print(self.get_profit)
-        if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
-            print("Gains: +" + self.GainorLoss)
-        elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
-            return
+    def portfolioList(self, db):
+        self.percentChange = 0
+        self.get_profit = 0
+        portfolioList = []
+        
+        if Order.doTheyOwnThat() == True:
+            for entry in  db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).get():
+                temp = entry.to_dict()
+                portfolioList.append([temp['ticker']], temp['buyOrSell'], temp['quantity'], temp['totalPrice'])
+            df = pd.DataFrame(portfolioList, columns=['ticker', 'buyOrSell', 'quantity', 'totalPrice'])
+            print(df)
+            return df
+        else:
+            return -1
+            
+            
