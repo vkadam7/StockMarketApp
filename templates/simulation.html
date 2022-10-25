@@ -83,24 +83,57 @@
         <div class="stockList">
             <h3>Available stocks:</h3>
         </div>
-        <div class="portfolio">
-            <h3>Your holdings:</h3>
-            <table>
-                <tr>
-                    <th>Starting Amount: </th>
-                    <td>${{ session['portfolioValue'] }}</td>
-                </tr>
-                <tr>
-                  <th>Current Amount: </th>
-                  <td>$ {{session['currentCash']}}</td>
-                
-                </tr>
-                <tr>
-                    
-                </tr>
-            </table>
+        <div class = 'sessionInfo'>
+          <h5>Remaining Cash: </h5>
+          <p>${{ session['currentCash'] }}</p>
         </div>
-        <div class="orderListButton">
+        <div class="portfolio">
+          <table>
+
+           </table>
+          <script type="text/javascript">
+            let tickersList = {{tickers|safe}}
+            let quantList = {{quantities|safe}}
+            let profitList = {{profits|safe}}
+
+            let portfolio = [];
+            for (let i = 0; i < tickersList.length; i++) {
+              portfolio.push({
+                Shares: tickersList[i],
+                Quantity: quantList[i],
+                Profit: profitList[i]
+              })
+            }
+
+            function generateTableHead(table, data) {
+              let thead = table.createTHead();
+              let row = thead.insertRow();
+              for (let key of data) {
+                let th = document.createElement("th");
+                let text = document.createTextNode(key);
+                th.appendChild(text);
+                row.appendChild(th);
+              }
+            }
+
+            function generateTable(table, data) {
+              for (let element of data) {
+                let row = table.insertRow();
+                for (key in element) {
+                  let cell = row.insertCell();
+                  let text = document.createTextNode(element[key]);
+                  cell.appendChild(text);
+                }
+              }
+            }
+
+            let table = document.querySelector("table");
+            let data = Object.keys(portfolio[0]);
+            generateTable(table, portfolio); 
+            generateTableHead(table, data);
+            </script>
+          </div>
+                  <div class="orderListButton">
             <a href="orderList">Order History</a>
         {% with messages = get_flashed_messages() %}
         {% if messages %}   
