@@ -91,10 +91,10 @@
                 <td> $ {{session['initialCash']}}</td>
               </tr>
                 <tr>
-<<<<<<<<< Temporary merge branch 1
+
                     <th>Current Money: </th>
                     <td>${{ session['currentCash'] }}</td>
-=========
+
                     <th>Starting Amount: </th>
                     <td>${{ session['portfolioValue'] }}</td>
                 </tr>
@@ -102,7 +102,7 @@
                   <th>Current Amount: </th>
                   <td>$ {{session['currentCash']}}</td>
                 
->>>>>>>>> Temporary merge branch 2
+
                 </tr>
                 <tr>
                     
@@ -111,15 +111,17 @@
 
             <h3> Your Information: </h3>
             <br> 
-            {% for orders in portfoliolist%}
-
-            {{portfoliolist}}
-
-            {%endfor%}
           </br>
         </div>
         <div class="NewPortfolio">
-          
+          <table class = "table table-light">
+            <thead>
+              <tr>
+                {%for portfolio in Portfolio%}
+                <th scope = "col"> {{Portfolio}}</th>
+          {% endfor %}
+          <tr>
+            
           </div>
           <script>
             function portfolioTable(table, pf){
@@ -134,7 +136,7 @@
             }
 
             let portTable = document.querySelector("table");
-            let pf = {{ portfolio }}
+            let pf = {{ Portfolio }}
             portfolioTable(portTable, pf);
             </script>
         <div class="orderListButton">

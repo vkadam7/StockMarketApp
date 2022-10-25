@@ -10,5 +10,5 @@ function portfolioTable(table, pf){
 }
 
 let portTable = document.querySelector("table");
-let pf = { portfolio }
+let pf = {{ Portfolio}}
 portfolioTable(portTable, pf);

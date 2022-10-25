@@ -313,7 +313,7 @@ def startSimulation():
 
                 Portfolio = portfolio(dbfire, session['user'], session['ticker'], session['simName'], session['initialCash'])
 
-                return render_template('simulation.html', person=session['user'], pf=Portfolio)
+                return render_template('simulation.html', person=session['user'], pf=portfolio)
             pattern = re.compile("^\d+(.\d{1,2})?$")
             if pattern.match(request.form['initialCash']):
                     session['simulationFlag'] = 1
