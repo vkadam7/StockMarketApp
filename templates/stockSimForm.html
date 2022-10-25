@@ -83,12 +83,12 @@
     <body>
         <div class = "centering">
             <h1>Starting the simulation:</h1>
-            <h3>Just need to enter some details to get the simulation started!</h3>
+            <h4>Just need to enter some details to get the simulation started!</h4>
             <hr>
         </div>
         
             <div class="container">
-              <div class="row justify-content-center" style = "margin-left: 40%;margin-right: 20%;">
+            <div class="row justify-content-center" style = "margin-left: 40%;margin-right: 20%;">
             <form action="/startSimulation" method="post">
               <div class = "form-row align-items-center" style = "box-sizing: 0;">
                 <div class = "form-group col-md-5">
@@ -102,19 +102,20 @@
                 </div>
               </div>
               <br>
-              <div class = "form-row align-items-center">
-                <div class = "form-group col-md-2">
-                  <label for="Money">Starting Cash for Simulation:</label>
+              <div class = "form-row align-items-center" style = "box-sizing: 0;">
+                <div class = "form-group col-md-8">
+                  <label for="Money">Simulation Starting Cash:</label>
                   <input type="Money" name="initialCash" value="{{ request.form['initialCash'] }}" placeholder="Enter an amount...">
                 </div>
                 <br>
-                <button class = "btn btn-block" style = "background-color: green;color: white;">Start Simulation!</button>
+                <button class = "btn btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Start Simulation!</button>
               </div>
             </form>
+
             {% with messages = get_flashed_messages() %}
             {% if messages %}   
               {% for message in messages %}
-              <div class ="alert alert-warning alert-dismissible fade show" role="alert">
+              <div class ="alert alert-warning alert-dismissible fade show" style = "text-align: center" role="alert">
                   {{ message }}
                   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -124,11 +125,7 @@
               {% endif %} 
             {% endwith %} 
         </div>
-        <footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
-            <div class="container">
-              <span>Copyright 2022 by StockSim</span>
-            </div>
-            </div>
+        </div>
     </body>
 
     <footer class="footer mt-auto py-3 fixed-bottom" style = "background-color:rgb(33, 103, 42)">

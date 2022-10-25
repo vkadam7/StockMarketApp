@@ -79,11 +79,11 @@
     </header>
     <br><br><br>
     <body>
-    
+    <div class = "centering">
         <div class="stockList">
             <h3>Available stocks:</h3>
         </div>
-        <div class = {{session['Portfolio'] }}>
+        <div class = {{ session['portfolio'] }}>
             <h3>Your holdings:</h3>
             <table>
               <tr>
@@ -91,60 +91,46 @@
                 <td> $ {{session['initialCash']}}</td>
               </tr>
                 <tr>
-
                     <th>Current Money: </th>
                     <td>${{ session['currentCash'] }}</td>
 
-                    <th>Starting Amount: </th>
-                    <td>${{ session['portfolioValue'] }}</td>
-                </tr>
-                <tr>
-                  <th>Current Amount: </th>
-                  <td>$ {{session['currentCash']}}</td>
-                
+           </table>
+          <script type="text/javascript">
+            let tickersList = {{tickers|safe}}
+            let quantList = {{quantities|safe}}
+            let profitList = {{profits|safe}}
 
-                </tr>
-                <tr>
-                    
-                </tr>
-            </table>
+            let portfolio = [];
+            for (let i = 0; i < tickersList.length; i++) {
+              portfolio.push({
+                Shares: tickersList[i],
+                Quantity: quantList[i],
+                Profit: profitList[i]
+              })
+            }
 
-            <h3> Your Information: </h3>
-            <br> 
-          </br>
-        </div>
-        <div class="NewPortfolio">
-          <table class = "table table-light">
-            <thead>
-              <tr>
-                {%for portfolio in Portfolio%}
-                <th scope = "col"> {{Portfolio}}</th>
-          {% endfor %}
-          <tr>
-            
-          </div>
-          <script>
-            function portfolioTable(table, pf){
-                let portHeader = table.createTHead();
-                let headRow = table.insertRow();
-                for (let entry of pf) {
-                    let th = document.createElement('th');
-                    let text = doculment.createTextNode(entry);
-                    th.appendChild(text);
-                    headRow.appendChild(th);
-                }
+            function generateTableHead(table, data) {
+              let thead = table.createTHead();
+              let row = thead.insertRow();
+              for (let key of data) {
+                let th = document.createElement("th");
+                let text = document.createTextNode(key);
+                th.appendChild(text);
+                row.appendChild(th);
+              }
             }
 
             let portTable = document.querySelector("table");
-            let pf = {{ Portfolio }}
+            let pf = {{ portfolio }}
             portfolioTable(portTable, pf);
             </script>
-        <div class="orderListButton">
+          </div>
+                  <div class="orderListButton">
             <a href="orderList">Order History</a>
         {% with messages = get_flashed_messages() %}
         {% if messages %}   
             {% for message in messages %}
-            <div class ="alert alert-warning alert-dismissible fade show" role="alert">
+            <div class ="alert alert-warning alert-dismissible fade show" style = "text-align: center"; role="alert">
                 {{ message }}
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -153,7 +139,8 @@
             {% endfor %} 
         {% endif %} 
         {% endwith %} 
-
+      </div>
+      </div>
     </body>
     <br><br>
     
