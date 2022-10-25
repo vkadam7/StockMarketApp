@@ -471,22 +471,22 @@ def displayStock(ticker):
     else:
         stockData = SimulationFactory(dbfire, session['user']).simulation.retrieveStock(ticker)
         if timespan != 'hourly':
-            if timespan == 'daily':
-                for entry in stockData:
-                    stock = entry.to_dict()
-                if stock != -1:
-                    dates = []
-                    prices = []
+            #if timespan == 'daily':
+            for entry in stockData:
+                stock = entry.to_dict()
+            if stock != -1:
+                dates = []
+                prices = []
+                avgPrice = []
+            for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
+                avgPrice.append(stock['prices'][i])
+                if i % 7 == 1:
+                    prices.append(mean(avgPrice))
+                    print(mean(avgPrice))
+                    dates.append(stock['dates'][i][0:10])
+                    print(stock['dates'][i][0:10])
                     avgPrice = []
-                for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
-                    avgPrice.append(stock['prices'][i])
-                    if i % 7 == 1:
-                        prices.append(mean(avgPrice))
-                        print(mean(avgPrice))
-                        dates.append(stock['dates'][i][0:10])
-                        print(stock['dates'][i][0:10])
-                        avgPrice = []
-                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
         else: 
             for entry in stockData:
                 stock = entry.to_dict()
