@@ -102,6 +102,25 @@
                 </tr>
             </table>
         </div>
+        <div class="NewPortfolio">
+          
+          </div>
+          <script>
+            function portfolioTable(table, pf){
+                let portHeader = table.createTHead();
+                let headRow = table.insertRow();
+                for (let entry of pf) {
+                    let th = document.createElement('th');
+                    let text = doculment.createTextNode(entry);
+                    th.appendChild(text);
+                    headRow.appendChild(th);
+                }
+            }
+
+            let portTable = document.querySelector("table");
+            let pf = {{ portfolio }}
+            portfolioTable(portTable, pf);
+            </script>
         <div class="orderListButton">
             <a href="orderList">Order History</a>
         {% with messages = get_flashed_messages() %}
