@@ -665,6 +665,7 @@ class Order:
             df = pd.DataFrame(orderslist, columns=['avgStockPrice','buyOrSell','dayOfPurchase','quantity','simulation','ticker','totalPrice'])
             print(df)
             return df
+
         else:
             return -1
     

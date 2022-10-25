@@ -87,11 +87,27 @@
         
         <h3>Order list</h3>
         <br>
-        {% for orders in orderlist%}
-          {{orderlist}}
-        {% endfor %}
+        <table class="table table-light">
+          <thead>
+            <tr>
+              {% for orders in orderlist%}
+              <th scope="col">{{orders}}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              {% for orders in orderlist['avgStockPrice']%}
+              <tr><td>{{orders}}</td></tr>
+              {% endfor %}
+              {% for orders in orderlist['buyOrSell']%}
+              <tr><td>{{orders}}</td></tr>
+              {% endfor %}
+            </tr>
+          </tbody>   
+        </table>
         <br>
-    <footer class="footer mt-auto py-3" style = "background-color:rgb(15, 158, 230)">
+    <footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
         <div class="container">
             <span>Copyright 2022 by StockSim</span>
         </div>
