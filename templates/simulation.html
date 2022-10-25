@@ -135,6 +135,11 @@
           </div>
                   <div class="orderListButton">
             <a href="orderList">Order History</a>
+            <div class="finishSimButton">
+              <form action="/finishSimulation">
+                <button>Finish the Simulation!</button>
+                </form>
+              </div>
         {% with messages = get_flashed_messages() %}
         {% if messages %}   
             {% for message in messages %}

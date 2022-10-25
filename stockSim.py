@@ -419,12 +419,12 @@ class Simulation:
             self.stocks.append(tempData)
             self.db.collection('IntradayStockData').add(tempData)
 
-    def finishSimulation(self):
-        data = self.db.collection('Simulations').document(self.simName).get().to_dict()
+    def finishSimulation(db, simName):
+        data = db.collection('Simulations').document(simName).get().to_dict()
         data['ongoing'] = False
         percentChange = (float(data['currentCash']) - float(data['initialCash'])) / float(data['initialCash'])
         data['score'] = percentChange * 100
-        self.db.collection('Simulations').document(self.sim).update(data)
+        db.collection('Simulations').document(simName).update(data)
 
     def retrieveOngoing(db, email):
         for query in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream():
@@ -627,6 +627,7 @@ class Order:
                             amountToSell -= int(temp['newQuantity'])
                         else:
                             self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['newQuantity']) - amountToSell)})
+                            amountToSell -= abs(int(temp['newQuantity']) - amountToSell)
                 for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream():
                     temp = entry.to_dict()
                     print("Difference is: " + str(amountToSell) + "-" + temp['quantity'] + "=" + str(amountToSell - int(temp['quantity'])))
@@ -635,6 +636,7 @@ class Order:
                         amountToSell -= int(temp['quantity'])
                     else:
                         self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['quantity']) - amountToSell)})
+                        amountToSell -= abs(int(temp['quantity']) - amountToSell)
 
             return ownageFlag
         
@@ -642,6 +644,9 @@ class Order:
 
     def retrieve(db, sim, ticker):
         return db.collection('Orders').where('simulation','==',sim).where('ticker','==',ticker).stream()
+
+    def retrieveOwned(db, sim, ticker):
+        return db.collection('Orders').where('simulation','==',sim).where('ticker','==',ticker).where('sold','==',False).stream()
 
     def stocksBought(db, sim):
         tickers = []
