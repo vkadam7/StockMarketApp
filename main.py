@@ -366,14 +366,17 @@ def goToSimulation():
                 tickers = []
                 quantities = []
                 profits = []
+                netogainorloss = []
                 for entry in Order.stocksBought(dbfire, session['simName']):
                     Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
                     tickers.append(entry)
                     quantities.append(Portfolio.quantity)
                     profits.append(Portfolio.profit)
+                    netogainorloss.append(Portfolio.netgainorloss)
                 print(tickers)
                 print(quantities)
                 print(profits)
+                print(netogainorloss)
 
                 return render_template('simulation.html', person=session['user'], tickers=tickers, quantities=quantities, profits=profits)
         #except KeyError:
