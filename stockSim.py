@@ -669,12 +669,7 @@ class Order:
         # under the ordernameslist [] array. - Muneeb Khan
         orderslist = []
 
-<<<<<<< HEAD
-
-        for entry in self.db.collection('IntradayStockData').stream(): # To loop through the users orders
-=======
         for entry in db.collection('IntradayStockData').stream(): # To loop through the users orders
->>>>>>> Master
             temp = entry.to_dict()
             orders = temp['prices']
             orderslist.append(temp)
@@ -703,21 +698,6 @@ class portfolio:
     #round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
     #Returns profit from the simulator(Need to test and fix if needed )
     def get_profit(self):
-<<<<<<< HEAD
-            currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
-            prices = []
-            amountOfSharesOwned = 0
-            for entry in self.orderList:
-                temp = entry.to_dict()
-                prices.append(temp['totalPrice'])
-                if temp.get('newQuantity') != None:
-                    amountOfSharesOwned += temp['newQuantity']
-                else:
-                    amountOfSharesOwned += temp['quantity']
-            avgPriceOfOrders = mean(prices)
-            currentValueOfShares = currentPriceOfStock * amountOfSharesOwned
-            return round(currentValueOfShares - avgPriceOfOrders, 2)
-=======
         currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
         prices = []
         amountOfSharesOwned = 0
@@ -731,7 +711,6 @@ class portfolio:
         avgPriceOfOrders = mean(prices)
         currentValueOfShares = currentPriceOfStock * amountOfSharesOwned
         return round(currentValueOfShares - avgPriceOfOrders, 2)
->>>>>>> Master
 
         #profit = 0
         #quantity = self.db.collection('Orders').document('quantity').get()
@@ -748,16 +727,6 @@ class portfolio:
             
     #Displays amount of shares owned (To also be implemented later)
     def weight(self):
-<<<<<<< HEAD
-            quantity = 0
-            for entry in self.orderList:
-                temp = entry.to_dict()
-                if temp.get('newQuantity') != None:
-                    quantity += temp['newQuantity']
-                else:
-                    quantity += temp['quantity']
-            return quantity
-=======
         quantity = 0
         for entry in Order.retrieve(self.firebase, self.sim, self.stock):
             temp = entry.to_dict()
@@ -766,7 +735,6 @@ class portfolio:
             else:
                 quantity += int(temp['quantity'])
         return quantity
->>>>>>> Master
 
         #share = [self.quantity]
         #max_share = 1

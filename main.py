@@ -328,10 +328,6 @@ def startSimulation():
                                             request.form['simEndDate'], request.form['initialCash'])
                     sim.createSim()
                     session['simName'] = sim.simName
-<<<<<<< HEAD
-                    return render_template('simulation.html', person=session['user'])
-            else:
-=======
                     
                     Portfolio = portfolio(dbfire, session['user'], session['ticker'], session['simName'], session['initialCash'])
                     pf = {
@@ -341,8 +337,7 @@ def startSimulation():
                     }
 
                     return render_template('simulation.html', person=session['user'], portfolio=Portfolio)
-                else:
->>>>>>> Master
+            else:
                     flash("Please enter a valid cash amount.")
                     return render_template('stockSimForm.html', person=session['user'])
 
@@ -367,18 +362,6 @@ def goToSimulation():
                 session['initialCash'] = sim.initialCash
                 session['portfolioValue'] = sim.initialCash
                 session['simName'] = sim.simName
-<<<<<<< HEAD
-                #if ('user' in session):
-                #    portfoliolist = portfolio(dbfire, stock, session['user'], session['simName'], session['initialCash']).
-                #    session['Profit'] = portfolio.get_profit()
-                #    session['cashUsed'] =int(session['portfolioValue'] - session['currentCash'])               
-                #    return render_template('simulation.html', person=session['user'], profit = session['Profit'])
-                
-                return render_template('simulation.html', person=session['user'])
-        except KeyError:
-            print("KeyError occured: startSimulation")
-            return redirect(url_for('fourOhFour'))
-=======
 
                 tickers = []
                 quantities = []
@@ -396,7 +379,6 @@ def goToSimulation():
         #except KeyError:
         #    print("KeyError occured: simulation")
          #   return redirect(url_for('fourOhFour'))
->>>>>>> Master
     else:
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
