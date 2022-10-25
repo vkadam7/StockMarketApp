@@ -97,23 +97,29 @@
     {% endwith %} 
     <br>
     <section class = "vh-100">
-        <div class = "container py-5 h-100">
+         <div class = "container h-100 mb-5" style = "padding-bottom: 3rem;">
             <div class = "row d-flex align-items-center justify-content-center h-100">
                 <div class = "col-md-8 col-lg-7 col-xl-6">
                     <img src = "/static/stockLogo.png" class = "img-fluid" alt = "Stock image" width = "350" height = "300">
                 </div>
                 <div class = "col-md-7 col-lg-5 col-xl-5 offset-x;-1">
+                  <div class="shadow-lg p-3 mb-5 bg-white rounded">
                     <form method = "POST">
-         <div class = "form-outline mb-4">
+                        <div class = "form-outline mb-4">
                           <label class = "form-label" for = "name">Enter your name</label>
-                          <input type = "text" id = "Unames" name = "Unames" class = "form-control form-control-lg" placeholder="ex: john123@sample.com" required />
+                          <input type = "text" id = "Unames" name = "Unames" class = "form-control form-control-lg" required />
                         </div>
 
                         <div class = "form-outline mb-4">
                             <label class = "form-label" for = "email">Enter your email</label>
-                            <input type = "email" id = "email" name = "email" class = "form-control form-control-lg" placeholder="Must be 6 characters minimum" required />
+                            <input type = "email" id = "email" name = "email" class = "form-control form-control-lg" placeholder="ex: john123@sample.com" required />
                         </div>
-
+                        
+                        <div class = "form-outline mb-4">
+                          <label class = "form-label" for = "name">Enter your username</label>
+                          <input type = "text" id = "username" name = "username" class = "form-control form-control-lg" required />
+                        </div>
+                        
                         <div class = "form-outline mb-4">
                             <label class = "form-label" for = "password">Enter your password</label>
                             <input type = "password" id = "password" name = "password" class = "form-control form-control-lg" placeholder="Must be 6 characters minimum" required />
@@ -129,6 +135,7 @@
                         </div>
                         <button type = "submit" class = "btn btn-primary btn-lg btn-block" style = "background-color:rgb(33, 103, 42)">Register</button>
                     </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -141,9 +148,10 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<br><br><br><br><br><br><br><br><br><br>
+
 </body>
-<footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
+<br>
+<footer class="footer mt-auto py-3 fixed-bottom" style = "background-color:rgb(33, 103, 42)">
       <span>Copyright 2022 by StockSim</span>
   </footer>
   
