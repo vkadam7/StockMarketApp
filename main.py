@@ -410,9 +410,10 @@ def orderConfirm():
         profits = []
         for entry in Order.stocksBought(dbfire, session['simName']):
             Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
-            tickers.append(entry)
-            quantities.append(Portfolio.quantity)
-            profits.append(Portfolio.profit)
+            if Portfolio.quantity != 0:
+                tickers.append(entry)
+                quantities.append(Portfolio.quantity)
+                profits.append(Portfolio.profit)
         print(tickers)
         print(quantities)
         print(profits)

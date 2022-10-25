@@ -434,7 +434,7 @@ class Simulation:
         tempSim = Simulation(db, email, entry['startDate'], entry['endDate'], entry['initialCash'])
         tempSim.simName = id
         tempSim.startTimestamp = datetime.datetime.fromtimestamp(entry['startTimestamp'].timestamp())
-        tempSim.currentCash = round(entry['currentCash'], 2)
+        tempSim.currentCash = round(float(entry['currentCash']), 2)
         tempSim.initialCash = entry['initialCash']
         tempSim.stocks = []
         for entry in db.collection('IntradayStockData').where('simulation','==',id).stream():
@@ -733,7 +733,7 @@ class portfolio:
     #Displays amount of shares owned (To also be implemented later)
     def weight(self):
         quantity = 0
-        for entry in Order.retrieve(self.firebase, self.sim, self.stock):
+        for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
             temp = entry.to_dict()
             if temp.get('newQuantity') != None:
                 quantity += int(temp['newQuantity'])
