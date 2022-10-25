@@ -640,7 +640,7 @@ class Order:
         return ownageFlag
 
     # List of Orders by Muneeb Khan
-    def orderList(db):
+    def orderList(db, simName):
         quantityOwned = 0
         ownageFlag = True
         # data = {
@@ -658,7 +658,7 @@ class Order:
         orderslist = []
 
         if ownageFlag == True:
-            for entry in db.collection('Orders').stream(): # To loop through the users orders
+            for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
                 temp = entry.to_dict()
                 orderslist.append([temp['avgStockPrice'],temp['buyOrSell'],temp['dayOfPurchase'],temp['quantity'],temp['simulation'],temp['ticker'],temp['totalPrice']])
             
