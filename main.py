@@ -314,8 +314,13 @@ def startSimulation():
                     session['simName'] = sim.simName
                     
                     Portfolio = portfolio(dbfire, session['user'], session['ticker'], session['simName'], session['initialCash'])
-  
-                    return render_template('simulation.html', person=session['user'])
+                    pf = {
+                        'ticker' : Portfolio.stock,
+                        'quantity' : Portfolio.quantity,
+                        'profit' : Portfolio.profit
+                    }
+
+                    return render_template('simulation.html', person=session['user'], portfolio=Portfolio)
                 else:
                     flash("Please enter a valid cash amount.")
                     return render_template('stockSimForm.html', person=session['user'])
@@ -332,17 +337,31 @@ def startSimulation():
 @app.route("/simulation", methods=['POST', 'GET'])
 def goToSimulation():
     if ('user' in session):
-        try:
+        #try:
             if request.method == 'POST':
                 session['simulationFlag'] = 1
                 sim = SimulationFactory(dbfire, session['user']).simulation
                 session['currentCash'] = sim.currentCash
+                session['initialCash'] = sim.initialCash
                 session['portfolioValue'] = sim.initialCash
                 session['simName'] = sim.simName
-                return render_template('simulation.html', person=session['user'])
-        except KeyError:
-            print("KeyError occured: startSimulation")
-            return redirect(url_for('fourOhFour'))
+
+                tickers = []
+                quantities = []
+                profits = []
+                for entry in Order.stocksBought(dbfire, session['simName']):
+                    Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
+                    tickers.append(entry)
+                    quantities.append(Portfolio.quantity)
+                    profits.append(Portfolio.profit)
+                print(tickers)
+                print(quantities)
+                print(profits)
+
+                return render_template('simulation.html', person=session['user'], tickers=tickers, quantities=quantities, profits=profits)
+        #except KeyError:
+        #    print("KeyError occured: simulation")
+         #   return redirect(url_for('fourOhFour'))
     else:
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))

@@ -434,7 +434,7 @@ class Simulation:
         tempSim = Simulation(db, email, entry['startDate'], entry['endDate'], entry['initialCash'])
         tempSim.simName = id
         tempSim.startTimestamp = datetime.datetime.fromtimestamp(entry['startTimestamp'].timestamp())
-        tempSim.currentCash = entry['currentCash']
+        tempSim.currentCash = round(entry['currentCash'], 2)
         tempSim.initialCash = entry['initialCash']
         tempSim.stocks = []
         for entry in db.collection('IntradayStockData').where('simulation','==',id).stream():
@@ -641,7 +641,15 @@ class Order:
         return ownageFlag
 
     def retrieve(db, sim, ticker):
-        return db.collections('Orders').where('simulation','==',sim).where('ticker','==',ticker).stream()
+        return db.collection('Orders').where('simulation','==',sim).where('ticker','==',ticker).stream()
+
+    def stocksBought(db, sim):
+        tickers = []
+        for entry in db.collection('Orders').where('simulation','==',sim).stream():
+            temp = entry.to_dict()
+            tickers.append(temp['ticker'])
+        print(tickers)
+        return [*set(tickers)]
 
     # List of Orders by Muneeb Khan
     def orderList(db):
@@ -661,7 +669,7 @@ class Order:
         # under the ordernameslist [] array. - Muneeb Khan
         orderslist = []
 
-        for entry in self.db.collection('IntradayStockData').stream(): # To loop through the users orders
+        for entry in db.collection('IntradayStockData').stream(): # To loop through the users orders
             temp = entry.to_dict()
             orders = temp['prices']
             orderslist.append(temp)
@@ -680,7 +688,8 @@ class portfolio:
             #self.fundsRemaining = fundsRemaining
             #self.dayofPurchase = datetime.datetime.now()
             self.currentCash = Simulation.retrieveCurrentCash(db, simulation)
-            self.orderList = Order.retrieve(db, stock, user)
+            self.quantity = self.weight()
+            self.profit = self.get_profit()
     
     #def retrieve(self, id):
     #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
@@ -692,13 +701,13 @@ class portfolio:
         currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
         prices = []
         amountOfSharesOwned = 0
-        for entry in self.orderList:
+        for entry in Order.retrieve(self.firebase, self.sim, self.stock):
             temp = entry.to_dict()
-            prices.append(temp['totalPrice'])
+            prices.append(float(temp['totalPrice']))
             if temp.get('newQuantity') != None:
-                amountOfSharesOwned += temp['newQuantity']
+                amountOfSharesOwned += int(temp['newQuantity'])
             else:
-                amountOfSharesOwned += temp['quantity']
+                amountOfSharesOwned += int(temp['quantity'])
         avgPriceOfOrders = mean(prices)
         currentValueOfShares = currentPriceOfStock * amountOfSharesOwned
         return round(currentValueOfShares - avgPriceOfOrders, 2)
@@ -719,12 +728,12 @@ class portfolio:
     #Displays amount of shares owned (To also be implemented later)
     def weight(self):
         quantity = 0
-        for entry in self.orderList:
+        for entry in Order.retrieve(self.firebase, self.sim, self.stock):
             temp = entry.to_dict()
             if temp.get('newQuantity') != None:
-                quantity += temp['newQuantity']
+                quantity += int(temp['newQuantity'])
             else:
-                quantity += temp['quantity']
+                quantity += int(temp['quantity'])
         return quantity
 
         #share = [self.quantity]
