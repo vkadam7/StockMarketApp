@@ -1,5 +1,6 @@
 from asyncio.windows_events import NULL
 #from crypt import methods
+#from crypt import methods
 #from re import T
 from datetime import datetime
 import math
@@ -9,7 +10,7 @@ from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
 import firebase_admin
-from stockSim import SimulationFactory, StockData, User, Order, Simulation
+from stockSim import SimulationFactory, StockData, User, Order, Simulation, portfolio
 
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -311,6 +312,9 @@ def startSimulation():
                                             request.form['simEndDate'], request.form['initialCash'])
                     sim.createSim()
                     session['simName'] = sim.simName
+                    
+                    Portfolio = portfolio(dbfire, session['user'], session['ticker'], session['simName'], session['initialCash'])
+  
                     return render_template('simulation.html', person=session['user'])
                 else:
                     flash("Please enter a valid cash amount.")
@@ -345,7 +349,7 @@ def goToSimulation():
         
 @app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
-    sim.finishSimulation()
+    #sim.finishSimulation()
     session['simulationFlag'] = 0
 
 @app.route("/orderForm", methods=['POST', 'GET'])
@@ -435,6 +439,7 @@ def displayStock(ticker):
     startDate = request.args['startDate']
     endDate = request.args['endDate']
     timespan = request.args['timespan']
+    session['ticker'] = ticker
     global stock
     if session['simulationFlag'] == 0:
         stockData = StockData(dbfire, ticker)
@@ -541,25 +546,46 @@ def orderlists():
 @app.route('/404Error')
 def fourOhFour():
     return render_template('404Error.html',person = session['user'])
+
+
 #Author: Viraj Kadam
-@app.route('/displayInfo') #Retrieving info from portolio file
+@app.route('/portfolio', methods=['POST', "GET"]) #Retrieving info from portolio file
 def Portfolio():
-    if('user' in session): #to check if the user is logged in will change to profile page
-        session['simulation'] = {
-            'startDate': request.form['startDate'],
-            'endDate': request.form['endDate'],
-            'initialCash': request.form['initialCash'],
-            'currentCash': request.form['currentCash']
-        }
-        session['currentCash'] = request.form['initialCash']
-        global sim
-        sim = Simulation(dbfire, session['user'], request.form['startDate'],
-                        request.form['endDate'], request.form['initialCash'], request.form['currentCash'] )
-        sim.createSim()
-        return render_template('simulation.html', person=session['user'])
-    else: 
-        return render_template('404Error.html')
+    if ('user' in session):
     
+                session['simulationFlag'] = 1
+                session['simulation'] = {
+                    'simStartDate': request.form['simStartDate'],
+                    'simEndDate': request.form['simEndDate'],
+                    'initialCash': request.form['initialCash',]
+                }
+                Portfolio = portfolio(dbfire, session['user'], portfolio.get_profit,
+                                portfolio.funds_remaining, request.form['initialCash'])
+                
+                
+               # session['portfolio'] = {
+               #    'Profit': portfolio.get_profit,
+               #     'Funds_remaining': portfolio.funds_remaining,
+               #     'initialCash': request.form['initialCash'],
+               #     'currentCash': Simulation['currentCash'],
+                    
+              #  }
+              
+                #session['portfolio'] = {
+                #  'Profit': request.form['profit'], 
+                #  'currentCash': request.form['currentCash'], 
+                #  'initialCash': request.form['initialCash']
+                #}
+                session['Profit']: portfolio.get_profit
+    
+              
+                #sim.displayInfo
+                #session['simName'] = sim.simName
+                return render_template('simulation.html')
+  
+        
+    #line 318  
+
 
 ## Need to complete this setup route for the dashboard, will show up to the user once they have started the simulation. 
 @app.route('/dashboard')
