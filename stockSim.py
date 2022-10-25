@@ -661,14 +661,16 @@ class Order:
         # under the ordernameslist [] array. - Muneeb Khan
         orderslist = []
 
-        if ownageFlag == True:
-            for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('buyOrSell','==','Sell').where('sold','==',False).where('sold','==',True).where('ticker','==',self.stock['ticker']).stream(): # To loop through the users orders
-                temp = entry.to_dict()
-                orderslist.append(temp)
-                print(orderslist)
-                return orderslist
-        else:
-            return -1     
+
+        for entry in self.db.collection('IntradayStockData').stream(): # To loop through the users orders
+            temp = entry.to_dict()
+            orders = temp['prices']
+            orderslist.append(temp)
+
+        return orderslist
+
+        return orders
+    
 class portfolio:
     def __init__(self, db, stock, user, simulation, initialCash):
             self.firebase = db
@@ -849,6 +851,16 @@ class portfolio:
                     increase = newstockPrice[day+1] - stockPrice[day]
                 percentIncrease = (increase/stockPrice) * 100
                 return percentIncrease
+
+        if ownageFlag == True:
+            for entry in db.collection('Orders').stream(): # To loop through the users orders
+                temp = entry.to_dict()
+                orderslist.append([temp['avgStockPrice'],temp['buyOrSell'],temp['dayOfPurchase'],temp['quantity'],temp['simulation'],temp['ticker'],temp['totalPrice']])
+            
+            df = pd.DataFrame(orderslist, columns=['avgStockPrice','buyOrSell','dayOfPurchase','quantity','simulation','ticker','totalPrice'])
+            print(df)
+            return df
+
         else:
             return -1     
         

@@ -310,11 +310,29 @@ def startSimulation():
                                         request.form['simEndDate'], request.form['initialCash'])
                 sim.createSim()
                 session['simName'] = sim.simName
-                if ('user' in session):
-                    portfoliolist = portfolio(dbfire, stock, session['user'], session['simName'], session['initialCash'])
-                    session['Profit'] = portfolio.get_profit()
-                    session['cashUsed'] =int(session['portfolioValue'] - session['currentCash'])               
-                return render_template('simulation.html', person=session['user'], profit = session['Profit'])
+
+                Portfolio = portfolio(dbfire, session['user'], session['ticker'], session['simName'], session['initialCash'])
+
+                return render_template('simulation.html', person=session['user'], pf=Portfolio)
+            pattern = re.compile("^\d+(.\d{1,2})?$")
+            if pattern.match(request.form['initialCash']):
+                    session['simulationFlag'] = 1
+                    session['simulation'] = {
+                        'simStartDate': request.form['simStartDate'],
+                        'simEndDate': request.form['simEndDate'],
+                        'initialCash': request.form['initialCash']
+                    }
+                    session['currentCash'] = request.form['initialCash']
+                    session['portfolioValue'] = request.form['initialCash']
+                    sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
+                                            request.form['simEndDate'], request.form['initialCash'])
+                    sim.createSim()
+                    session['simName'] = sim.simName
+                    return render_template('simulation.html', person=session['user'])
+            else:
+                    flash("Please enter a valid cash amount.")
+                    return render_template('stockSimForm.html', person=session['user'])
+
         except KeyError:
             print("KeyError occured: startSimulation")
             return redirect(url_for('fourOhFour'))
