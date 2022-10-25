@@ -87,25 +87,57 @@
         
         <h3>Order list</h3>
         <br>
-        <table class="table table-light">
-          <thead>
-            <tr>
-              {% for orders in orderlist%}
-              <th scope="col">{{orders}}</th>
-              {% endfor %}
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              {% for orders in orderlist['avgStockPrice']%}
-              <tr><td>{{orders}}</td></tr>
-              {% endfor %}
-              {% for orders in orderlist['buyOrSell']%}
-              <tr><td>{{orders}}</td></tr>
-              {% endfor %}
-            </tr>
-          </tbody>   
-        </table>
+
+        <div class="orderList">
+          <table>
+
+           </table>
+          <script type="text/javascript">
+            let buyOrSells = {{ buyOrSell|safe }};
+            let timestamps = {{ daysOfPurchase|safe}};
+            let tickersList = {{tickers|safe}};
+            let quantList = {{quantities|safe}};
+            let totalPrices = {{prices|safe}};
+
+            let orderList = [];
+            for (let i = 0; i < tickersList.length; i++) {
+              orderList.push({
+                Option : buyOrSells[i],
+                Timestamp : timestamps[i],
+                Stock: tickersList[i],
+                Quantity: quantList[i],
+                Value: totalPrices[i]
+              });
+            }
+
+            function generateTableHead(table, data) {
+              let thead = table.createTHead();
+              let row = thead.insertRow();
+              for (let key of data) {
+                let th = document.createElement("th");
+                let text = document.createTextNode(key);
+                th.appendChild(text);
+                row.appendChild(th);
+              }
+            }
+
+            function generateTable(table, data) {
+              for (let element of data) {
+                let row = table.insertRow();
+                for (key in element) {
+                  let cell = row.insertCell();
+                  let text = document.createTextNode(element[key]);
+                  cell.appendChild(text);
+                }
+              }
+            }
+
+            let table = document.querySelector("table");
+            let data = Object.keys(orderList[0]);
+            generateTable(table, orderList); 
+            generateTableHead(table, data);
+            </script>
+            </div>
         <br>
     <footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
         <div class="container">

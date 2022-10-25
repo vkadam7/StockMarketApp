@@ -524,7 +524,11 @@ def orderlists():
 
             orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
 
-            return render_template('orderList.html',orderlist = orderlist)
+            print(orderlist['ticker'].to_list())
+
+            return render_template('orderList.html',buyOrSell=orderlist['buyOrSell'].to_list(),
+            daysOfPurchase=orderlist['dayOfPurchase'].to_list(), tickers=orderlist['ticker'].to_list(),
+            quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
 
 ## 
 @app.route('/404Error')
