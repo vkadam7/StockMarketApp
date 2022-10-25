@@ -82,7 +82,7 @@
 <body>
 
 
-
+  <div class = "centering">
     <form action="orderConfirm" method="post">
     <h3>{{ session['option'] }} order for {{ stock['name'] }}</h3>
     <br>
@@ -94,34 +94,8 @@
     <b>
     <button>Confirm Order</button>
     </form>
-
-    <form action = "orderConfirm" method = "post">
-        <div class = "modal" tabindex = "-1" role = "dialog">
-            <div class = "modal-dialog" role = "document">
-                <div class = "modal-content">
-                    <div class = "modal-header">
-                        <h3 class = "modal-title">{{ session['option'] }} order for {{ stock['name'] }}</h3>
-                    </div>
-                    <div class = "modal-body">
-                        <br>
-                        <p>Price: {{ session['currentPrice'] }}</p>
-                        <br>
-                        <p>Quantity: {{ session['orderQuantity'] }}</p>
-                        <br>
-                        <p>Total Price: {{ session['orderPrice'] }}</p>
-                        <br>
-                    </div>
-                    <div class = "modal-footer">
-                        <button class = "btn btn-primary btn-lg btn-block" style = "background-color:rgb(33, 103, 42)">Confirm Order</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
-
+  </div>
 </body>
-
-
 <footer class="footer mt-5 py-3 fixed-bottom" style = "background-color:rgb(33, 103, 42)">
     <div class="container">
       <span>Copyright 2022 by StockSim</span>

@@ -42,6 +42,7 @@
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
+          
           <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
             <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
               <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Start a simulation!</button>
@@ -96,11 +97,12 @@
               </div>
                 <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
                     <h5 class = "card-text">
-                      With our information page we will provide several source links to places we went 
-                      to get a better knowledge of stock investments. Some users may learn different but 
-                      we want ensure we can help all our users get a better understanding.
-                 <br> If the information doesn't help then you may contact us directly by email and we will 
-                      see if we can provide the service necessary.
+                      With our information page we will provide several sources ranging from videos, external links,
+                      helpful terms, a quiz, and our very own stock simulator. Some users may learn different however 
+                      we want to ensure that we can help all our users get a better understanding.
+                      <br><br>
+                      If the information doesn't help then you may contact us directly by email through our contact us page 
+                      and we will provide assitance. You may also contact us if you have any questions regarding our website.
                     </h5>
                 </div>
               <br>
@@ -114,18 +116,24 @@
                       have a fractional ownership of the company. Stocks are typically listed as line graphs
                       and they basically keep track of the stock price of the company overtime. 
                       It can show the companies records by daily, monthly, and yearly.
-                      <br>
-                      <br>
+                      <br><br>
+
                       Below is an example of a graph showing Googles shares for the past 6 years.
-                      <br>
-                      <br>  
-                      <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = "90%" height = "90%" display = "d-flex" class = "stock" />
-                      <br>
-                      <br>
-                      You may also search for stocks using our stock search bar on the top right hand corner.
-                      You will taken to the stock display page and shown a graph of the companies shares 
-                      over a selected time frame. There will be an option to choose the time frame from
-                      the starting date to end date.
+                      <br><br>
+
+                      <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = "75%" height = "75%" display = "d-flex" class = "stock" />
+                      <br><br><br>
+                      
+                      To see more examples of stock graphs click the button below.
+                      <br><br>
+                    
+                      <a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "graphPictures">Graph Pictures</a>
+                      <br><br><br>
+
+                      You may also search for a company's stocks using our stock search bar on the top right hand corner.
+                      You will taken to the stock display page and shown a graph of the companies shares over a time period.
+                      There will also be an option to choose the time frame from the starting to end date and you may choose to
+                      display either hourly, daily, weekly, or monthly data.
                       <br>
                     </h5>
                   </div>
@@ -133,7 +141,7 @@
 
 
                   <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
-                    <h2>How Should I Start Investing?</h2>
+                    <h2>How to start investing?</h2>
                     <br>  
                     <h5 class = "card-text">
                     The best way to start is to do paper trading which will allow users
@@ -163,32 +171,16 @@
                     <br>
                     <br>
                     <iframe width = "480" height = "320" display = "d-flex" src = "https://www.youtube.com/embed/hE2NsJGpEq4"></iframe> 
-                    <br>
-                    <br>
-                    <br>
-                    Our website gives users the option to start a stock simulation. The users
-                    will have the option to choose the starting and end dates and their initial
-                    starting cash for the simulator.
-                    <br><br>
-                    During the simulation, the users will have the option to buy a stock from the company
-                    they have searched and will be asked the quantity of how much they would like to purchase.
-                    The users will also have the option to sell a current stock they own.
-                    <br><br>
-                    The users will also have a portfolio page to keep track of their records on how many orders they
-                    have bought and sold and how many wins and losses they had on the simulator.
-                    <br><br>
-                    We also have a leaderboards page to show all the users current records on 
-                    the stock sim, so users will know who is leading with investments and who is behind.
-                    The purpose of the leaderboard is to make our simluator more competitive.  
+                    <br><br><br> 
                     </h5>
                   </div>
                 <br>
 
-
                 <div class = "card-body">
                   <h2>Defintions of Stocks?</h2>
                   <br>
-                  <h5 class = "card-text">To see some defintions of stocks, please click the button below
+                  <h5 class = "card-text">To see some defintions of stocks, please click the button below to visit
+                    our stock definitions page.
                     <br><br>
                     <a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "StockDefinitions">StockDefinitions</a>
                   </h5>
@@ -196,9 +188,9 @@
                 <br>
 
                 <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
-                  <h2>Sources?</h2>
+                  <h2>Other sources?</h2>
                   <br>
-                  <h5 class = "card-text">We have sources below of where you may find further information
+                  <h5 class = "card-text">We have sources below of other good websites where you may find more information
                   <br>on stocks.
                   <br><br>
                   <br>Below is a link to the Investor.gov website which also gives basic information on stocks.
@@ -211,7 +203,7 @@
                 <br>
 
                 <div class = "card-body">
-                  <h2>Quiz?</h2>
+                  <h2>Is there a quiz to test my knowledge?</h2>
                   <br>
                   <h5 class = "card-text">We have a 10 question quiz you may take to test your knowledge
                   <br>of stocks. The questions will relate to what was discussed on this page and the definitions
@@ -220,6 +212,30 @@
                   <br>
                   <br>
                   <a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST">Take the quiz</a>
+                  </h5>
+                </div>
+                <br>
+                <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
+                  <h2>Ready to invest?</h2>
+                  <br>
+                  <h5>Our website gives users the ability to start a stock simulation, which simulates a real stock investment 
+                    competiton. The users will have the option to choose their starting and end dates with their initial
+                    starting cash.
+                    <br><br>
+                    During the simulation, the users will have the option to buy a stock from the company
+                    they have searched and will be asked the quantity of how much they would like to purchase.
+                    The users will also have the option to sell a current stock they own.
+                    <br><br>
+                    There will also be a portfolio page to help users keep track of their records on how many orders they
+                    have bought and sold and how many wins and losses they had on the simulator.
+                    <br><br>
+                    We also have a leaderboards page to show all the users current records on 
+                    the stock sim, so users will know who is leading with the most investments and who is behind.
+                    The purpose of the leaderboard is to make our simluator more competitive like a game. 
+                    <br><br>
+                    To start a simulation, visit your profile page after registering and click on the button "start simluation"
+                    and you will then be taken to your portfolio page. From there you will search a company's stock using the
+                    stock search bar on the top right and begin making your investments.
                   </h5>
                 </div>
                 <br>
@@ -232,7 +248,9 @@
           <span>Copyright 2022 by StockSim</span>
         </div>
       </footer>
-      
+      <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
       <script src="/static/jsStyle/bootstrap.bundle.min.js"></script>
 </body>
 

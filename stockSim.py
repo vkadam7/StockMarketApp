@@ -534,12 +534,11 @@ class User:
 
         for entry in db.collection('Users').stream(): # To loop through usernames in firebase
             temp = entry.to_dict()
-            name = temp['Name']
-            usernameslist.append(name)
-        print(usernameslist)
-        return (usernameslist) 
+            usernameslist.append([temp['userName']])
 
-        
+        df = pd.DataFrame(usernameslist, columns=['userName'])
+        print(df)
+        return df                       
 
 class Order:
     def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
@@ -645,18 +644,18 @@ class Order:
         return db.collections('Orders').where('simulation','==',sim).where('ticker','==',ticker).stream()
 
     # List of Orders by Muneeb Khan
-    def orderList(self):
+    def orderList(db):
         quantityOwned = 0
         ownageFlag = True
-        data = {
-                'simulation': self.sim,
-                'ticker': self.stock['ticker'],
-                'dayOfPurchase': self.dayOfPurchase,
-                'buyOrSell': self.buyOrSell,
-                'quantity': self.quantity,
-                'avgStockPrice': self.avgStockPrice,
-                'totalPrice': self.totalPrice
-            }
+        # data = {
+        #         'simulation': self.sim,
+        #         'ticker': self.stock['ticker'],
+        #         'dayOfPurchase': self.dayOfPurchase,
+        #         'buyOrSell': self.buyOrSell,
+        #         'quantity': self.quantity,
+        #         'avgStockPrice': self.avgStockPrice,
+        #         'totalPrice': self.totalPrice
+        #     }
 
         # The order list function will loop through the orders in firebase and store each one
         # under the ordernameslist [] array. - Muneeb Khan

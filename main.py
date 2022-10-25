@@ -5,6 +5,7 @@ from asyncio.windows_events import NULL
 from datetime import datetime
 import math
 from operator import mod
+import re
 from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
@@ -264,6 +265,20 @@ def StockDefinitions():
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
 
+# Route for Graph pictures page - Muneeb Khan
+@app.route("/graphPictures")
+def graphPictures():
+    if('user' in session):
+        person = dbfire.collection('Users').where('Email', '==', session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
+
+        for x in person.get():
+            person = x.to_dict()
+
+        return render_template("graphPictures.html", person = person)
+    else:
+        flash("Sorry you must be logged in to view that page.")
+        return redirect(url_for("login"))
+
 ## stockSim
 #   Description: Brings the logged in user to the stock sim start page, if the user
 #   isn't logged in, a 404 page error is given.
@@ -283,22 +298,27 @@ def startSimulation():
     if ('user' in session):
         try:
             if request.method == 'POST':
-                session['simulationFlag'] = 1
-                session['simulation'] = {
-                    'simStartDate': request.form['simStartDate'],
-                    'simEndDate': request.form['simEndDate'],
-                    'initialCash': request.form['initialCash']
-                }
-                session['currentCash'] = request.form['initialCash']
-                session['portfolioValue'] = request.form['initialCash']
-                sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
-                                        request.form['simEndDate'], request.form['initialCash'])
-                sim.createSim()
-                session['simName'] = sim.simName
-
-                Portfolio = portfolio(dbfire, session['user'], session['ticker'], session['simName'], session['initialCash'])
-
-                return render_template('simulation.html', person=session['user'], pf=Portfolio)
+                pattern = re.compile("^\d+(.\d{1,2})?$")
+                if pattern.match(request.form['initialCash']):
+                    session['simulationFlag'] = 1
+                    session['simulation'] = {
+                        'simStartDate': request.form['simStartDate'],
+                        'simEndDate': request.form['simEndDate'],
+                        'initialCash': request.form['initialCash']
+                    }
+                    session['currentCash'] = request.form['initialCash']
+                    session['portfolioValue'] = request.form['initialCash']
+                    sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
+                                            request.form['simEndDate'], request.form['initialCash'])
+                    sim.createSim()
+                    session['simName'] = sim.simName
+                    
+                    Portfolio = portfolio(dbfire, session['user'], session['ticker'], session['simName'], session['initialCash'])
+  
+                    return render_template('simulation.html', person=session['user'])
+                else:
+                    flash("Please enter a valid cash amount.")
+                    return render_template('stockSimForm.html', person=session['user'])
         except KeyError:
             print("KeyError occured: startSimulation")
             return redirect(url_for('fourOhFour'))
@@ -340,9 +360,13 @@ def orderFormFill():
 
 @app.route("/orderCreate", methods=['POST', 'GET'])
 def orderCreate():
-    session['orderQuantity'] = request.form['stockQuantity']
-    session['orderPrice'] = round(int(session['orderQuantity']) * session['currentPrice'], 2)
-    return render_template('orderConfirmation.html', stock=stock, option=session['option'])
+    if request.form['stockQuantity'].isnumeric():
+        session['orderQuantity'] = request.form['stockQuantity']
+        session['orderPrice'] = round(int(session['orderQuantity']) * session['currentPrice'], 2)
+        return render_template('orderConfirmation.html', stock=stock, option=session['option'])
+    else:
+        flash("Please enter a valid quantity amount")
+        return render_template('orderForm.html', stock=stock, option=session['option'])
 
 @app.route("/orderConfirm", methods=['POST', 'GET'])
 def orderConfirm():
@@ -353,6 +377,7 @@ def orderConfirm():
     else:
         flag = order.sellOrder()
     if flag == 1:
+        flash("Order Complete!")
         session['currentCash'] = Simulation.retrieveCurrentCash(dbfire, session['simName'])
         return render_template('simulation.html', person=session['user'])
     elif session['option'] == 'Buy' and flag == -1:
@@ -444,22 +469,22 @@ def displayStock(ticker):
     else:
         stockData = SimulationFactory(dbfire, session['user']).simulation.retrieveStock(ticker)
         if timespan != 'hourly':
-            if timespan == 'daily':
-                for entry in stockData:
-                    stock = entry.to_dict()
-                if stock != -1:
-                    dates = []
-                    prices = []
+            #if timespan == 'daily':
+            for entry in stockData:
+                stock = entry.to_dict()
+            if stock != -1:
+                dates = []
+                prices = []
+                avgPrice = []
+            for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
+                avgPrice.append(stock['prices'][i])
+                if i % 7 == 1:
+                    prices.append(mean(avgPrice))
+                    print(mean(avgPrice))
+                    dates.append(stock['dates'][i][0:10])
+                    print(stock['dates'][i][0:10])
                     avgPrice = []
-                for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
-                    avgPrice.append(stock['prices'][i])
-                    if i % 7 == 1:
-                        prices.append(mean(avgPrice))
-                        print(mean(avgPrice))
-                        dates.append(stock['dates'][i][0:10])
-                        print(stock['dates'][i][0:10])
-                        avgPrice = []
-                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
         else: 
             for entry in stockData:
                 stock = entry.to_dict()
