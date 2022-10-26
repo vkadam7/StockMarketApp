@@ -347,7 +347,7 @@ def goToSimulation():
             if request.method == 'POST':
                 session['simulationFlag'] = 1
                 sim = SimulationFactory(dbfire, session['user']).simulation
-                session['currentCash'] = sim.currentCash
+                session['currentCash'] = round(sim.currentCash,2)
                 session['initialCash'] = sim.initialCash
                 session['portfolioValue'] = sim.initialCash
                 session['simName'] = sim.simName
@@ -411,7 +411,7 @@ def orderConfirm():
         flag = order.sellOrder()
     if flag == 1:
         flash("Order Complete!")
-        session['currentCash'] = Simulation.retrieveCurrentCash(dbfire, session['simName'])
+        session['currentCash'] = round(Simulation.retrieveCurrentCash(dbfire, session['simName']),2)
         tickers = []
         quantities = []
         profits = []
