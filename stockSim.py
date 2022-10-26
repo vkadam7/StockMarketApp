@@ -2,7 +2,7 @@ from ast import Constant, Or
 from mimetypes import init
 from queue import Empty
 from re import search
-from statistics import mean
+from statistics import mean, quantiles
 from this import d
 from time import daylight
 import numpy as np
@@ -695,6 +695,7 @@ class portfolio:
             self.currentCash = Simulation.retrieveCurrentCash(db, simulation)
             self.quantity = self.weight()
             self.profit = self.get_profit()
+            self.avgSharePrice = self.returnValue()
     
     #def retrieve(self, id):
     #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
@@ -749,6 +750,12 @@ class portfolio:
         #    else:
         #        return -1   
         
+    def returnValue(self):
+        prices = []
+        for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
+            temp = entry.to_dict()
+            prices.append(float(temp['avgStockPrice']))
+        return round(mean(prices),2)
 
     #
     #
