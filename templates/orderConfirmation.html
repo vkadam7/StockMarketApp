@@ -96,7 +96,7 @@
 
   <div class = "centering">
     <form action="orderConfirm" method="post">
-    <h3>{{ session['option'] }} order for {{ stock['name'] }}</h3>
+    <h3>{{ session['option'] }} order for {{ session['ticker'] }}</h3>
     <br>
     <p>Price: {{ session['currentPrice'] }}</p>
     <br>

@@ -409,17 +409,17 @@ def finishSimulation():
 def orderFormFill():
     session['option'] = request.form['option']
     session['currentPrice'] = round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
-    return render_template('orderForm.html', stock=stock, option=session['option'])
+    return render_template('orderForm.html', option=session['option'])
 
 @app.route("/orderCreate", methods=['POST', 'GET'])
 def orderCreate():
     if request.form['stockQuantity'].isnumeric():
         session['orderQuantity'] = request.form['stockQuantity']
         session['orderPrice'] = round(int(session['orderQuantity']) * session['currentPrice'], 2)
-        return render_template('orderConfirmation.html', stock=stock, option=session['option'])
+        return render_template('orderConfirmation.html', option=session['option'])
     else:
         flash("Please enter a valid quantity amount")
-        return render_template('orderForm.html', stock=stock, option=session['option'])
+        return render_template('orderForm.html', option=session['option'])
 
 @app.route("/orderConfirm", methods=['POST', 'GET'])
 def orderConfirm():
@@ -461,10 +461,10 @@ def orderConfirm():
         currentPrices=currentPrices)    
     elif session['option'] == 'Buy' and flag == -1:
         flash("Insufficient funds to complete purchase")
-        return render_template('orderForm.html', stock=stock, option=session['option'])
+        return render_template('orderForm.html', option=session['option'])
     elif session['option'] == 'Sell' and flag == -1:
         flash("Insufficient shares to complete sale")
-        return render_template('orderForm.html', stock=stock, option=session['option'])
+        return render_template('orderForm.html', option=session['option'])
     
 ## stockSearch
 #   Description: Searchs the database for the search term given by the user
@@ -617,13 +617,13 @@ def userlists():
 def orderlists():
     if ('user' in session):
 
-            orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
+        orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
 
-            print(orderlist['ticker'].to_list())
+        print(orderlist['ticker'].to_list())
 
-            return render_template('orderList.html',buyOrSell=orderlist['buyOrSell'].to_list(),
-            daysOfPurchase=orderlist['dayOfPurchase'].to_list(), tickers=orderlist['ticker'].to_list(),
-            quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
+        return render_template('orderList.html',session=session,buyOrSell=orderlist['buyOrSell'].to_list,
+        daysOfPurchase=orderlist['dayOfPurchase'].to_list(), tickers=orderlist['ticker'].to_list(),
+        quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
 
 ## 
 @app.route('/404Error')
