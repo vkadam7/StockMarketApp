@@ -86,15 +86,14 @@
         <h1>This page is just for testing the Order list function </h1>
         
         <h3>Order list</h3>
-        <br>
 
         <div class="orderList">
           <table>
 
            </table>
-          <script type="text/javascript">
-            let buyOrSells = {{ buyOrSell|safe }};
-            let timestamps = {{ daysOfPurchase|safe}};
+          <script>
+            let buyOrSells = {{buyOrSell|safe}};
+            let timestamps = {{daysOfPurchase|safe}};
             let tickersList = {{tickers|safe}};
             let quantList = {{quantities|safe}};
             let totalPrices = {{prices|safe}};
@@ -133,8 +132,7 @@
             let headers = Object.keys(orderList[0]);
             portfolio(table, orderList, headers); 
             </script>
-            </div>
-        <br>
+        </div>
     <footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
         <div class="container">
             <span>Copyright 2022 by StockSim</span>

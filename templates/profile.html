@@ -100,55 +100,6 @@
 
     <h1><a href = "update.html">Update Profile </a></h1>
     <br>
- <!--  {% with alerts = get_flashed_messages() %}
-        {% for print in alerts %}
-            {% if print in get_flashed_messages(category_filter = ['pass']) %} 
-            <div class="alert-pass" role="alert">
-                {{ print }}
-            </div>
-            {% elif print in get_flashed_messages(category_filter = ['fail']) %}
-            <div class="alert-fail" role="alert">
-                {{ print }}
-            </div>
-            {% endif %}
-         {% endfor %}
-        {% endwith %}  Keep this an alternative - Muneeb Khan
-    <br>
-    </h1> -->
-    <!--
-    {% with messages = get_flashed_messages() %}
-                    {% if messages %}   
-                        {% for message in messages %}
-                        <div class ="alert alert-warning alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        {% endfor %} 
-                    {% endif %} 
-    {% endwith %}
-    -->                    
-    </h1>     
-    <div class="stockSimStartButton">
-        <form id="stockSimButton" action="/stockSimForm" method="post">
-          <button class = "stockSimStartButtonStyle">Start a simulation!</button>
-        </form>
-        <script type="text/javascript">
-          if ({{ session['simulationFlag'] }} == 1 ) { 
-            document.getElementById('stockSimButton').style.display = "none";
-          }
-        </script>
-        
-        <form id="stockSimStart" action="/simulation" method="post"> 
-              <button class = "stockSimStartButtonStyle" id="goToSim">Go to Current Sim!</button>
-            </form>
-            <script type="text/javascript">
-              if ({{ session['simulationFlag'] }} == 0 ) { 
-                document.getElementById('goToSim').style.display = "none";
-              }
-            </script> 
-    </div>
 
     <footer class="footer mt-auto py-3 fixed-bottom" style = "background-color:rgb(33, 103, 42)">
 
