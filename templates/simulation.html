@@ -111,33 +111,24 @@
           <script type="text/javascript">
             let tickersList = {{tickers|safe}};
             let quantList = {{quantities|safe}};
-            let profitList = {{profits|safe}};
             
-          
-
             let portfolio = [];
             for (let i = 0; i < tickersList.length; i++) {
               portfolio.push({
                 Stock: tickersList[i],
                 Quantity: quantList[i],
-                "Gain/Loss": profitList[i], 
               })
             }
 
-            
-
-            function generateTableHead(table, data) {
+            function generatePortfolio(table, data, keys) {
               let thead = table.createTHead();
               let row = thead.insertRow();
-              for (let key of data) {
+              for (let key of keys) {
                 let th = document.createElement("th");
                 let text = document.createTextNode(key);
                 th.appendChild(text);
                 row.appendChild(th);
               }
-            }
-
-            function generateTable(table, data) {
               for (let element of data) {
                 let row = table.insertRow();
                 for (key in element) {
@@ -150,10 +141,8 @@
 
             let table = document.querySelector("table");
             let data = Object.keys(portfolio[0]);
-            generateTable(table, portfolio); 
-            generateTableHead(table, data);
-            
-          </script>
+            generatePortfolio(table, portfolio, data); 
+            </script>
           </div>
           
                   <div class="orderListButton">
