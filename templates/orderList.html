@@ -86,12 +86,54 @@
         <h1>This page is just for testing the Order list function </h1>
         
         <h3>Order list</h3>
-        <br>
-        {% for orders in orderlist%}
-          {{orderlist}}
-        {% endfor %}
-        <br>
-    <footer class="footer mt-auto py-3" style = "background-color:rgb(15, 158, 230)">
+
+        <div class="orderList">
+          <table>
+
+           </table>
+          <script>
+            let buyOrSells = {{buyOrSell|safe}};
+            let timestamps = {{daysOfPurchase|safe}};
+            let tickersList = {{tickers|safe}};
+            let quantList = {{quantities|safe}};
+            let totalPrices = {{prices|safe}};
+
+            let orderList = [];
+            for (let i = 0; i < tickersList.length; i++) {
+              orderList.push({
+                Option : buyOrSells[i],
+                Timestamp : timestamps[i],
+                Stock: tickersList[i],
+                Quantity: quantList[i],
+                Value: totalPrices[i]
+              });
+            }
+
+            function portfolio(table, data, headers) {
+              let thead = table.createTHead();
+              let row = thead.insertRow();
+              for (let key of headers) {
+                let th = document.createElement("th");
+                let text = document.createTextNode(key);
+                th.appendChild(text);
+                row.appendChild(th);
+              }
+              for (let element of data) {
+                let row = table.insertRow();
+                for (key in element) {
+                  let cell = row.insertCell();
+                  let text = document.createTextNode(element[key]);
+                  cell.appendChild(text);
+                }
+              }
+            }
+
+            let table = document.querySelector("table");
+            let headers = Object.keys(orderList[0]);
+            portfolio(table, orderList, headers); 
+            </script>
+        </div>
+    <footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
         <div class="container">
             <span>Copyright 2022 by StockSim</span>
         </div>

@@ -657,7 +657,7 @@ class Order:
         return [*set(tickers)]
 
     # List of Orders by Muneeb Khan
-    def orderList(db):
+    def orderList(db, simName):
         quantityOwned = 0
         ownageFlag = True
         # data = {
@@ -674,15 +674,15 @@ class Order:
         # under the ordernameslist [] array. - Muneeb Khan
         orderslist = []
 
-        for entry in db.collection('IntradayStockData').stream(): # To loop through the users orders
-            temp = entry.to_dict()
-            orders = temp['prices']
-            orderslist.append(temp)
+        if ownageFlag == True:
+            for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
+                temp = entry.to_dict()
+                orderslist.append([temp['avgStockPrice'],temp['buyOrSell'],temp['dayOfPurchase'],temp['quantity'],temp['simulation'],temp['ticker'],temp['totalPrice']])
+            
+            df = pd.DataFrame(orderslist, columns=['avgStockPrice','buyOrSell','dayOfPurchase','quantity','simulation','ticker','totalPrice'])
+            print(df)
+            return df
 
-        return orderslist
-
-        return orders
-    
 class portfolio:
     def __init__(self, db, stock, user, simulation, initialCash):
             self.firebase = db
