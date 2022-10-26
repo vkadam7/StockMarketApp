@@ -318,6 +318,7 @@ def startSimulation():
                     profits = []
                     netGainLoss = []
                     sharesPrices = []
+                    currentPrices = []
                     ##avgPrice = []
                     
                     for entry in Order.stocksBought(dbfire, session['simName']):
@@ -327,14 +328,18 @@ def startSimulation():
                             quantities.append(Portfolio.quantity)
                             profits.append(Portfolio.profit)
                             sharesPrices.append(Portfolio.avgSharePrice)
+                            currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                             #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
                     print(tickers)
                     print(quantities)
                     print(profits)
                     print(sharesPrices)
+                    print(currentPrices)
                     print(netGainLoss)
 
-                    return render_template('simulation.html', person=session['user'], tickers=tickers, quantities=quantities, profits=profits, sharesPrices=sharesPrices)
+                    return render_template('simulation.html', person=session['user'], tickers=tickers, 
+                    quantities=quantities, profits=profits, sharesPrices=sharesPrices,
+                    currentPrices=currentPrices)                
                 else:
                     flash("Please enter a valid cash amount.")
                     return render_template('stockSimForm.html', person=session['user'])
@@ -365,6 +370,7 @@ def goToSimulation():
                 profits = []
                 netGainLoss = []
                 sharesPrices = []
+                currentPrices = []
                 ##avgPrice = []
                 
                 for entry in Order.stocksBought(dbfire, session['simName']):
@@ -374,14 +380,18 @@ def goToSimulation():
                         quantities.append(Portfolio.quantity)
                         profits.append(Portfolio.profit)
                         sharesPrices.append(Portfolio.avgSharePrice)
+                        currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                         #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
                 print(tickers)
                 print(quantities)
                 print(profits)
                 print(sharesPrices)
+                print(currentPrices)
                 print(netGainLoss)
 
-                return render_template('simulation.html', person=session['user'], tickers=tickers, quantities=quantities, profits=profits, sharesPrices=sharesPrices)
+                return render_template('simulation.html', person=session['user'], tickers=tickers, 
+                quantities=quantities, profits=profits, sharesPrices=sharesPrices,
+                currentPrices=currentPrices)
         except KeyError:
             print("KeyError occured: simulation")
             return redirect(url_for('fourOhFour'))
@@ -393,8 +403,7 @@ def goToSimulation():
 def finishSimulation():
     session['simulationFlag'] = 0
     Simulation.finishSimulation(dbfire, session['simName'])
-    return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
-
+    return redirect(url_for("profile")) 
 
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
@@ -428,6 +437,7 @@ def orderConfirm():
         profits = []
         netGainLoss = []
         sharesPrices = []
+        currentPrices = []
         ##avgPrice = []
         
         for entry in Order.stocksBought(dbfire, session['simName']):
@@ -437,14 +447,18 @@ def orderConfirm():
                 quantities.append(Portfolio.quantity)
                 profits.append(Portfolio.profit)
                 sharesPrices.append(Portfolio.avgSharePrice)
+                currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                 #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
         print(tickers)
         print(quantities)
         print(profits)
         print(sharesPrices)
+        print(currentPrices)
         print(netGainLoss)
 
-        return render_template('simulation.html', person=session['user'], tickers=tickers, quantities=quantities, profits=profits, sharesPrices=sharesPrices)
+        return render_template('simulation.html', person=session['user'], tickers=tickers, 
+        quantities=quantities, profits=profits, sharesPrices=sharesPrices,
+        currentPrices=currentPrices)    
     elif session['option'] == 'Buy' and flag == -1:
         flash("Insufficient funds to complete purchase")
         return render_template('orderForm.html', stock=stock, option=session['option'])
