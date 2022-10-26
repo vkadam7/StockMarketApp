@@ -99,14 +99,15 @@
           <h5>Remaining Cash: </h5>
           <p>${{ session['currentCash'] }}</p>
         </div>
-        <div class="portfolio">
+        <div class= "portfolio">
           <table>
+
 
            </table>
           <script type="text/javascript">
-            let tickersList = {{tickers|safe}}
-            let quantList = {{quantities|safe}}
-            let profitList = {{profits|safe}}
+            let tickersList = {{tickers|safe}};
+            let quantList = {{quantities|safe}};
+            let profitList = {{profits|safe}};
 
             let portfolio = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -143,7 +144,7 @@
             let data = Object.keys(portfolio[0]);
             generateTable(table, portfolio); 
             generateTableHead(table, data);
-            </script>
+          </script>
           </div>
                   <div class="orderListButton">
             <a href="orderList">Order History</a>

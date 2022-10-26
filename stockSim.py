@@ -434,7 +434,7 @@ class Simulation:
         tempSim = Simulation(db, email, entry['startDate'], entry['endDate'], entry['initialCash'])
         tempSim.simName = id
         tempSim.startTimestamp = datetime.datetime.fromtimestamp(entry['startTimestamp'].timestamp())
-        tempSim.currentCash = round(entry['currentCash'], 2)
+        tempSim.currentCash = round(float(entry['currentCash']), 2)
         tempSim.initialCash = entry['initialCash']
         tempSim.stocks = []
         for entry in db.collection('IntradayStockData').where('simulation','==',id).stream():
