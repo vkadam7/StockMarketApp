@@ -12,7 +12,7 @@
     </head>
     <header>
 
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(33, 103, 42)">
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top" id = "navBar">
             <div class="container-fluid">
               <a class="navbar-brand" href="home">
                 <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
@@ -68,11 +68,23 @@
           </li>
         {% endif %}
                 </ul>
-                <form action="/stockSearch" method="post">
-                  <input type="search" name="searchTerm" placeholder="Find a stock..."
-                          value="{{ request.form['searchTerm'] }}">
-                  <button>Search</button>
-              </form>
+                <form action="/stockSearch" method="post" id = "dropStock">
+                  <select id = "dropSelect" class = "form" type="search" name="searchTerm" value="{{ request.form['searchTerm'] }}">
+                    <option selected>Find a stock</option>
+                    <option value = "AMZN">Amazon</option>
+                    <option value = "F">Ford</option>
+                    <option value = "BAC">Bank of America</option>
+                    <option value = "DIS">Disney</option>
+                    <option value = "GE">General Electric Company</option>
+                    <option value = "GOOG">Google</option>
+                    <option value = "JPM">JPMorgan Chase & Co</option>
+                    <option value = "KO">Coca-Cola</option>
+                    <option value = "MCD">McDonald's</option>
+                    <option value = "MSFT">Microsoft</option>
+                    <option value = "NFLX">Netflix</option>
+                  </select> 
+                  <button>Display Stock</button>
+                </form>
               </div>        
             </div>
           </nav>
@@ -83,12 +95,12 @@
     <body>
         <div class = "centering">
             <h1>Starting the simulation:</h1>
-            <h3>Just need to enter some details to get the simulation started!</h3>
+            <h4>Just need to enter some details to get the simulation started!</h4>
             <hr>
         </div>
         
             <div class="container">
-              <div class="row justify-content-center" style = "margin-left: 40%;margin-right: 20%;">
+            <div class="row justify-content-center" style = "margin-left: 40%;margin-right: 20%;">
             <form action="/startSimulation" method="post">
               <div class = "form-row align-items-center" style = "box-sizing: 0;">
                 <div class = "form-group col-md-5">
@@ -102,19 +114,20 @@
                 </div>
               </div>
               <br>
-              <div class = "form-row align-items-center">
-                <div class = "form-group col-md-2">
-                  <label for="Money">Starting Cash for Simulation:</label>
+              <div class = "form-row align-items-center" style = "box-sizing: 0;">
+                <div class = "form-group col-md-8">
+                  <label for="Money">Simulation Starting Cash:</label>
                   <input type="Money" name="initialCash" value="{{ request.form['initialCash'] }}" placeholder="Enter an amount...">
                 </div>
                 <br>
-                <button class = "btn btn-block" style = "background-color: green;color: white;">Start Simulation!</button>
+                <button class = "btn btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Start Simulation!</button>
               </div>
             </form>
+
             {% with messages = get_flashed_messages() %}
             {% if messages %}   
               {% for message in messages %}
-              <div class ="alert alert-warning alert-dismissible fade show" role="alert">
+              <div class ="alert alert-warning alert-dismissible fade show" style = "text-align: center" role="alert">
                   {{ message }}
                   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -124,14 +137,10 @@
               {% endif %} 
             {% endwith %} 
         </div>
-        <footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
-            <div class="container">
-              <span>Copyright 2022 by StockSim</span>
-            </div>
-            </div>
+        </div>
     </body>
 
-    <footer class="footer mt-auto py-3 fixed-bottom" style = "background-color:rgb(33, 103, 42)">
+    <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
       <div class="container">
         <span>Copyright 2022 by StockSim</span>
       </div>
