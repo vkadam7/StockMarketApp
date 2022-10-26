@@ -1,14 +1,16 @@
 from asyncio.windows_events import NULL
 #from crypt import methods
+#from crypt import methods
 #from re import T
 from datetime import datetime
 import math
 from operator import mod
+import re
 from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
 import firebase_admin
-from stockSim import SimulationFactory, StockData, User, Order, Simulation
+from stockSim import SimulationFactory, StockData, User, Order, Simulation, portfolio
 
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -296,19 +298,38 @@ def startSimulation():
     if ('user' in session):
         try:
             if request.method == 'POST':
-                session['simulationFlag'] = 1
-                session['simulation'] = {
-                    'simStartDate': request.form['simStartDate'],
-                    'simEndDate': request.form['simEndDate'],
-                    'initialCash': request.form['initialCash']
-                }
-                session['currentCash'] = request.form['initialCash']
-                session['portfolioValue'] = request.form['initialCash']
-                sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
-                                        request.form['simEndDate'], request.form['initialCash'])
-                sim.createSim()
-                session['simName'] = sim.simName
-                return render_template('simulation.html', person=session['user'])
+                pattern = re.compile("^\d+(.\d{1,2})?$")
+                if pattern.match(request.form['initialCash']):
+                    session['simulationFlag'] = 1
+                    session['simulation'] = {
+                        'simStartDate': request.form['simStartDate'],
+                        'simEndDate': request.form['simEndDate'],
+                        'initialCash': request.form['initialCash']
+                    }
+                    session['currentCash'] = request.form['initialCash']
+                    session['portfolioValue'] = request.form['initialCash']
+                    sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
+                                            request.form['simEndDate'], request.form['initialCash'])
+                    sim.createSim()
+                    session['simName'] = sim.simName
+                    
+                    tickers = []
+                    quantities = []
+                    profits = []
+                    for entry in Order.stocksBought(dbfire, session['simName']):
+                        Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
+                        if Portfolio.quantity != 0:
+                            tickers.append(entry)
+                            quantities.append(Portfolio.quantity)
+                            profits.append(Portfolio.profit)
+                    print(tickers)
+                    print(quantities)
+                    print(profits)
+
+                    return render_template('simulation.html', person=session['user'], tickers=tickers, quantities=quantities, profits=profits)
+                else:
+                    flash("Please enter a valid cash amount.")
+                    return render_template('stockSimForm.html', person=session['user'])
         except KeyError:
             print("KeyError occured: startSimulation")
             return redirect(url_for('fourOhFour'))
@@ -327,11 +348,26 @@ def goToSimulation():
                 session['simulationFlag'] = 1
                 sim = SimulationFactory(dbfire, session['user']).simulation
                 session['currentCash'] = sim.currentCash
+                session['initialCash'] = sim.initialCash
                 session['portfolioValue'] = sim.initialCash
                 session['simName'] = sim.simName
-                return render_template('simulation.html', person=session['user'])
+
+                tickers = []
+                quantities = []
+                profits = []
+                for entry in Order.stocksBought(dbfire, session['simName']):
+                    Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
+                    if Portfolio.quantity != 0:
+                        tickers.append(entry)
+                        quantities.append(Portfolio.quantity)
+                        profits.append(Portfolio.profit)
+                print(tickers)
+                print(quantities)
+                print(profits)
+
+                return render_template('simulation.html', person=session['user'], tickers=tickers, quantities=quantities, profits=profits)
         except KeyError:
-            print("KeyError occured: startSimulation")
+            print("KeyError occured: simulation")
             return redirect(url_for('fourOhFour'))
     else:
         flash("Sorry you must be logged in to view that page.")
@@ -339,8 +375,10 @@ def goToSimulation():
         
 @app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
-    sim.finishSimulation()
     session['simulationFlag'] = 0
+    Simulation.finishSimulation(dbfire, session['simName'])
+    return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
+
 
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
@@ -350,9 +388,13 @@ def orderFormFill():
 
 @app.route("/orderCreate", methods=['POST', 'GET'])
 def orderCreate():
-    session['orderQuantity'] = request.form['stockQuantity']
-    session['orderPrice'] = round(int(session['orderQuantity']) * session['currentPrice'], 2)
-    return render_template('orderConfirmation.html', stock=stock, option=session['option'])
+    if request.form['stockQuantity'].isnumeric():
+        session['orderQuantity'] = request.form['stockQuantity']
+        session['orderPrice'] = round(int(session['orderQuantity']) * session['currentPrice'], 2)
+        return render_template('orderConfirmation.html', stock=stock, option=session['option'])
+    else:
+        flash("Please enter a valid quantity amount")
+        return render_template('orderForm.html', stock=stock, option=session['option'])
 
 @app.route("/orderConfirm", methods=['POST', 'GET'])
 def orderConfirm():
@@ -363,8 +405,21 @@ def orderConfirm():
     else:
         flag = order.sellOrder()
     if flag == 1:
+        flash("Order Complete!")
         session['currentCash'] = Simulation.retrieveCurrentCash(dbfire, session['simName'])
-        return render_template('simulation.html', person=session['user'])
+        tickers = []
+        quantities = []
+        profits = []
+        for entry in Order.stocksBought(dbfire, session['simName']):
+            Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
+            if Portfolio.quantity != 0:
+                tickers.append(entry)
+                quantities.append(Portfolio.quantity)
+                profits.append(Portfolio.profit)
+        print(tickers)
+        print(quantities)
+        print(profits)
+        return render_template('simulation.html', person=session['user'], tickers=tickers, quantities=quantities, profits=profits)
     elif session['option'] == 'Buy' and flag == -1:
         flash("Insufficient funds to complete purchase")
         return render_template('orderForm.html', stock=stock, option=session['option'])
@@ -424,6 +479,7 @@ def displayStock(ticker):
     startDate = request.args['startDate']
     endDate = request.args['endDate']
     timespan = request.args['timespan']
+    session['ticker'] = ticker
     global stock
     if session['simulationFlag'] == 0:
         stockData = StockData(dbfire, ticker)
@@ -453,22 +509,22 @@ def displayStock(ticker):
     else:
         stockData = SimulationFactory(dbfire, session['user']).simulation.retrieveStock(ticker)
         if timespan != 'hourly':
-            if timespan == 'daily':
-                for entry in stockData:
-                    stock = entry.to_dict()
-                if stock != -1:
-                    dates = []
-                    prices = []
+            #if timespan == 'daily':
+            for entry in stockData:
+                stock = entry.to_dict()
+            if stock != -1:
+                dates = []
+                prices = []
+                avgPrice = []
+            for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
+                avgPrice.append(stock['prices'][i])
+                if i % 7 == 1:
+                    prices.append(mean(avgPrice))
+                    print(mean(avgPrice))
+                    dates.append(stock['dates'][i][0:10])
+                    print(stock['dates'][i][0:10])
                     avgPrice = []
-                for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
-                    avgPrice.append(stock['prices'][i])
-                    if i % 7 == 1:
-                        prices.append(mean(avgPrice))
-                        print(mean(avgPrice))
-                        dates.append(stock['dates'][i][0:10])
-                        print(stock['dates'][i][0:10])
-                        avgPrice = []
-                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
         else: 
             for entry in stockData:
                 stock = entry.to_dict()
@@ -534,25 +590,46 @@ def orderlists():
 @app.route('/404Error')
 def fourOhFour():
     return render_template('404Error.html',person = session['user'])
+
+
 #Author: Viraj Kadam
-@app.route('/displayInfo') #Retrieving info from portolio file
+@app.route('/portfolio', methods=['POST', "GET"]) #Retrieving info from portolio file
 def Portfolio():
-    if('user' in session): #to check if the user is logged in will change to profile page
-        session['simulation'] = {
-            'startDate': request.form['startDate'],
-            'endDate': request.form['endDate'],
-            'initialCash': request.form['initialCash'],
-            'currentCash': request.form['currentCash']
-        }
-        session['currentCash'] = request.form['initialCash']
-        global sim
-        sim = Simulation(dbfire, session['user'], request.form['startDate'],
-                        request.form['endDate'], request.form['initialCash'], request.form['currentCash'] )
-        sim.createSim()
-        return render_template('simulation.html', person=session['user'])
-    else: 
-        return render_template('404Error.html')
+    if ('user' in session):
     
+                session['simulationFlag'] = 1
+                session['simulation'] = {
+                    'simStartDate': request.form['simStartDate'],
+                    'simEndDate': request.form['simEndDate'],
+                    'initialCash': request.form['initialCash',]
+                }
+                Portfolio = portfolio(dbfire, session['user'], portfolio.get_profit,
+                                portfolio.funds_remaining, request.form['initialCash'])
+                
+                
+               # session['portfolio'] = {
+               #    'Profit': portfolio.get_profit,
+               #     'Funds_remaining': portfolio.funds_remaining,
+               #     'initialCash': request.form['initialCash'],
+               #     'currentCash': Simulation['currentCash'],
+                    
+              #  }
+              
+                #session['portfolio'] = {
+                #  'Profit': request.form['profit'], 
+                #  'currentCash': request.form['currentCash'], 
+                #  'initialCash': request.form['initialCash']
+                #}
+                session['Profit']: portfolio.get_profit
+    
+              
+                #sim.displayInfo
+                #session['simName'] = sim.simName
+                return render_template('simulation.html')
+  
+        
+    #line 318  
+
 
 ## Need to complete this setup route for the dashboard, will show up to the user once they have started the simulation. 
 @app.route('/dashboard')

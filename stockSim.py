@@ -1,7 +1,8 @@
-from ast import Constant
+from ast import Constant, Or
 from mimetypes import init
 from queue import Empty
 from re import search
+from statistics import mean
 from this import d
 from time import daylight
 import numpy as np
@@ -418,12 +419,12 @@ class Simulation:
             self.stocks.append(tempData)
             self.db.collection('IntradayStockData').add(tempData)
 
-    def finishSimulation(self):
-        data = self.db.collection('Simulations').document(self.simName).get().to_dict()
+    def finishSimulation(db, simName):
+        data = db.collection('Simulations').document(simName).get().to_dict()
         data['ongoing'] = False
         percentChange = (float(data['currentCash']) - float(data['initialCash'])) / float(data['initialCash'])
         data['score'] = percentChange * 100
-        self.db.collection('Simulations').document(self.simName).update(data)
+        db.collection('Simulations').document(simName).update(data)
 
     def retrieveOngoing(db, email):
         for query in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream():
@@ -433,7 +434,7 @@ class Simulation:
         tempSim = Simulation(db, email, entry['startDate'], entry['endDate'], entry['initialCash'])
         tempSim.simName = id
         tempSim.startTimestamp = datetime.datetime.fromtimestamp(entry['startTimestamp'].timestamp())
-        tempSim.currentCash = entry['currentCash']
+        tempSim.currentCash = round(float(entry['currentCash']), 2)
         tempSim.initialCash = entry['initialCash']
         tempSim.stocks = []
         for entry in db.collection('IntradayStockData').where('simulation','==',id).stream():
@@ -626,6 +627,7 @@ class Order:
                             amountToSell -= int(temp['newQuantity'])
                         else:
                             self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['newQuantity']) - amountToSell)})
+                            amountToSell -= abs(int(temp['newQuantity']) - amountToSell)
                 for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream():
                     temp = entry.to_dict()
                     print("Difference is: " + str(amountToSell) + "-" + temp['quantity'] + "=" + str(amountToSell - int(temp['quantity'])))
@@ -634,10 +636,25 @@ class Order:
                         amountToSell -= int(temp['quantity'])
                     else:
                         self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['quantity']) - amountToSell)})
+                        amountToSell -= abs(int(temp['quantity']) - amountToSell)
 
             return ownageFlag
         
         return ownageFlag
+
+    def retrieve(db, sim, ticker):
+        return db.collection('Orders').where('simulation','==',sim).where('ticker','==',ticker).stream()
+
+    def retrieveOwned(db, sim, ticker):
+        return db.collection('Orders').where('simulation','==',sim).where('ticker','==',ticker).where('sold','==',False).stream()
+
+    def stocksBought(db, sim):
+        tickers = []
+        for entry in db.collection('Orders').where('simulation','==',sim).stream():
+            temp = entry.to_dict()
+            tickers.append(temp['ticker'])
+        print(tickers)
+        return [*set(tickers)]
 
     # List of Orders by Muneeb Khan
     def orderList(db, simName):
@@ -666,6 +683,212 @@ class Order:
             print(df)
             return df
 
-        else:
-            return -1
+class portfolio:
+    def __init__(self, db, stock, user, simulation, initialCash):
+            self.firebase = db
+            self.stock = stock
+            self.user = user
+            self.initialCash = initialCash
+            self.sim = simulation 
+            #self.fundsRemaining = fundsRemaining
+            #self.dayofPurchase = datetime.datetime.now()
+            self.currentCash = Simulation.retrieveCurrentCash(db, simulation)
+            self.quantity = self.weight()
+            self.profit = self.get_profit()
     
+    #def retrieve(self, id):
+    #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
+    #    return stockRetrieved
+
+    #round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+    #Returns profit from the simulator(Need to test and fix if needed )
+    def get_profit(self):
+        currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
+        prices = []
+        amountOfSharesOwned = 0
+        for entry in Order.retrieve(self.firebase, self.sim, self.stock):
+            temp = entry.to_dict()
+            prices.append(float(temp['totalPrice']))
+            if temp.get('newQuantity') != None:
+                amountOfSharesOwned += int(temp['newQuantity'])
+            else:
+                amountOfSharesOwned += int(temp['quantity'])
+        avgPriceOfOrders = mean(prices)
+        currentValueOfShares = currentPriceOfStock * amountOfSharesOwned
+        return round(currentValueOfShares - avgPriceOfOrders, 2)
+
+        #profit = 0
+        #quantity = self.db.collection('Orders').document('quantity').get()
+        #if Order.buyOrder() == True:
+        #    tempPrice = self.db.collection('Order').document('avgStockPrice').get()
+        #    quantity = self.db.collection('Orders').document('quantity').get()
+        #    profit += tempPrice * quantity
+        #    return profit
+        #elif Order.sellOrder() == True:
+        #    tempPrice = self.db.collection('Order').document('avgStockPrice').get()
+        #    quantity = self.db.collection('Orders').document('quantity').get()
+        #    profit -= tempPrice * quantity
+        #    return profit
+            
+    #Displays amount of shares owned (To also be implemented later)
+    def weight(self):
+        quantity = 0
+        for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
+            temp = entry.to_dict()
+            if temp.get('newQuantity') != None:
+                quantity += int(temp['newQuantity'])
+            else:
+                quantity += int(temp['quantity'])
+        return quantity
+
+        #share = [self.quantity]
+        #max_share = 1
+        #for share in max_share:
+        #    if(self.quantity <= max_share and self.quantity >= 0):
+        #        return share[self.quantity]
+        #    else:
+        #        return -1   
+        
+
+    #
+    #
+    #
+    #
+    # I dont think this is necessary - Ian
+    #               |
+    #               |
+    #               |
+    #               V
+    #Fixed this section to account for gains or losses, need to test to check if everything is correct  
+    def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
+          #tempData = self.db.collection('Simulations').document(self.sim).document('Orders').get()
+        data = {'name': self.name, 
+                'quantity': self.quantity, 
+                'avgStockPrice': self.avgStockPrice, 
+                }
+        currentCash = self.db.collection('Simulations').document(self.sim).document('currentCash').get()
+        currentPrice = Simulation.currentPriceOf
+        day = datetime()
+        
+        
+        stocksOwned = self.db.collection('Orders').document(self.sim).document('ticker')
+
+        if quanity > 0:    
+            if currentCash > currentPrice:
+                tempPrice = self.db.collection('Simulations').document(simName).document('Stocks').document('prices').get()
+                #Need to fix this function
+                #CurrentPrice = self.db.collection('Stocks').document('daily').document('closes').get
+                
+                netLoss = "-" + netGainorLoss
+                print("Net loss" + netLoss )
+                return netLoss
+            else:
+                netGain = netGainorLoss
+                print("Net Gain: " + netGain)
+                return netGain
+        if Order.buyOrder == True:
+                netGainorLoss = (currentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
+                return netGainorLoss
+        elif Order.sellOrder == True:
+                 netGainorLoss = (currentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
+                 return netGainorLoss
+
+      
+    #
+    #
+    #
+    #
+    # Calculated by: self.currentCash = Simulation.retrieveCurrentCash(db, simulation)
+    #               |
+    #               |
+    #               |
+    #               V                     
+     #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
+    def funds_remaining(self, initialAmount, finalAmount):
+        finalAmount = 0
+        fundsUsed = 0
+        fundsRemainiing = 0
+        quantity = 0
+        tempPrice = self.db.collection('Stocks').document('daily').document('closes').get()
+        data = {'name': self.name,
+                'quantity': self.quantity, 
+                'avgStockPrice': self.avgStockPrice, 
+                'startDate': self.startDate,
+                'endDate': self.endDate,
+                'initialCash': self.initialCash,
+                'currentCash': self.currentCash,
+                'score': 0,
+                'Orders': []  
+        }
+
+        if Order.buyOrder() == True:
+            if data ['currentCash'] == data['initialCash']:
+                return data['currentCash']
+            elif data['currentCash'] > data['initialCash']:
+                 fundsUsed = data['currentCash'] - data['initialCash']
+                 fundsRemainiing = fundsUsed
+                 return fundsRemainiing
+        elif Order.sellOrder():
+            if data ['currentCash'] == data['initialCash']:
+                return data['currentCash']
+            elif data['currentCash'] > data['initialCash']:
+                 fundsUsed = data['currentCash'] - data['initialCash']
+                 fundsRemainiing = fundsUsed
+                 return fundsRemainiing
+       
+        
+    #Edited returns feature
+    def returns(self, quantity, avgStockPrice, AdjustClose):
+        returns = self.db.collection('Stocks').document('daily').document('closes').get()
+        daily_returns = returns.pct_change()
+        print(daily_returns)
+       
+           
+    #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
+    #Updated by Muneeb Khan
+    def percentChange(self,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
+
+        
+        percentIncrease = 0
+        AdjustClose = 0
+
+        day = self.db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
+       #Need more inquiry
+       # newstockPrice = self.db.collection('IntradayStockData').document('daily').document('closes').get()
+        stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
+        stock=  self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream()
+        quantity = self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('quantity', '==', self.stock['quantity']).stream()
+        for i in stock:
+             if quantity > 0:
+                for stockPrice in day: 
+                    increase = newstockPrice[day+1] - stockPrice[day]
+                percentIncrease = (increase/stockPrice) * 100
+                return percentIncrease
+        else:
+            return -1     
+        
+    #Author: Viraj Kadam    
+    #Graph of user stocks   (Need buy and sell info)
+    #def user_graph(self, db):
+    #   prices = self.db.collection('IntradayStockData').document('prices').get()
+    #    dates = self.db.collection('IntradayStockData').document('dates').get()
+    #    for x in prices:
+    #        plt.plot(x[dates][prices])
+    #        
+    #    plt.xlabel('Date')
+    #    plt.ylabel('Price')
+    #    plt.show
+            
+        
+        
+    #Display all information
+    def displayInfo(self, close):
+        print(self.percentChange)
+        print(self.returns)
+        print(self.funds_remaining)
+
+        print(self.get_profit)
+        if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
+            print("Gains: +" + self.GainorLoss)
+        elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
+            return

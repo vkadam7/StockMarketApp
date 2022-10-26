@@ -32,29 +32,27 @@ class portfolio:
         self.stockPrice = stockPrice
         return -1
     
-    def displayPortfolio(self):
-        count = len(self.db.collection('Simulations').get(id))
-        simName = "Sim" + str(count+1)
-        self.simName = simName
-        data = {
-                'ongoing': True,
-                'user': self.user.email,
-                'startDate': self.startDate,
-                'endDate': self.endDate,
-                'initialCash': self.initialCash,
-                'currentCash': self.initialCash,
-                'score': 0,
-                'Orders': [],
-                'profit': 0
-            }
-        self.db.collection('Simulations').document(simName).set(data)
+    #def displayPortfolio(self):
+     #   count = len(self.db.collection('Simulations').get(id))
+    #  simName = "Sim" + str(count+1)
+    # self.simName = simName
+    #    data = {
+     #           'ongoing': True,
+      #          'user': self.user.email,
+       #         'startDate': self.startDate,
+        #       'initialCash': self.initialCash,
+         #       'currentCash': self.initialCash,
+          #      'score': 0,
+         #       'Orders': [],
+          #      'profit': 0
+           # }
+        #self.db.collection('Simulations').document(simName).set(data)
         
     
     def retrieve(self, id):
-        try:
-            return self.firebase.collection("Stocks").document(id).get()
-        except:
-            return ''
+        stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
+        return stockRetrieved
+        
 
     #Retrieves the number of shares owned by the user, to be implemented once buy and sell features are finished. Will be coded in line with
     #those feaures.
@@ -82,7 +80,7 @@ class portfolio:
         tempPrice = self.db.collection('Simulations').document('daily').document('closes').get()
         quantity = self.db.collection('Simulations').document('daily').document('volume').get()
         profit += tempPrice * quantity
-        return data[profit]
+        return profit
     
     #Displays amount of shares owned (To also be implemented later)
     def weight(self, db, stock):
@@ -96,10 +94,6 @@ class portfolio:
         
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
     def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
-        totalGain = 0
-        netGain = 0
-        netLoss = 0
-        CurrentPrice = 0
         tempData = self.db.collection('Simulations').document(self.sim).document('Orders').get()
         data = {'name': self.name, 
                 'quantity': self.quantity, 
@@ -110,8 +104,9 @@ class portfolio:
                 tempPrice = self.db.collection('Simulations').document(simName).document('Stocks').document('prices').get()
                 #Need to fix this function
                 #CurrentPrice = self.db.collection('Stocks').document('daily').document('closes').get()
-                CurrentPrice = self.db.collection('Simulations').document(simName).document('Stocks').document('prices').get()
-                day = self.db.collection('Stocks').document('daily').document('dates').get()
+                CurrentPrice = self.db.collection('Simulations').document(simName).document('currentCash').document('prices').get()
+                #day = self.db.collection('Stocks').document('daily').document('dates').get()
+                day = self.db.collection('IntradayStockData').document('dates').get()
                 for CurrentPrice in day :
                     netGainorLoss = (CurrentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
                     if netGainorLoss > CurrentPrice:
@@ -161,29 +156,26 @@ class portfolio:
        
         
     #Deletes a stock from the portfolio
-    def delete(self, stock):
-            stock = stock.upper()
-            try:
-                self.portfolio.pop(stock)
-                return True
-            except Error:
-                return False
+    #       stock = stock.upper()
+    #          return True
+    #        except Error:
+     #           return False
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
-    #def percentChange(self,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
+    def percentChange(self,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
 
-     #   quantity = 0
-      #  percentIncrease = 0
-       # AdjustClose = 0
+        quantity = 0
+        percentIncrease = 0
+        AdjustClose = 0
 
-#        day = self.db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
- ##      stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
+        day = self.db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
+        stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
 
-   #     if quantity > 0:
-    ##           increase = newstockPrice[day+1] - stockPrice[day]
+        if quantity > 0:
+            increase = newstockPrice[day+1] - stockPrice[day]
                     
-      ###    return -1
+        return -1
         
         
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
@@ -195,7 +187,8 @@ class portfolio:
         AdjustClose = 0
 
         day = self.db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
-        newstockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
+       #Need more inquiry
+       # newstockPrice = self.db.collection('IntradayStockData').document('daily').document('closes').get()
         stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
 
         if quantity > 0:
@@ -205,8 +198,20 @@ class portfolio:
             percentIncrease = (increase/stockPrice) * 100
             return percentIncrease
         else:
-            return -1        
-    #def user_graph(self, db):
+            return -1     
+        
+    #Author: Viraj Kadam    
+    #Graph of user stocks   (Need buy and sell info)
+    def user_graph(self, db):
+        prices = self.db.collection('IntradayStockData').document('prices').get()
+        dates = self.db.collection('IntradayStockData').document('dates').get
+        for x in prices:
+            plt.plot(x[dates][prices])
+            
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.show
+            
         
         
     #Display all information
@@ -214,17 +219,16 @@ class portfolio:
         print("Percent Change: " + self.percentChange)
         print("Returns: " + self.returns)
         print("Amount Remaining: " + self.funds_remaining)
+       
         print("Profit: " + self.get_profit)
-        if (self.GainorLoss > self.db.collection('Stocks').document('daily').document('closes').get()):
+        if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
             print("Gains: +" + self.GainorLoss)
-            return
         elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
             print("Loss: -" + self.GainorLoss)
-            return
-        else:
-            return -1
         
         print("Would you like to delete a stock: " + self.delete)
         print("Retrive stocks: " + self.retrieve)
+        
+        
         
         
