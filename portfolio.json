@@ -1,0 +1,13 @@
+{
+
+    "headers":[
+        "Ticker", 
+        "Quantity/Shares",
+        "Price",
+        "Current Value:",
+        "Gain/Loss"
+    ]
+
+
+    
+}
