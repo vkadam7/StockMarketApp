@@ -14,7 +14,7 @@
     </head>
     <header>
     
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top" style = "background-color:rgb(33, 103, 42)">
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top py-3" id = "navBar">
             <div class="container-fluid">
               <a class="navbar-brand" href="home">
                 <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
@@ -70,11 +70,25 @@
           </li>
         {% endif %}
                 </ul>
-                <form action="/stockSearch" method="post">
-                  <input type="search" name="searchTerm" placeholder="Find a stock..."
-                          value="{{ request.form['searchTerm'] }}">
-                  <button>Search</button>
-              </form>
+                <form action="/stockSearch" method="post" id = "dropStock">
+                  <select id = "dropSelect" class = "form" type="search" name="searchTerm" value="{{ request.form['searchTerm'] }}">
+                    <option selected>Find a stock</option>
+                    <option value = "AMZN">Amazon</option>
+                    <option value = "F">Ford</option>
+                    <option value = "BAC">Bank of America</option>
+                    <option value = "DIS">Disney</option>
+                    <option value = "GE">General Electric Company</option>
+                    <option value = "GOOG">Google</option>
+                    <option value = "JPM">JPMorgan Chase & Co</option>
+                    <option value = "KO">Coca-Cola</option>
+                    <option value = "MCD">McDonald's</option>
+                    <option value = "MSFT">Microsoft</option>
+                    <option value = "NFLX">Netflix</option>
+                  </select> 
+                  <button>Display Stock</button>
+                </form>
+
+
               </div>        
             </div>
           </nav>
@@ -102,7 +116,7 @@
         </div>
 
     
-        <div class = "card w-50">
+        <div class = "card w-75">
             <div class = "card-header">
                 <img class = "logo" src = "/static/questionLogo.png" alt = "question symbol" width = "50" height = "50">
                 <h4> About us </h4>
@@ -117,7 +131,7 @@
             </div>
         </div>
 
-        <div class = "card w-50">
+        <div class = "card w-75">
             <div class = "card-header">
                <img class = "logo" src = "/static/infoLogo.png" alt = "info symbol" width = "50" height = "50">
                <h4> Information </h4>
@@ -134,7 +148,7 @@
         </div>
 
 
-        <div class = "card w-50">
+        <div class = "card w-75">
             <div class = "card-header">
                 <img class = "logo" src = "/static/registerLogo.png" alt = "register symbol" width = "50" height = "50">
                 <h4>Become a Member</h4>
@@ -152,7 +166,7 @@
 
         </div>
 
-        <div class = "card w-50">
+        <div class = "card w-75">
             <div class = "card-header">
                 <img class = "logo" src = "/static/stockLogo.png" alt = "stock symbol" width = "50" height = "50">
                 <h4>Search for stocks</h4>
@@ -166,7 +180,7 @@
       
 </main>
 
-<footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
+<footer class="footer mt-auto py-3" id = "foot">
   <div class="container">
     <span>Copyright 2022 by StockSim</span>
   </div>
