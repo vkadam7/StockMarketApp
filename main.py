@@ -366,20 +366,19 @@ def goToSimulation():
                 tickers = []
                 quantities = []
                 profits = []
-<<<<<<< HEAD
+
                 netogainorloss = []
-=======
+
                 
->>>>>>> Master
+
                 for entry in Order.stocksBought(dbfire, session['simName']):
                     Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
                     tickers.append(entry)
                     quantities.append(Portfolio.quantity)
-<<<<<<< HEAD
+
                     profits.append(Portfolio.profit)
                     netogainorloss.append(Portfolio.netgainorloss)
-=======
->>>>>>> Master
+
                 print(tickers)
                 print(quantities)
                 print(profits)
