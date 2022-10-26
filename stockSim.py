@@ -755,7 +755,9 @@ class portfolio:
         for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
             temp = entry.to_dict()
             prices.append(float(temp['avgStockPrice']))
-        return round(mean(prices),2)
+        if prices:
+            return round(mean(prices),2)
+        return 0
 
     #
     #
