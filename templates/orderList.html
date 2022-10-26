@@ -91,20 +91,20 @@
           <thead>
             <tr>
               {% for orders in orderlist%}
-              <th scope="col">{{orders}}</th>
+              <th>{{orders}}</th>
               {% endfor %}
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              {% for orders in orderlist['avgStockPrice']%}
-              <tr><td>{{orders}}</td></tr>
-              {% endfor %}
-              {% for orders in orderlist['buyOrSell']%}
-              <tr><td>{{orders}}</td></tr>
-              {% endfor %}
-            </tr>
-          </tbody>   
+            <tbody>
+              <tr>
+                {% for orders in orderlist['avgStockPrice']%}
+                  <tr><td>{{orders}}</td>
+                      <td>{{orders2}}</td>
+                      <td>{{orders.dayOfPurchase}}</td>
+                  </tr>
+                {% endfor %}
+              </tr>  
+            </tbody>
         </table>
         <br>
     <footer class="footer mt-auto py-3" style = "background-color:rgb(33, 103, 42)">
