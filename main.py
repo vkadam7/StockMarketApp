@@ -349,14 +349,21 @@ def goToSimulation():
                 tickers = []
                 quantities = []
                 profits = []
+                netGainLoss = []
+                ##avgPrice = []
                 
                 for entry in Order.stocksBought(dbfire, session['simName']):
                     Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
                     tickers.append(entry)
                     quantities.append(Portfolio.quantity)
+                    profits.append(Portfolio.get_profit())
+                  #  avgPrice.append()
+                    
+                    #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
                 print(tickers)
                 print(quantities)
                 print(profits)
+                print(netGainLoss)
 
                 return render_template('simulation.html', person=session['user'], tickers=tickers, quantities=quantities, profits=profits)
         #except KeyError:

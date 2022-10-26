@@ -100,7 +100,11 @@
           <p>${{ session['currentCash'] }}</p>
         </div>
         <div class= "portfolio">
-          <table>
+
+          <table class = "table table-striped table-dark table-bordered table-hover">
+            
+            <thead class = "thead-dark">
+            
 
 
            </table>
@@ -108,15 +112,19 @@
             let tickersList = {{tickers|safe}};
             let quantList = {{quantities|safe}};
             let profitList = {{profits|safe}};
+            
+          
 
             let portfolio = [];
             for (let i = 0; i < tickersList.length; i++) {
               portfolio.push({
-                Shares: tickersList[i],
+                Stock: tickersList[i],
                 Quantity: quantList[i],
-                Profit: profitList[i]
+                "Gain/Loss": profitList[i], 
               })
             }
+
+            
 
             function generateTableHead(table, data) {
               let thead = table.createTHead();
@@ -144,8 +152,10 @@
             let data = Object.keys(portfolio[0]);
             generateTable(table, portfolio); 
             generateTableHead(table, data);
+            
           </script>
           </div>
+          
                   <div class="orderListButton">
             <a href="orderList">Order History</a>
         {% with messages = get_flashed_messages() %}
