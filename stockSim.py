@@ -2,7 +2,7 @@ from ast import Constant, Or
 from mimetypes import init
 from queue import Empty
 from re import search
-from statistics import mean
+from statistics import mean, quantiles
 from this import d
 from time import daylight
 import numpy as np
@@ -419,12 +419,12 @@ class Simulation:
             self.stocks.append(tempData)
             self.db.collection('IntradayStockData').add(tempData)
 
-    def finishSimulation(self):
-        data = self.db.collection('Simulations').document(self.simName).get().to_dict()
+    def finishSimulation(db, simName):
+        data = db.collection('Simulations').document(simName).get().to_dict()
         data['ongoing'] = False
         percentChange = (float(data['currentCash']) - float(data['initialCash'])) / float(data['initialCash'])
         data['score'] = percentChange * 100
-        self.db.collection('Simulations').document(self.sim).update(data)
+        db.collection('Simulations').document(simName).update(data)
 
     def retrieveOngoing(db, email):
         for query in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream():
@@ -627,6 +627,7 @@ class Order:
                             amountToSell -= int(temp['newQuantity'])
                         else:
                             self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['newQuantity']) - amountToSell)})
+                            amountToSell -= abs(int(temp['newQuantity']) - amountToSell)
                 for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream():
                     temp = entry.to_dict()
                     print("Difference is: " + str(amountToSell) + "-" + temp['quantity'] + "=" + str(amountToSell - int(temp['quantity'])))
@@ -635,6 +636,7 @@ class Order:
                         amountToSell -= int(temp['quantity'])
                     else:
                         self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['quantity']) - amountToSell)})
+                        amountToSell -= abs(int(temp['quantity']) - amountToSell)
 
             return ownageFlag
         
@@ -642,6 +644,9 @@ class Order:
 
     def retrieve(db, sim, ticker):
         return db.collection('Orders').where('simulation','==',sim).where('ticker','==',ticker).stream()
+
+    def retrieveOwned(db, sim, ticker):
+        return db.collection('Orders').where('simulation','==',sim).where('ticker','==',ticker).where('sold','==',False).stream()
 
     def stocksBought(db, sim):
         tickers = []
@@ -652,7 +657,7 @@ class Order:
         return [*set(tickers)]
 
     # List of Orders by Muneeb Khan
-    def orderList(db):
+    def orderList(db, simName):
         quantityOwned = 0
         ownageFlag = True
         # data = {
@@ -669,15 +674,15 @@ class Order:
         # under the ordernameslist [] array. - Muneeb Khan
         orderslist = []
 
-        for entry in db.collection('IntradayStockData').stream(): # To loop through the users orders
-            temp = entry.to_dict()
-            orders = temp['prices']
-            orderslist.append(temp)
+        if ownageFlag == True:
+            for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
+                temp = entry.to_dict()
+                orderslist.append([temp['avgStockPrice'],temp['buyOrSell'],temp['dayOfPurchase'],temp['quantity'],temp['simulation'],temp['ticker'],temp['totalPrice']])
+            
+            df = pd.DataFrame(orderslist, columns=['avgStockPrice','buyOrSell','dayOfPurchase','quantity','simulation','ticker','totalPrice'])
+            print(df)
+            return df
 
-        return orderslist
-
-        return orders
-    
 class portfolio:
     def __init__(self, db, stock, user, simulation, initialCash):
             self.firebase = db
@@ -690,6 +695,7 @@ class portfolio:
             self.currentCash = Simulation.retrieveCurrentCash(db, simulation)
             self.quantity = self.weight()
             self.profit = self.get_profit()
+            self.avgSharePrice = self.returnValue()
     
     #def retrieve(self, id):
     #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
@@ -728,7 +734,7 @@ class portfolio:
     #Displays amount of shares owned (To also be implemented later)
     def weight(self):
         quantity = 0
-        for entry in Order.retrieve(self.firebase, self.sim, self.stock):
+        for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
             temp = entry.to_dict()
             if temp.get('newQuantity') != None:
                 quantity += int(temp['newQuantity'])
@@ -744,6 +750,14 @@ class portfolio:
         #    else:
         #        return -1   
         
+    def returnValue(self):
+        prices = []
+        for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
+            temp = entry.to_dict()
+            prices.append(float(temp['avgStockPrice']))
+        if prices:
+            return round(mean(prices),2)
+        return 0
 
     #
     #
