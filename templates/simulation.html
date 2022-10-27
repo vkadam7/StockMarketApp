@@ -100,8 +100,8 @@
           <p>${{ session['currentCash'] }}</p>
         </div>
         <div class= "portfolio">
-
-          <table class = "table table-striped table-dark table-bordered table-hover">
+          <div class="row justify-content-center">
+          <table class = "table table-striped w-75 table-dark table-bordered table-hover">
             
             <thead class = "thead-dark">
             
@@ -150,12 +150,14 @@
             generatePortfolio(table, portfolio, data); 
             </script>
           </div>
-          
-                  <div class="orderListButton">
-            <a href="orderList">Order History</a>
+          </div>
+            <div class="orderListButton">
+            <button class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;" href="orderList">Order History</button>
+          </div>
+            <br>
             <div class="finishSimButton">
               <form action="/finishSimulation">
-                <button>Finish the Simulation!</button>
+                <button class="btn btn btn-lg" name="option" value="Buy" style = "color:rgb(33, 103, 42);background-color:antiquewhite;">Finish the Simulation!</button>
                 </form>
               </div>
         {% with messages = get_flashed_messages() %}
@@ -170,7 +172,6 @@
             {% endfor %} 
         {% endif %} 
         {% endwith %} 
-      </div>
       </div>
     </body>
     <br><br>
