@@ -884,7 +884,18 @@ class portfolio:
             return df
 
         else:
-            return -1     
+            return -1       
+        
+    def volatitlity(self):
+       currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
+       day = datetime.datetime.now()
+       for x in day :
+           vt = (currentPriceOfStock[x+1]/currentPriceOfStock)
+           vt = vt.pct_change(1)
+           return vt
+       
+       currentPriceOfStock = vt 
+       return currentPriceOfStock  
         
     #Author: Viraj Kadam    
     #Graph of user stocks   (Need buy and sell info)
