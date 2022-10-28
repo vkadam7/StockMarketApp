@@ -680,8 +680,9 @@ class Order:
                 orderslist.append([temp['buyOrSell'],temp['dayOfPurchase'],temp['quantity'],temp['ticker'],temp['totalPrice']])
             
             df = pd.DataFrame(orderslist, columns=['buyOrSell','dayOfPurchase','quantity','ticker','totalPrice'])
-            print(df)
-            return df
+            
+
+            return df.to_dict()
 
 class portfolio:
     def __init__(self, db, stock, user, simulation, initialCash):

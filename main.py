@@ -613,14 +613,26 @@ def userlists():
 @app.route("/orderList")
 def orderlists():
     if ('user' in session):
-
+        days = []
+        buys = []
+        tickers = []
+        quantities = []
+        prices = []
         orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
+        tickers.append(orderlist['ticker'])
+        days.append(orderlist['dayOfPurchase'])
+        buys.append(orderlist['buyOrSell'])
+        quantities.append(orderlist['quantity'])
+        prices.append(orderlist['totalPrice'])
+        print(tickers)
+        print(days)
+        print(buys)
+        print(quantities)
+        print(prices)
 
-        print(orderlist['ticker'].to_list())
-
-        return render_template('orderList.html',session=session,buyOrSell=orderlist['buyOrSell'].to_list,
-        daysOfPurchase=orderlist['dayOfPurchase'].to_list(), tickers=orderlist['ticker'].to_list(),
-        quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
+        return render_template('orderList.html',person=session['user'],buys=buys,
+        days=days, tickers=tickers,
+        quantities=quantities, prices=prices)
 
 ## 
 @app.route('/404Error')

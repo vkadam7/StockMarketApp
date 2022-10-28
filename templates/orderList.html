@@ -99,25 +99,22 @@
         
         <h3>Order list</h3>
 
-        <div class= "portfolio">
           <div class="row justify-content-center">
           <table class = "table table-striped w-75 table-dark table-bordered table-hover">
-            
-            <thead class = "thead-dark">
-            
 
+            <thead class = "thead-dark">
 
            </table>
           <script type="text/javascript">
             let tickersList = {{tickers|safe}};
             let quantList = {{quantities|safe}};
-            let buyList = {{buyOrSell|safe}};
-            let dayList = {{daysOfPurchase|safe}};
+            let buyList = {{buys|safe}};
+            let dayList = {{days|safe}};
             let totalList = {{prices|safe}};
             
-            let orderslist = [];
+            let orderlist = [];
             for (let i = 0; i < tickersList.length; i++) {
-              orderslist.push({
+              orderlist.push({
                 Stock: tickersList[i],
                 Quantity: quantList[i],
                 BuyorSell: buyList[i],
@@ -146,10 +143,9 @@
             }
 
             let table = document.querySelector("table");
-            let data = Object.keys(portfolio[0]);
-            generateOrderlist(table, portfolio, data); 
+            let data = Object.keys(orderlist[0]);
+            generateOrderlist(table, orderlist, data); 
             </script>
-          </div>
           </div>
     <footer class="footer mt-auto py-3" id = "foot">
         <div class="container">
