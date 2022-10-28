@@ -874,7 +874,20 @@ class portfolio:
                 percentIncrease = (increase/stockPrice) * 100
                 return percentIncrease
         else:
-            return -1     
+            return -1    
+   
+   
+    #Thursday: Volatility shows the movement of the stock price over a period of time.    (Needs more editing)
+    def volatitlity(self):
+       currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
+       day = datetime.datetime.now()
+       for x in day :
+           vt = (currentPriceOfStock[x+1]/currentPriceOfStock)
+           return vt
+       
+       currentPriceOfStock = vt 
+       return currentPriceOfStock
+          
         
     #Author: Viraj Kadam    
     #Graph of user stocks   (Need buy and sell info)

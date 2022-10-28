@@ -111,7 +111,7 @@
           <script type="text/javascript">
             let tickersList = {{tickers|safe}};
             let quantList = {{quantities|safe}};
-            //let profitList = {{profits|safe}};
+            let profitList = {{profits|safe}};
             let sharesList = {{sharesPrices|safe}};
             let currentPricesList = {{currentPrices|safe}};
             
@@ -120,9 +120,10 @@
               portfolio.push({
                 Stock: tickersList[i],
                 Quantity: quantList[i],
-                //'Gain/Loss': profitList[i],
+                'Gain/Loss': profitList[i],
                 'Average Price': sharesList[i],
-                'Current Price': currentPricesList[i]
+                'Current Price': currentPricesList[i], 
+                
               })
             }
 
