@@ -883,6 +883,7 @@ class portfolio:
        day = datetime.datetime.now()
        for x in day :
            vt = (currentPriceOfStock[x+1]/currentPriceOfStock)
+           vt = vt.pct_change(1)
            return vt
        
        currentPriceOfStock = vt 
