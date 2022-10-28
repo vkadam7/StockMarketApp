@@ -249,8 +249,7 @@ def information():
 
         return render_template("information.html", person = person)
     else:
-        flash("Sorry you must be logged in to view that page.")
-        return redirect(url_for("login"))
+        return render_template("information.html")
 
 @app.route("/StockDefinitions")
 def StockDefinitions():
@@ -262,8 +261,7 @@ def StockDefinitions():
 
         return render_template("StockDefinitions.html", person = person)
     else:
-        flash("Sorry you must be logged in to view that page.")
-        return redirect(url_for("login"))
+        return render_template("StockDefinitions.html")
 
 # Route for Graph pictures page - Muneeb Khan
 @app.route("/graphPictures")
@@ -276,8 +274,7 @@ def graphPictures():
 
         return render_template("graphPictures.html", person = person)
     else:
-        flash("Sorry you must be logged in to view that page.")
-        return redirect(url_for("login"))
+        return render_template("graphPictures.html")
 
 ## stockSim
 #   Description: Brings the logged in user to the stock sim start page, if the user
