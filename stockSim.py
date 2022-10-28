@@ -677,9 +677,9 @@ class Order:
         if ownageFlag == True:
             for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
                 temp = entry.to_dict()
-                orderslist.append([temp['avgStockPrice'],temp['buyOrSell'],temp['dayOfPurchase'],temp['quantity'],temp['simulation'],temp['ticker'],temp['totalPrice']])
+                orderslist.append([temp['buyOrSell'],temp['dayOfPurchase'],temp['quantity'],temp['ticker'],temp['totalPrice']])
             
-            df = pd.DataFrame(orderslist, columns=['avgStockPrice','buyOrSell','dayOfPurchase','quantity','simulation','ticker','totalPrice'])
+            df = pd.DataFrame(orderslist, columns=['buyOrSell','dayOfPurchase','quantity','ticker','totalPrice'])
             print(df)
             return df
 
