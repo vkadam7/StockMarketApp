@@ -435,6 +435,7 @@ def orderConfirm():
         netGainLoss = []
         sharesPrices = []
         currentPrices = []
+        percentage = []
         ##avgPrice = []
         
         for entry in Order.stocksBought(dbfire, session['simName']):
@@ -444,12 +445,14 @@ def orderConfirm():
                 quantities.append(Portfolio.quantity)
                 profits.append(Portfolio.profit)
                 sharesPrices.append(Portfolio.avgSharePrice)
+                percentage.append(Portfolio.percentages)
                 currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                 #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
         print(tickers)
         print(quantities)
         print(profits)
         print(sharesPrices)
+        print(percentage)
         print(currentPrices)
         print(netGainLoss)
 

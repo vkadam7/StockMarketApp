@@ -334,7 +334,7 @@ class StockData:
         #}
         tickers = []
 
-        for entry in db.collection('Stocks').get():
+        for entry in db.collection('Stocks').document('ticker').stream():
             tickers.append(entry.id)
 
         return tickers
@@ -538,7 +538,7 @@ class User:
 
         df = pd.DataFrame(usernameslist, columns=['userName'])
         print(df)
-        return df                       
+        return df                 
 
 class Order:
     def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
@@ -697,6 +697,7 @@ class portfolio:
             self.quantity = self.weight()
             self.profit = self.get_profit()
             self.avgSharePrice = self.returnValue()
+            self.percentages = self.percentChange()
     
     #def retrieve(self, id):
     #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
@@ -856,24 +857,15 @@ class portfolio:
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
-    def percentChange(self,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
+    def percentChange(self):
+ 
+        initialAmount = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock),2)
+        day = self.collection('IntradayStockData').document('dates').stream()
+        finalAmount = 0
 
-        
-        percentIncrease = 0
-        AdjustClose = 0
-
-        day = self.db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
-       #Need more inquiry
-       # newstockPrice = self.db.collection('IntradayStockData').document('daily').document('closes').get()
-        stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
-        stock=  self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream()
-        quantity = self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('quantity', '==', self.stock['quantity']).stream()
-        for i in stock:
-             if quantity > 0:
-                for stockPrice in day: 
-                    increase = newstockPrice[day+1] - stockPrice[day]
-                percentIncrease = (increase/stockPrice) * 100
-                return percentIncrease
+        for i in day:
+                finalAmount = (initialAmount[day+1]/initialAmount[day]) * 100
+                return str(finalAmount) + "%"
         else:
             return -1     
         
