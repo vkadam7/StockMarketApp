@@ -347,7 +347,7 @@ def startSimulation():
                     print(currentPrices)
                     print(netGainLoss)
 
-                    return render_template('simulation.html', person=session['user'], tickers=tickers, 
+                    return render_template({'simulation.html', 'profile.html'}, person=session['user'], tickers=tickers, 
                     quantities=quantities, profits=profits, sharesPrices=sharesPrices,
                     currentPrices=currentPrices)                
                 else:
@@ -400,7 +400,7 @@ def goToSimulation():
                 print(currentPrices)
                 print(netGainLoss)
 
-                return render_template('simulation.html', person=session['user'], tickers=tickers, 
+                return render_template('simulation.html',  person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
                 currentPrices=currentPrices)
         except KeyError:
@@ -450,7 +450,7 @@ def orderConfirm():
         sharesPrices = []
         currentPrices = []
         ##avgPrice = []
-        volatility  = []
+        #volatility  = []
         for entry in Order.stocksBought(dbfire, session['simName']):
             Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
             if Portfolio.quantity != 0:
@@ -460,7 +460,7 @@ def orderConfirm():
                 sharesPrices.append(Portfolio.avgSharePrice)
                 currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                 #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
-                volatility.append(Portfolio.volatitlity)
+                #volatility.append(Portfolio.volatitlity)
         print(tickers)
         print(quantities)
         print(profits)
