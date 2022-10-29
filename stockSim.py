@@ -697,7 +697,7 @@ class portfolio:
             self.quantity = self.weight()
             self.profit = self.get_profit()
             self.avgSharePrice = self.returnValue()
-            self.percentages = self.percentChange()
+            self.percentages = self.percentChange(db)
     
     #def retrieve(self, id):
     #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
@@ -857,15 +857,18 @@ class portfolio:
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
-    def percentChange(self):
+    def percentChange(self,db):
  
         initialAmount = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock),2)
-        day = self.collection('IntradayStockData').document('dates').stream()
-        finalAmount = 0
+        day = []
+        for entry in db.collection('IntradayStockData').get():
+            tempdays = entry.to_dict()
+            day.append(tempdays['dates'])
+        finalAmount = []
 
         for i in day:
-                finalAmount = (initialAmount[day+1]/initialAmount[day]) * 100
-                return str(finalAmount) + "%"
+                finalAmount = (initialAmount[i+1]/initialAmount[i]) * 100
+                return str(finalAmount) + " %"
         else:
             return -1     
         
