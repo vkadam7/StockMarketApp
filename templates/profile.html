@@ -94,22 +94,46 @@
 <br><br><br><br><br><br>
 
 <body>
-    <h1>
-        Welcome, {{results['Name']}}
-    </h1>
-        <br>
-    <h1>
-        Username: {{results['userName']}}
-    </h1>
-    <br>
-    <h1>
-        Email: {{results['Email']}}
-    </h1>
-    <br>
+  <h1>Welcome, {{results['Name']}}</h1>
+  <section class = "vh-100" style = "background-color: #eee;">
+    <div class = "container py-6 h-100">
+      <div class = "row">
+        <div class = "col-lg-6">
+          <div class = "card mb-4" style = "border-radius: .5rem;">
+            <div class = "card-body text-center">
+              <h3 tex>Name: {{results['Name']}}</h3>
+              <h3>Username: {{results['userName']}}</h3>
+              <h3>Email: {{results['Email']}}</h3>
+            </div>
+          </div>
+  </div>
+  <div class = "container py-6 h-100">
+    <div class = "row">
+      <div class = "col-lg-6">
+        <div class = "card mb-4" style = "border-radius: .5rem;">
+          <h1><a href = "update.html">Update Profile </a></h1>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <h1><a href = "update.html">Update Profile </a></h1>
-    <br>
 
+
+  <div class = "row">
+      <div class = "col-md-6">
+        <div class = "card mb-4 mb-md-0" style = "border-radius: .5rem;">
+          <div class = "card-body">
+          <h3>Simulation Status</h3>
+          <h4>Start Date: {{session['simStartDate']}}</h4>
+          <h4>Days Remaining: </h4>
+          <h4>Current Money: ${{ session['currentCash'] }} </h4>
+          <h4>Score: </h4>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>  
  <!--  {% with alerts = get_flashed_messages() %}
         {% for print in alerts %}
             {% if print in get_flashed_messages(category_filter = ['pass']) %} 
