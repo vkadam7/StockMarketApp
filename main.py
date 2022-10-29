@@ -59,7 +59,10 @@ def profile():
 @app.route("/Leaderboard")
 def Leaderboard():
     if('user' in session):
-        return render_template("Leaderboard.html") #placeholder
+        leaderB = dbfire.colletion('Leaderboard')
+        for doc in leaderB.stream():
+            leaderb = doc.to_dict()
+        return render_template("Leaderboard.html",leaderB = leaderB) #placeholder
     else:
         redirect(url_for("login"))
 # Login

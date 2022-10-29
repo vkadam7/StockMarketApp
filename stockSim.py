@@ -433,7 +433,7 @@ class Simulation:
                 emails = docs.to_dict()
         grabUserName = emails['userName']
 
-        db.collection('Leaderboard').document(grabUserName).set({"score":scores, "username":grabUserName})
+        db.collection('Leaderboard').set({"score":scores, "username":grabUserName, "email":grabDataEmail})
 
 
 
