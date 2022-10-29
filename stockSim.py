@@ -677,12 +677,11 @@ class Order:
         if ownageFlag == True:
             for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
                 temp = entry.to_dict()
-                orderslist.append([temp['buyOrSell'],temp['dayOfPurchase'],temp['quantity'],temp['ticker'],temp['totalPrice']])
+                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],temp['totalPrice']])
             
-            df = pd.DataFrame(orderslist, columns=['buyOrSell','dayOfPurchase','quantity','ticker','totalPrice'])
+            df = pd.DataFrame(orderslist, columns=['buyOrSell','quantity','ticker','totalPrice'])
             
-
-            return df.to_dict()
+            return df
 
 class portfolio:
     def __init__(self, db, stock, user, simulation, initialCash):
