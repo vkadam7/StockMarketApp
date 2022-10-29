@@ -334,7 +334,7 @@ class StockData:
         #}
         tickers = []
 
-        for entry in db.collection('Stocks').get():
+        for entry in db.collection('Stocks').document('ticker').stream():
             tickers.append(entry.id)
 
         return tickers
@@ -538,7 +538,7 @@ class User:
 
         df = pd.DataFrame(usernameslist, columns=['userName'])
         print(df)
-        return df                       
+        return df                 
 
 class Order:
     def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
@@ -677,10 +677,10 @@ class Order:
         if ownageFlag == True:
             for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
                 temp = entry.to_dict()
-                orderslist.append([temp['avgStockPrice'],temp['buyOrSell'],temp['dayOfPurchase'],temp['quantity'],temp['simulation'],temp['ticker'],temp['totalPrice']])
+                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],temp['totalPrice']])
             
-            df = pd.DataFrame(orderslist, columns=['avgStockPrice','buyOrSell','dayOfPurchase','quantity','simulation','ticker','totalPrice'])
-            print(df)
+            df = pd.DataFrame(orderslist, columns=['buyOrSell','quantity','ticker','totalPrice'])
+            
             return df
 
 class portfolio:
@@ -873,16 +873,6 @@ class portfolio:
                     increase = newstockPrice[day+1] - stockPrice[day]
                 percentIncrease = (increase/stockPrice) * 100
                 return percentIncrease
-
-        if ownageFlag == True:
-            for entry in db.collection('Orders').stream(): # To loop through the users orders
-                temp = entry.to_dict()
-                orderslist.append([temp['avgStockPrice'],temp['buyOrSell'],temp['dayOfPurchase'],temp['quantity'],temp['simulation'],temp['ticker'],temp['totalPrice']])
-            
-            df = pd.DataFrame(orderslist, columns=['avgStockPrice','buyOrSell','dayOfPurchase','quantity','simulation','ticker','totalPrice'])
-            print(df)
-            return df
-
         else:
             return -1       
         

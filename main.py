@@ -249,8 +249,7 @@ def information():
 
         return render_template("information.html", person = person)
     else:
-        flash("Sorry you must be logged in to view that page.")
-        return redirect(url_for("login"))
+        return render_template("information.html")
 
 @app.route("/StockDefinitions")
 def StockDefinitions():
@@ -262,8 +261,7 @@ def StockDefinitions():
 
         return render_template("StockDefinitions.html", person = person)
     else:
-        flash("Sorry you must be logged in to view that page.")
-        return redirect(url_for("login"))
+        return render_template("StockDefinitions.html")
 
 # Route for Graph pictures page - Muneeb Khan
 @app.route("/graphPictures")
@@ -276,8 +274,7 @@ def graphPictures():
 
         return render_template("graphPictures.html", person = person)
     else:
-        flash("Sorry you must be logged in to view that page.")
-        return redirect(url_for("login"))
+        return render_template("graphPictures.html")
 
 ## stockSim
 #   Description: Brings the logged in user to the stock sim start page, if the user
@@ -449,6 +446,7 @@ def orderConfirm():
         netGainLoss = []
         sharesPrices = []
         currentPrices = []
+        percentage = []
         ##avgPrice = []
         #volatility  = []
         for entry in Order.stocksBought(dbfire, session['simName']):
@@ -628,14 +626,23 @@ def userlists():
 @app.route("/orderList")
 def orderlists():
     if ('user' in session):
-
+        # days = []
+        # buys = []
+        # tickers = []
+        # quantities = []
+        # prices = []
         orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
+        # tickers.append(orderlist['ticker'])
+        # buys.append(orderlist['buyOrSell'])
+        # quantities.append(orderlist['quantity'])
+        # prices.append(orderlist['totalPrice'])
+        # print(tickers)
+        # print(buys)
+        # print(quantities)
+        # print(prices)
 
-        print(orderlist['ticker'].to_list())
-
-        return render_template('orderList.html',session=session,buyOrSell=orderlist['buyOrSell'].to_list,
-        daysOfPurchase=orderlist['dayOfPurchase'].to_list(), tickers=orderlist['ticker'].to_list(),
-        quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
+        return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(),
+        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
 
 ## 
 @app.route('/404Error')
