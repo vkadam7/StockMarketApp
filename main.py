@@ -56,7 +56,12 @@ def profile():
     else:
         redirect(url_for("login"))
 
-
+@app.route("/Leaderboard")
+def Leaderboard():
+    if('user' in session):
+        return render_template("Leaderboard.html") #placeholder
+    else:
+        redirect(url_for("login"))
 # Login
 #  This function allows the user to log into the app with correct credentials
 #  If correct users will be taken to the profile page
@@ -702,6 +707,9 @@ def Dashboard():
 #@app.route('/')
 #def method_name():
 #    pass
+
+
+
     
 if __name__ == '__main__':
     app.run(debug=True)
