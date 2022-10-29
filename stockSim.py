@@ -334,7 +334,7 @@ class StockData:
         #}
         tickers = []
 
-        for entry in db.collection('Stocks').get():
+        for entry in db.collection('Stocks').document('ticker').stream():
             tickers.append(entry.id)
 
         return tickers
@@ -538,7 +538,7 @@ class User:
 
         df = pd.DataFrame(usernameslist, columns=['userName'])
         print(df)
-        return df                       
+        return df                 
 
 class Order:
     def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
@@ -677,10 +677,10 @@ class Order:
         if ownageFlag == True:
             for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
                 temp = entry.to_dict()
-                orderslist.append([temp['avgStockPrice'],temp['buyOrSell'],temp['dayOfPurchase'],temp['quantity'],temp['simulation'],temp['ticker'],temp['totalPrice']])
+                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],temp['totalPrice']])
             
-            df = pd.DataFrame(orderslist, columns=['avgStockPrice','buyOrSell','dayOfPurchase','quantity','simulation','ticker','totalPrice'])
-            print(df)
+            df = pd.DataFrame(orderslist, columns=['buyOrSell','quantity','ticker','totalPrice'])
+            
             return df
 
 class portfolio:
@@ -855,24 +855,18 @@ class portfolio:
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
-    def percentChange(self,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
+    def percentChange(self,db):
+ 
+        initialAmount = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock),2)
+        day = []
+        for entry in db.collection('IntradayStockData').get():
+            tempdays = entry.to_dict()
+            day.append(tempdays['dates'])
+        finalAmount = []
 
-        
-        percentIncrease = 0
-        AdjustClose = 0
-
-        day = self.db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
-       #Need more inquiry
-       # newstockPrice = self.db.collection('IntradayStockData').document('daily').document('closes').get()
-        stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
-        stock=  self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream()
-        quantity = self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('quantity', '==', self.stock['quantity']).stream()
-        for i in stock:
-             if quantity > 0:
-                for stockPrice in day: 
-                    increase = newstockPrice[day+1] - stockPrice[day]
-                percentIncrease = (increase/stockPrice) * 100
-                return percentIncrease
+        for i in day:
+                finalAmount = (initialAmount[i+1]/initialAmount[i]) * 100
+                return str(finalAmount) + " %"
         else:
             return -1     
         

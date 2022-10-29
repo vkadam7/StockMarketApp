@@ -95,7 +95,13 @@
             <h1>{{ stock['ticker'] }} - {{ stock['name'] }}</h1>
             <h3>Headquarters: {{ stock['headquarters'] }}</h3>
             <h3>Listed at: {{ stock['listedAt'] }}</h3>
-            <canvas id="stockChart" width="900" height="400"></canvas>
+            <canvas id="stockChart" width="200" height="50"></canvas>
+            <select name = "chartType" id = "chartType" onchange="changeStockChart(this)">
+            <optgroup label = "Select Chart type"></optgroup>"
+            <option value = "line">Line</option>
+            <option value = "bar">Bar</option>
+            <option value = "pie">Pie</option>
+            </select>
             <script>
                 var ctx = document.getElementById("stockChart").getContext("2d");
                 var stockChart = new Chart(ctx, {
@@ -105,7 +111,7 @@
                         datasets: [{
                             label: "Stock values",
                             data: {{ avgs | safe }},
-                            fill: false,
+                            fill: true,
                             borderColor: "rgb(20, 100, 200)",
                             lineTension: 0
                         }]
@@ -114,6 +120,25 @@
                         display: true
                     }
                 });
+
+                function changeStockChart(chartType2) {
+                stockChart.destroy();
+                stockChart = new Chart(ctx, {type: document.getElementById("chartType").value,
+                  data: {
+                        labels: {{ dates | safe }},
+                        datasets: [{
+                            label: "Stock values",
+                            data: {{ avgs | safe }},
+                            fill: true,
+                            borderColor: "rgb(20, 100, 200)",
+                            lineTension: 0
+                        }]
+                    },
+                    options: {
+                        display: true
+                    }
+                });
+              }
             </script>
         </div>        
         
