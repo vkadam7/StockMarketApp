@@ -12,7 +12,7 @@ from firebase_admin import firestore
 from google.cloud.firestore import ArrayUnion
 import datetime
 import math
-import matplotlib as plt
+#import matplotlib as plt
 
 DAYS_IN_MONTH = {
     1 : 31,

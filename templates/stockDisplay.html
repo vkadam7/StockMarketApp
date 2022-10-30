@@ -96,6 +96,8 @@
             <h3>Headquarters: {{ stock['headquarters'] }}</h3>
             <h3>Listed at: {{ stock['listedAt'] }}</h3>
             <canvas id="stockChart" width="200" height="50"></canvas>
+
+            <!-- Selection menu for graph types - Muneeb Khan -->
             <select name = "chartType" id = "chartType" onchange="changeStockChart(this)">
             <optgroup label = "Select Chart type"></optgroup>"
             <option value = "line">Line</option>
@@ -121,6 +123,7 @@
                     }
                 });
 
+                <!-- This function will reconfigure the graph settings based on selection from dropdown - Muneeb Khan -->
                 function changeStockChart(chartType2) {
                 stockChart.destroy();
                 stockChart = new Chart(ctx, {type: document.getElementById("chartType").value,
