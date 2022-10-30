@@ -59,10 +59,11 @@ def profile():
 @app.route("/Leaderboard")
 def Leaderboard():
     if('user' in session):
-        leaderB = dbfire.colletion('Leaderboard')
-        for doc in leaderB.stream():
-            leaderb = doc.to_dict()
-        return render_template("Leaderboard.html",leaderB = leaderB) #placeholder
+        leaderB = dbfire.collection('Leaderboard').order_by('score',direction = firestore.Query.DESCENDING).get()
+        documentRef = list(doc.to_dict() for doc in leaderB)
+        print("about to print leaderboard")
+        print(documentRef)
+        return render_template("Leaderboard.html",documentRef = documentRef) #placeholder
     else:
         redirect(url_for("login"))
 # Login
