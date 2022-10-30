@@ -101,7 +101,14 @@
     
     
 
-
+{% for user in documentRef %}
+<h1>
+  Username: {{user['username']}}
+</h1>
+<h1>
+  Score: {{user['score']}}
+</h1>  
+{%endfor%}
 
 
 
