@@ -11,6 +11,8 @@ import firebase_admin
 from firebase_admin import firestore
 from google.cloud.firestore import ArrayUnion
 import datetime
+import math
+import matplotlib as plt
 
 DAYS_IN_MONTH = {
     1 : 31,
@@ -852,6 +854,17 @@ class portfolio:
         daily_returns = returns.pct_change()
         print(daily_returns)
        
+       
+    def volatitlity(self):
+       currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
+       day = datetime.datetime.now()
+       for x in day :
+           vt = (currentPriceOfStock[x+1]/currentPriceOfStock)
+           vt = vt.pct_change(1)
+           return vt
+       
+       currentPriceOfStock = vt 
+       return currentPriceOfStock  
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
@@ -872,15 +885,15 @@ class portfolio:
         
     #Author: Viraj Kadam    
     #Graph of user stocks   (Need buy and sell info)
-    #def user_graph(self, db):
-    #   prices = self.db.collection('IntradayStockData').document('prices').get()
-    #    dates = self.db.collection('IntradayStockData').document('dates').get()
-    #    for x in prices:
-    #        plt.plot(x[dates][prices])
-    #        
-    #    plt.xlabel('Date')
-    #    plt.ylabel('Price')
-    #    plt.show
+    def user_graph(self, db):
+        prices = self.db.collection('IntradayStockData').document('prices').get()
+        dates = self.db.collection('IntradayStockData').document('dates').get()
+        for entry in prices:
+            plt.plot(x[dates][prices])
+            
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.show
             
         
         

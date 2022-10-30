@@ -675,6 +675,11 @@ def Portfolio():
   
         
     #line 318  
+    
+#@app.route('/route_name')
+#def portfolioGraph():
+#    if 'user' in session:
+        
 
 
 ## Need to complete this setup route for the dashboard, will show up to the user once they have started the simulation. 
