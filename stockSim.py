@@ -662,15 +662,6 @@ class Order:
     def orderList(db, simName):
         quantityOwned = 0
         ownageFlag = True
-        # data = {
-        #         'simulation': self.sim,
-        #         'ticker': self.stock['ticker'],
-        #         'dayOfPurchase': self.dayOfPurchase,
-        #         'buyOrSell': self.buyOrSell,
-        #         'quantity': self.quantity,
-        #         'avgStockPrice': self.avgStockPrice,
-        #         'totalPrice': self.totalPrice
-        #     }
 
         # The order list function will loop through the orders in firebase and store each one
         # under the ordernameslist [] array. - Muneeb Khan

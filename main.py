@@ -597,8 +597,7 @@ def stockAvailability():
 
     return -1    
 
-#Testing the User list
-#Will remove after successful test - Muneeb Khan
+#Route for the User list - Muneeb Khan
 @app.route("/Userlist")
 def userlists():
     if ('user' in session):
@@ -609,25 +608,11 @@ def userlists():
        # except:
         #    return redirect(url_for('fourOhFour'))
 
-#Testing the Order list
-#Will remove after successful test - Muneeb Khan
+#Route for the Order list - Muneeb Khan
 @app.route("/orderList")
 def orderlists():
     if ('user' in session):
-        # days = []
-        # buys = []
-        # tickers = []
-        # quantities = []
-        # prices = []
         orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
-        # tickers.append(orderlist['ticker'])
-        # buys.append(orderlist['buyOrSell'])
-        # quantities.append(orderlist['quantity'])
-        # prices.append(orderlist['totalPrice'])
-        # print(tickers)
-        # print(buys)
-        # print(quantities)
-        # print(prices)
 
         return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(),
         tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
