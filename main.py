@@ -4,7 +4,7 @@ from asyncio.windows_events import NULL
 #from re import T
 from datetime import datetime
 import math
-from operator import mod
+from operator import itemgetter, mod
 import re
 from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
@@ -60,13 +60,17 @@ def profile():
 @app.route("/Leaderboard")
 def Leaderboard():
     if('user' in session):
-        leaderB = dbfire.collection('Leaderboard').order_by('score',direction = firestore.Query.DESCENDING).get()
+        leaderB = dbfire.collection('Leaderboard').get()
         documentRef = list(doc.to_dict() for doc in leaderB)
+        documentRef.sort(key = itemgetter('score'), reverse=True)
         print("about to print leaderboard")
         print(documentRef)
         return render_template("Leaderboard.html",documentRef = documentRef) #placeholder
     else:
         redirect(url_for("login"))
+
+
+
 # Login
 #  This function allows the user to log into the app with correct credentials
 #  If correct users will be taken to the profile page
