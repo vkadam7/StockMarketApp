@@ -336,7 +336,7 @@ class StockData:
         #}
         tickers = []
 
-        for entry in db.collection('Stocks').document('ticker').stream():
+        for entry in db.collection('Stocks').get():
             tickers.append(entry.id)
 
         return tickers
