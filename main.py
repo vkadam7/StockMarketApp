@@ -437,6 +437,8 @@ def orderConfirm():
         currentPrices = []
         percentage = []
         ##avgPrice = []
+        volatility = []
+        
         
         for entry in Order.stocksBought(dbfire, session['simName']):
             Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
@@ -447,16 +449,18 @@ def orderConfirm():
                 sharesPrices.append(Portfolio.avgSharePrice)
                 currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                 #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
+                volatility.append(Portfolio.volatitlity)
         print(tickers)
         print(quantities)
         print(profits)
         print(sharesPrices)
         print(currentPrices)
         print(netGainLoss)
+        print(volatility)
 
         return render_template('simulation.html', person=session['user'], tickers=tickers, 
         quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-        currentPrices=currentPrices)    
+        currentPrices=currentPrices, volatility = volatility)    
     elif session['option'] == 'Buy' and flag == -1:
         flash("Insufficient funds to complete purchase")
         return render_template('orderForm.html', option=session['option'])
@@ -676,9 +680,10 @@ def Portfolio():
         
     #line 318  
     
-#@app.route('/route_name')
+#@app.route('/startSimulation')
 #def portfolioGraph():
 #    if 'user' in session:
+        
         
 
 

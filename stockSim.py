@@ -13,6 +13,7 @@ from google.cloud.firestore import ArrayUnion
 import datetime
 import math
 import matplotlib as plt
+import math
 
 DAYS_IN_MONTH = {
     1 : 31,
@@ -854,17 +855,20 @@ class portfolio:
         daily_returns = returns.pct_change()
         print(daily_returns)
        
-       
+    #New volatility function (Viraj Kadam)   
     def volatitlity(self):
        currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
        day = datetime.datetime.now()
-       for x in day :
-           vt = (currentPriceOfStock[x+1]/currentPriceOfStock)
-           vt = vt.pct_change(1)
-           return vt
-       
-       currentPriceOfStock = vt 
-       return currentPriceOfStock  
+       volatility = 0
+       returns = 0
+       prices = []
+       for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
+           temp = entry.to_dict()
+           returns =  np.log((prices.append(float(temp['avgStockPrice']))/(prices.append(float(temp['avgStockPrice']))).shift()))
+           returns.std()
+           volatility = returns.std()*225**.5
+           
+       return volatility
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
@@ -888,8 +892,10 @@ class portfolio:
     def user_graph(self, db):
         prices = self.db.collection('IntradayStockData').document('prices').get()
         dates = self.db.collection('IntradayStockData').document('dates').get()
-        for entry in prices:
-            plt.plot(x[dates][prices])
+        for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
+            temp = entry.to_dict()
+            
+            
             
         plt.xlabel('Date')
         plt.ylabel('Price')
@@ -898,13 +904,13 @@ class portfolio:
         
         
     #Display all information
-    def displayInfo(self, close):
-        print(self.percentChange)
-        print(self.returns)
-        print(self.funds_remaining)
+    #def displayInfo(self, close):
+    #    print(self.percentChange)
+    #    print(self.returns)
+    #    print(self.funds_remaining)
 
-        print(self.get_profit)
-        if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
-            print("Gains: +" + self.GainorLoss)
-        elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
-            return
+    #    print(self.get_profit)
+    #    if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
+    #        print("Gains: +" + self.GainorLoss)
+    #    elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
+    #        return
