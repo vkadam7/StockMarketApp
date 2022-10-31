@@ -420,10 +420,12 @@ def orderCreate():
 
 @app.route("/orderConfirm", methods=['POST', 'GET'])
 def orderConfirm():
+    
     order = Order(dbfire, session['simName'], stock, 
                     session['option'], session['orderQuantity'], session['currentPrice'])
     if session['option'] == 'Buy':
         flag = order.buyOrder()
+        
     else:
         flag = order.sellOrder()
     if flag == 1:
@@ -437,6 +439,7 @@ def orderConfirm():
         currentPrices = []
         percentage = []
         ##avgPrice = []
+        session['initialCash'] = sim.initialCash
         
         for entry in Order.stocksBought(dbfire, session['simName']):
             Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
