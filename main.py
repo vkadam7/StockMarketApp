@@ -316,6 +316,7 @@ def startSimulation():
                     netGainLoss = []
                     sharesPrices = []
                     currentPrices = []
+                    volatility = []
                     ##avgPrice = []
                     
                     for entry in Order.stocksBought(dbfire, session['simName']):
@@ -326,6 +327,7 @@ def startSimulation():
                             profits.append(Portfolio.profit)
                             sharesPrices.append(Portfolio.avgSharePrice)
                             currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
+                            volatility.append(Portfolio.volatility)
                             #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
                     print(tickers)
                     print(quantities)
@@ -333,6 +335,7 @@ def startSimulation():
                     print(sharesPrices)
                     print(currentPrices)
                     print(netGainLoss)
+                    print(volatility)
 
                     return render_template('simulation.html', person=session['user'], tickers=tickers, 
                     quantities=quantities, profits=profits, sharesPrices=sharesPrices,
@@ -368,7 +371,11 @@ def goToSimulation():
                 netGainLoss = []
                 sharesPrices = []
                 currentPrices = []
+                volatility = []
                 ##avgPrice = []
+               
+                
+                
                 
                 for entry in Order.stocksBought(dbfire, session['simName']):
                     Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
@@ -378,6 +385,7 @@ def goToSimulation():
                         profits.append(Portfolio.profit)
                         sharesPrices.append(Portfolio.avgSharePrice)
                         currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
+                        volatility.append(Portfolio.volatility)
                         #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
                 print(tickers)
                 print(quantities)
@@ -385,10 +393,11 @@ def goToSimulation():
                 print(sharesPrices)
                 print(currentPrices)
                 print(netGainLoss)
+                print(volatility)
 
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                currentPrices=currentPrices)
+                currentPrices=currentPrices, volatility = volatility)
         except KeyError:
             print("KeyError occured: simulation")
             return redirect(url_for('fourOhFour'))
