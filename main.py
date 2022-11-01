@@ -4,7 +4,7 @@ from asyncio.windows_events import NULL
 #from re import T
 from datetime import datetime
 import math
-from operator import mod
+from operator import itemgetter, mod
 import re
 from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
@@ -17,6 +17,7 @@ from firebase_admin import credentials
 import numpy as np
 import pyrebase
 import firebase_admin
+from firebase_admin import db
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
@@ -55,6 +56,19 @@ def profile():
         return render_template("profile.html", results = results)
     else:
         redirect(url_for("login"))
+
+@app.route("/Leaderboard")
+def Leaderboard():
+    if('user' in session):
+        leaderB = dbfire.collection('Leaderboard').get()
+        documentRef = list(doc.to_dict() for doc in leaderB)
+        documentRef.sort(key = itemgetter('score'), reverse=True)
+        print("about to print leaderboard")
+        print(documentRef)
+        return render_template("Leaderboard.html",documentRef = documentRef) #placeholder
+    else:
+        redirect(url_for("login"))
+
 
 
 # Login
@@ -134,10 +148,10 @@ def register():
         else:
 
             try: 
+                authen.send_email_verification(user['idToken'])
                 user = authen.create_user_with_email_and_password(email, Password)
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                authen.send_email_verification(user['idToken'])
                 dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 flash("Account succesfully created, you may now login" , "pass")
@@ -702,6 +716,9 @@ def Dashboard():
 #@app.route('/')
 #def method_name():
 #    pass
+
+
+
     
 if __name__ == '__main__':
     app.run(debug=True)
