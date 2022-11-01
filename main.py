@@ -670,6 +670,13 @@ def Dashboard():
     else:
         return render_template('404Error.html')
 
+@app.route('/quiz')
+def quizpage():
+    if ('user' in session):
+        return render_template('quiz.html', person = session['user'])
+    else:
+        return render_template('404Error.html')
+
 #Author: Viraj Kadam   
 #Updates user profile  
 #class User(Flaskform):
