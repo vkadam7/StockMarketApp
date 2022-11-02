@@ -1,5 +1,3 @@
-<!--Profile page by Miqdad Hafiz-->
-<!--CSS Updated by Miqdad and integrated by Muneeb-->
 <!doctype html>
 <html lang="en" class="h-100">
   <head>
@@ -12,8 +10,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
     </head>
     <header>
-
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top" id = "navBar">
+    
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top py-3" id = "navBar">
             <div class="container-fluid">
               <a class="navbar-brand" href="home">
                 <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
@@ -33,12 +31,12 @@
                   <li class="nav-item">
                     <a class="nav-link" href="information">Information</a>
                   </li>
-                  {% if session['user'] %}
+        {% if session['user'] %}
           <li class="nav-item">
-            <a class = "nav-link active" method = "POST" href = "profile">Profile</a> 
+            <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
           </li>
           <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
+            <a class = "nav-link active" method = "POST" href = "Leaderboard">Leaderboard</a> 
           </li>
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
@@ -89,91 +87,54 @@
                   </select> 
                   <button>Display Stock</button>
                 </form>
+
+
               </div>        
             </div>
           </nav>
     </header>
-
 <br><br><br><br><br><br>
 
+
+
 <body>
-  <h1>Welcome, {{results['Name']}}</h1>
-  <section class = "vh-100" style = "background-color: #eee;">
-    <div class = "container py-6 h-100">
-      <div class = "row">
-        <div class = "col-lg-6">
-          <div class = "card mb-4" style = "border-radius: .5rem;">
-            <div class = "card-body text-center">
-              <h3 tex>Name: {{results['Name']}}</h3>
-              <h3>Username: {{results['userName']}}</h3>
-              <h3>Email: {{results['Email']}}</h3>
-            </div>
-          </div>
-  </div>
-  <div class = "container py-6 h-100">
-    <div class = "row">
-      <div class = "col-lg-6">
-        <div class = "card mb-4" style = "border-radius: .5rem;">
-          <h1><a href = "update.html">Update Profile </a></h1>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
-  <div class = "row">
-      <div class = "col-md-6">
-        <div class = "card mb-4 mb-md-0" style = "border-radius: .5rem;">
-          <div class = "card-body">
-          <h3>Simulation Status</h3>
-          <h4>Start Date: {{session['simStartDate']}}</h4>
-          <h4>Days Remaining: </h4>
-          <h4>Current Money: ${{ session['currentCash'] }} </h4>
-          <h4>Score: </h4>
-
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>  
- <!--  {% with alerts = get_flashed_messages() %}
-        {% for print in alerts %}
-            {% if print in get_flashed_messages(category_filter = ['pass']) %} 
-            <div class="alert-pass" role="alert">
-                {{ print }}
-            </div>
-            {% elif print in get_flashed_messages(category_filter = ['fail']) %}
-            <div class="alert-fail" role="alert">
-                {{ print }}
-            </div>
-            {% endif %}
-         {% endfor %}
-        {% endwith %}  Keep this an alternative - Muneeb Khan
-    <br>
-    </h1> -->
     
-    {% with messages = get_flashed_messages() %}
-                    {% if messages %}   
-                        {% for message in messages %}
-                        <div class ="alert alert-warning alert-dismissible fade show" style = "text-align: center"; role="alert">
-                            {{ message }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        {% endfor %} 
-                    {% endif %} 
-    {% endwith %}
+    
 
-    <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
-        <div class="container">
-          <span>Copyright 2022 by StockSim</span>
-        </div>
-      </footer>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+{% for user in documentRef %}
+<h1>
+  Username: {{user['username']}}
+</h1>
+<h1>
+  Score: {{user['score']}}
+</h1>  
+{%endfor%}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</body>
+
+<footer class="footer mt-auto py-3" id = "foot">
+  <div class="container">
+    <span>Copyright 2022 by StockSim</span>
+  </div>
+</footer>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-    <script src="/static/jsStyle/bootstrap.bundle.min.js"></script>
-    </body>      
+<script src="/static/jsStyle/bootstrap.bundle.min.js"></script>
 </html>

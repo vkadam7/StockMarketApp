@@ -40,6 +40,9 @@
             <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
           </li>
           <li class="nav-item">
+            <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
+          </li>
+          <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
           
@@ -104,11 +107,25 @@
         </div>
         <div class = infomain>
             <div class = "card w-75 d-flex justify-content-left" style= "padding-top: 20px; padding-bottom: 20px;">
+
               <div class = "card-header">
-              <h2>What Should I Know?</h2>
+              <h2>Table of contents</h2>
               </div>
-                <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
-                    <h5 class = "card-text">
+                <div class = "card-body" style = "border-bottom: solid black">
+                    <h5 class = "card-text" style = "text-align: left;">
+                        <a href = "#infosection1">1. What should I know</a>
+                    <br><a href = "#infosection2">2. The Basics of Stock markets</a>
+                    <br><a href = "#infosection3">3. How to start investing</a>
+                    <br><a href = "#infosection4">4. Definitions of stocks</a>
+                    <br><a href = "#infosection5">5. Other sources</a>
+                    <br><a href = "#infosection6">6. Quiz</a>
+                    <br><a href = "#infosection7">7. Stock simulator</a>
+                    </h5>
+                </div>
+
+                <div class = "card-body" id = "info1" style = "background-color: rgb(243, 243, 243); border-bottom: solid black;">
+                    <h2 id = "infosection1">What Should I Know?</h2>
+                    <h5 class = "card-text" style = "text-align: left;">
                       With our information page we will provide several sources ranging from videos, external links,
                       helpful terms, a quiz, and our very own stock simulator. Some users may learn different however 
                       we want to ensure that we can help all our users get a better understanding.
@@ -118,19 +135,16 @@
                     </h5>
                 </div>
 
-                  <div class = "card-body">
-                    <h2>The Basics of Stock Markets</h2>
-                    <br>
+                  <div class = "card-body" id = "info2" style = "border-bottom: solid black;">
+                    <h2 id = "infosection2">The Basics of Stock Markets</h2>
                     <h5 class = "card-text">
                       Stocks are basically the shares of ownership in a company and stockholders 
                       have a fractional ownership of the company. Stocks are typically listed as line graphs
                       and they basically keep track of the stock price of the company overtime. 
                       It can show the companies records by daily, monthly, and yearly.
                       <br><br>
-
                       Below is an example of a graph showing Googles shares for the past 6 years.
                       <br><br>
-
                       <img src = "{{url_for('static', filename='Graphexample.jpg')}}" width = "75%" height = "75%" display = "d-flex" class = "stock" />
                       <br><br><br>
                       
@@ -148,10 +162,10 @@
                     </h5>
                   </div>
 
-                  <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
-                    <h2>How to start investing?</h2>
+                  <div class = "card-body" id = "info3" style = "background-color: rgb(243, 243, 243); border-bottom: solid black;">
+                    <h2 id = "infosection3">How to start investing?</h2>
                     <br>  
-                    <h5 class = "card-text">
+                    <h5 class = "card-text" style = "text-align: left;">
                     The best way to start is to do paper trading which will allow users
                     to buy and sell on a simulator without having to invest real money
                     that way the user is practicing before they decide to invest. 
@@ -179,20 +193,20 @@
                     </h5>
                   </div>
 
-                <div class = "card-body">
-                  <h2>Defintions of Stocks?</h2>
+                <div class = "card-body" id = "info4" style = "border-bottom: solid black;">
+                  <h2 id = "infosection4">Defintions of Stocks?</h2>
                   <br>
-                  <h5 class = "card-text">To see some defintions of stocks, please click the button below to visit
+                  <h5 class = "card-text" style = "text-align: left;">To see some defintions of stocks, please click the button below to visit
                     our stock definitions page.
                     <br><br>
                     <a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "StockDefinitions">StockDefinitions</a>
                   </h5>
                 </div>
 
-                <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
-                  <h2>Other sources?</h2>
+                <div class = "card-body" id = "info5" style = "background-color: rgb(243, 243, 243); border-bottom: solid black;">
+                  <h2 id = "infosection5">Other sources?</h2>
                   <br>
-                  <h5 class = "card-text">We have sources below of other good websites where you may find more information
+                  <h5 class = "card-text" style = "text-align: left;">We have sources below of other good websites where you may find more information
                   <br>on stocks.
                   <br><br>
                   <br>Below is a link to the Investor.gov website which also gives basic information on stocks.
@@ -203,10 +217,10 @@
                   </h5>
                 </div>
 
-                <div class = "card-body">
-                  <h2>Is there a quiz to test my knowledge?</h2>
+                <div class = "card-body" id = "info6" style = "border-bottom: solid black;">
+                  <h2 id = "infosection6">Is there a quiz to test my knowledge?</h2>
                   <br>
-                  <h5 class = "card-text">We have a 10 question quiz you may take to test your knowledge
+                  <h5 class = "card-text" style = "text-align: left;">We have a 10 question quiz you may take to test your knowledge
                   <br>of stocks. The questions will relate to what was discussed on this page and the definitions
                   <br>page. Once you fully understand the terms of stocks. You are ready to make investments.
                   <br>Click the button below to begin the quiz.
@@ -216,10 +230,10 @@
                   </h5>
                 </div>
 
-                <div class = "card-body" style = "background-color: rgb(243, 243, 243);">
-                  <h2>Ready to invest?</h2>
+                <div class = "card-body" id = "info7" style = "background-color: rgb(243, 243, 243); border-bottom: solid black;">
+                  <h2 id = "infosection7">Ready to invest?</h2>
                   <br>
-                  <h5>Our website gives users the ability to start a stock simulation, which simulates a real stock investment 
+                  <h5 class="card-text" style = "text-align: left;">Our website gives users the ability to start a stock simulation, which simulates a real stock investment 
                     competiton. The users will have the option to choose their starting and end dates with their initial
                     starting cash.
                     <br><br>

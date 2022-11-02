@@ -4,7 +4,7 @@ from asyncio.windows_events import NULL
 #from re import T
 from datetime import datetime
 import math
-from operator import mod
+from operator import itemgetter, mod
 import re
 from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
@@ -17,6 +17,7 @@ from firebase_admin import credentials
 import numpy as np
 import pyrebase
 import firebase_admin
+from firebase_admin import db
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
@@ -55,6 +56,19 @@ def profile():
         return render_template("profile.html", results = results)
     else:
         redirect(url_for("login"))
+
+@app.route("/Leaderboard")
+def Leaderboard():
+    if('user' in session):
+        leaderB = dbfire.collection('Leaderboard').get()
+        documentRef = list(doc.to_dict() for doc in leaderB)
+        documentRef.sort(key = itemgetter('score'), reverse=True)
+        print("about to print leaderboard")
+        print(documentRef)
+        return render_template("Leaderboard.html",documentRef = documentRef) #placeholder
+    else:
+        redirect(url_for("login"))
+
 
 
 # Login
@@ -134,10 +148,10 @@ def register():
         else:
 
             try: 
+                authen.send_email_verification(user['idToken'])
                 user = authen.create_user_with_email_and_password(email, Password)
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                authen.send_email_verification(user['idToken'])
                 dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 flash("Account succesfully created, you may now login" , "pass")
@@ -249,8 +263,7 @@ def information():
 
         return render_template("information.html", person = person)
     else:
-        flash("Sorry you must be logged in to view that page.")
-        return redirect(url_for("login"))
+        return render_template("information.html")
 
 @app.route("/StockDefinitions")
 def StockDefinitions():
@@ -262,8 +275,7 @@ def StockDefinitions():
 
         return render_template("StockDefinitions.html", person = person)
     else:
-        flash("Sorry you must be logged in to view that page.")
-        return redirect(url_for("login"))
+        return render_template("StockDefinitions.html")
 
 # Route for Graph pictures page - Muneeb Khan
 @app.route("/graphPictures")
@@ -276,8 +288,7 @@ def graphPictures():
 
         return render_template("graphPictures.html", person = person)
     else:
-        flash("Sorry you must be logged in to view that page.")
-        return redirect(url_for("login"))
+        return render_template("graphPictures.html")
 
 ## stockSim
 #   Description: Brings the logged in user to the stock sim start page, if the user
@@ -423,10 +434,12 @@ def orderCreate():
 
 @app.route("/orderConfirm", methods=['POST', 'GET'])
 def orderConfirm():
+    
     order = Order(dbfire, session['simName'], stock, 
                     session['option'], session['orderQuantity'], session['currentPrice'])
     if session['option'] == 'Buy':
         flag = order.buyOrder()
+        
     else:
         flag = order.sellOrder()
     if flag == 1:
@@ -438,7 +451,9 @@ def orderConfirm():
         netGainLoss = []
         sharesPrices = []
         currentPrices = []
+        percentage = []
         ##avgPrice = []
+        session['initialCash'] = sim.initialCash
         
         for entry in Order.stocksBought(dbfire, session['simName']):
             Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
@@ -599,8 +614,7 @@ def stockAvailability():
 
     return -1    
 
-#Testing the User list
-#Will remove after successful test - Muneeb Khan
+#Route for the User list - Muneeb Khan
 @app.route("/Userlist")
 def userlists():
     if ('user' in session):
@@ -611,19 +625,14 @@ def userlists():
        # except:
         #    return redirect(url_for('fourOhFour'))
 
-#Testing the Order list
-#Will remove after successful test - Muneeb Khan
+#Route for the Order list - Muneeb Khan
 @app.route("/orderList")
 def orderlists():
     if ('user' in session):
-
         orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
 
-        print(orderlist['ticker'].to_list())
-
-        return render_template('orderList.html',session=session,buyOrSell=orderlist['buyOrSell'].to_list,
-        daysOfPurchase=orderlist['dayOfPurchase'].to_list(), tickers=orderlist['ticker'].to_list(),
-        quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
+        return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(),
+        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
 
 ## 
 @app.route('/404Error')
@@ -668,6 +677,11 @@ def Portfolio():
   
         
     #line 318  
+    
+#@app.route('/route_name')
+#def portfolioGraph():
+#    if 'user' in session:
+        
 
 
 ## Need to complete this setup route for the dashboard, will show up to the user once they have started the simulation. 
@@ -702,6 +716,9 @@ def Dashboard():
 #@app.route('/')
 #def method_name():
 #    pass
+
+
+
     
 if __name__ == '__main__':
     app.run(debug=True)
