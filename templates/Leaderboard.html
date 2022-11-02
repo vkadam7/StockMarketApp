@@ -104,9 +104,10 @@
 
 
 
-<table class = "table align-middle mb-0 bg-white" id = "tableL">
+<table class = "table table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
   <thead class = "bg-light">
   <tr>
+    <th> Rank </th>
     <th> Username </th>
     <th> Score </th>
   </tr>
@@ -114,11 +115,12 @@
   {% for user in documentRef%}
   <tbody>
     <tr>
+      <td class = "counterIncrement"></td>
       <td>
-        <p class = "fw-bold mb-1"> {{user['username']}}</p>
+        <p class = "fw-noraml mb-1"> {{user['username']}}</p>
       </td>
       <td>
-        <p class = "fw-bold mb-1"> {{user['score']}}</p>
+        <p class = "fw-normal mb-1"> {{user['score']}}</p>
       </td>
     </tr>
   </tbody>

@@ -264,3 +264,12 @@ background: #eee;
 #tableL{
   text-align: center;
 }
+
+table{
+  counter-reset: tableL;
+}
+
+.counterIncrement::before{
+  content: counter(tableL);
+  counter-increment: tableL;
+}
