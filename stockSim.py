@@ -11,6 +11,8 @@ import firebase_admin
 from firebase_admin import firestore
 from google.cloud.firestore import ArrayUnion
 import datetime
+import math
+#import matplotlib as plt
 
 DAYS_IN_MONTH = {
     1 : 31,
@@ -426,6 +428,17 @@ class Simulation:
         data['score'] = percentChange * 100
         db.collection('Simulations').document(simName).update(data)
 
+        scores = percentChange * 100
+        grabDataEmail = data['user']
+        userEmail = db.collection('Users').where('Email', '==', grabDataEmail)
+        for docs in userEmail.stream():
+                emails = docs.to_dict()
+        grabUserName = emails['userName']
+
+        db.collection('Leaderboard').add({"email":grabDataEmail, "score":scores, "username":grabUserName})
+
+
+
     def retrieveOngoing(db, email):
         for query in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream():
             id = query.id
@@ -545,7 +558,7 @@ class User:
 
         df = pd.DataFrame(usernameslist, columns=['userName'])
         print(df)
-        return df                       
+        return df                 
 
 class Order:
     def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
@@ -667,15 +680,6 @@ class Order:
     def orderList(db, simName):
         quantityOwned = 0
         ownageFlag = True
-        # data = {
-        #         'simulation': self.sim,
-        #         'ticker': self.stock['ticker'],
-        #         'dayOfPurchase': self.dayOfPurchase,
-        #         'buyOrSell': self.buyOrSell,
-        #         'quantity': self.quantity,
-        #         'avgStockPrice': self.avgStockPrice,
-        #         'totalPrice': self.totalPrice
-        #     }
 
         # The order list function will loop through the orders in firebase and store each one
         # under the ordernameslist [] array. - Muneeb Khan
@@ -684,10 +688,10 @@ class Order:
         if ownageFlag == True:
             for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
                 temp = entry.to_dict()
-                orderslist.append([temp['avgStockPrice'],temp['buyOrSell'],temp['dayOfPurchase'],temp['quantity'],temp['simulation'],temp['ticker'],temp['totalPrice']])
+                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],temp['totalPrice']])
             
-            df = pd.DataFrame(orderslist, columns=['avgStockPrice','buyOrSell','dayOfPurchase','quantity','simulation','ticker','totalPrice'])
-            print(df)
+            df = pd.DataFrame(orderslist, columns=['buyOrSell','quantity','ticker','totalPrice'])
+            
             return df
 
 class portfolio:
@@ -859,41 +863,46 @@ class portfolio:
         daily_returns = returns.pct_change()
         print(daily_returns)
        
+       
+    def volatitlity(self):
+       currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
+       day = datetime.datetime.now()
+       for x in day :
+           vt = (currentPriceOfStock[x+1]/currentPriceOfStock)
+           vt = vt.pct_change(1)
+           return vt
+       
+       currentPriceOfStock = vt 
+       return currentPriceOfStock  
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
-    def percentChange(self,quantity, stockPrice, newstockPrice, day, increase, percentIncrease, AdjustClose):
+    def percentChange(self,db):
+ 
+        initialAmount = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock),2)
+        day = []
+        for entry in db.collection('IntradayStockData').get():
+            tempdays = entry.to_dict()
+            day.append(tempdays['dates'])
+        finalAmount = []
 
-        
-        percentIncrease = 0
-        AdjustClose = 0
-
-        day = self.db.collection('Stocks').document('daily').document('dates').get() # Day will get values of dates
-       #Need more inquiry
-       # newstockPrice = self.db.collection('IntradayStockData').document('daily').document('closes').get()
-        stockPrice = self.db.collection('Stocks').document('daily').document('closes').get()
-        stock=  self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream()
-        quantity = self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('quantity', '==', self.stock['quantity']).stream()
-        for i in stock:
-             if quantity > 0:
-                for stockPrice in day: 
-                    increase = newstockPrice[day+1] - stockPrice[day]
-                percentIncrease = (increase/stockPrice) * 100
-                return percentIncrease
+        for i in day:
+                finalAmount = (initialAmount[i+1]/initialAmount[i]) * 100
+                return str(finalAmount) + " %"
         else:
             return -1     
         
     #Author: Viraj Kadam    
     #Graph of user stocks   (Need buy and sell info)
-    #def user_graph(self, db):
-    #   prices = self.db.collection('IntradayStockData').document('prices').get()
-    #    dates = self.db.collection('IntradayStockData').document('dates').get()
-    #    for x in prices:
-    #        plt.plot(x[dates][prices])
-    #        
-    #    plt.xlabel('Date')
-    #    plt.ylabel('Price')
-    #    plt.show
+    def user_graph(self, db):
+        prices = self.db.collection('IntradayStockData').document('prices').get()
+        dates = self.db.collection('IntradayStockData').document('dates').get()
+        for entry in prices:
+            plt.plot(x[dates][prices])
+            
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.show
             
         
         
