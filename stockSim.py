@@ -527,6 +527,17 @@ class User:
         }
         db.collection("Users").add(data)
 
+    def removeFriend(db, user1, user2):
+        for entry in db.collection('Users').where('user1','==',user1).where('user2','==',user2).stream():
+            db.collection('Users').document(entry.id).delete()
+
+    def listFriends(db, user):
+        friends = []
+        for entry in db.collection('Users').where('user1','==',user).stream():
+            temp = entry.to_dict()
+            friends.append(temp['user2'])
+        return friends
+
     def registerUser(db, username, email, name, userID, description="", picture="", experience=""):
         data = {
             'Email' : email,
