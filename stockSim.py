@@ -886,3 +886,36 @@ class portfolio:
             print("Gains: +" + self.GainorLoss)
         elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
             return
+
+
+## Class for setting up quiz - Muneeb Khan (WIP!)
+class Quiz:
+    def __init__(self,db,question,answer,useranswer):
+        self.db = db
+        self.useranswer = useranswer
+        self.data = Quiz.retrievequestions(self.db,self.quiz)
+        self.question = question
+        self.answer = answer
+        self.useranswer = useranswer
+    
+    def retrieveQuestions(db,self):
+        questionList = []
+
+        for entry in db.collection('Quiz').get():
+            tempQuestions = entry.to_dict()
+            questionList.append([tempQuestions['question'],tempQuestions['a'],tempQuestions['b'],tempQuestions['c']])
+        df = pd.DataFrame(questionList, columns=['question','a','b','c'])
+
+        print(df)
+        return df
+
+    def answerQuestions(self,db):
+        correct = 0
+        incorrect = 0
+
+        if self.useranswer == self.answer:
+            print("correct")
+            correct+1
+        else:
+            print("incorrect")
+            incorrect+1

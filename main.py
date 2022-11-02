@@ -10,7 +10,7 @@ from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
 import firebase_admin
-from stockSim import SimulationFactory, StockData, User, Order, Simulation, portfolio
+from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, portfolio
 
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -673,7 +673,10 @@ def Dashboard():
 @app.route('/quiz')
 def quizpage():
     if ('user' in session):
-        return render_template('quiz.html', person = session['user'])
+        quiz = Quiz.retrieveQuestions(dbfire, session['user'])
+
+        return render_template('quiz.html', quiz = quiz, questions = quiz['question'], a = quiz['a'], b = quiz['b'],
+        c = quiz['c'])
     else:
         return render_template('404Error.html')
 
