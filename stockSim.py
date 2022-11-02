@@ -13,7 +13,11 @@ from google.cloud.firestore import ArrayUnion
 import datetime
 import math
 import matplotlib as plt
+import matplotlib.animation as animation
+from matplotlib import style
 import math
+import mpld3
+from mpld3 import plugins
 
 DAYS_IN_MONTH = {
     1 : 31,
@@ -893,25 +897,16 @@ class portfolio:
     def user_graph(self, db):
         prices = self.db.collection('IntradayStockData').document('prices').get()
         dates = self.db.collection('IntradayStockData').document('dates').get()
+        
         for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
             temp = entry.to_dict()
-            
-            
-            
-        plt.xlabel('Date')
-        plt.ylabel('Price')
-        plt.show
-            
+            xlabel = prices
+            ylabel = dates
+            plt.xlabel('Date')
+            plt.ylabel('Price')
+            plt.show
+           
+           
+    #def animate():
         
-        
-    #Display all information
-    #def displayInfo(self, close):
-    #    print(self.percentChange)
-    #    print(self.returns)
-    #    print(self.funds_remaining)
-
-    #    print(self.get_profit)
-    #    if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
-    #        print("Gains: +" + self.GainorLoss)
-    #    elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
-    #        return
+    

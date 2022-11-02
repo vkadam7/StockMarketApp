@@ -1,5 +1,6 @@
 #Author: Viraj Kadam 
 #Followers feature: Allows user to search, follow, and unfollow different users
+from this import d
 import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -7,7 +8,7 @@ import pyrebase
 
 
 
-class Followers():
+class UserInfo():
     def __init__(self, db, username):
         self.db = db
         self.username = username
@@ -36,7 +37,7 @@ class Followers():
         for entry in userssDB.stream():
             temp = entry.to_dict()
             name = temp['Name'].lower()
-            username = temp['usernam'].lower()
+            username = temp['username'].lower()
             tempSearchTerm = searchTerm.lower()
             if tempSearchTerm == name:
                 return True, name.upper()
@@ -45,5 +46,43 @@ class Followers():
 
         return False, -1
     
+class FollowUnfollow:
+    def __init__(self, db, followOrUnfollow, user1, user2):
+        self.db = db
+        self.option = self.followOrUnfollow
+        self.user1 = user1
+        self.user2 = user2
+        
     
     
+    def followOption(self, db, user1, user2):
+        if self.option == 'Follow':
+            if self.doTheyhaveAnaccount() == True:
+                if doTheyFollow() == False:
+                    return
+                
+                
+                
+    def unfollowOption(self, db, user1, user2):
+        if self.option == 'Unfollow':
+            if self.doTheyFollow() == True:
+                remove = self.db.collection('')
+                
+                
+            
+    def doTheyhaveAnaccount(self):
+        return
+    
+    
+    def doTheyFollow(self):
+        followCheck = self.db.collection('Following').collection('users').get()
+        followingCheck = self.db.collection('Followers').collection('users').get()
+        if followCheck == followCheck:
+            return True
+        else:
+            return False
+
+
+class Recommendation:
+    def __init__(self, db, recommend, ):
+        return
