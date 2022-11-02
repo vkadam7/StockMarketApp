@@ -507,6 +507,13 @@ class User:
         data = self.db.collection("Users").document(self.username)
         data.update({ 'Experience' : experience })
 
+    def addFriend(db, user1, user2):
+        data = {
+            'user1': user1,
+            'user2': user2
+        }
+        db.collection("Users").add(data)
+
     def registerUser(db, username, email, name, userID, description="", picture="", experience=""):
         data = {
             'Email' : email,
