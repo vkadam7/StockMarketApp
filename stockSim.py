@@ -429,13 +429,14 @@ class Simulation:
         db.collection('Simulations').document(simName).update(data)
 
         scores = percentChange * 100
+        scoreRounded = round(scores)
         grabDataEmail = data['user']
         userEmail = db.collection('Users').where('Email', '==', grabDataEmail)
         for docs in userEmail.stream():
                 emails = docs.to_dict()
         grabUserName = emails['userName']
 
-        db.collection('Leaderboard').add({"email":grabDataEmail, "score":scores, "username":grabUserName})
+        db.collection('Leaderboard').add({"email":grabDataEmail, "score":scoreRounded, "username":grabUserName})
 
 
 

@@ -260,3 +260,16 @@ background: #eee;
 .navCenter{
   text-align: center;
 }
+
+#tableL{
+  text-align: center;
+}
+
+table{
+  counter-reset: tableL;
+}
+
+.counterIncrement::before{
+  content: counter(tableL);
+  counter-increment: tableL;
+}

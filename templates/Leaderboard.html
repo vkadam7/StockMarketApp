@@ -99,36 +99,36 @@
 
 <body>
     
-    
-
-{% for user in documentRef %}
-<h1>
-  Username: {{user['username']}}
-</h1>
-<h1>
-  Score: {{user['score']}}
-</h1>  
-{%endfor%}
+<h1>StockSim Leaderboard</h1>    
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+<table class = "table table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
+  <thead class = "bg-light">
+  <tr>
+    <th> Rank </th>
+    <th> Username </th>
+    <th> Score </th>
+  </tr>
+  </thead>
+  {% for user in documentRef%}
+  <tbody>
+    <tr>
+      <td class = "counterIncrement"></td>
+      <td>
+        <p class = "fw-noraml mb-1"> {{user['username']}}</p>
+      </td>
+      <td>
+        <p class = "fw-normal mb-1"> {{user['score']}}</p>
+      </td>
+    </tr>
+  </tbody>
+  {% endfor %}
+</table>
 </body>
 
-<footer class="footer mt-auto py-3" id = "foot">
+<footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
   <div class="container">
     <span>Copyright 2022 by StockSim</span>
   </div>
