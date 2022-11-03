@@ -890,32 +890,55 @@ class portfolio:
 
 ## Class for setting up quiz - Muneeb Khan (WIP!)
 class Quiz:
-    def __init__(self,db,question,answer,useranswer):
+    def __init__(self,db,question,answer,useranswer,correct,incorrect):
         self.db = db
         self.useranswer = useranswer
         self.data = Quiz.retrievequestions(self.db,self.quiz)
         self.question = question
         self.answer = answer
         self.useranswer = useranswer
+        self.correct = correct
+        self.incorrect = incorrect
     
-    def retrieveQuestions(db,self):
+    # To store all the questions and answers for the Quiz
+    def listOfQuestions(self,db):
         questionList = []
 
-        for entry in db.collection('Quiz').get():
+        for entry in db.collection('Quiz').document('').stream():
             tempQuestions = entry.to_dict()
-            questionList.append([tempQuestions['question'],tempQuestions['a'],tempQuestions['b'],tempQuestions['c']])
-        df = pd.DataFrame(questionList, columns=['question','a','b','c'])
+            questionList.append([tempQuestions['question'],tempQuestions['answer'],tempQuestions['a'],tempQuestions['b'],tempQuestions['c']])
 
-        print(df)
-        return df
+        print(questionList)
+        return questionList
 
+    # To get the next quiz question from the the question list
+    def retrieveNextQuestion(self,db):
+        questionList = Quiz.listOfQuestions(db,self)
+
+        for entry in questionList:
+            self.question.pop(questionList['questions'])
+            self.db.answer.pop(questionList['answer'])
+            self.a.pop(questionList['a'])
+            self.b.pop(questionList['b'])
+            self.c.pop(questionList['c'])
+        return (self.question,self.a,self.b,self.c)
+
+    # Check if Users answer is correct
     def answerQuestions(self,db):
-        correct = 0
-        incorrect = 0
 
-        if self.useranswer == self.answer:
+        if self.db.useranswer == self.db.answer:
             print("correct")
-            correct+1
+            return self.correct+1
         else:
             print("incorrect")
-            incorrect+1
+            return self.incorrect+1
+
+    # Check if User got at least 7 correct to pass the quiz
+    def passedQuiz(self,db):
+
+        if self.db.correct >= 7:
+            print("You passed passed the quiz! with " + str(self.db.correct) + " out of 10! great work")
+            
+        else: 
+            print("Sorry you didnt pass the quiz, you only scored " + str(self.db.correct) + " out of 10.")
+            print("You must score at least 7/10 to pass, better luck next time!")

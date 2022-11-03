@@ -673,7 +673,7 @@ def Dashboard():
 @app.route('/quiz')
 def quizpage():
     if ('user' in session):
-        quiz = Quiz.retrieveQuestions(dbfire, session['user'])
+        quiz = Quiz.retrieveNextQuestion(dbfire, session['user'])
 
         return render_template('quiz.html', quiz = quiz, questions = quiz['question'], a = quiz['a'], b = quiz['b'],
         c = quiz['c'])
