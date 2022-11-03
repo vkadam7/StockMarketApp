@@ -257,3 +257,19 @@ background: #eee;
   border-radius: 5px;
 }
 
+.navCenter{
+  text-align: center;
+}
+
+#tableL{
+  text-align: center;
+}
+
+table{
+  counter-reset: tableL;
+}
+
+.counterIncrement::before{
+  content: counter(tableL);
+  counter-increment: tableL;
+}

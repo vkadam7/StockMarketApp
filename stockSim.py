@@ -437,6 +437,18 @@ class Simulation:
         data['score'] = percentChange * 100
         db.collection('Simulations').document(simName).update(data)
 
+        scores = percentChange * 100
+        scoreRounded = round(scores)
+        grabDataEmail = data['user']
+        userEmail = db.collection('Users').where('Email', '==', grabDataEmail)
+        for docs in userEmail.stream():
+                emails = docs.to_dict()
+        grabUserName = emails['userName']
+
+        db.collection('Leaderboard').add({"email":grabDataEmail, "score":scoreRounded, "username":grabUserName})
+
+
+
     def retrieveOngoing(db, email):
         for query in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream():
             id = query.id
