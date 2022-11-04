@@ -417,8 +417,8 @@ class Simulation:
         difference = currentTime - self.startTimestamp
         index = -1
         for i in range(0,difference.days):
-            index += 8
-        index += (difference.seconds//3600)%24
+            index += 40
+        index += (difference.seconds//3600)%40
         return index
 
     def currentPriceOf(self, ticker):
