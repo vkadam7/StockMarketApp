@@ -154,11 +154,18 @@ class StockData:
                         interp[j] += np.random.randn() * np.std(tempArr)
                     date = self.dates[i]
                     hourlyDates = []
-                    for i in range(9,17):
-                        if i < 10:
-                            tempDate = date + ' 0' + str(i) + ':00:00'
+                    for j in range(9,17):
+                        if timespan == '10minute':
+                            for k in range(0,5):
+                                if i < 10:
+                                    tempDate = date + ' 0' + str(j) + ':' + str(k) + '0' + ':00'
+                                else:
+                                    tempDate = date + ' ' + str(j) + ':' + str(k) + '0' + ':00'
                         else:
-                            tempDate = date + ' ' + str(i) + ':00:00'
+                            if i < 10:
+                                tempDate = date + ' 0' + str(j) + ':00:00'
+                            else:
+                                tempDate = date + ' ' + str(j) + ':00:00'
                         hourlyDates.append(tempDate)
                     dataMatrix.append([hourlyDates, interp])
                 else:
@@ -303,11 +310,11 @@ class StockData:
                         interp[j] += np.random.randn() * np.std(tempArr)
                     date = dates[i]
                     hourlyDates = []
-                    for i in range(9,16):
+                    for j in range(9,16):
                         if i < 10:
-                            tempDate = date + ' 0' + str(i) + ':00:00'
+                            tempDate = date + ' 0' + str(j) + ':00:00'
                         else:
-                            tempDate = date + ' ' + str(i) + ':00:00'
+                            tempDate = date + ' ' + str(j) + ':00:00'
                         hourlyDates.append(tempDate)
                     for entry in hourlyDates:
                         newDates.append(entry)
