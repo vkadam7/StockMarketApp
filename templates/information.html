@@ -1,5 +1,4 @@
-<!--Information Page by Muneeb Khan-->
-<!--Updated by Muneeb and Viraj-->
+<!--Profile page by Miqdad Hafiz-->
 <!--CSS Updated by Miqdad and integrated by Muneeb-->
 <!doctype html>
 <html lang="en" class="h-100">
@@ -7,42 +6,46 @@
     <meta charset="utf-8">
     <title>StockSim: Learn How to Trade</title>
 
-    <!-- Bootstrap core CSS -->
+    <!-- Bootstrap -->
     <link rel = "stylesheet" href = "/static/stylesheets/newStyle.css">
     <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
-  </head>
-  <body class="d-flex flex-column h-100">
-    
-<header>
-  <!-- Fixed navbar -->
-  <nav class="navbar navbar-expand-md navbar-dark fixed-top" id = "navBar">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="information">
-        <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
-        StockSim: Learn How to Trade
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarCollapse">
-        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    </head>
+    <header>
+
+        <nav class="navbar navbar-expand-md navbar-dark fixed-top" id = "navBar">
+            <div class="container-fluid">
+              <a class="navbar-brand" href="home">
+                <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
+                StockSim: Learn How to Trade
+              </a>
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                  <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="home">Home</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="aboutus">About Us</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="information">Information</a>
+                  </li>
+                  {% if session['user'] %}
           <li class="nav-item">
-            <a class="nav-link" href="home">Home</a>
+            <a class = "nav-link active" method = "POST" href = "profile">Profile</a> 
           </li>
+        </li class = "nav-item">
+            <a class = "nav-link active" method = "POST" href = "social"> Your Network</a>
+         </li>
           <li class="nav-item">
-            <a class="nav-link" href="aboutus">About Us</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="information">Information</a>
-          </li>
-          {% if session['user'] %}
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
+            <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
           </li>
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
-          
           <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
             <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
               <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Start a simulation!</button>
@@ -71,9 +74,8 @@
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
         {% endif %}
-          <!--For some reason li class must be "nav-item in order to show up on nav bar"-->
-        </ul>
-        <form action="/stockSearch" method="post" id = "dropStock">
+                </ul>
+                <form action="/stockSearch" method="post" id = "dropStock">
                   <select id = "dropSelect" class = "form" type="search" name="searchTerm" value="{{ request.form['searchTerm'] }}">
                     <option selected>Find a stock</option>
                     <option value = "AMZN">Amazon</option>
@@ -88,12 +90,12 @@
                     <option value = "MSFT">Microsoft</option>
                     <option value = "NFLX">Netflix</option>
                   </select> 
-                  <button>Display Stock</button>
+                  <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
                 </form>
-      </div>
-    </div>
-  </nav>
-</header>
+              </div>        
+            </div>
+          </nav>
+    </header>
 
 <br><br><br><br><br><br>
 

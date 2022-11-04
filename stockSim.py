@@ -11,6 +11,13 @@ import firebase_admin
 from firebase_admin import firestore
 from google.cloud.firestore import ArrayUnion
 import datetime
+#import math
+import matplotlib as plt
+import matplotlib.animation as animation
+from matplotlib import style
+import math
+import mpld3
+from mpld3 import plugins
 
 DAYS_IN_MONTH = {
     1 : 31,
@@ -426,6 +433,18 @@ class Simulation:
         data['score'] = percentChange * 100
         db.collection('Simulations').document(simName).update(data)
 
+        scores = percentChange * 100
+        scoreRounded = round(scores)
+        grabDataEmail = data['user']
+        userEmail = db.collection('Users').where('Email', '==', grabDataEmail)
+        for docs in userEmail.stream():
+                emails = docs.to_dict()
+        grabUserName = emails['userName']
+
+        db.collection('Leaderboard').add({"email":grabDataEmail, "score":scoreRounded, "username":grabUserName})
+
+
+
     def retrieveOngoing(db, email):
         for query in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream():
             id = query.id
@@ -687,6 +706,7 @@ class portfolio:
             self.quantity = self.weight()
             self.profit = self.get_profit()
             self.avgSharePrice = self.returnValue()
+            self.volatility = self.volatitlity()
     
     #def retrieve(self, id):
     #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
@@ -843,6 +863,20 @@ class portfolio:
         daily_returns = returns.pct_change()
         print(daily_returns)
        
+    #New volatility function (Viraj Kadam)   
+    def volatitlity(self):
+       currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
+       day = datetime.datetime.now()
+       volatility = 0
+       returns = 0
+       prices = []
+       for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
+           temp = entry.to_dict()
+           returns =  np.log((prices.append(float(temp['avgStockPrice']))/(prices.append(float(temp['avgStockPrice']))).shift()))
+           returns.std()
+           volatility = returns.std()*225**.5
+           
+       return volatility
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
@@ -863,17 +897,20 @@ class portfolio:
         
     #Author: Viraj Kadam    
     #Graph of user stocks   (Need buy and sell info)
-    #def user_graph(self, db):
-    #   prices = self.db.collection('IntradayStockData').document('prices').get()
-    #    dates = self.db.collection('IntradayStockData').document('dates').get()
-    #    for x in prices:
-    #        plt.plot(x[dates][prices])
-    #        
-    #    plt.xlabel('Date')
-    #    plt.ylabel('Price')
-    #    plt.show
-            
+    def user_graph(self, db):
+        prices = self.db.collection('IntradayStockData').document('prices').get()
+        dates = self.db.collection('IntradayStockData').document('dates').get()
         
+        for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
+            temp = entry.to_dict()
+            xlabel = prices
+            ylabel = dates
+            plt.xlabel('Date')
+            plt.ylabel('Price')
+            plt.show
+           
+           
+    #def animate():
         
     #Display all information
     def displayInfo(self, close):
