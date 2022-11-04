@@ -10,7 +10,8 @@ from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
 import firebase_admin
-from stockSim import SimulationFactory, StockData, User, Order, Simulation, portfolio
+
+from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, portfolio
 from followers import FollowUnfollow, Recommendation, UserInfo
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -667,6 +668,16 @@ def fourOhFour():
 #def portfolioGraph():
 #    if 'user' in session:
         
+
+@app.route('/quiz')
+def quizpage():
+    if ('user' in session):
+        quiz = Quiz.retrieveNextQuestion(dbfire, session['user'])
+
+        return render_template('quiz.html', quiz = quiz, questions = quiz['question'], a = quiz['a'], b = quiz['b'],
+        c = quiz['c'])
+    else:
+        return render_template('404Error.html')
 
 #Author: Viraj Kadam   
 #Updates user profile  
