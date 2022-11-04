@@ -308,15 +308,24 @@ class StockData:
                     for j in range(0,len(interp)):
                         tempArr = np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])])
                         interp[j] += np.random.randn() * np.std(tempArr)
+
+                    ## Date calculations
                     date = dates[i]
-                    hourlyDates = []
-                    for j in range(9,17):
-                        if i < 10:
-                            tempDate = date + ' 0' + str(j) + ':00:00'
-                        else:
-                            tempDate = date + ' ' + str(j) + ':00:00'
-                        hourlyDates.append(tempDate)
-                    for entry in hourlyDates:
+                    dateEntries = []
+                    for j in range(3,6):
+                        tempDate = date + ' 09:' + str(k) + '0:00'
+                        dateEntries.append(tempDate)
+                    for j in range(10,16):
+                        for k in range(0,5):
+                            if i < 10:
+                                tempDate = date + ' 0' + str(j) + ':' + str(k) + '0:00'
+                            else:
+                                tempDate = date + ' ' + str(j) + ':' + str(k) + '0:00'
+                        dateEntries.append(tempDate)
+                    dateEntries.append(date + ' 16:00:00')
+
+                    ## Array creations
+                    for entry in dateEntries:
                         newDates.append(entry)
                     for entry in interp.tolist():
                         newData.append(entry)
