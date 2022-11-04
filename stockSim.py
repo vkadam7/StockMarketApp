@@ -304,13 +304,13 @@ class StockData:
                         endLoc = np.where(tempArr == (strYear + "-" + strMonth + "-" + strDay))
                 b = endLoc[0][0]
                 for i in range(a, b+1):
-                    interp = np.interp(range(0,7),[0, 4, 7],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
+                    interp = np.interp(range(0,8),[0, 4, 8],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
                     for j in range(0,len(interp)):
                         tempArr = np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])])
                         interp[j] += np.random.randn() * np.std(tempArr)
                     date = dates[i]
                     hourlyDates = []
-                    for j in range(9,16):
+                    for j in range(9,17):
                         if i < 10:
                             tempDate = date + ' 0' + str(j) + ':00:00'
                         else:

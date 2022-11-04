@@ -570,15 +570,13 @@ def displayStock(ticker):
                 dates = []
                 prices = []
                 avgPrice = []
-            for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
-                avgPrice.append(stock['prices'][i])
-                if i % 7 == 1:
-                    prices.append(mean(avgPrice))
-                    print(mean(avgPrice))
-                    dates.append(stock['dates'][i][0:10])
-                    print(stock['dates'][i][0:10])
-                    avgPrice = []
-            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+                for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
+                    avgPrice.append(stock['prices'][i])
+                    if i % 7 == 1:
+                        prices.append(mean(avgPrice))
+                        dates.append(stock['dates'][i][0:10])
+                        avgPrice = []
+                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
         else: 
             for entry in stockData:
                 stock = entry.to_dict()
