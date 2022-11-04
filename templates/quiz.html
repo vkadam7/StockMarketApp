@@ -99,18 +99,21 @@
             <hr>
         </div>
             <div class="container">
+              <form action = "/" method ="POST">
                 <div class="questions">
                   <div class = "card-body">
-                    <div class = "card-text">
+                    <div class = "question">
                       <h2>{{quiz['questions']}}</h2>  
                     </div>
                   </div>
-                    <div id="btn-sm" class="btn-grid">
+                    <div id="btn-sm" class="answers, btn-grid">
                         <button class = "btn-lg">{{quiz['a']}}</button>
                         <button class = "btn-lg">{{quiz['b']}}</button>
                         <button class = "btn-lg">{{quiz['c']}}</button>
                     </div>
                 </div>
+                <input type = "submit">
+              </form>
             </div>
     </body>
 

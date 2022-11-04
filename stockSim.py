@@ -890,7 +890,7 @@ class portfolio:
 
 ## Class for setting up quiz - Muneeb Khan (WIP!)
 class Quiz:
-    def __init__(self,db,question,answer,useranswer,correct,incorrect):
+    def __init__(self,db,question,answer,useranswer,correct,incorrect,nextbutton,submitbutton):
         self.db = db
         self.useranswer = useranswer
         self.data = Quiz.retrievequestions(self.db,self.quiz)
@@ -899,25 +899,27 @@ class Quiz:
         self.useranswer = useranswer
         self.correct = correct
         self.incorrect = incorrect
+        self.nextbutton = nextbutton
+        self.submitbutton = submitbutton
     
     # To store all the questions and answers for the Quiz
-    def listOfQuestions(self,db):
+    def listOfQuestions(db):
         questionList = []
 
-        for entry in db.collection('Quiz').document('').stream():
+        for entry in db.collection('Quiz').document('QuizA').collection('QuizA').stream():
             tempQuestions = entry.to_dict()
             questionList.append([tempQuestions['question'],tempQuestions['answer'],tempQuestions['a'],tempQuestions['b'],tempQuestions['c']])
 
-        print(questionList)
         return questionList
 
     # To get the next quiz question from the the question list
     def retrieveNextQuestion(self,db):
-        questionList = Quiz.listOfQuestions(db,self)
+        questionList = Quiz.listOfQuestions(self,db)
 
         for entry in questionList:
+          if self.nextbutton:
             self.question.pop(questionList['questions'])
-            self.db.answer.pop(questionList['answer'])
+            self.answer.pop(questionList['answer'])
             self.a.pop(questionList['a'])
             self.b.pop(questionList['b'])
             self.c.pop(questionList['c'])
