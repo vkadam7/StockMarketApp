@@ -453,7 +453,6 @@ def orderConfirm():
         currentPrices = []
         percentage = []
         ##avgPrice = []
-        session['initialCash'] = sim.initialCash
         
         for entry in Order.stocksBought(dbfire, session['simName']):
             Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])

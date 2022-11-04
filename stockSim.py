@@ -304,31 +304,34 @@ class StockData:
                         endLoc = np.where(tempArr == (strYear + "-" + strMonth + "-" + strDay))
                 b = endLoc[0][0]
                 for i in range(a, b+1):
-                    interp = np.interp(range(0,8),[0, 4, 8],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
-                    for j in range(0,len(interp)):
+                    interpHourly = np.interp(range(0,8),[0, 4, 8],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
+                    interps = []
+                    interpHourly[0] += np.random.randn() * np.std(np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])]))
+                    for j in range(1,len(interpHourly)):
                         tempArr = np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])])
-                        interp[j] += np.random.randn() * np.std(tempArr)
+                        interpHourly[j] += np.random.randn() * np.std(tempArr)
+                        temp = interpHourly[j]
+                        temp += np.random.randn()/10 * np.std(tempArr)
+                        interps.append(np.interp(range(6), [0, 5], [interpHourly[j-1], temp]))
 
                     ## Date calculations
                     date = dates[i]
                     dateEntries = []
                     for j in range(3,6):
-                        tempDate = date + ' 09:' + str(k) + '0:00'
+                        tempDate = date + ' 09:' + str(j) + '0:00'
                         dateEntries.append(tempDate)
                     for j in range(10,16):
-                        for k in range(0,5):
-                            if i < 10:
-                                tempDate = date + ' 0' + str(j) + ':' + str(k) + '0:00'
-                            else:
-                                tempDate = date + ' ' + str(j) + ':' + str(k) + '0:00'
-                        dateEntries.append(tempDate)
+                        for k in range(0,6):
+                            tempDate = date + ' ' + str(j) + ':' + str(k) + '0:00'
+                            dateEntries.append(tempDate)
                     dateEntries.append(date + ' 16:00:00')
 
                     ## Array creations
                     for entry in dateEntries:
                         newDates.append(entry)
-                    for entry in interp.tolist():
-                        newData.append(entry)
+                    for entry in interps:
+                        for point in entry.tolist():
+                            newData.append(point)
                 return {
                     'simulation': simName,
                     'name': data['name'],
