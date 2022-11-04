@@ -397,8 +397,6 @@ class Simulation:
 
     def createSim(self):
         count = len(self.db.collection('Simulations').get())
-        simName = "Sim" + str(count+1)
-        self.simName = simName
         self.startTimestamp = datetime.datetime.now()
         data = {
             'ongoing': True,
@@ -410,8 +408,9 @@ class Simulation:
             'score': 0,
             'startTimestamp': self.startTimestamp,
         }
+        updateTime, tempRef = self.db.collection('Simulations').add(data)
+        self.simName = tempRef.id
         self.addStocksToSim()
-        self.db.collection('Simulations').document(simName).set(data)
 
     def whatTimeIsItRightNow(self):
         currentTime = datetime.datetime.now()
@@ -446,6 +445,10 @@ class Simulation:
         percentChange = (float(data['currentCash']) - float(data['initialCash'])) / float(data['initialCash'])
         data['score'] = percentChange * 100
         db.collection('Simulations').document(simName).update(data)
+
+        for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
+            temp = entry.id
+            db.collection('IntradayStockData').document(temp).delete()
 
         scores = percentChange * 100
         grabDataEmail = data['user']
