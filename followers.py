@@ -68,15 +68,15 @@ class FollowUnfollow:
         if self.option == 'Unfollow':
             if self.doTheyFollow() == True:
                 return self.db
+    
+    
+    def followerCount():
         
     
-    #def doTheyFollow(self):
-    #    followCheck = self.db.collection('Following').collection('users').get()
-    #    followingCheck = self.db.collection('Followers').collection('users').get()
-    #    if followCheck == followCheck:
-    #        return True
-    #    else:
-    #        return False
-class Recommendation:
-    def __init__(self, db, recommend, ):
-        return
+    def doTheyFollow(self):
+        followCheck = self.db.collection('Following').collection('users').get()
+        followingCheck = self.db.collection('Followers').collection('users').get()
+        if followCheck == followCheck:
+            return True
+        else:
+            return False
