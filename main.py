@@ -608,7 +608,7 @@ def displayStock(ticker):
                         if timespan == '5minute':
                             tempInterp = np.interp(range(0,3),[0, 2],[stock['prices'][i-1], stock['prices'][i]])
                             for element in tempInterp:
-                                element += np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]])
+                                element += (np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]]))/100
                                 prices.append(element)
                             # 15 = index of minute
                             tempDate = list(stock['dates'][i])
@@ -618,7 +618,7 @@ def displayStock(ticker):
                         elif timespan == '1minute':
                             tempInterp = np.interp(range(0,11),[0, 10],[stock['prices'][i-1], stock['prices'][i]])
                             for element in tempInterp:
-                                element += np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]])
+                                element += (np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]]))/50
                                 prices.append(element)
                             tempDate = list(stock['dates'][i])
                             for j in range(0,10):
