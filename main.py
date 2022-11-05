@@ -597,6 +597,34 @@ def displayStock(ticker):
                         #    if int(stock['dates'][i][11:13]) == 9:
                         #        mod = 6
                     return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+            elif timespan == '1minute' or timespan == '5minute':
+                for entry in stockData:
+                    stock = entry.to_dict()
+                    #session['stock'] = stock
+                if stock != -1:
+                    dates = []
+                    prices = []
+                    for i in range(1, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
+                        if timespan == '5minute':
+                            tempInterp = np.interp(range(0,3),[0, 2],[stock['prices'][i-1], stock['prices'][i]])
+                            for element in tempInterp:
+                                element += np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]])
+                                prices.append(element)
+                            # 15 = index of minute
+                            tempDate = list(stock['dates'][i])
+                            for j in range(1,3):
+                                tempDate[15] = str((j*5)%10)
+                                dates.append("".join(tempDate))
+                        elif timespan == '1minute':
+                            tempInterp = np.interp(range(0,11),[0, 10],[stock['prices'][i-1], stock['prices'][i]])
+                            for element in tempInterp:
+                                element += np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]])
+                                prices.append(element)
+                            tempDate = list(stock['dates'][i])
+                            for j in range(0,10):
+                                tempDate[15] = str(j)
+                                dates.append("".join(tempDate))
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
             else:
                 for entry in stockData:
                     stock = entry.to_dict()
