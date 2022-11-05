@@ -253,7 +253,14 @@ class StockData:
                 finalDate = tempArr[len(tempArr)-1]
                 print(initialDate)
                 print(endDate)
-                if int(initialDate[0:4]) > int(endDate[0:4]):
+                availabilityFlag = True
+                if int(initialDate[0:4]) >= int(endDate[0:4]):
+                    if int(initialDate[5:7]) > int(endDate[5:7]):
+                        availabilityFlag = False
+                    elif int(initialDate[5:7]) == int(endDate[5:7]):
+                        if int(initialDate[8:10]) > int(endDate[8:10]):
+                            availabilityFlag = False
+                if availabilityFlag == False:
                     return {
                         'simulation': simName,
                         'name': data['name'],
@@ -334,7 +341,10 @@ class StockData:
                             interpHourly[j] += np.random.randn() * np.std(tempArr)
                             temp = interpHourly[j]
                             temp += np.random.randn()/10 * np.std(tempArr)
-                            interps.append(np.interp(range(6), [0, 5], [interpHourly[j-1], temp]) + np.random.randn() * np.std(tempArr))
+                            tempInterp = np.interp(range(6), [0, 5], [interpHourly[j-1], temp])
+                            for element in tempInterp:
+                                element += + np.random.randn() * np.std(tempArr)
+                            interps.append(tempInterp)
 
                         ## Date calculations
                         date = dates[i]
