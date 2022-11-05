@@ -117,6 +117,15 @@ def login():
     else:
         print("Landing on page")
         return render_template('login.html')
+
+
+#Author: Miqdad Hafiz
+@app.route('/social', methods = ["POST", "GET"])
+def social():
+    if request.method == "POST":
+        search = request.form
+        searchKey = search["searchUser"]
+
     
 #Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
