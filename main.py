@@ -125,6 +125,17 @@ def social():
     if request.method == "POST":
         search = request.form
         searchKey = search["searchUser"]
+        doc = dbfire.collection('Users').document(searchKey).get()
+        if doc.exists:
+            grabUser = dbfire.collection('Users').where('userName', '==', searchKey)
+            for docs in grabUser.stream(): 
+                grabUser = docs.to_dict()
+            searchResult = grabUser['userName']
+            print("HERE COMES THE USERNAME!")
+            return print(searchResult)
+        else:
+            flash("Sorry we could not find the user: " + searchKey + " Please try searching another username.")
+            return render_template('social.html')
 
     
 #Author: Viraj Kadam
