@@ -416,9 +416,17 @@ class Simulation:
         currentTime = datetime.datetime.now()
         difference = currentTime - self.startTimestamp
         index = -1
-        for i in range(0,difference.days):
+        total = difference.total_seconds()
+        days = round(total//86400)
+        total -= days*86400
+        hours = round(total//3600)
+        total -= hours*3600
+        tenMin = round(total//600)
+        for i in range(0,days):
             index += 40
-        index += (difference.seconds//3600)%40
+        for i in range(0,hours):
+            index += 6
+        index += tenMin
         return index
 
     def currentPriceOf(self, ticker):
