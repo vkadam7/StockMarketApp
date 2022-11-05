@@ -903,27 +903,17 @@ class Quiz:
         self.submitbutton = submitbutton
     
     # To store all the questions and answers for the Quiz
-    def listOfQuestions(db):
+    def listOfQuestions(db,self):
         questionList = []
 
-        for entry in db.collection('Quiz').document('QuizA').collection('QuizA').stream():
-            tempQuestions = entry.to_dict()
-            questionList.append([tempQuestions['question'],tempQuestions['answer'],tempQuestions['a'],tempQuestions['b'],tempQuestions['c']])
+        for entry in db.collection('Quiz').stream():
+            temp = entry.to_dict()
+            questionList.append([temp['question'],temp['answer'],temp['a'],temp['b'],temp['c']])
 
-        return questionList
+        df = pd.DataFrame(questionList, columns=['question','answer','a','b','c'])
 
-    # To get the next quiz question from the the question list
-    def retrieveNextQuestion(self,db):
-        questionList = Quiz.listOfQuestions(self,db)
-
-        for entry in questionList:
-          if self.nextbutton:
-            self.question.pop(questionList['questions'])
-            self.answer.pop(questionList['answer'])
-            self.a.pop(questionList['a'])
-            self.b.pop(questionList['b'])
-            self.c.pop(questionList['c'])
-        return (self.question,self.a,self.b,self.c)
+        print(df)
+        return df
 
     # Check if Users answer is correct
     def answerQuestions(self,db):

@@ -673,10 +673,14 @@ def Dashboard():
 @app.route('/quiz')
 def quizpage():
     if ('user' in session):
-        quiz = Quiz.retrieveNextQuestion(dbfire, session['user'])
+        quiz = Quiz.listOfQuestions(dbfire, session['user'])
+                 
+        question = quiz.pop('question')
+        a = quiz.pop('a')
+        b = quiz.pop('b')
+        c = quiz.pop('c')
 
-        return render_template('quiz.html', quiz = quiz, questions = quiz['question'], a = quiz['a'], b = quiz['b'],
-        c = quiz['c'])
+        return render_template('quiz.html',quiz = quiz,question = question, a = a, b = b, c = c)
     else:
         return render_template('404Error.html')
 

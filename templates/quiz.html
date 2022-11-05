@@ -99,17 +99,17 @@
             <hr>
         </div>
             <div class="container">
-              <form action = "/" method ="POST">
+              <form action = "/quiz" method ="POST">
                 <div class="questions">
                   <div class = "card-body">
                     <div class = "question">
-                      <h2>{{quiz['questions']}}</h2>  
+                      <h2>{{question[0]}}</h2>  
                     </div>
                   </div>
-                    <div id="btn-sm" class="answers, btn-grid">
-                        <button class = "btn-lg">{{quiz['a']}}</button>
-                        <button class = "btn-lg">{{quiz['b']}}</button>
-                        <button class = "btn-lg">{{quiz['c']}}</button>
+                    <div id="btn-sm" class="btn-btn-grid">
+                        <button class = "btn-lg" type = "radio" value = "a">A. {{a[0]}}</button>
+                        <button class = "btn-lg" type = "radio" value = "b">B. {{b[0]}}</button>
+                        <button class = "btn-lg" type = "radio" value = "c">C. {{c[0]}}</button>
                     </div>
                 </div>
                 <input type = "submit">
