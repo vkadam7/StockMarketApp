@@ -249,98 +249,120 @@ class StockData:
                 opens = dailys['opens']
                 closes = dailys['closes']
                 tempArr = np.array(dates)
-                startLoc = np.where(tempArr == startDate)
-                endLoc = np.where(tempArr == endDate)
-                newDates = []
-                newData = []
-                if startLoc[0].size == 0:
-                    print(ticker + " only partially available for this period, startDate")
-                    tempDate = startDate
-                    month = int(tempDate[5:7])
-                    day = int(tempDate[8:10])
-                    year = int(tempDate[0:4])
-                    while startLoc[0].size == 0:
-                        day += 1
-                        if day >= DAYS_IN_MONTH[month]:
-                            month += 1
-                            if month >= 12:
-                                month = 1
-                                year += 1
-                            day = 1
-                        if month < 10:
-                            strMonth = "0" + str(month)       
-                        else: 
-                            strMonth = str(month)
-                        if day < 10:
-                            strDay = "0" + str(day)       
-                        else: 
-                            strDay = str(day)
-                        strYear = str(year)
-                        startLoc = np.where(tempArr == (strYear + "-" + strMonth + "-" + strDay))
-                a = startLoc[0][0]
-                if endLoc[0].size == 0:
-                    print(ticker + " only partially available for this period, startDate")
-                    tempDate = endDate
-                    month = int(tempDate[5:7])
-                    day = int(tempDate[8:10])
-                    year = int(tempDate[0:4])
-                    while endLoc[0].size == 0:
-                        day -= 1
-                        if day <= 0:
-                            month -= 1
-                            if month <= 0:
-                                month = 12
-                                year -= 1
-                            day = DAYS_IN_MONTH[month]
-                        if month < 10:
-                            strMonth = "0" + str(month)       
-                        else: 
-                            strMonth = str(month)
-                        if day < 10:
-                            strDay = "0" + str(day)       
-                        else: 
-                            strDay = str(day)
-                        strYear = str(year)
-                        endLoc = np.where(tempArr == (strYear + "-" + strMonth + "-" + strDay))
-                b = endLoc[0][0]
-                for i in range(a, b+1):
-                    interpHourly = np.interp(range(0,8),[0, 4, 8],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
-                    interps = []
-                    interpHourly[0] += np.random.randn() * np.std(np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])]))
-                    for j in range(1,len(interpHourly)):
-                        tempArr = np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])])
-                        interpHourly[j] += np.random.randn() * np.std(tempArr)
-                        temp = interpHourly[j]
-                        temp += np.random.randn()/10 * np.std(tempArr)
-                        interps.append(np.interp(range(6), [0, 5], [interpHourly[j-1], temp]))
+                initialDate = tempArr[0]
+                finalDate = tempArr[len(tempArr)-1]
+                print(initialDate)
+                print(endDate)
+                if int(initialDate[0:4]) > int(endDate[0:4]):
+                    return {
+                        'simulation': simName,
+                        'name': data['name'],
+                        'ticker': ticker,
+                        'headquarters': data['headquarters'],
+                        'listedAt': data['listedAt'],
+                        'unavailable': True
+                    }
+                else:
+                    startLoc = np.where(tempArr == startDate)
+                    endLoc = np.where(tempArr == endDate)
+                    newDates = []
+                    newData = []
+                    if startLoc[0].size == 0:
+                        print(ticker + " only partially available for this period, startDate")
+                        tempDate = startDate
+                        month = int(tempDate[5:7])
+                        day = int(tempDate[8:10])
+                        year = int(tempDate[0:4])
+                        initialYear = int(initialDate[0:4])
+                        if initialYear <= year:
+                            while startLoc[0].size == 0:
+                                day += 1
+                                if day >= DAYS_IN_MONTH[month]:
+                                    month += 1
+                                    if month >= 12:
+                                        month = 1
+                                        year += 1
+                                    day = 1
+                                if month < 10:
+                                    strMonth = "0" + str(month)       
+                                else: 
+                                    strMonth = str(month)
+                                if day < 10:
+                                    strDay = "0" + str(day)       
+                                else: 
+                                    strDay = str(day)
+                                strYear = str(year)
+                                startLoc = np.where(tempArr == (strYear + "-" + strMonth + "-" + strDay))
+                        else:
+                            startLoc = np.where(tempArr == initialDate)
+                    a = startLoc[0][0]
+                    if endLoc[0].size == 0:
+                        print(ticker + " only partially available for this period, startDate")
+                        tempDate = endDate
+                        month = int(tempDate[5:7])
+                        day = int(tempDate[8:10])
+                        year = int(tempDate[0:4])
+                        finalYear = int(finalDate[0:4])
+                        if finalYear >= year:
+                            while endLoc[0].size == 0:
+                                day -= 1
+                                if day <= 0:
+                                    month -= 1
+                                    if month <= 0:
+                                        month = 12
+                                        year -= 1
+                                    day = DAYS_IN_MONTH[month]
+                                if month < 10:
+                                    strMonth = "0" + str(month)       
+                                else: 
+                                    strMonth = str(month)
+                                if day < 10:
+                                    strDay = "0" + str(day)       
+                                else: 
+                                    strDay = str(day)
+                                strYear = str(year)
+                                endLoc = np.where(tempArr == (strYear + "-" + strMonth + "-" + strDay))
+                        else:
+                            endLoc = np.where(tempArr == finalDate)
+                    b = endLoc[0][0]
+                    for i in range(a, b+1):
+                        interpHourly = np.interp(range(0,8),[0, 4, 8],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
+                        interps = []
+                        interpHourly[0] += np.random.randn() * np.std(np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])]))
+                        for j in range(1,len(interpHourly)):
+                            tempArr = np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])])
+                            interpHourly[j] += np.random.randn() * np.std(tempArr)
+                            temp = interpHourly[j]
+                            temp += np.random.randn()/10 * np.std(tempArr)
+                            interps.append(np.interp(range(6), [0, 5], [interpHourly[j-1], temp]) + np.random.randn() * np.std(tempArr))
 
-                    ## Date calculations
-                    date = dates[i]
-                    dateEntries = []
-                    for j in range(3,6):
-                        tempDate = date + ' 09:' + str(j) + '0:00'
-                        dateEntries.append(tempDate)
-                    for j in range(10,16):
-                        for k in range(0,6):
-                            tempDate = date + ' ' + str(j) + ':' + str(k) + '0:00'
+                        ## Date calculations
+                        date = dates[i]
+                        dateEntries = []
+                        for j in range(3,6):
+                            tempDate = date + ' 09:' + str(j) + '0:00'
                             dateEntries.append(tempDate)
-                    dateEntries.append(date + ' 16:00:00')
+                        for j in range(10,16):
+                            for k in range(0,6):
+                                tempDate = date + ' ' + str(j) + ':' + str(k) + '0:00'
+                                dateEntries.append(tempDate)
+                        dateEntries.append(date + ' 16:00:00')
 
-                    ## Array creations
-                    for entry in dateEntries:
-                        newDates.append(entry)
-                    for entry in interps:
-                        for point in entry.tolist():
-                            newData.append(point)
-                return {
-                    'simulation': simName,
-                    'name': data['name'],
-                    'ticker': ticker,
-                    'headquarters': data['headquarters'],
-                    'listedAt': data['listedAt'],
-                    'dates': newDates,
-                    'prices': newData
-                }
+                        ## Array creations
+                        for entry in dateEntries:
+                            newDates.append(entry)
+                        for entry in interps:
+                            for point in entry.tolist():
+                                newData.append(point)
+                    return {
+                        'simulation': simName,
+                        'name': data['name'],
+                        'ticker': ticker,
+                        'headquarters': data['headquarters'],
+                        'listedAt': data['listedAt'],
+                        'dates': newDates,
+                        'prices': newData
+                    }
         except KeyError:
             return 'This data entry does not exist'
 
