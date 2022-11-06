@@ -239,9 +239,11 @@ class StockData:
     #   Author: Ian McNulty
     def retrieve(db, ticker, simName="", startDate="", endDate=""):
         try:
+            ## General Retrieve data
             if startDate == "":
-                #print(db.collection("Stocks").document(ticker).get().to_dict())
                 return db.collection("Stocks").document(ticker).get().to_dict()
+            
+            ## Specialized retrieve data for IntradayStockData creation
             else:
                 data = db.collection("Stocks").document(ticker).get().to_dict()
                 dailys = data['daily']
@@ -254,12 +256,17 @@ class StockData:
                 print(initialDate)
                 print(endDate)
                 availabilityFlag = True
+
+                ## Checks if the stock is available for this timespan
                 if int(initialDate[0:4]) >= int(endDate[0:4]):
                     if int(initialDate[5:7]) > int(endDate[5:7]):
                         availabilityFlag = False
                     elif int(initialDate[5:7]) == int(endDate[5:7]):
                         if int(initialDate[8:10]) > int(endDate[8:10]):
                             availabilityFlag = False
+                
+                ## If the stock is unavailable, code creates an empty entry with a
+                ##  true value in the unavailable field
                 if availabilityFlag == False:
                     return {
                         'simulation': simName,
@@ -269,11 +276,16 @@ class StockData:
                         'listedAt': data['listedAt'],
                         'unavailable': True
                     }
+
+                ## If the stock is available, the data is processed to create a 
+                ##  corresponding entry in the IntradayStockData Firestore db
                 else:
                     startLoc = np.where(tempArr == startDate)
                     endLoc = np.where(tempArr == endDate)
                     newDates = []
                     newData = []
+
+                    ## Start Date Calculation algorithm
                     if startLoc[0].size == 0:
                         print(ticker + " only partially available for this period, startDate")
                         tempDate = startDate
@@ -303,6 +315,8 @@ class StockData:
                         else:
                             startLoc = np.where(tempArr == initialDate)
                     a = startLoc[0][0]
+
+                    ## End Date Calculation algorithm
                     if endLoc[0].size == 0:
                         print(ticker + " only partially available for this period, startDate")
                         tempDate = endDate
@@ -332,6 +346,8 @@ class StockData:
                         else:
                             endLoc = np.where(tempArr == finalDate)
                     b = endLoc[0][0]
+
+                    ## Data interpolation
                     for i in range(a, b+1):
                         interpHourly = np.interp(range(0,8),[0, 4, 8],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
                         interps = []
