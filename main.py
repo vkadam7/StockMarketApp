@@ -140,6 +140,7 @@ def social():
                 return render_template("home.html")
             else:
                 print("Can't find user.")
+                flash("Can't find the user you searched for.")
                 return render_template("social.html")
         return render_template("social.html")
             
