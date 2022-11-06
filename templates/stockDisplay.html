@@ -33,15 +33,18 @@
                     <a class="nav-link" href="information">Information</a>
                   </li>
         {% if session['user'] %}
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
-          </li>
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
-          </li>
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
-          </li>
+        <li class="nav-item">
+          <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
+        </li>
+      </li class = "nav-item">
+          <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
+       </li>
+        <li class="nav-item">
+          <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
+        </li>
+        <li class="nav-item">
+          <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
+        </li>
           <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
             <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
               <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Start a simulation!</button>
