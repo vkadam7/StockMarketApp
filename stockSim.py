@@ -787,10 +787,6 @@ class portfolio:
             self.quantity = self.weight()
             self.profit = self.get_profit()
             self.avgSharePrice = self.returnValue()
-    
-    #def retrieve(self, id):
-    #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
-    #    return stockRetrieved
 
     #round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
     #Returns profit from the simulator(Need to test and fix if needed )
@@ -808,19 +804,6 @@ class portfolio:
         avgPriceOfOrders = mean(prices)
         currentValueOfShares = currentPriceOfStock * amountOfSharesOwned
         return round(currentValueOfShares - avgPriceOfOrders, 2)
-
-        #profit = 0
-        #quantity = self.db.collection('Orders').document('quantity').get()
-        #if Order.buyOrder() == True:
-        #    tempPrice = self.db.collection('Order').document('avgStockPrice').get()
-        #    quantity = self.db.collection('Orders').document('quantity').get()
-        #    profit += tempPrice * quantity
-        #    return profit
-        #elif Order.sellOrder() == True:
-        #    tempPrice = self.db.collection('Order').document('avgStockPrice').get()
-        #    quantity = self.db.collection('Orders').document('quantity').get()
-        #    profit -= tempPrice * quantity
-        #    return profit
             
     #Displays amount of shares owned (To also be implemented later)
     def weight(self):
@@ -831,15 +814,7 @@ class portfolio:
                 quantity += int(temp['newQuantity'])
             else:
                 quantity += int(temp['quantity'])
-        return quantity
-
-        #share = [self.quantity]
-        #max_share = 1
-        #for share in max_share:
-        #    if(self.quantity <= max_share and self.quantity >= 0):
-        #        return share[self.quantity]
-        #    else:
-        #        return -1   
+        return quantity 
         
     def returnValue(self):
         prices = []
@@ -850,15 +825,6 @@ class portfolio:
             return round(mean(prices),2)
         return 0
 
-    #
-    #
-    #
-    #
-    # I dont think this is necessary - Ian
-    #               |
-    #               |
-    #               |
-    #               V
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
     def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
           #tempData = self.db.collection('Simulations').document(self.sim).document('Orders').get()
@@ -892,17 +858,7 @@ class portfolio:
         elif Order.sellOrder == True:
                  netGainorLoss = (currentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
                  return netGainorLoss
-
-      
-    #
-    #
-    #
-    #
-    # Calculated by: self.currentCash = Simulation.retrieveCurrentCash(db, simulation)
-    #               |
-    #               |
-    #               |
-    #               V                     
+              
      #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
     def funds_remaining(self, initialAmount, finalAmount):
         finalAmount = 0
