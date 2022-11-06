@@ -296,17 +296,7 @@ table{
 
 
  }
-
-
- .active{
-
-  background: #f6f7fb !important;
-  border-color: #f6f7fb !important;
-  color: #000 !important;
-      font-size: 12px;
-
- }
-
+ 
  .inputs{
 
   position: relative;
