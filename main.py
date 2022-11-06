@@ -11,7 +11,7 @@ from flask import Flask, abort, flash, session, render_template, request, redire
 import pyrebase
 import firebase_admin
 from stockSim import SimulationFactory, StockData, User, Order, Simulation, portfolio
-from followers import FollowUnfollow, Recommendation, UserInfo
+from followers import FollowUnfollow, UserInfo
 from firebase_admin import firestore
 from firebase_admin import credentials
 import numpy as np
@@ -182,9 +182,6 @@ def register():
 @app.route('/verification', methods = ["POST" , "GET"])
 def verification():
     if request.method == "POST":
-
-        result = request.form
-        email = result["email"]
         try:
             user = authen.send_email_verification(email['idToken'])
             print("Verification sent")
@@ -212,6 +209,17 @@ def PasswordRecovery():
             return redirect(url_for("PasswordRecovery"))
           
     return render_template("PasswordRecovery.html")   
+
+@app.route('/update', methods = ['POST', 'GEt'])
+def update():
+    if 'user' in session:
+        if request.method == 'POST':
+            new = request.form
+            username = new['username']
+            experience = new['experience']
+            description = new['description']
+                        
+        return render_template("update.html")
 
 #Logout
 # After user logs out session is ended and user is taken to login page
@@ -657,6 +665,25 @@ def orderlists():
 
         return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(),
         tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
+        
+@app.route('/followrequest', methods = ['POST', 'GET'])
+def sendRequest():
+    followUnfollow = FollowUnfollow(dbfire, session['option'], session['Name'])
+    if 'user' in session:
+        followUnfollow = FollowUnfollow(dbfire, session['option'], session['Name'])
+        if session['option'] == 'Follow':
+            flag = FollowUnfollow.followOption()
+        else:
+            flag = FollowUnfollow.unfollowOption()
+    
+    return render_template("social.html")
+            
+            
+            
+            
+            
+        
+        
 
 ## 
 @app.route('/404Error')

@@ -5,8 +5,8 @@ import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import credentials
 import pyrebase
-
-
+from stockSim import User
+from re import search
 
 class UserInfo():
     def __init__(self, db, username):
@@ -47,36 +47,50 @@ class UserInfo():
         return False, -1
     
 class FollowUnfollow:
-    def __init__(self, db, followOrUnfollow, user1, user2):
+    def __init__(self, db, followOrUnfollow, user):
         self.db = db
         self.option = self.followOrUnfollow
-        self.user1 = user1
-        self.user2 = user2
+        self.user = user
+        
         
     
     
-    def followOption(self, db, user1, user2):
+    def followOption(self):
+        following = []
         if self.option == 'Follow':
             if self.doTheyhaveAnaccount() == True:
-                if doTheyFollow() == False:
-                    user_ref = db.collection('Followers').document('users')
-                    user_ref.update({'users': True})
+                if self.doTheyFollow() == False:
+                    for request in self.db.collection('Users').where('Name', '==', user1).stream():
+                     temp = request.to_dict()
+                     following.append(temp['followingList'])
+        
+        print(following)
+        
                 
                 
                 
-    def unfollowOption(self, db, user1, user2):
+    def unfollowOption(self):
+        following = []
         if self.option == 'Unfollow':
-            if self.doTheyFollow() == True:
-                return self.db
+            if self.doTheyhaveAnaccount() == True:
+                if self.doTheyFollow() == True:
+                    for unfollow in self.db.collection('Users').where('Name', '==', user1).stream():
+                        temp = unfollow.to_dict()
+                        following.remove(temp['followingList'])
+                        
+    
+    def followList(self):
+        followList = []
+        
     
     
-    def followerCount():
+    def doTheyhaveAnaccount(self, db, user):
+        
+        if UserInfo.userSearch(db, user):
+            return
         
     
     def doTheyFollow(self):
-        followCheck = self.db.collection('Following').collection('users').get()
-        followingCheck = self.db.collection('Followers').collection('users').get()
-        if followCheck == followCheck:
-            return True
-        else:
-            return False
+        followFlag = False
+        followingFlag = False
+        
