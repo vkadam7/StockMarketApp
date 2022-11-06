@@ -311,46 +311,50 @@ def startSimulation():
             if request.method == 'POST':
                 pattern = re.compile("^\d+(.\d{1,2})?$")
                 if pattern.match(request.form['initialCash']):
-                    session['simulationFlag'] = 1
-                    session['simulation'] = {
-                        'simStartDate': request.form['simStartDate'],
-                        'simEndDate': request.form['simEndDate'],
-                        'initialCash': request.form['initialCash']
-                    }
-                    session['currentCash'] = request.form['initialCash']
-                    session['portfolioValue'] = request.form['initialCash']
-                    sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
-                                            request.form['simEndDate'], request.form['initialCash'])
-                    sim.createSim()
-                    session['simName'] = sim.simName
-                    
-                    tickers = []
-                    quantities = []
-                    profits = []
-                    netGainLoss = []
-                    sharesPrices = []
-                    currentPrices = []
-                    ##avgPrice = []
-                    
-                    for entry in Order.stocksBought(dbfire, session['simName']):
-                        Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
-                        if Portfolio.quantity != 0:
-                            tickers.append(entry)
-                            quantities.append(Portfolio.quantity)
-                            profits.append(Portfolio.profit)
-                            sharesPrices.append(Portfolio.avgSharePrice)
-                            currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
-                            #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
-                    print(tickers)
-                    print(quantities)
-                    print(profits)
-                    print(sharesPrices)
-                    print(currentPrices)
-                    print(netGainLoss)
+                    if Simulation.checkDates(request.form['simStartDate'], request.form['simEndDate']):
+                        session['simulationFlag'] = 1
+                        session['simulation'] = {
+                            'simStartDate': request.form['simStartDate'],
+                            'simEndDate': request.form['simEndDate'],
+                            'initialCash': request.form['initialCash']
+                        }
+                        session['currentCash'] = request.form['initialCash']
+                        session['portfolioValue'] = request.form['initialCash']
+                        sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
+                                                request.form['simEndDate'], request.form['initialCash'])
+                        sim.createSim()
+                        session['simName'] = sim.simName
+                        
+                        tickers = []
+                        quantities = []
+                        profits = []
+                        netGainLoss = []
+                        sharesPrices = []
+                        currentPrices = []
+                        ##avgPrice = []
+                        
+                        for entry in Order.stocksBought(dbfire, session['simName']):
+                            Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
+                            if Portfolio.quantity != 0:
+                                tickers.append(entry)
+                                quantities.append(Portfolio.quantity)
+                                profits.append(Portfolio.profit)
+                                sharesPrices.append(Portfolio.avgSharePrice)
+                                currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
+                                #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
+                        print(tickers)
+                        print(quantities)
+                        print(profits)
+                        print(sharesPrices)
+                        print(currentPrices)
+                        print(netGainLoss)
 
-                    return render_template('simulation.html', person=session['user'], tickers=tickers, 
-                    quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                    currentPrices=currentPrices)                
+                        return render_template('simulation.html', person=session['user'], tickers=tickers, 
+                        quantities=quantities, profits=profits, sharesPrices=sharesPrices,
+                        currentPrices=currentPrices)    
+                    else:
+                        flash("Please swap your date values, the starting date must be before the ending date.")
+                        return render_template('stockSimForm.html', person=session['user'])
                 else:
                     flash("Please enter a valid cash amount.")
                     return render_template('stockSimForm.html', person=session['user'])

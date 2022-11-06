@@ -499,7 +499,14 @@ class Simulation:
 
         db.collection('Leaderboard').add({"email":grabDataEmail, "score":scores, "username":grabUserName})
 
-
+    def checkDates(startDate, endDate):
+        if int(startDate[0:4]) >= int(endDate[0:4]):
+            if int(startDate[5:7]) > int(endDate[5:7]):
+                return False
+            elif int(startDate[5:7]) == int(endDate[5:7]):
+                if int(startDate[8:10]) > int(endDate[8:10]):
+                    return False
+        return True
 
     def retrieveOngoing(db, email):
         for query in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream():
