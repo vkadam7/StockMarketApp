@@ -7,6 +7,7 @@ import math
 from operator import itemgetter, mod
 import re
 from statistics import mean
+#from django.shortcuts import render
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
 import firebase_admin
@@ -53,19 +54,15 @@ def profile():
         results = dbfire.collection('Users').where('Email', '==', session['user'])
         #Author: Viraj Kadam
         cash = dbfire.collection('Simulations').where('user', '==', session['user']). where('ongoing', '==', 'true') #For simulation status section
-       # daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
-        
-        
+        # daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
         #Author: Miqdad Hafiz
         for doc in results.stream(): 
             results = doc.to_dict()
         #Author: Viraj Kadam    
         for doc in cash.stream():
             cash = doc.to_dict()
-       # for doc in daysRemaining.stream():
+        # for doc in daysRemaining.stream():
         #    daysRemaining = daysRemaining.to_dict()
-            
-
         return render_template("profile.html", results = results, cash = cash)
     else:
         redirect(url_for("login"))
@@ -122,20 +119,31 @@ def login():
 #Author: Miqdad Hafiz
 @app.route('/social', methods = ["POST", "GET"])
 def social():
-    if request.method == "POST":
-        search = request.form
-        searchKey = search["searchUser"]
-        doc = dbfire.collection('Users').document(searchKey).get()
-        if doc.exists:
-            grabUser = dbfire.collection('Users').where('userName', '==', searchKey)
-            for docs in grabUser.stream(): 
-                grabUser = docs.to_dict()
-            searchResult = grabUser['userName']
-            print("HERE COMES THE USERNAME!")
-            return print(searchResult)
-        else:
-            flash("Sorry we could not find the user: " + searchKey + " Please try searching another username.")
-            return render_template('social.html')
+    if('user' in session):
+        if request.method == "POST":
+            search = request.form
+            searchKey = search["searchUser"]
+            doc = dbfire.collection('Users').document(searchKey).get()
+            if doc.exists:
+                grabUser = dbfire.collection('Users').where('userName', '==', searchKey)
+                for docs in grabUser.stream(): 
+                    grabUser = docs.to_dict()
+                searchResult = grabUser['userName']
+                found = True
+            else:
+                searchResult = "cantFind"
+                found = False
+        
+            if(found == True ):
+                print("HERE COMES THE USERNAME!")
+                print(searchResult)
+                return render_template("home.html")
+            else:
+                print("Can't find user.")
+                return render_template("social.html")
+        return render_template("social.html")
+            
+        
 
     
 #Author: Viraj Kadam
