@@ -482,14 +482,27 @@ class Simulation:
     def finishSimulation(db, simName):
         data = db.collection('Simulations').document(simName).get().to_dict()
         data['ongoing'] = False
-        percentChange = (float(data['currentCash']) - float(data['initialCash'])) / float(data['initialCash'])
-        data['score'] = percentChange * 100
         db.collection('Simulations').document(simName).update(data)
 
         for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
             temp = entry.id
             db.collection('IntradayStockData').document(temp).delete()
 
+        quantities = []
+        currentPrices = []
+        totalValue = 0
+        
+        for entry in Order.stocksBought(db, simName):
+            Portfolio = portfolio(db, entry, data['user'], simName, data['initialCash'])
+            if Portfolio.quantity != 0:
+                quantities.append(Portfolio.quantity)
+                currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
+        
+        for i in range(len(quantities)):
+            totalValue += quantities(i) * currentPrices(i)
+
+        percentChange = ((float(data['currentCash']) + totalValue) - float(data['initialCash'])) / float(data['initialCash'])
+        data['score'] = percentChange * 100
         scores = percentChange * 100
         grabDataEmail = data['user']
         userEmail = db.collection('Users').where('Email', '==', grabDataEmail)
