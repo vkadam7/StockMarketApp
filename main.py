@@ -354,6 +354,7 @@ def startSimulation():
                     sharesPrices = []
                     currentPrices = []
                     volatility = []
+                    percentage = []
                     ##avgPrice = []
                     
                     for entry in Order.stocksBought(dbfire, session['simName']):
@@ -365,6 +366,7 @@ def startSimulation():
                             sharesPrices.append(Portfolio.avgSharePrice)
                             currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                             volatility.append(Portfolio.volatility)
+                            percentage.append(Portfolio.percentChange)
                             #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
                     print(tickers)
                     print(quantities)
@@ -373,10 +375,12 @@ def startSimulation():
                     print(currentPrices)
                     print(netGainLoss)
                     print(volatility)
+                    print(percentage)
+
 
                     return render_template('simulation.html', person=session['user'], tickers=tickers, 
                     quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                    currentPrices=currentPrices)                
+                    currentPrices=currentPrices, percentage = percentage)                
                 else:
                     flash("Please enter a valid cash amount.")
                     return render_template('stockSimForm.html', person=session['user'])
@@ -409,6 +413,7 @@ def goToSimulation():
                 sharesPrices = []
                 currentPrices = []
                 volatility = []
+                percentage = []
                 ##avgPrice = []   
                 
                 for entry in Order.stocksBought(dbfire, session['simName']):
@@ -421,6 +426,7 @@ def goToSimulation():
                         currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                         volatility.append(Portfolio.volatility)
                         #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
+                        percentage.append(Portfolio.percentChange)
                 print(tickers)
                 print(quantities)
                 print(profits)
@@ -428,10 +434,11 @@ def goToSimulation():
                 print(currentPrices)
                 print(netGainLoss)
                 print(volatility)
+                print(percentage)
 
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                currentPrices=currentPrices, volatility = volatility)
+                currentPrices=currentPrices, volatility = volatility, percentage = percentage)
         except KeyError:
             print("KeyError occured: simulation")
             return redirect(url_for('fourOhFour'))
@@ -495,6 +502,7 @@ def orderConfirm():
                 currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                 #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
                 volatility.append(Portfolio.volatitlity)
+                percentage.append(Portfolio.percentChange)
         print(tickers)
         print(quantities)
         print(profits)
@@ -502,10 +510,11 @@ def orderConfirm():
         print(currentPrices)
         print(netGainLoss)
         print(volatility)
+        print(percentage)
 
         return render_template('simulation.html', person=session['user'], tickers=tickers, 
         quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-        currentPrices=currentPrices, volatility = volatility)    
+        currentPrices=currentPrices, volatility = volatility, percentage = percentage)    
     elif session['option'] == 'Buy' and flag == -1:
         flash("Insufficient funds to complete purchase")
         return render_template('orderForm.html', option=session['option'])

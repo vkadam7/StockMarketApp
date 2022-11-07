@@ -119,7 +119,8 @@
             //let profitList = {{profits|safe}};
             let sharesList = {{sharesPrices|safe}};
             let currentPricesList = {{currentPrices|safe}};
-            let volatilityList = {{volatilityList|safe}};
+            let volatilityList = {{volatility|safe}};
+            let percentageList = {{percentage|safe}}
             
             let portfolio = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -129,7 +130,8 @@
                 //'Gain/Loss': profitList[i],
                 'Average Price': sharesList[i],
                 'Current Price': currentPricesList[i], 
-                Volatility: volatilityList[i]
+                Volatility: volatilityList[i],
+                'Percentage Change': percentageList[i]
               })
             }
 
