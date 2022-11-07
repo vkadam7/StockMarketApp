@@ -215,9 +215,20 @@ def update():
     if 'user' in session:
         if request.method == 'POST':
             new = request.form
-            username = new['username']
-            experience = new['experience']
+            username = new['userName']
+            #experience = new['experience']
             description = new['description']
+            doc = dbfire.collection('Users').document('userName').get()
+            for docs in doc:
+                if docs.to_dict() ['userName'] != username:
+                    db.collection('Users').document(username).update({'userName': username})                    
+            else:
+                uniqueName = "usernameoktouse"
+                
+            if (len(description) < 200):
+                flash("Your description should be at least 200 characters")
+            else:
+                dbfire.collection('Users').set(description)
                         
         return render_template("update.html")
 

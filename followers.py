@@ -77,6 +77,7 @@ class FollowUnfollow:
                     for unfollow in self.db.collection('Users').where('Name', '==', user1).stream():
                         temp = unfollow.to_dict()
                         following.remove(temp['followingList'])
+        return following
                         
     
     def followList(self):
@@ -85,12 +86,19 @@ class FollowUnfollow:
     
     
     def doTheyhaveAnaccount(self, db, user):
-        
-        if UserInfo.userSearch(db, user):
-            return
+        accountFlag = False
+        tempdata = self.db.collection('Users').document('userName').get()
+       # if tempdata 
         
     
     def doTheyFollow(self):
-        followFlag = False
         followingFlag = False
-        
+        numfollowing = 0
+        for person in self.db.collection('Users').document('followingList').stream():
+            temp = person.to_dict()
+            if temp.get('username') != None:
+                numfollowing = int(temp['followingList'])
+                followingFlag = True
+            else:
+                followingFlag = False
+        print(numfollowing)
