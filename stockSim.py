@@ -890,20 +890,19 @@ class portfolio:
 
 ## Class for setting up quiz - Muneeb Khan (WIP!)
 class Quiz:
-    def __init__(self,db,question,answer,useranswer,correct,incorrect,nextbutton,submitbutton):
+    def __init__(self,db,question,answer,useranswer,correct,nextbutton,submitbutton):
         self.db = db
-        self.useranswer = useranswer
-        self.data = Quiz.retrievequestions(self.db,self.quiz)
+        self.data = Quiz.listOfQuestions(self.db,self.quiz)
         self.question = question
         self.answer = answer
         self.useranswer = useranswer
         self.correct = correct
-        self.incorrect = incorrect
         self.nextbutton = nextbutton
         self.submitbutton = submitbutton
     
     # To store all the questions and answers for the Quiz
     def listOfQuestions(db,self):
+        global questionList 
         questionList = []
 
         for entry in db.collection('Quiz').stream():
@@ -915,22 +914,25 @@ class Quiz:
         print(df)
         return df
 
-    # Check if Users answer is correct
-    def answerQuestions(self,db):
+    def nextButton(self,db):
+        return (self.question.pop(questionList['question'], self.answer.pop(questionList['answer']), self.answer.pop(questionList['a']),
+        self.answer.pop(questionList['b']), self.answer.pop(questionList['c'])))
 
-        if self.db.useranswer == self.db.answer:
+    # Check if Users answer is correct
+    def answerQuestions(self,db,answer,useranswer,correct):
+        correct = 0
+        if useranswer == answer:
             print("correct")
-            return self.correct+1
+            return correct+1
         else:
             print("incorrect")
-            return self.incorrect+1
 
     # Check if User got at least 7 correct to pass the quiz
-    def passedQuiz(self,db):
-
-        if self.db.correct >= 7:
-            print("You passed passed the quiz! with " + str(self.db.correct) + " out of 10! great work")
+    def submittedQuiz(self,db,correct):
+        db.collection('Quiz').update({'score' : correct})  
+        if correct >= 7:
+            print("You passed passed the quiz! with " + str(correct) + " out of 10! great work")
             
         else: 
-            print("Sorry you didnt pass the quiz, you only scored " + str(self.db.correct) + " out of 10.")
+            print("Sorry you didnt pass the quiz, you only scored " + str(correct) + " out of 10.")
             print("You must score at least 7/10 to pass, better luck next time!")
