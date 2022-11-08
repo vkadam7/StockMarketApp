@@ -102,14 +102,7 @@
             <h3>Headquarters: {{ stock['headquarters'] }}</h3>
             <h3>Listed at: {{ stock['listedAt'] }}</h3>
             <canvas id="stockChart" width="200" height="50"></canvas>
-
-            <!-- Selection menu for graph types - Muneeb Khan -->
-            <select name = "chartType" id = "chartType" onchange="changeStockChart(this)">
-            <optgroup label = "Select Chart type"></optgroup>"
-            <option value = "line">Line</option>
-            <option value = "bar">Bar</option>
-            <option value = "pie">Pie</option>
-            </select>
+            
             <script>
                 var ctx = document.getElementById("stockChart").getContext("2d");
                 var stockChart = new Chart(ctx, {
@@ -169,10 +162,20 @@
                 <div class = "form-group col-md-6">
                     <label for = "timespan">Timespan:</label>
                     <select class = "form-control" name="timespan" value="{{ request.form['timespan'] }}">
+                        <option value="1minute">1 Minute</option>
+                        <option value="5minute">5 Minutes</option>
+                        <option value="10minute">10 Minutes</option>
                         <option value="hourly">Hourly prices</option>
                         <option value="daily">Daily prices</option>
                         <option value="weekly">Weekly prices</option>
                         <option value="monthly">Monthly prices</option>
+                    </select>
+                </div>
+                <div class = "form-group col-md-6">
+                    <label for = "chartType">Select Chart Type:</label>
+                    <select class = "form-control" name = "chartType" id = "chartType" onchange="changeStockChart(this)">
+                        <option value = "line">Line</option>
+                        <option value = "bar">Bar</option>
                     </select>
                 </div>
             </div>
@@ -205,7 +208,7 @@
     </body>
 <br><br>
 
-    <footer class="footer mt-5 py-3" id = "foot">
+<footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
     <div class="container">
       <span>Copyright 2022 by StockSim</span>
     </div>

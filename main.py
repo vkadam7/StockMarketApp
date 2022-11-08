@@ -11,7 +11,8 @@ from statistics import mean
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
 import firebase_admin
-from stockSim import SimulationFactory, StockData, User, Order, Simulation, portfolio
+
+from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, portfolio
 from followers import FollowUnfollow, Recommendation, UserInfo
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -357,49 +358,53 @@ def startSimulation():
             if request.method == 'POST':
                 pattern = re.compile("^\d+(.\d{1,2})?$")
                 if pattern.match(request.form['initialCash']):
-                    session['simulationFlag'] = 1
-                    session['simulation'] = {
-                        'simStartDate': request.form['simStartDate'],
-                        'simEndDate': request.form['simEndDate'],
-                        'initialCash': request.form['initialCash']
-                    }
-                    session['currentCash'] = request.form['initialCash']
-                    session['portfolioValue'] = request.form['initialCash']
-                    sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
-                                            request.form['simEndDate'], request.form['initialCash'])
-                    sim.createSim()
-                    session['simName'] = sim.simName
-                    
-                    tickers = []
-                    quantities = []
-                    profits = []
-                    netGainLoss = []
-                    sharesPrices = []
-                    currentPrices = []
-                    volatility = []
-                    ##avgPrice = []
-                    
-                    for entry in Order.stocksBought(dbfire, session['simName']):
-                        Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
-                        if Portfolio.quantity != 0:
-                            tickers.append(entry)
-                            quantities.append(Portfolio.quantity)
-                            profits.append(Portfolio.profit)
-                            sharesPrices.append(Portfolio.avgSharePrice)
-                            currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
-                            volatility.append(Portfolio.volatility)
-                            #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
-                    print(tickers)
-                    print(quantities)
-                    print(profits)
-                    print(sharesPrices)
-                    print(currentPrices)
-                    print(netGainLoss)
-                    print(volatility)
+                    if Simulation.checkDates(request.form['simStartDate'], request.form['simEndDate']):
+                        session['simulationFlag'] = 1
+                        session['simulation'] = {
+                            'simStartDate': request.form['simStartDate'],
+                            'simEndDate': request.form['simEndDate'],
+                            'initialCash': request.form['initialCash']
+                        }
+                        session['currentCash'] = request.form['initialCash']
+                        session['portfolioValue'] = request.form['initialCash']
+                        sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
+                                                request.form['simEndDate'], request.form['initialCash'])
+                        sim.createSim()
+                        session['simName'] = sim.simName
+                        
+                        tickers = []
+                        quantities = []
+                        profits = []
+                        netGainLoss = []
+                        sharesPrices = []
+                        currentPrices = []
+                        volatility = []
+                        ##avgPrice = []
 
-                    return render_template('simulation.html', person=session['user'], tickers=tickers, 
-                    quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                    currentPrices=currentPrices)                
+                        for entry in Order.stocksBought(dbfire, session['simName']):
+                            Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
+                            if Portfolio.quantity != 0:
+                                tickers.append(entry)
+                                quantities.append(Portfolio.quantity)
+                                profits.append(Portfolio.profit)
+                                sharesPrices.append(Portfolio.avgSharePrice)
+                                currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
+                                volatility.append(Portfolio.volatility)
+                                #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
+                        print(tickers)
+                        print(quantities)
+                        print(profits)
+                        print(sharesPrices)
+                        print(currentPrices)
+                        print(netGainLoss)
+                        print(volatility)
+
+                        return render_template('simulation.html', person=session['user'], tickers=tickers, 
+                        quantities=quantities, profits=profits, sharesPrices=sharesPrices,
+                        currentPrices=currentPrices)      
+                    else:
+                        flash("Please swap your date values, the starting date must be before the ending date.")
+                        return render_template('stockSimForm.html', person=session['user'])
                 else:
                     flash("Please enter a valid cash amount.")
                     return render_template('stockSimForm.html', person=session['user'])
@@ -506,7 +511,6 @@ def orderConfirm():
         percentage = []
         ##avgPrice = []
         volatility = []
-        
         
         for entry in Order.stocksBought(dbfire, session['simName']):
             Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
@@ -617,36 +621,83 @@ def displayStock(ticker):
         #    return displayStock(ticker)
     else:
         stockData = SimulationFactory(dbfire, session['user']).simulation.retrieveStock(ticker)
-        if timespan != 'hourly':
-            #if timespan == 'daily':
-            for entry in stockData:
-                stock = entry.to_dict()
-            if stock != -1:
-                dates = []
-                prices = []
-                avgPrice = []
-            for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
-                avgPrice.append(stock['prices'][i])
-                if i % 7 == 1:
-                    prices.append(mean(avgPrice))
-                    print(mean(avgPrice))
-                    dates.append(stock['dates'][i][0:10])
-                    print(stock['dates'][i][0:10])
+        existenceFlag = True
+        for entry in stockData:
+            temp = entry.to_dict()
+            if temp.get('unavailable') != None:
+                existenceFlag = False
+        if existenceFlag:
+            if timespan == 'hourly' or timespan == 'daily' or timespan == 'weekly' or timespan == 'monthly':
+                if timespan == 'hourly':
+                    mod = 6
+                elif timespan == 'daily':
+                    mod = 40
+                elif timespan == 'weekly':
+                    mod = 40*7
+                for entry in stockData:
+                    stock = entry.to_dict()
+                if stock != -1:
+                    dates = []
+                    prices = []
                     avgPrice = []
-            return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
-        else: 
-            for entry in stockData:
-                stock = entry.to_dict()
-                #session['stock'] = stock
-            if stock != -1:
-                dates = []
-                prices = []
-                for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
-                    dates.append(stock['dates'][i])
-                    prices.append(stock['prices'][i])
-                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
-        #else:
-        #    return displayStock(ticker)
+                    for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
+                        avgPrice.append(stock['prices'][i])
+                        if timespan == 'monthly':
+                            mod = 40*7*int(stock['dates'][i][5:7])
+                        #if timespan == 'hourly' and int(stock['dates'][i][11:13]) == 9:
+                        #    mod = 3
+                        print(mod)
+                        if i % mod == 1:
+                            prices.append(mean(avgPrice))
+                            if timespan != 'hourly':
+                                dates.append(stock['dates'][i][0:10])
+                            else:
+                                dates.append(stock['dates'][i-1])
+                            avgPrice = []
+                        #    if int(stock['dates'][i][11:13]) == 9:
+                        #        mod = 6
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+            elif timespan == '1minute' or timespan == '5minute':
+                for entry in stockData:
+                    stock = entry.to_dict()
+                    #session['stock'] = stock
+                if stock != -1:
+                    dates = []
+                    prices = []
+                    for i in range(1, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
+                        if timespan == '5minute':
+                            tempInterp = np.interp(range(0,3),[0, 2],[stock['prices'][i-1], stock['prices'][i]])
+                            for element in tempInterp:
+                                element += (np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]]))/100
+                                prices.append(element)
+                            # 15 = index of minute
+                            tempDate = list(stock['dates'][i])
+                            for j in range(1,3):
+                                tempDate[15] = str((j*5)%10)
+                                dates.append("".join(tempDate))
+                        elif timespan == '1minute':
+                            tempInterp = np.interp(range(0,11),[0, 10],[stock['prices'][i-1], stock['prices'][i]])
+                            for element in tempInterp:
+                                element += (np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]]))/50
+                                prices.append(element)
+                            tempDate = list(stock['dates'][i])
+                            for j in range(0,10):
+                                tempDate[15] = str(j)
+                                dates.append("".join(tempDate))
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+            else:
+                for entry in stockData:
+                    stock = entry.to_dict()
+                    #session['stock'] = stock
+                if stock != -1:
+                    dates = []
+                    prices = []
+                    for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
+                        dates.append(stock['dates'][i])
+                        prices.append(stock['prices'][i])
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+        else:
+            return redirect(url_for('fourOhFour'))
     return redirect(url_for('fourOhFour'))
 
 ## changeStockView
@@ -698,6 +749,16 @@ def fourOhFour():
 #def portfolioGraph():
 #    if 'user' in session:
         
+
+@app.route('/quiz')
+def quizpage():
+    if ('user' in session):
+        quiz = Quiz.retrieveNextQuestion(dbfire, session['user'])
+
+        return render_template('quiz.html', quiz = quiz, questions = quiz['question'], a = quiz['a'], b = quiz['b'],
+        c = quiz['c'])
+    else:
+        return render_template('404Error.html')
 
 #Author: Viraj Kadam   
 #Updates user profile  
