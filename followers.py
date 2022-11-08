@@ -5,6 +5,7 @@ import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import credentials
 import pyrebase
+from google.cloud import firestore
 from stockSim import User
 from re import search
 
@@ -47,48 +48,59 @@ class UserInfo():
         return False, -1
     
 class FollowUnfollow:
-    def __init__(self, db, followOrUnfollow, user):
+    def __init__(self, db, followOrUnfollow, user, name):
         self.db = db
         self.option = self.followOrUnfollow
         self.user = user
+        self.name = name
         
         
     
     
     def followOption(self):
-        following = []
         if self.option == 'Follow':
             if self.doTheyhaveAnaccount() == True:
                 if self.doTheyFollow() == False:
-                    for request in self.db.collection('Users').where('Name', '==', user1).stream():
-                     temp = request.to_dict()
-                     following.append(temp['followingList'])
-        
-        print(following)
-        
-                
-                
-                
+                    userName = self.user 
+                    data ={
+                        'name': self.name
+                    }
+                    for follower in data:
+                        doc_ref = self.db.collection('UsersFollowers').document(userName).set(data)
+                                    
     def unfollowOption(self):
-        following = []
         if self.option == 'Unfollow':
             if self.doTheyhaveAnaccount() == True:
                 if self.doTheyFollow() == True:
-                    for unfollow in self.db.collection('Users').where('Name', '==', user1).stream():
-                        temp = unfollow.to_dict()
-                        following.remove(temp['followingList'])
-        return following
+                    userName = self.user
+                    data = {
+                        'name': self.name
+                    }
+                    for follower in data:
+                        doc_ref = self.db.collection('UserFollowers').document(userName).get(data)
                         
     
     def followList(self):
         followList = []
+        followList = self.db.collection('Users').document('followList')
+        follow_ref = self.db.collection(u'Users').document(u'followList')
+        doc = follow_ref.get()
+        print(doc.to_dict())
+        
         
     
     
     def doTheyhaveAnaccount(self, db, user):
         accountFlag = False
-        tempdata = self.db.collection('Users').document('userName').get()
-       # if tempdata 
+        tempdata = self.db.collection('Users').document('userName')
+        doc_ref =  self.db.collection('Users').document('userName')
+        temp = tempdata.get()
+        if temp.exists():
+            accountFlag = True
+            return accountFlag
+        else:
+            print("User does not have an account in StockSim")
+       
         
     
     def doTheyFollow(self):
