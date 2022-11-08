@@ -1,8 +1,4 @@
-
-<!--Updated by Muneeb, Miqdad, and Viraj-->
-<!--CSS Updated by Miqdad and integrated by Muneeb-->
-<!--This page is just for testing the Order list function - Muneeb Khan-->
-
+<!-- Created by Miqdad-->
 <!doctype html>
 <html lang="en" class="h-100">
   <head>
@@ -41,7 +37,7 @@
           <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
         </li>
       </li class = "nav-item">
-          <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
+          <a class = "nav-link active" method = "POST" href = "social"> Your Network</a>
        </li>
         <li class="nav-item">
           <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
@@ -100,61 +96,54 @@
           </nav>
     </header>
 
-<body>  
-        <h1>This page is just for testing the Order list function </h1>
-        
-        <h3>Order list</h3>
-        <div class = "orderlist">
-          <div class="row justify-content-center">
-          <table class = "table table-striped w-75 table-dark table-bordered table-hover">
+<br><br><br><br>
 
-            <thead class = "thead-dark">
+<body>
+    
+    <section>
+        <div class = "container py-5 h-100 w-75">
+            <div class = "row d-flex justify-content-center align-items-center h-100">
+                <div class = "col col-md-9 col-lg-7 col-xl-5d-flex">
+                    <div class = "card" style = "border-radius: 15px;">
+                        <div class = "card-body p-4">
+                            <div class = "d-flex text-black">
+                                <div class = "flex-grow-1 ms-3">
+                                    
+                                    <h5 class = "mb-1"> {{userResult['Name']}}</h5>
+                                    <div class = "d-flex justify-content-start rounded-3 p-2 mb-2" style="background-color: #efefef;">
+                                        <div>
+                                            <p class = "small text-muted mb-1">Followers</p>
+                                            <p class = "mb-0"></p>
+                                        </div>
+                                        <div class = "px-3">
+                                            <p class = "small text-muted mb-1">User Name</p>
+                                            <p class = "mb-0">{{userResult['userName']}}</p>
+                                        </div>
+                                        <div class = "px-3">
+                                            <p class = "small text-muted mb-1">Email</p>
+                                            <p class = "mb-0">{{userResult['Email']}}</p>
+                                        </div>
+                                    
+                                    </div>
+                                    <div class = "d-flex justify-content-end">
+                                        <button class = "btn btn-primary" style = "background-color:rgb(33, 103, 42)">Follow</button>    
+                                    </div>
+                                </div>
+                            </div>    
+                        </div>    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-           </table>
 
-          <!--The following JavaScript code will generate a table for the Orderlist - Muneeb Khan -->
-          <script type="text/javascript">
-            let tickersList = {{tickers|safe}};
-            let quantList = {{quantities|safe}};
-            let buyList = {{buys|safe}};
-            let totalList = {{prices|safe}};
-            
-            let orderlist = [];
-            for (let i = 0; i < tickersList.length; i++) {
-              orderlist.push({
-                Stock: tickersList[i],
-                Quantity: quantList[i],
-                'Transaction Type': buyList[i],
-                Total: totalList[i]
-              })
-            }
 
-            function generateOrderlist(table, data, keys) {
-              let thead = table.createTHead();
-              let row = thead.insertRow();
-              for (let key of keys) {
-                let th = document.createElement("th");
-                let text = document.createTextNode(key);
-                th.appendChild(text);
-                row.appendChild(th);
-              }
-              for (let element of data) {
-                let row = table.insertRow();
-                for (key in element) {
-                  let cell = row.insertCell();
-                  let text = document.createTextNode(element[key]);
-                  cell.appendChild(text);
-                }
-              }
-            }
+</body>
 
-            let table = document.querySelector("table");
-            let data = Object.keys(orderlist[0]);
-            generateOrderlist(table, orderlist, data); 
-            </script>
-          </div>
-          </div>
-          <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
+
+
+<footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
         <div class="container">
           <span>Copyright 2022 by StockSim</span>
         </div>
@@ -163,8 +152,5 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="/static/jsStyle/bootstrap.bundle.min.js"></script>
-
-</body>
-
-
+    </body>      
 </html>

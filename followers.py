@@ -86,8 +86,6 @@ class FollowUnfollow:
         follow_ref = self.db.collection(u'Users').document(u'followList')
         doc = follow_ref.get()
         print(doc.to_dict())
-        
-        
     
     
     def doTheyhaveAnaccount(self, db, user):
