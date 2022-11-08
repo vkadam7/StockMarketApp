@@ -486,8 +486,8 @@ def orderConfirm():
             if Portfolio.quantity != 0:
                 tickers.append(entry)
                 quantities.append(Portfolio.quantity)
-                profits.append(Portfolio.profit)
-                sharesPrices.append(Portfolio.avgSharePrice)
+                profits.append(round(Portfolio.profit, 2))
+                sharesPrices.append(round(Portfolio.avgSharePrice,2))
                 currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                 #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
                 volatility.append(Portfolio.volatitlity)

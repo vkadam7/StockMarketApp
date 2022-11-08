@@ -804,7 +804,7 @@ class Order:
             for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
                 temp = entry.to_dict()
                 date = str(datetime.datetime.fromtimestamp(temp['dayOfPurchase'].timestamp()))
-                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],temp['totalPrice'],date])
+                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],round(float(temp['totalPrice']),2),date])
             
             df = pd.DataFrame(orderslist, columns=['buyOrSell','quantity','ticker','totalPrice', 'dayOfPurchase'])
             
