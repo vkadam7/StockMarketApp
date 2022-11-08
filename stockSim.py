@@ -570,6 +570,12 @@ class Simulation:
         data = db.collection('Simulations').document(sim).get().to_dict()
         return data['currentCash']
 
+    def listSims(db, user):
+        sims = []
+        for entry in db.collection('Simulations').where('user','==',user).where('ongoing','==',False).stream():
+            sims.append(entry.id)
+        return sims
+
 class SimulationFactory:
     def __init__(self, db, email):
         self.simulation = Simulation.retrieveOngoing(db, email)
