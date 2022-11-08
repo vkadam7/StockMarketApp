@@ -572,8 +572,14 @@ class Simulation:
 
     def listSims(db, user):
         sims = []
+        dates = []
+        scores = []
         for entry in db.collection('Simulations').where('user','==',user).where('ongoing','==',False).stream():
+            temp = entry.to_dict()
             sims.append(entry.id)
+            date = str(datetime.datetime.fromtimestamp(temp['startTimestamp'].timestamp()))
+            dates.append(date)
+            scores.append(temp['score'])
         return sims
 
 class SimulationFactory:
