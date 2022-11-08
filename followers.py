@@ -58,7 +58,7 @@ class FollowUnfollow:
     def followOption(self, db, user1, user2):
         if self.option == 'Follow':
             if self.doTheyhaveAnaccount() == True:
-                if doTheyFollow() == False:
+                if self.doTheyFollow() == False:
                     user_ref = db.collection('Followers').document('users')
                     user_ref.update({'users': True})
                 
@@ -67,12 +67,15 @@ class FollowUnfollow:
     def unfollowOption(self, db, user1, user2):
         if self.option == 'Unfollow':
             if self.doTheyFollow() == True:
+                return -1
+
+        return -1
                 
     
                 
                 
     def doTheyExist(self, db, user):
-        return
+        return -1
         
     
     def doTheyFollow(self):
