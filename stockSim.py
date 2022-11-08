@@ -11,6 +11,19 @@ import firebase_admin
 from firebase_admin import firestore
 from google.cloud.firestore import ArrayUnion
 import datetime
+
+import math
+
+#import matplotlib as plt
+
+#import matplotlib as plt
+#import matplotlib.animation as animation
+#from matplotlib import style
+#import math
+#import mpld3
+#from mpld3 import plugins
+
+
 #import math
 import matplotlib as plt
 import matplotlib.animation as animation
@@ -18,6 +31,7 @@ from matplotlib import style
 import math
 import mpld3
 from mpld3 import plugins
+
 
 DAYS_IN_MONTH = {
     1 : 31,

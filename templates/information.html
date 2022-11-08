@@ -31,14 +31,14 @@
                     <a class="nav-link" href="aboutus">About Us</a>
                   </li>
                   <li class="nav-item">
-                    <a class="nav-link" href="information">Information</a>
+                    <a class="nav-link active" href="information">Information</a>
                   </li>
                   {% if session['user'] %}
           <li class="nav-item">
-            <a class = "nav-link active" method = "POST" href = "profile">Profile</a> 
+            <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
           </li>
         </li class = "nav-item">
-            <a class = "nav-link active" method = "POST" href = "social"> Your Network</a>
+            <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
          </li>
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
@@ -90,7 +90,7 @@
                     <option value = "MSFT">Microsoft</option>
                     <option value = "NFLX">Netflix</option>
                   </select> 
-                  <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
+                  <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Display Stock</button>
                 </form>
               </div>        
             </div>

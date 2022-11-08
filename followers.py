@@ -64,15 +64,15 @@ class FollowUnfollow:
                 
                 
                 
-    def unfollowOption(self, db, user1, user2):
-        if self.option == 'Unfollow':
-            if self.doTheyFollow() == True:
+    #def unfollowOption(self, db, user1, user2):
+        #if self.option == 'Unfollow':
+            #if self.doTheyFollow() == True:
                 
     
                 
                 
-    def doTheyExist(self, db, user):
-        return
+    #def doTheyExist(self, db, user):
+        #return
         
     
     def doTheyFollow(self):

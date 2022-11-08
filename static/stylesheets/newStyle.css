@@ -273,3 +273,67 @@ table{
   content: counter(tableL);
   counter-increment: tableL;
 }
+
+#centers{
+    border: 3px;
+    text-align: center;
+  
+}
+.btn{
+
+  border-radius: 25px;
+
+ }
+
+ .new{
+      font-size: 12px;
+ }
+
+ .card{
+
+  padding: 20px;
+  border:none;
+
+
+ }
+ 
+ .inputs{
+
+  position: relative;
+
+ }
+
+ .form-control {
+      text-indent: 15px;
+  border: none;
+  height: 45px;
+  border-radius: 0px;
+  border-bottom: 1px solid #eee;
+ }
+
+ .form-control:focus {
+  color: #495057;
+  background-color: #fff;
+  border-color: #eee;
+  outline: 0;
+  box-shadow: none;
+
+}
+ .inputs i{
+
+    position: absolute;
+  top: 14px;
+  left: 4px;
+  color: #b8b9bc;
+ }
+ 
+ .content-text-3{
+
+  height: 40px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  font-weight: 700;
+ }
