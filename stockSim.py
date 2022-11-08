@@ -803,7 +803,8 @@ class Order:
         if ownageFlag == True:
             for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
                 temp = entry.to_dict()
-                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],temp['totalPrice'],temp['dayOfPurchase'].date()])
+                date = str(datetime.datetime.fromtimestamp(temp['dayOfPurchase'].timestamp()))
+                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],temp['totalPrice'],date])
             
             df = pd.DataFrame(orderslist, columns=['buyOrSell','quantity','ticker','totalPrice', 'dayOfPurchase'])
             
@@ -823,7 +824,7 @@ class portfolio:
             self.profit = self.get_profit()
             self.avgSharePrice = self.returnValue()
 
-            self.volatility = self.volatitlity()
+            self.volatility = 0
     
     #def retrieve(self, id):
     #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
