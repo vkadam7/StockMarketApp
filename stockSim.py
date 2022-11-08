@@ -11,8 +11,13 @@ import firebase_admin
 from firebase_admin import firestore
 from google.cloud.firestore import ArrayUnion
 import datetime
+#import math
+import matplotlib as plt
+import matplotlib.animation as animation
+from matplotlib import style
 import math
-#import matplotlib as plt
+import mpld3
+from mpld3 import plugins
 
 DAYS_IN_MONTH = {
     1 : 31,
@@ -520,13 +525,14 @@ class Simulation:
         percentChange = ((float(data['currentCash']) + totalValue) - float(data['initialCash'])) / float(data['initialCash'])
         data['score'] = percentChange * 100
         scores = percentChange * 100
+        scoreRounded = round(scores)
         grabDataEmail = data['user']
         userEmail = db.collection('Users').where('Email', '==', grabDataEmail)
         for docs in userEmail.stream():
                 emails = docs.to_dict()
         grabUserName = emails['userName']
 
-        db.collection('Leaderboard').add({"email":grabDataEmail, "score":scores, "username":grabUserName})
+        db.collection('Leaderboard').add({"email":grabDataEmail, "score":scoreRounded, "username":grabUserName})
 
     def checkDates(startDate, endDate):
         if int(startDate[0:4]) >= int(endDate[0:4]):
@@ -817,6 +823,12 @@ class portfolio:
             self.profit = self.get_profit()
             self.avgSharePrice = self.returnValue()
 
+            self.volatility = self.volatitlity()
+    
+    #def retrieve(self, id):
+    #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
+    #    return stockRetrieved
+
     #round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
     #Returns profit from the simulator(Need to test and fix if needed )
     def get_profit(self):
@@ -928,17 +940,20 @@ class portfolio:
         daily_returns = returns.pct_change()
         print(daily_returns)
        
-       
+    #New volatility function (Viraj Kadam)   
     def volatitlity(self):
        currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
        day = datetime.datetime.now()
-       for x in day :
-           vt = (currentPriceOfStock[x+1]/currentPriceOfStock)
-           vt = vt.pct_change(1)
-           return vt
-       
-       currentPriceOfStock = vt 
-       return currentPriceOfStock  
+       volatility = 0
+       returns = 0
+       prices = []
+       for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
+           temp = entry.to_dict()
+           returns =  np.log((prices.append(float(temp['avgStockPrice']))/(prices.append(float(temp['avgStockPrice']))).shift()))
+           returns.std()
+           volatility = returns.std()*225**.5
+           
+       return volatility
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
@@ -962,14 +977,17 @@ class portfolio:
     def user_graph(self, db):
         prices = self.db.collection('IntradayStockData').document('prices').get()
         dates = self.db.collection('IntradayStockData').document('dates').get()
-        for entry in prices:
-            plt.plot(x[dates][prices])
-            
-        plt.xlabel('Date')
-        plt.ylabel('Price')
-        plt.show
-            
         
+        for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
+            temp = entry.to_dict()
+            xlabel = prices
+            ylabel = dates
+            plt.xlabel('Date')
+            plt.ylabel('Price')
+            plt.show
+           
+           
+    #def animate():
         
     #Display all information
     def displayInfo(self, close):
@@ -982,3 +1000,59 @@ class portfolio:
             print("Gains: +" + self.GainorLoss)
         elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
             return
+
+
+## Class for setting up quiz - Muneeb Khan (WIP!)
+class Quiz:
+    def __init__(self,db,question,answer,useranswer,correct,incorrect):
+        self.db = db
+        self.useranswer = useranswer
+        self.data = Quiz.retrievequestions(self.db,self.quiz)
+        self.question = question
+        self.answer = answer
+        self.useranswer = useranswer
+        self.correct = correct
+        self.incorrect = incorrect
+    
+    # To store all the questions and answers for the Quiz
+    def listOfQuestions(self,db):
+        questionList = []
+
+        for entry in db.collection('Quiz').document('').stream():
+            tempQuestions = entry.to_dict()
+            questionList.append([tempQuestions['question'],tempQuestions['answer'],tempQuestions['a'],tempQuestions['b'],tempQuestions['c']])
+
+        print(questionList)
+        return questionList
+
+    # To get the next quiz question from the the question list
+    def retrieveNextQuestion(self,db):
+        questionList = Quiz.listOfQuestions(db,self)
+
+        for entry in questionList:
+            self.question.pop(questionList['questions'])
+            self.db.answer.pop(questionList['answer'])
+            self.a.pop(questionList['a'])
+            self.b.pop(questionList['b'])
+            self.c.pop(questionList['c'])
+        return (self.question,self.a,self.b,self.c)
+
+    # Check if Users answer is correct
+    def answerQuestions(self,db):
+
+        if self.db.useranswer == self.db.answer:
+            print("correct")
+            return self.correct+1
+        else:
+            print("incorrect")
+            return self.incorrect+1
+
+    # Check if User got at least 7 correct to pass the quiz
+    def passedQuiz(self,db):
+
+        if self.db.correct >= 7:
+            print("You passed passed the quiz! with " + str(self.db.correct) + " out of 10! great work")
+            
+        else: 
+            print("Sorry you didnt pass the quiz, you only scored " + str(self.db.correct) + " out of 10.")
+            print("You must score at least 7/10 to pass, better luck next time!")

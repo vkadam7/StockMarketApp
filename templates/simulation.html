@@ -86,7 +86,7 @@
                   <option value = "MSFT">Microsoft</option>
                   <option value = "NFLX">Netflix</option>
                 </select> 
-                <button>Display Stock</button>
+                <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
               </form>
 
 
@@ -106,7 +106,7 @@
         </div>
         <div class= "portfolio">
           <div class="row justify-content-center">
-          <table class = "table table-striped w-75 table-dark table-bordered table-hover">
+          <table class = "table table-striped  table-dark table-bordered table-hover">
             
             <thead class = "thead-dark">
             
@@ -119,6 +119,7 @@
             //let profitList = {{profits|safe}};
             let sharesList = {{sharesPrices|safe}};
             let currentPricesList = {{currentPrices|safe}};
+            let volatilityList = {{volatilityList|safe}};
             
             let portfolio = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -127,7 +128,8 @@
                 Quantity: quantList[i],
                 //'Gain/Loss': profitList[i],
                 'Average Price': sharesList[i],
-                'Current Price': currentPricesList[i]
+                'Current Price': currentPricesList[i], 
+                Volatility: volatilityList[i]
               })
             }
 
