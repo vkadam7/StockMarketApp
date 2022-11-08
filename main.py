@@ -129,6 +129,7 @@ def social():
                 for docs in grabUser.stream(): 
                     grabUser = docs.to_dict()
                 searchResult = grabUser['userName']
+                userResult = grabUser
                 found = True
             else:
                 searchResult = "cantFind"
@@ -137,7 +138,8 @@ def social():
             if(found == True ):
                 print("HERE COMES THE USERNAME!")
                 print(searchResult)
-                return render_template("userDisplay.html", searchResult = searchResult)
+                print(userResult)
+                return render_template("userDisplay.html", searchResult = searchResult, userResult = userResult)
             else:
                 print("Can't find user.")
                 flash("Can't find the user you searched for.")
