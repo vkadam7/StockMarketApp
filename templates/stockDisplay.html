@@ -159,6 +159,9 @@
                 <div class = "form-group col-md-6">
                     <label for = "timespan">Timespan:</label>
                     <select class = "form-control" name="timespan" value="{{ request.form['timespan'] }}">
+                        <option value="1minute">1 Minute</option>
+                        <option value="5minute">5 Minutes</option>
+                        <option value="10minute">10 Minutes</option>
                         <option value="hourly">Hourly prices</option>
                         <option value="daily">Daily prices</option>
                         <option value="weekly">Weekly prices</option>

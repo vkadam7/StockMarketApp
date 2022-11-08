@@ -159,11 +159,18 @@ class StockData:
                         interp[j] += np.random.randn() * np.std(tempArr)
                     date = self.dates[i]
                     hourlyDates = []
-                    for i in range(9,17):
-                        if i < 10:
-                            tempDate = date + ' 0' + str(i) + ':00:00'
+                    for j in range(9,17):
+                        if timespan == '10minute':
+                            for k in range(0,5):
+                                if i < 10:
+                                    tempDate = date + ' 0' + str(j) + ':' + str(k) + '0' + ':00'
+                                else:
+                                    tempDate = date + ' ' + str(j) + ':' + str(k) + '0' + ':00'
                         else:
-                            tempDate = date + ' ' + str(i) + ':00:00'
+                            if i < 10:
+                                tempDate = date + ' 0' + str(j) + ':00:00'
+                            else:
+                                tempDate = date + ' ' + str(j) + ':00:00'
                         hourlyDates.append(tempDate)
                     dataMatrix.append([hourlyDates, interp])
                 else:
@@ -237,9 +244,11 @@ class StockData:
     #   Author: Ian McNulty
     def retrieve(db, ticker, simName="", startDate="", endDate=""):
         try:
+            ## General Retrieve data
             if startDate == "":
-                #print(db.collection("Stocks").document(ticker).get().to_dict())
                 return db.collection("Stocks").document(ticker).get().to_dict()
+            
+            ## Specialized retrieve data for IntradayStockData creation
             else:
                 data = db.collection("Stocks").document(ticker).get().to_dict()
                 dailys = data['daily']
@@ -247,86 +256,144 @@ class StockData:
                 opens = dailys['opens']
                 closes = dailys['closes']
                 tempArr = np.array(dates)
-                startLoc = np.where(tempArr == startDate)
-                endLoc = np.where(tempArr == endDate)
-                newDates = []
-                newData = []
-                if startLoc[0].size == 0:
-                    print(ticker + " only partially available for this period, startDate")
-                    tempDate = startDate
-                    month = int(tempDate[5:7])
-                    day = int(tempDate[8:10])
-                    year = int(tempDate[0:4])
-                    while startLoc[0].size == 0:
-                        day += 1
-                        if day >= DAYS_IN_MONTH[month]:
-                            month += 1
-                            if month >= 12:
-                                month = 1
-                                year += 1
-                            day = 1
-                        if month < 10:
-                            strMonth = "0" + str(month)       
-                        else: 
-                            strMonth = str(month)
-                        if day < 10:
-                            strDay = "0" + str(day)       
-                        else: 
-                            strDay = str(day)
-                        strYear = str(year)
-                        startLoc = np.where(tempArr == (strYear + "-" + strMonth + "-" + strDay))
-                a = startLoc[0][0]
-                if endLoc[0].size == 0:
-                    print(ticker + " only partially available for this period, startDate")
-                    tempDate = endDate
-                    month = int(tempDate[5:7])
-                    day = int(tempDate[8:10])
-                    year = int(tempDate[0:4])
-                    while endLoc[0].size == 0:
-                        day -= 1
-                        if day <= 0:
-                            month -= 1
-                            if month <= 0:
-                                month = 12
-                                year -= 1
-                            day = DAYS_IN_MONTH[month]
-                        if month < 10:
-                            strMonth = "0" + str(month)       
-                        else: 
-                            strMonth = str(month)
-                        if day < 10:
-                            strDay = "0" + str(day)       
-                        else: 
-                            strDay = str(day)
-                        strYear = str(year)
-                        endLoc = np.where(tempArr == (strYear + "-" + strMonth + "-" + strDay))
-                b = endLoc[0][0]
-                for i in range(a, b+1):
-                    interp = np.interp(range(0,7),[0, 4, 7],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
-                    for j in range(0,len(interp)):
-                        tempArr = np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])])
-                        interp[j] += np.random.randn() * np.std(tempArr)
-                    date = dates[i]
-                    hourlyDates = []
-                    for i in range(9,16):
-                        if i < 10:
-                            tempDate = date + ' 0' + str(i) + ':00:00'
+                initialDate = tempArr[0]
+                finalDate = tempArr[len(tempArr)-1]
+                print(initialDate)
+                print(endDate)
+                availabilityFlag = True
+
+                ## Checks if the stock is available for this timespan
+                if int(initialDate[0:4]) >= int(endDate[0:4]):
+                    if int(initialDate[5:7]) > int(endDate[5:7]):
+                        availabilityFlag = False
+                    elif int(initialDate[5:7]) == int(endDate[5:7]):
+                        if int(initialDate[8:10]) > int(endDate[8:10]):
+                            availabilityFlag = False
+                
+                ## If the stock is unavailable, code creates an empty entry with a
+                ##  true value in the unavailable field
+                if availabilityFlag == False:
+                    return {
+                        'simulation': simName,
+                        'name': data['name'],
+                        'ticker': ticker,
+                        'headquarters': data['headquarters'],
+                        'listedAt': data['listedAt'],
+                        'unavailable': True
+                    }
+
+                ## If the stock is available, the data is processed to create a 
+                ##  corresponding entry in the IntradayStockData Firestore db
+                else:
+                    startLoc = np.where(tempArr == startDate)
+                    endLoc = np.where(tempArr == endDate)
+                    newDates = []
+                    newData = []
+
+                    ## Start Date Calculation algorithm
+                    if startLoc[0].size == 0:
+                        print(ticker + " only partially available for this period, startDate")
+                        tempDate = startDate
+                        month = int(tempDate[5:7])
+                        day = int(tempDate[8:10])
+                        year = int(tempDate[0:4])
+                        initialYear = int(initialDate[0:4])
+                        if initialYear <= year:
+                            while startLoc[0].size == 0:
+                                day += 1
+                                if day >= DAYS_IN_MONTH[month]:
+                                    month += 1
+                                    if month >= 12:
+                                        month = 1
+                                        year += 1
+                                    day = 1
+                                if month < 10:
+                                    strMonth = "0" + str(month)       
+                                else: 
+                                    strMonth = str(month)
+                                if day < 10:
+                                    strDay = "0" + str(day)       
+                                else: 
+                                    strDay = str(day)
+                                strYear = str(year)
+                                startLoc = np.where(tempArr == (strYear + "-" + strMonth + "-" + strDay))
                         else:
-                            tempDate = date + ' ' + str(i) + ':00:00'
-                        hourlyDates.append(tempDate)
-                    for entry in hourlyDates:
-                        newDates.append(entry)
-                    for entry in interp.tolist():
-                        newData.append(entry)
-                return {
-                    'simulation': simName,
-                    'name': data['name'],
-                    'ticker': ticker,
-                    'headquarters': data['headquarters'],
-                    'listedAt': data['listedAt'],
-                    'dates': newDates,
-                    'prices': newData
-                }
+                            startLoc = np.where(tempArr == initialDate)
+                    a = startLoc[0][0]
+
+                    ## End Date Calculation algorithm
+                    if endLoc[0].size == 0:
+                        print(ticker + " only partially available for this period, startDate")
+                        tempDate = endDate
+                        month = int(tempDate[5:7])
+                        day = int(tempDate[8:10])
+                        year = int(tempDate[0:4])
+                        finalYear = int(finalDate[0:4])
+                        if finalYear >= year:
+                            while endLoc[0].size == 0:
+                                day -= 1
+                                if day <= 0:
+                                    month -= 1
+                                    if month <= 0:
+                                        month = 12
+                                        year -= 1
+                                    day = DAYS_IN_MONTH[month]
+                                if month < 10:
+                                    strMonth = "0" + str(month)       
+                                else: 
+                                    strMonth = str(month)
+                                if day < 10:
+                                    strDay = "0" + str(day)       
+                                else: 
+                                    strDay = str(day)
+                                strYear = str(year)
+                                endLoc = np.where(tempArr == (strYear + "-" + strMonth + "-" + strDay))
+                        else:
+                            endLoc = np.where(tempArr == finalDate)
+                    b = endLoc[0][0]
+
+                    ## Data interpolation
+                    for i in range(a, b+1):
+                        interpHourly = np.interp(range(0,8),[0, 4, 8],[opens[i], np.mean([opens[i], closes[i]]), closes[i]])
+                        interps = []
+                        interpHourly[0] += np.random.randn() * np.std(np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])]))
+                        for j in range(1,len(interpHourly)):
+                            tempArr = np.array([opens[i], closes[i], np.mean([opens[i], closes[i]])])
+                            interpHourly[j] += np.random.randn() * np.std(tempArr)
+                            temp = interpHourly[j]
+                            temp += np.random.randn()/10 * np.std(tempArr)
+                            tempInterp = np.interp(range(6), [0, 5], [interpHourly[j-1], temp])
+                            for element in tempInterp:
+                                element += + np.random.randn() * np.std(tempArr)
+                            interps.append(tempInterp)
+
+                        ## Date calculations
+                        date = dates[i]
+                        dateEntries = []
+                        for j in range(3,6):
+                            tempDate = date + ' 09:' + str(j) + '0:00'
+                            dateEntries.append(tempDate)
+                        for j in range(10,16):
+                            for k in range(0,6):
+                                tempDate = date + ' ' + str(j) + ':' + str(k) + '0:00'
+                                dateEntries.append(tempDate)
+                        dateEntries.append(date + ' 16:00:00')
+
+                        ## Array creations
+                        for entry in dateEntries:
+                            newDates.append(entry)
+                        for entry in interps:
+                            for point in entry.tolist():
+                                newData.append(point)
+                    return {
+                        'simulation': simName,
+                        'name': data['name'],
+                        'ticker': ticker,
+                        'headquarters': data['headquarters'],
+                        'listedAt': data['listedAt'],
+                        'dates': newDates,
+                        'prices': newData
+                    }
         except KeyError:
             return 'This data entry does not exist'
 
@@ -383,8 +450,6 @@ class Simulation:
 
     def createSim(self):
         count = len(self.db.collection('Simulations').get())
-        simName = "Sim" + str(count+1)
-        self.simName = simName
         self.startTimestamp = datetime.datetime.now()
         data = {
             'ongoing': True,
@@ -396,16 +461,25 @@ class Simulation:
             'score': 0,
             'startTimestamp': self.startTimestamp,
         }
+        updateTime, tempRef = self.db.collection('Simulations').add(data)
+        self.simName = tempRef.id
         self.addStocksToSim()
-        self.db.collection('Simulations').document(simName).set(data)
 
     def whatTimeIsItRightNow(self):
         currentTime = datetime.datetime.now()
         difference = currentTime - self.startTimestamp
         index = -1
-        for i in range(0,difference.days):
-            index += 8
-        index += (difference.seconds//3600)%24
+        total = difference.total_seconds()
+        days = round(total//86400)
+        total -= days*86400
+        hours = round(total//3600)
+        total -= hours*3600
+        tenMin = round(total//600)
+        for i in range(0,days):
+            index += 40
+        for i in range(0,hours):
+            index += 6
+        index += tenMin
         return index
 
     def currentPriceOf(self, ticker):
@@ -429,10 +503,27 @@ class Simulation:
     def finishSimulation(db, simName):
         data = db.collection('Simulations').document(simName).get().to_dict()
         data['ongoing'] = False
-        percentChange = (float(data['currentCash']) - float(data['initialCash'])) / float(data['initialCash'])
-        data['score'] = percentChange * 100
         db.collection('Simulations').document(simName).update(data)
 
+        for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
+            temp = entry.id
+            db.collection('IntradayStockData').document(temp).delete()
+
+        quantities = []
+        currentPrices = []
+        totalValue = 0
+        
+        for entry in Order.stocksBought(db, simName):
+            Portfolio = portfolio(db, entry, data['user'], simName, data['initialCash'])
+            if Portfolio.quantity != 0:
+                quantities.append(Portfolio.quantity)
+                currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
+        
+        for i in range(len(quantities)):
+            totalValue += quantities(i) * currentPrices(i)
+
+        percentChange = ((float(data['currentCash']) + totalValue) - float(data['initialCash'])) / float(data['initialCash'])
+        data['score'] = percentChange * 100
         scores = percentChange * 100
         scoreRounded = round(scores)
         grabDataEmail = data['user']
@@ -443,7 +534,14 @@ class Simulation:
 
         db.collection('Leaderboard').add({"email":grabDataEmail, "score":scoreRounded, "username":grabUserName})
 
-
+    def checkDates(startDate, endDate):
+        if int(startDate[0:4]) >= int(endDate[0:4]):
+            if int(startDate[5:7]) > int(endDate[5:7]):
+                return False
+            elif int(startDate[5:7]) == int(endDate[5:7]):
+                if int(startDate[8:10]) > int(endDate[8:10]):
+                    return False
+        return True
 
     def retrieveOngoing(db, email):
         for query in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream():
@@ -525,6 +623,24 @@ class User:
     def updateExperience(self, experience):
         data = self.db.collection("Users").document(self.username)
         data.update({ 'Experience' : experience })
+
+    def addFriend(db, user1, user2):
+        data = {
+            'user1': user1,
+            'user2': user2
+        }
+        db.collection("Users").add(data)
+
+    def removeFriend(db, user1, user2):
+        for entry in db.collection('Users').where('user1','==',user1).where('user2','==',user2).stream():
+            db.collection('Users').document(entry.id).delete()
+
+    def listFriends(db, user):
+        friends = []
+        for entry in db.collection('Users').where('user1','==',user).stream():
+            temp = entry.to_dict()
+            friends.append(temp['user2'])
+        return friends
 
     def registerUser(db, username, email, name, userID, description="", picture="", experience=""):
         data = {
@@ -706,6 +822,7 @@ class portfolio:
             self.quantity = self.weight()
             self.profit = self.get_profit()
             self.avgSharePrice = self.returnValue()
+
             self.volatility = self.volatitlity()
     
     #def retrieve(self, id):
@@ -728,19 +845,6 @@ class portfolio:
         avgPriceOfOrders = mean(prices)
         currentValueOfShares = currentPriceOfStock * amountOfSharesOwned
         return round(currentValueOfShares - avgPriceOfOrders, 2)
-
-        #profit = 0
-        #quantity = self.db.collection('Orders').document('quantity').get()
-        #if Order.buyOrder() == True:
-        #    tempPrice = self.db.collection('Order').document('avgStockPrice').get()
-        #    quantity = self.db.collection('Orders').document('quantity').get()
-        #    profit += tempPrice * quantity
-        #    return profit
-        #elif Order.sellOrder() == True:
-        #    tempPrice = self.db.collection('Order').document('avgStockPrice').get()
-        #    quantity = self.db.collection('Orders').document('quantity').get()
-        #    profit -= tempPrice * quantity
-        #    return profit
             
     #Displays amount of shares owned (To also be implemented later)
     def weight(self):
@@ -751,15 +855,7 @@ class portfolio:
                 quantity += int(temp['newQuantity'])
             else:
                 quantity += int(temp['quantity'])
-        return quantity
-
-        #share = [self.quantity]
-        #max_share = 1
-        #for share in max_share:
-        #    if(self.quantity <= max_share and self.quantity >= 0):
-        #        return share[self.quantity]
-        #    else:
-        #        return -1   
+        return quantity 
         
     def returnValue(self):
         prices = []
@@ -770,15 +866,6 @@ class portfolio:
             return round(mean(prices),2)
         return 0
 
-    #
-    #
-    #
-    #
-    # I dont think this is necessary - Ian
-    #               |
-    #               |
-    #               |
-    #               V
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
     def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
           #tempData = self.db.collection('Simulations').document(self.sim).document('Orders').get()
@@ -812,17 +899,7 @@ class portfolio:
         elif Order.sellOrder == True:
                  netGainorLoss = (currentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
                  return netGainorLoss
-
-      
-    #
-    #
-    #
-    #
-    # Calculated by: self.currentCash = Simulation.retrieveCurrentCash(db, simulation)
-    #               |
-    #               |
-    #               |
-    #               V                     
+              
      #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
     def funds_remaining(self, initialAmount, finalAmount):
         finalAmount = 0
