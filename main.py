@@ -137,7 +137,7 @@ def social():
             if(found == True ):
                 print("HERE COMES THE USERNAME!")
                 print(searchResult)
-                return render_template("home.html")
+                return render_template("userDisplay.html", searchResult = searchResult)
             else:
                 print("Can't find user.")
                 flash("Can't find the user you searched for.")
