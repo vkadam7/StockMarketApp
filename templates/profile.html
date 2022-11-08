@@ -37,6 +37,12 @@
           <li class="nav-item">
             <a class = "nav-link active" method = "POST" href = "profile">Profile</a> 
           </li>
+        </li class = "nav-item">
+            <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
+         </li>
+          <li class="nav-item">
+            <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
+          </li>
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
           </li>
@@ -84,32 +90,70 @@
                     <option value = "MSFT">Microsoft</option>
                     <option value = "NFLX">Netflix</option>
                   </select> 
-                  <button>Display Stock</button>
+                  <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Display Stock</button>
                 </form>
               </div>        
             </div>
           </nav>
     </header>
 
+
 <br><br><br><br><br><br>
 
 <body>
-    <h1>
-        Welcome, {{results['Name']}}
-    </h1>
-        <br>
-    <h1>
-        Username: {{results['userName']}}
-    </h1>
-    <br>
-    <h1>
-        Email: {{results['Email']}}
-    </h1>
-    <br>
+  <h1>Welcome, {{results['Name']}}</h1>
+  <section class = "vh-100" style = "background-color: #eee;">
+    <div class = "container py-6 h-100">
+      <div class = "row">
+        <div class = "col-lg-6">
+          <div class = "card mb-4" style = "border-radius: .5rem;">
+            <div class = "card-body text-center">
+              <h3 tex>Name: {{results['Name']}}</h3>
+              <h3>Username: {{results['userName']}}</h3>
+              <h3>Email: {{results['Email']}}</h3>
+            </div>
+          </div>
+  </div>
+  <div class = "container py-6 h-100">
+    <div class = "row">
+      <div class = "col-lg-6">
+        <div class = "card mb-4" style = "border-radius: .5rem;">
+          <h1><a href = "update.html">Update Profile </a></h1>
+        </div>
+      </div>
+    </div>
+  </div>
 
-    <h1><a href = "update.html">Update Profile </a></h1>
-    <br>
 
+
+  <div class = "row">
+      <div class = "col-md-6">
+        <div class = "card mb-4 mb-md-0" style = "border-radius: .5rem; text-align = center;">
+          <div class = "card-body">
+          <h3>Simulation Status</h3>
+          <h4>Start Date: {{cash['simStartDate']}}</h4>
+          <h4>Days Remaining: {{daysRemaining}}</h4>
+          <h4>Current Money: ${{ cash['currentCash'] }} </h4>
+          <h4>Score: {{cash['score']}}</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  <div class = "row">
+      <div class = "col-md-6">
+        <div class = "card mb-4 mb-md-0" style = "border-radius: .5rem;">
+          <div class = "card-body">
+          <a class "nav-link"  href= "social.html">Go to your network</a>
+          <h3>Social Status </h3>
+          <h5>Following: </h5>
+          <h5>Followers: </h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>  
  <!--  {% with alerts = get_flashed_messages() %}
         {% for print in alerts %}
             {% if print in get_flashed_messages(category_filter = ['pass']) %} 
