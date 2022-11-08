@@ -115,6 +115,7 @@
             let quantList = {{quantities|safe}};
             let buyList = {{buys|safe}};
             let totalList = {{prices|safe}};
+            let datesList = {{dates|safe}};
             
             let orderlist = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -122,7 +123,8 @@
                 Stock: tickersList[i],
                 Quantity: quantList[i],
                 'Transaction Type': buyList[i],
-                Total: totalList[i]
+                Total: totalList[i],
+                'Date of Order' : datesList[i]
               })
             }
 
