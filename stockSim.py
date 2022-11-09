@@ -24,14 +24,6 @@ import math
 #from mpld3 import plugins
 
 
-#import math
-import matplotlib as plt
-import matplotlib.animation as animation
-from matplotlib import style
-import math
-import mpld3
-from mpld3 import plugins
-
 
 DAYS_IN_MONTH = {
     1 : 31,

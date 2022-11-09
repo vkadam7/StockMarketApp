@@ -11,12 +11,11 @@
     </head>
     <header>
 
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top" id = "navBar">
-            <div class="container-fluid">
-              <a class="navbar-brand" href="home">
-                <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
-                StockSim: Learn How to Trade
-              </a>
+      <a class="navbar-brand" href="home" style = "color: black; padding: 10px;">
+        StockSim: Learn How to Trade
+      </a>
+        <nav class="navbar navbar-expand-md navbar-dark" id = "navBar">
+          <img src = "/static/stockLogo.png" alt = "stock symbol" width = "45" height = "45" class="d-inline-block align-top">
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
@@ -92,7 +91,7 @@
           </nav>
     </header>
 
-<br><br>
+<br>
 <body>
 
 
@@ -109,7 +108,7 @@
                         {% endfor %} 
                     {% endif %} 
                 {% endwith %}
-                <br><br> 
+                
             <section class = "vh-100">
                 <div class = "container h-100" style = "padding-bottom: 3rem;">
                     <div class = "row d-flex align-items-center justify-content-center h-100">
@@ -132,8 +131,10 @@
                                 <div class = "d-flex justify-content-around align-items-center mb-4">
                                     <a href = "PasswordRecovery"> Forgot Password?</a>
                                 </div>
+                                <div class = "d-flex justify-content-end">
                                 <button type = "submit" class = "btn btn-primary btn-lg btn-block" style = "background-color:rgb(33, 103, 42)">Log In</button>
-                            </form>
+                                </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -145,8 +146,8 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
-<br><br>
-<footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
+<br>
+<footer class="footer mt-auto py-3" id = "foot">
     <div class="container">
       <span>Copyright 2022 by StockSim</span>
     </div>
