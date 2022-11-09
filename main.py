@@ -447,10 +447,10 @@ def finishSimulation():
 @app.route("/simulationHistory")
 def simlists():
     if ('user' in session):
-        simlist = Simulation.listSims(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
+        sims, dates, scores = Simulation.listSims(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
 
-        return render_template('simulationHistory.html', person = session['user'],sims = simlist['currentCash'], 
-        dates = simlist['startTimestamp'], scores = simlist['score'])
+        return render_template('simulationHistory.html', person = session['user'],sims = sims, 
+        dates = dates, scores = scores)
 
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():

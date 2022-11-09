@@ -605,7 +605,7 @@ class Simulation:
             date = str(datetime.datetime.fromtimestamp(temp['startTimestamp'].timestamp()).strftime("%Y-%m-%d %H:%M:%S"))
             dates.append(date)
             scores.append(temp['score'])
-        return sims
+        return sims, dates, scores
 
     def completedCheck(db, user):
         count = 0
