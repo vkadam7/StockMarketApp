@@ -520,7 +520,7 @@ class Simulation:
                 currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
         
         for i in range(len(quantities)):
-            totalValue += quantities(i) * currentPrices(i)
+            totalValue += quantities[i] * currentPrices[i]
 
         percentChange = ((float(data['currentCash']) + totalValue) - float(data['initialCash'])) / float(data['initialCash'])
         data['score'] = percentChange * 100
@@ -606,6 +606,23 @@ class Simulation:
             dates.append(date)
             scores.append(temp['score'])
         return sims
+
+    def getPortfolioValue(db, simName):
+        quantities = []
+        currentPrices = []
+        totalValue = 0
+        data = db.collection('Simulations').document(simName).get().to_dict()
+        
+        for entry in Order.stocksBought(db, simName):
+            Portfolio = portfolio(db, entry, data['user'], simName, data['initialCash'])
+            if Portfolio.quantity != 0:
+                quantities.append(Portfolio.quantity)
+                currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
+        
+        for i in range(len(quantities)):
+            totalValue += quantities[i] * currentPrices[i]
+
+        return round(totalValue, 2)
 
 class SimulationFactory:
     def __init__(self, db, email):
