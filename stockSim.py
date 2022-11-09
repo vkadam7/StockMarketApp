@@ -602,7 +602,7 @@ class Simulation:
         for entry in db.collection('Simulations').where('user','==',user).where('ongoing','==',False).stream():
             temp = entry.to_dict()
             sims.append(entry.id)
-            date = str(datetime.datetime.fromtimestamp(temp['startTimestamp'].timestamp()))
+            date = str(datetime.datetime.fromtimestamp(temp['startTimestamp'].timestamp()).strftime("%Y-%m-%d %H:%M:%S"))
             dates.append(date)
             scores.append(temp['score'])
         return sims
