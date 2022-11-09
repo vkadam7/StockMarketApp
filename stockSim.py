@@ -570,6 +570,31 @@ class Simulation:
         data = db.collection('Simulations').document(sim).get().to_dict()
         return data['currentCash']
 
+    def ongoingCheck(db, sim):
+        data = db.collection('Simulations').document(sim).get().to_dict()
+        currentTime = datetime.datetime.now()
+        difference = currentTime - data['startTimestamp'].replace(tzinfo=None)
+        index = -1
+        total = difference.total_seconds()
+        days = round(total//86400)
+        total -= days*86400
+        hours = round(total//3600)
+        total -= hours*3600
+        tenMin = round(total//600)
+        for i in range(0,days):
+            index += 40
+        for i in range(0,hours):
+            index += 6
+        index += tenMin
+        highestIndex = 0
+        for entry in db.collection('IntradayStockData').where('simulation','==',sim).stream():
+            temp = entry.to_dict()
+            if len(temp['prices']) > highestIndex:
+                highestIndex = len(temp['prices'])
+        if index > highestIndex:
+            return False
+        return True
+
     def listSims(db, user):
         sims = []
         dates = []
