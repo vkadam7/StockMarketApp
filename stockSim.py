@@ -607,6 +607,14 @@ class Simulation:
             scores.append(temp['score'])
         return sims
 
+    def completedCheck(db, user):
+        count = 0
+        for query in db.collection('Simulations').where('ongoing','==',False).where('user','==',user).stream():
+            count += 1
+        if count >= 1:
+            return True
+        return False
+
     def getPortfolioValue(db, simName):
         quantities = []
         currentPrices = []
