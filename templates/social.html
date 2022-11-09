@@ -120,31 +120,16 @@
 
 
   </section>  
- <!--  {% with alerts = get_flashed_messages() %}
-        {% for print in alerts %}
-            {% if print in get_flashed_messages(category_filter = ['pass']) %} 
-            <div class="alert-pass" role="alert">
-                {{ print }}
-            </div>
-            {% elif print in get_flashed_messages(category_filter = ['fail']) %}
-            <div class="alert-fail" role="alert">
-                {{ print }}
-            </div>
-            {% endif %}
-         {% endfor %}
-        {% endwith %}  Keep this an alternative - Muneeb Khan
-    <br>
-    </h1> -->
+ 
     
-    {% with messages = get_flashed_messages() %}
+  {% with messages = get_flashed_messages() %}
                     {% if messages %}   
                         {% for message in messages %}
-                        <div class ="alert alert-warning alert-dismissible fade show" style = "text-align: center"; role="alert">
-                            {{ message }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
+                        <script>
+                        swal( '{{ message }}', {
+                        button: "Close",
+                        });
+                        </script>
                         {% endfor %} 
                     {% endif %} 
     {% endwith %}
