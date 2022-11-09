@@ -622,7 +622,7 @@ class Simulation:
         for i in range(len(quantities)):
             totalValue += quantities[i] * currentPrices[i]
 
-        return round(totalValue, 2)
+        return totalValue
 
 class SimulationFactory:
     def __init__(self, db, email):
@@ -857,8 +857,8 @@ class Order:
         if ownageFlag == True:
             for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
                 temp = entry.to_dict()
-                date = str(datetime.datetime.fromtimestamp(temp['dayOfPurchase'].timestamp()))
-                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],round(float(temp['totalPrice']),2),date])
+                date = str(datetime.datetime.fromtimestamp(temp['dayOfPurchase'].timestamp()).strftime("%Y-%m-%d %H:%M:%S"))
+                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],"%.2f" % round(float(temp['totalPrice']),2),date])
             
             df = pd.DataFrame(orderslist, columns=['buyOrSell','quantity','ticker','totalPrice', 'dayOfPurchase'])
             
