@@ -640,19 +640,25 @@ def displayStock(ticker):
                                 element += (np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]]))/100
                                 prices.append(element)
                             # 15 = index of minute
-                            tempDate = list(stock['dates'][i])
+                            tempDate1 = list(stock['dates'][i])
                             for j in range(1,3):
-                                tempDate[15] = str((j*5)%10)
-                                dates.append("".join(tempDate))
+                                tempDate2 = tempDate1
+                                tempDate2[15] = str((j*5)%10)
+                                if i % 6 != 0:
+                                    tempDate2 = tempDate2[11:19]
+                                dates.append("".join(tempDate2))
                         elif timespan == '1minute':
                             tempInterp = np.interp(range(0,11),[0, 10],[stock['prices'][i-1], stock['prices'][i]])
                             for element in tempInterp:
                                 element += (np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]]))/50
                                 prices.append(element)
-                            tempDate = list(stock['dates'][i])
+                            tempDate1 = list(stock['dates'][i])
                             for j in range(0,10):
-                                tempDate[15] = str(j)
-                                dates.append("".join(tempDate))
+                                tempDate2 = tempDate1
+                                tempDate2[15] = str(j)
+                                if i % 30 != 0:
+                                    tempDate2 = tempDate2[11:19]
+                                dates.append("".join(tempDate2))
                     return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
             else:
                 for entry in stockData:
