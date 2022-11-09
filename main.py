@@ -418,13 +418,13 @@ def goToSimulation():
                             currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                             volatility.append(Portfolio.volatility)
                             #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
-                    print(tickers)
-                    print(quantities)
-                    print(profits)
-                    print(sharesPrices)
-                    print(currentPrices)
-                    print(netGainLoss)
-                    print(volatility)
+                    #print(tickers)
+                    #print(quantities)
+                    #print(profits)
+                    #print(sharesPrices)
+                    #print(currentPrices)
+                    #print(netGainLoss)
+                    #print(volatility)
 
                     return render_template('simulation.html', person=session['user'], tickers=tickers, 
                     quantities=quantities, profits=profits, sharesPrices=sharesPrices,
@@ -501,13 +501,13 @@ def orderConfirm():
                 currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                 #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
                 volatility.append(Portfolio.volatitlity)
-        print(tickers)
-        print(quantities)
-        print(profits)
-        print(sharesPrices)
-        print(currentPrices)
-        print(netGainLoss)
-        print(volatility)
+        #print(tickers)
+        #print(quantities)
+        #print(profits)
+        #print(sharesPrices)
+        #print(currentPrices)
+        #print(netGainLoss)
+        #print(volatility)
 
         return render_template('simulation.html', person=session['user'], tickers=tickers, 
         quantities=quantities, profits=profits, sharesPrices=sharesPrices,
