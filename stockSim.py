@@ -836,8 +836,8 @@ class portfolio:
             self.quantity = self.weight()
             self.profit = self.get_profit()
             self.avgSharePrice = self.returnValue()
-
             self.volatility = self.volatitlity()
+            self.percent = self.percentChange()
     
     #def retrieve(self, id):
     #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
@@ -971,20 +971,19 @@ class portfolio:
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
-    def percentChange(self,db):
+    def percentChange(db,simName):
  
-        initialAmount = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock),2)
-        day = []
-        for entry in db.collection('IntradayStockData').get():
+        currentAmount = round(db.collection('IntradayStockData').document('prices').where('simulation','==',simName).where('ticker','==',db.ticker).stream())
+        dates = []
+        for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
             tempdays = entry.to_dict()
-            day.append(tempdays['dates'])
-        finalAmount = []
+            dates.append(tempdays['dates'])
 
-        for i in day:
-                finalAmount = (initialAmount[i+1]/initialAmount[i]) * 100
-                return str(finalAmount) + " %"
-        else:
-            return -1     
+        for i in dates:
+            finalAmount = round(float(((currentAmount[i+1]-currentAmount[i])/currentAmount[i]) * 100),2)
+
+        print(str(finalAmount) + " %")
+        return (str(finalAmount) + " %")   
         
     #Author: Viraj Kadam    
     #Graph of user stocks   (Need buy and sell info)
@@ -1049,6 +1048,7 @@ class Quiz:
     # Check if Users answer is correct
     def answerQuestions(self,db,answer,useranswer,correct):
         correct = 0
+        answer = db.collection('Quiz').document('answer')
         if useranswer == answer:
             print("correct")
             return correct+1

@@ -379,6 +379,7 @@ def startSimulation():
                         sharesPrices = []
                         currentPrices = []
                         volatility = []
+                        percentage = []
                         ##avgPrice = []
 
                         for entry in Order.stocksBought(dbfire, session['simName']):
@@ -390,6 +391,7 @@ def startSimulation():
                                 sharesPrices.append(Portfolio.avgSharePrice)
                                 currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                                 volatility.append(Portfolio.volatility)
+                                percentage.append(Portfolio.percentChange)
                                 #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
                         print(tickers)
                         print(quantities)
@@ -398,6 +400,7 @@ def startSimulation():
                         print(currentPrices)
                         print(netGainLoss)
                         print(volatility)
+                        print(percentage)
 
                         return render_template('simulation.html', person=session['user'], tickers=tickers, 
                         quantities=quantities, profits=profits, sharesPrices=sharesPrices,
@@ -437,6 +440,7 @@ def goToSimulation():
                 sharesPrices = []
                 currentPrices = []
                 volatility = []
+                percentage = []
                 ##avgPrice = []   
                 
                 for entry in Order.stocksBought(dbfire, session['simName']):
@@ -448,6 +452,7 @@ def goToSimulation():
                         sharesPrices.append(Portfolio.avgSharePrice)
                         currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                         volatility.append(Portfolio.volatility)
+                        percentage.append(Portfolio.percentChange)
                         #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
                 print(tickers)
                 print(quantities)
@@ -456,6 +461,7 @@ def goToSimulation():
                 print(currentPrices)
                 print(netGainLoss)
                 print(volatility)
+                print(percentage)
 
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
@@ -522,6 +528,7 @@ def orderConfirm():
                 currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
                 #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
                 volatility.append(Portfolio.volatitlity)
+                percentage.append(Portfolio.percentChange)
         print(tickers)
         print(quantities)
         print(profits)
@@ -529,6 +536,7 @@ def orderConfirm():
         print(currentPrices)
         print(netGainLoss)
         print(volatility)
+        print(percentage)
 
         return render_template('simulation.html', person=session['user'], tickers=tickers, 
         quantities=quantities, profits=profits, sharesPrices=sharesPrices,
@@ -753,25 +761,29 @@ def fourOhFour():
 @app.route('/quiz')
 def quizpage():
     if ('user' in session):
-        
         quiz = Quiz.listOfQuestions(dbfire, session['user'])               
         question = quiz.pop('question')
         answer = quiz.pop('answer')
         a = quiz.pop('a')
         b = quiz.pop('b')
         c = quiz.pop('c')
-        if (request.method == 'a'):
-            return Quiz.answerQuestions(dbfire, session['user'],session['answer'],session['a'])
-        elif (request.method == 'b'):
-            return Quiz.answerQuestions(dbfire, session['user'],session['answer'],session['b'])
-        elif (request.method == 'c'):
-            return Quiz.answerQuestions(dbfire, session['user'],session['answer'],session['c'])
-        
-        if (request.method == 'nextButton'):
-            return Quiz.nextButton(dbfire, session['user'])
-        
-        if (request.method == 'submitButton'):
-            return Quiz.submittedQuiz(dbfire,session['user'])
+
+        if (request.method == 'POST'):
+            option = request.method['choices']
+            if (option == 'a'):
+                return Quiz.answerQuestions(dbfire, session['user'],session['answer'],session['a'])
+            elif (option == 'b'):
+                return Quiz.answerQuestions(dbfire, session['user'],session['answer'],session['b'])
+            elif (option == 'c'):
+                return Quiz.answerQuestions(dbfire, session['user'],session['answer'],session['c'])
+            
+            nextOption = request.method['nextButton']
+            if (nextOption == 'nextButton'):
+                return Quiz.nextButton(dbfire, session['user'])
+            
+            submitOption = request.method['submitButton']
+            if (submitOption == 'submitButton'):
+                return Quiz.submittedQuiz(dbfire,session['user'])
 
         return render_template('quiz.html',quiz = quiz,question = question, answer = answer, a = a, b = b, c = c)
        
