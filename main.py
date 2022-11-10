@@ -1,5 +1,4 @@
 from asyncio.windows_events import NULL
-from cgi import test
 #from crypt import methods
 #from crypt import methods
 #from re import T
@@ -125,8 +124,7 @@ def social():
         if request.method == "POST":
             search = request.form
             searchKey = search["searchUser"]
-            doc = dbfire.collection('Users').where("userName", '==', searchKey)
-            found = False
+            doc = dbfire.collection('Users').document(searchKey).get()
             if doc.exists:
                 grabUser = dbfire.collection('Users').where('userName', '==', searchKey)
                 for docs in grabUser.stream(): 
@@ -134,12 +132,6 @@ def social():
                 searchResult = grabUser['userName']
                 userResult = grabUser
                 found = True
-            elif(found == False):
-                doc = dbfire.collection('Users').where('Name',"==",searchKey)
-                if doc.exists:
-                    grabUser1 = dbfire.collection('Users').where("Name","==",searchKey)
-                    for docs in grabUser1.stream():
-                        
             else:
                 searchResult = "cantFind"
                 found = False
@@ -150,9 +142,8 @@ def social():
                 print(userResult)
                 return render_template("userDisplay.html", searchResult = searchResult, userResult = userResult)
             else:
-                print("Can't find user.")
                 flash("Can't find the user you searched for.")
-                return render_template("social.html")
+                return redirect(url_for("social"))
         return render_template("social.html")
             
         
