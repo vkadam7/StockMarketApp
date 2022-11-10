@@ -447,10 +447,10 @@ def finishSimulation():
 @app.route("/simulationHistory")
 def simlists():
     if ('user' in session):
-        sims, dates, scores = Simulation.listSims(dbfire, session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
+        sims, dates, scores, links = Simulation.listSims(dbfire, session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
 
         return render_template('simulationHistory.html', person = session['user'],sims = sims, 
-        dates = dates, scores = scores)
+        dates = dates, scores = scores, links=links)
 
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
@@ -724,6 +724,20 @@ def orderlists():
 
         return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
         tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
+
+@app.route("/orderHist/<simName>")
+def orderHist(simName):
+    if ('user' in session):
+        return redirect(url_for('.orderHistory', simName=simName))
+
+@app.route("/orderHistory")
+def orderHistory():
+    simName = request.args['simName']
+    orderlist = Order.orderList(dbfire, simName) # This will have the username show on webpage when logged in - Muneeb Khan
+    print(orderlist)
+
+    return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
+    tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
 
 ## 
 @app.route('/404Error')

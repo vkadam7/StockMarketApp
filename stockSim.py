@@ -599,13 +599,18 @@ class Simulation:
         sims = []
         dates = []
         scores = []
+        links = []
+        i = 1
         for entry in db.collection('Simulations').where('user','==',user).where('ongoing','==',False).stream():
             temp = entry.to_dict()
-            sims.append(entry.id)
+            sims.append(str(i))
             date = str(datetime.datetime.fromtimestamp(temp['startTimestamp'].timestamp()).strftime("%Y-%m-%d %H:%M:%S"))
             dates.append(date)
             scores.append(temp['score'])
-        return sims, dates, scores
+            link = str('/orderHist/'+entry.id)
+            links.append(link)
+            i+=1
+        return sims, dates, scores, links
 
     def completedCheck(db, user):
         count = 0

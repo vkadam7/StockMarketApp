@@ -93,6 +93,7 @@
     </header>
 
 <body>  
+    <br><br><br><br>
         <div class = "simulationHistory">
           <div class="row justify-content-center">
           <table class = "table table-striped w-75 table-dark table-bordered table-hover">
@@ -105,33 +106,52 @@
             let simNames = {{sims|safe}};
             let datesList = {{dates|safe}};
             let scoresList = {{scores|safe}};
+            let linksList = {{links|safe}};
             
             let simList = [];
             for (let i = 0; i < simNames.length; i++) {
               simList.push({
                 Simulation: simNames[i],
                 'Date Started': datesList[i],
-                Score: scoresList[i]
+                Score: scoresList[i],
+                'Links': linksList[i]
               })
             }
 
             function generateOrderlist(table, data, keys) {
-              let thead = table.createTHead();
-              let row = thead.insertRow();
-              for (let key of keys) {
-                let th = document.createElement("th");
-                let text = document.createTextNode(key);
-                th.appendChild(text);
-                row.appendChild(th);
-              }
-              for (let element of data) {
-                let row = table.insertRow();
-                for (key in element) {
-                  let cell = row.insertCell();
-                  let text = document.createTextNode(element[key]);
-                  cell.appendChild(text);
+                let thead = table.createTHead();
+                let row = thead.insertRow();
+                for (let key of keys) {
+                    let th = document.createElement("th");
+                    let text = document.createTextNode(key);
+                    th.appendChild(text);
+                    row.appendChild(th);
                 }
-              }
+                for (let element of data) {
+                    let row = table.insertRow();
+                    let i = 0;
+                    for (key in element) {
+                    if (i < 3) {
+                        let cell = row.insertCell();
+                        let text = document.createTextNode(element[key]);
+                        cell.appendChild(text);
+                    } else {
+                        var orderListCell = row.insertCell();
+                        var orderListLink = document.createElement('a');
+                        var orderListLinkText = document.createTextNode('Go to Order History');
+                        orderListLink.setAttribute('href', element[key]);
+                        orderListLink.appendChild(orderListLinkText);
+                        orderListCell.appendChild(orderListLink);
+                    }
+                    i = i + 1;
+                    }
+                    //var orderListCell = row.insertCell();
+                    //var orderListLink = document.createElement('a');
+                    //var orderListLinkText = document.createTextNode('Go to Order History');
+                    //orderListLink.setAttribute('href', '/orderHistory');
+                    //orderListLink.appendChild(orderListLinkText);
+                    //orderListCell.appendChild(orderListLink);
+                }
             }
 
             let table = document.querySelector("table");
