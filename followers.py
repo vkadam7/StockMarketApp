@@ -55,18 +55,20 @@ class FollowUnfollow:
         self.name = name
         
         
+        
     
     
     def followOption(self):
         if self.option == 'Follow':
-            if self.doTheyhaveAnaccount() == True:
-                if self.doTheyFollow() == False:
+            if self.doTheyhaveAnaccount() == True: #Checks if user has an account
+                if self.doTheyFollow() == False: #Checks if the user already follows that person
                     userName = self.user 
                     data ={
                         'name': self.name
                     }
                     for follower in data:
-                        doc_ref = self.db.collection('UsersFollowers').document(userName).set(data)
+                        doc_ref = self.db.collection('UsersFollowers').where('userName', '==', userName).set(data)
+        return -1
                                     
     def unfollowOption(self):
         if self.option == 'Unfollow':
@@ -76,22 +78,29 @@ class FollowUnfollow:
                     data = {
                         'name': self.name
                     }
-                    for follower in data:
-                        doc_ref = self.db.collection('UserFollowers').document(userName).get(data)
+                    doc_ref = self.db.collection('UserFollowers').where('userName', '==', userName).get(data)
+                    for follower in doc_ref.stream():
+                        follower_ref = self.db.collection('UserFollowers').where('userName', '==', userName)
+                        follower_ref.update({u'names': firestore.DELETE_FIELD})
+        return -1
+                    
                         
     
-    def followList(self):
-        followList = []
-        followList = self.db.collection('Users').document('followList')
-        follow_ref = self.db.collection(u'Users').document(u'followList')
-        doc = follow_ref.get()
-        print(doc.to_dict())
+    def retrievefollowList(self):
+       followers = []
+       userName = self.user
+       doc_ref = self.db.collection('UserFollowers').where('userName', '==', userName).get()
+       for doc in doc_ref:
+           followers = doc.to_dict()
+           return followers
+       
+       
     
     
     def doTheyhaveAnaccount(self, db, user):
         accountFlag = False
-        tempdata = self.db.collection('Users').document('userName')
-        doc_ref =  self.db.collection('Users').document('userName')
+        tempdata = self.db.collection('Users').document('userName').get()
+        doc_ref =  self.db.collection('Users').document('userName').get()
         temp = tempdata.get()
         if temp.exists():
             accountFlag = True
@@ -101,14 +110,18 @@ class FollowUnfollow:
        
         
     
-    def doTheyFollow(self):
+    def doTheyFollow(self, db, user):
         followingFlag = False
-        numfollowing = 0
-        for person in self.db.collection('Users').document('followingList').stream():
+        for person in self.db.collection('UserFollowers').document('userName', '==', user).stream():
             temp = person.to_dict()
-            if temp.get('username') != None:
+            if temp.get('userName') != None:
                 numfollowing = int(temp['followingList'])
                 followingFlag = True
             else:
                 followingFlag = False
-        print(numfollowing)
+    
+    
+    def countFollowers(self, db, user, name):
+        numofFollowers = 0
+        
+        
