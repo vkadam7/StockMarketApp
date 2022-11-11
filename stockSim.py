@@ -1017,33 +1017,41 @@ class portfolio:
 
 ## Class for setting up quiz - Muneeb Khan (WIP!)
 class Quiz:
-    def __init__(self,db,question,answer,useranswer,correct,nextbutton,submitbutton):
+    def __init__(self,db,question,answer,a,b,c,useranswer,nextbutton,submitbutton):
         self.db = db
         self.data = Quiz.listOfQuestions(self.db,self.quiz)
-        self.question = question
-        self.answer = answer
+        if self.data != 'This data entry does not exist':
+            self.question = self.data['question']
+            self.answer = self.data['answer']
+            self.a = self.data['a']
+            self.b = self.data['b']
+            self.c = self.data['c']
         self.useranswer = useranswer
-        self.correct = correct
         self.nextbutton = nextbutton
         self.submitbutton = submitbutton
+
     
     # To store all the questions and answers for the Quiz
     def listOfQuestions(db,self):
-        global questionList 
-        questionList = []
+        global questionsList
+        questionsList = []
 
         for entry in db.collection('Quiz').stream():
             temp = entry.to_dict()
-            questionList.append([temp['question'],temp['answer'],temp['a'],temp['b'],temp['c']])
+            questionsList.append([temp['question'],temp['answer'],temp['a'],temp['b'],temp['c']])
 
-        df = pd.DataFrame(questionList, columns=['question','answer','a','b','c'])
+        df = pd.DataFrame(questionsList, columns=['question','answer','a','b','c'])
 
-        print(df)
-        return df
+        return df 
 
     def nextButton(self,db):
-        return (self.question.pop(questionList['question'], self.answer.pop(questionList['answer']), self.answer.pop(questionList['a']),
-        self.answer.pop(questionList['b']), self.answer.pop(questionList['c'])))
+        nextQuestion = questionsList.pop(['question'])
+        nextAnswer = questionsList.pop(['answer'])
+        nextA = questionsList.pop(['a'])
+        nextB = questionsList.pop(['b'])
+        nextC = questionsList.pop(['c'])
+        return nextQuestion,nextAnswer,nextA,nextB,nextC
+
 
     # Check if Users answer is correct
     def answerQuestions(self,db,answer,useranswer,correct):
@@ -1051,9 +1059,11 @@ class Quiz:
         answer = db.collection('Quiz').document('answer')
         if useranswer == answer:
             print("correct")
-            return correct+1
+            correct += 1
+            return print("correct")
         else:
             print("incorrect")
+            return print("incorrect")
 
     # Check if User got at least 7 correct to pass the quiz
     def submittedQuiz(self,db,correct):

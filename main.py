@@ -757,8 +757,7 @@ def fourOhFour():
 #def portfolioGraph():
 #    if 'user' in session:
         
-
-@app.route('/quiz')
+@app.route('/quiz', methods =['GET','POST'])
 def quizpage():
     if ('user' in session):
         quiz = Quiz.listOfQuestions(dbfire, session['user'])               
@@ -769,25 +768,27 @@ def quizpage():
         c = quiz.pop('c')
 
         if (request.method == 'POST'):
-            option = request.method['choices']
-            if (option == 'a'):
-                return Quiz.answerQuestions(dbfire, session['user'],session['answer'],session['a'])
-            elif (option == 'b'):
-                return Quiz.answerQuestions(dbfire, session['user'],session['answer'],session['b'])
-            elif (option == 'c'):
-                return Quiz.answerQuestions(dbfire, session['user'],session['answer'],session['c'])
+
+            if ('a' in request.form):
+                usersAnswer = request.form['choices']
+                Quiz.answerQuestions(dbfire, session['answer'],usersAnswer,session['a'])
+
+            elif ('b' in request.form):
+                usersAnswer = request.form['choices']
+                Quiz.answerQuestions(dbfire, session['answer'],usersAnswer,session['b'])
+
+            elif ('c' in request.form):
+                usersAnswer = request.form['choices']
+                Quiz.answerQuestions(dbfire, session['answer'],usersAnswer,session['c'])
+
+            if ('nextButton' in request.form):
+                Quiz.nextButton(dbfire, session['user'])
             
-            nextOption = request.method['nextButton']
-            if (nextOption == 'nextButton'):
-                return Quiz.nextButton(dbfire, session['user'])
-            
-            submitOption = request.method['submitButton']
-            if (submitOption == 'submitButton'):
-                return Quiz.submittedQuiz(dbfire,session['user'])
+            if ('submitButton' in request.form):
+                Quiz.submittedQuiz(dbfire,session['user'])
 
         return render_template('quiz.html',quiz = quiz,question = question, answer = answer, a = a, b = b, c = c)
-       
-            
+                   
     else:
         return render_template('404Error.html')
 
@@ -815,9 +816,6 @@ def quizpage():
 #@app.route('/')
 #def method_name():
 #    pass
-
-
-
     
 if __name__ == '__main__':
     app.run(debug=True)
