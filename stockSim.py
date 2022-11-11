@@ -1087,23 +1087,21 @@ class portfolio:
 class Quiz:
     def __init__(self,db,quizID,user):
         self.db = db
-        self.questions = self.listOfQuestions(quizID)
+        self.questions = self.retrieveQuestions(quizID)
         self.quizID = quizID
         self.user = user
     
     # To store all the questions and answers for the Quiz
-    def listOfQuestions(self, db):
-        global questionList 
-        questionList = []
+    def retrieveQuestions(self, qid):
+        quiz = self.db.collection('Quiz').document(qid).get().to_dict()
 
-        for entry in db.collection('Quiz').stream():
-            temp = entry.to_dict()
-            questionList.append([temp['question'],temp['answer'],temp['a'],temp['b'],temp['c']])
+        questions = []
+        for id in quiz['questionIds']:
+            question = self.db.collection('Quiz').document(id).get().to_dict()
+            questions.append(id, question['text'], question['answers'], question['answer'], False)
 
-        df = pd.DataFrame(questionList, columns=['question','answer','a','b','c'])
-
-        print(df)
-        return df
+        self.questions = pd.DataFrame(questions, columns=['id','text','answers','answer','correctness'])
+        return pd.DataFrame(questions, columns=['id','text','answers','answer','correctness'])
 
     def nextButton(self,db):
         return (self.question.pop(questionList['question'], self.answer.pop(questionList['answer']), self.answer.pop(questionList['a']),
