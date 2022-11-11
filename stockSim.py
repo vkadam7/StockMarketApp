@@ -1139,3 +1139,4 @@ class Quiz:
             'qid': self.quizID,
             'score': self.score
         }
+        self.db.collection('QuizScores').add(data)
