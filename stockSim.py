@@ -1124,7 +1124,7 @@ class Quiz:
             print("Sorry you didnt pass the quiz, you only scored " + str(correct) + " out of 10.")
             print("You must score at least 7/10 to pass, better luck next time!")
 
-    def score(self):
+    def scoreCalc(self):
         count = 0
         for entry in self.questions['correctness'].to_list():
             if entry == True:
@@ -1133,3 +1133,9 @@ class Quiz:
         self.score = round(count/10, 2)
         return round(count/10, 2)
 
+    def submitScore(self):
+        data = {
+            'user': self.user,
+            'qid': self.quizID,
+            'score': self.score
+        }
