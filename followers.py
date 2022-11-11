@@ -48,11 +48,12 @@ class UserInfo():
         return False, -1
     
 class FollowUnfollow:
-    def __init__(self, db, followOrUnfollow, user, name):
+    def __init__(self, db, followOrUnfollow, user, name, num):
         self.db = db
         self.option = self.followOrUnfollow
         self.user = user
         self.name = name
+        self.num = num
         
         
         
@@ -86,7 +87,7 @@ class FollowUnfollow:
                     
                         
     
-    def retrievefollowList(self):
+    def retrievefollowList(self, user):
        followers = []
        userName = self.user
        doc_ref = self.db.collection('UserFollowers').where('userName', '==', userName).get()
@@ -96,17 +97,18 @@ class FollowUnfollow:
        
        
     
-    
-    def doTheyhaveAnaccount(self, db, user):
-        accountFlag = False
-        tempdata = self.db.collection('Users').document('userName').get()
-        doc_ref =  self.db.collection('Users').document('userName').get()
-        temp = tempdata.get()
-        if temp.exists():
-            accountFlag = True
-            return accountFlag
-        else:
-            print("User does not have an account in StockSim")
+    #Will delete this function later once everything is working properly
+    #Miqdad's user search accounts for this
+   # def doTheyhaveAnaccount(self, db, user):
+   #     accountFlag = False
+   #     tempdata = self.db.collection('Users').document('userName').get()
+   #     doc_ref =  self.db.collection('Users').document('userName').get()
+   #     temp = tempdata.get()
+   #     if temp.exists():
+   #         accountFlag = True
+   #         return accountFlag
+   #     else:
+   #         print("User does not have an account in StockSim")
        
         
     
@@ -123,5 +125,14 @@ class FollowUnfollow:
     
     def countFollowers(self, db, user, name):
         numofFollowers = 0
+        for person in self.db.collection('UserFollowers').where('userName', '==', user).stream():
+            temp = [person.to_dict()]
+            count = len(temp)
+        numofFollowers = count
+        return numofFollowers 
+            
+        
+        
+        
         
         
