@@ -1,5 +1,3 @@
-<!--Profile page by Miqdad Hafiz-->
-<!--CSS Updated by Miqdad and integrated by Muneeb-->
 <!doctype html>
 <html lang="en" class="h-100">
   <head>
@@ -33,13 +31,10 @@
                   <li class="nav-item">
                     <a class="nav-link" href="information">Information</a>
                   </li>
-                  {% if session['user'] %}
+        {% if session['user'] %}
           <li class="nav-item">
-            <a class = "nav-link active" method = "POST" href = "profile">Profile</a> 
+            <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
           </li>
-        </li class = "nav-item">
-            <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
-         </li>
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
           </li>
@@ -90,109 +85,82 @@
                     <option value = "MSFT">Microsoft</option>
                     <option value = "NFLX">Netflix</option>
                   </select> 
-                  <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Display Stock</button>
+                  <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
                 </form>
               </div>        
             </div>
           </nav>
     </header>
 
+<body>  
+    <br><br><br><br>
+        <div class = "simulationHistory">
+          <div class="row justify-content-center">
+          <table class = "table table-striped w-75 table-dark table-bordered table-hover">
 
-<br><br><br><br><br><br>
+            <thead class = "thead-dark">
 
-<body>
-  <h1>Welcome, {{results['Name']}}</h1>
-  <section class = "vh-100" style = "background-color: #eee;">
-    <div class = "container py-6 h-100">
-      <div class = "row">
-        <div class = "col-lg-6">
-          <div class = "card mb-4" style = "border-radius: .5rem;">
-            <div class = "card-body text-center">
-              <h3 tex>Name: {{results['Name']}}</h3>
-              <h3>Username: {{results['userName']}}</h3>
-              <h3>Email: {{results['Email']}}</h3>
-            </div>
+           </table>
+
+          <script type="text/javascript">
+            let simNames = {{sims|safe}};
+            let datesList = {{dates|safe}};
+            let scoresList = {{scores|safe}};
+            let linksList = {{links|safe}};
+            
+            let simList = [];
+            for (let i = 0; i < simNames.length; i++) {
+              simList.push({
+                Simulation: simNames[i],
+                'Date Started': datesList[i],
+                Score: scoresList[i],
+                'Links': linksList[i]
+              })
+            }
+
+            function generateOrderlist(table, data, keys) {
+                let thead = table.createTHead();
+                let row = thead.insertRow();
+                for (let key of keys) {
+                    let th = document.createElement("th");
+                    let text = document.createTextNode(key);
+                    th.appendChild(text);
+                    row.appendChild(th);
+                }
+                for (let element of data) {
+                    let row = table.insertRow();
+                    let i = 0;
+                    for (key in element) {
+                    if (i < 3) {
+                        let cell = row.insertCell();
+                        let text = document.createTextNode(element[key]);
+                        cell.appendChild(text);
+                    } else {
+                        var orderListCell = row.insertCell();
+                        var orderListLink = document.createElement('a');
+                        var orderListLinkText = document.createTextNode('Go to Order History');
+                        orderListLink.setAttribute('href', element[key]);
+                        orderListLink.appendChild(orderListLinkText);
+                        orderListCell.appendChild(orderListLink);
+                    }
+                    i = i + 1;
+                    }
+                    //var orderListCell = row.insertCell();
+                    //var orderListLink = document.createElement('a');
+                    //var orderListLinkText = document.createTextNode('Go to Order History');
+                    //orderListLink.setAttribute('href', '/orderHistory');
+                    //orderListLink.appendChild(orderListLinkText);
+                    //orderListCell.appendChild(orderListLink);
+                }
+            }
+
+            let table = document.querySelector("table");
+            let data = Object.keys(simList[0]);
+            generateOrderlist(table, simList, data); 
+            </script>
           </div>
-  </div>
-  <div class = "container py-6 h-100">
-    <div class = "row">
-      <div class = "col-lg-6">
-        <div class = "card mb-4" style = "border-radius: .5rem;">
-          <h1><a href = "update.html">Update Profile </a></h1>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
-  <div class = "row">
-      <div class = "col-md-6">
-        <div class = "card mb-4 mb-md-0" style = "border-radius: .5rem; text-align = center;">
-          <div class = "card-body">
-          <h3>Simulation Status</h3>
-          <h4>Start Date: {{cash['simStartDate']}}</h4>
-          <h4>Days Remaining: {{daysRemaining}}</h4>
-          <h4>Current Money: ${{ cash['currentCash'] }} </h4>
-          <h4>Score: {{cash['score']}}</h4>
           </div>
-        </div>
-      </div>
-    </div>
-
-
-  <div class = "row">
-      <div class = "col-md-6">
-        <div class = "card mb-4 mb-md-0" style = "border-radius: .5rem;">
-          <div class = "card-body">
-          <a class "nav-link"  href= "social.html">Go to your network</a>
-          <h3>Social Status </h3>
-          <h5>Following: </h5>
-          <h5>Followers: </h5>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class = 'row'>
-      <div class = "col-md-6">
-          <div class = "card mb-4 mb-md-0" style = "border-radius: .5rem;">
-            <div class = "card-body">
-            <a class "nav-link"  href= "/simulationHistory">Simulation History</a>
-            </div>
-          </div>
-        </div>
-    </div>
-  </section>  
- <!--  {% with alerts = get_flashed_messages() %}
-        {% for print in alerts %}
-            {% if print in get_flashed_messages(category_filter = ['pass']) %} 
-            <div class="alert-pass" role="alert">
-                {{ print }}
-            </div>
-            {% elif print in get_flashed_messages(category_filter = ['fail']) %}
-            <div class="alert-fail" role="alert">
-                {{ print }}
-            </div>
-            {% endif %}
-         {% endfor %}
-        {% endwith %}  Keep this an alternative - Muneeb Khan
-    <br>
-    </h1> -->
-    
-    {% with messages = get_flashed_messages() %}
-                    {% if messages %}   
-                        {% for message in messages %}
-                        <div class ="alert alert-warning alert-dismissible fade show" style = "text-align: center"; role="alert">
-                            {{ message }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        {% endfor %} 
-                    {% endif %} 
-    {% endwith %}
-
-    <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
+          <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
         <div class="container">
           <span>Copyright 2022 by StockSim</span>
         </div>
@@ -201,5 +169,8 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="/static/jsStyle/bootstrap.bundle.min.js"></script>
-    </body>      
+
+</body>
+
+
 </html>

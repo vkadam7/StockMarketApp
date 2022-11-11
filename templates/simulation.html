@@ -104,8 +104,7 @@
             <h3>Available stocks:</h3>
         </div>
         <div class = 'sessionInfo'>
-          <h5>Remaining Cash: </h5>
-          <p>${{ session['currentCash'] }}</p>
+          <h5>Remaining Cash: ${{ session['currentCash'] }} Current Portfolio Value: ${{ session['portfolioValue'] }} </h5>
         </div>
         <div class= "portfolio">
           <div class="row justify-content-center">
@@ -122,7 +121,7 @@
             //let profitList = {{profits|safe}};
             let sharesList = {{sharesPrices|safe}};
             let currentPricesList = {{currentPrices|safe}};
-            let volatilityList = {{volatilityList|safe}};
+            //let volatilityList = {{volatility|safe}};
             
             let portfolio = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -131,8 +130,8 @@
                 Quantity: quantList[i],
                 //'Gain/Loss': profitList[i],
                 'Average Price': sharesList[i],
-                'Current Price': currentPricesList[i], 
-                Volatility: volatilityList[i]
+                'Current Price': currentPricesList[i]
+                //Volatility: volatilityList[i]
               })
             }
 

@@ -118,6 +118,7 @@
             let quantList = {{quantities|safe}};
             let buyList = {{buys|safe}};
             let totalList = {{prices|safe}};
+            let datesList = {{dates|safe}};
             
             let orderlist = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -125,7 +126,8 @@
                 Stock: tickersList[i],
                 Quantity: quantList[i],
                 'Transaction Type': buyList[i],
-                Total: totalList[i]
+                Total: totalList[i],
+                'Date of Order' : datesList[i]
               })
             }
 
@@ -153,7 +155,14 @@
             generateOrderlist(table, orderlist, data); 
             </script>
           </div>
+          <br><br>
+          <div class="simListButton">
+              <form action="simList">
+            <button class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;" href="simulationHistory.html">Simulation History</button>
+            </form>
+            </div>
           </div>
+          <br><br>
           <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
         <div class="container">
           <span>Copyright 2022 by StockSim</span>
