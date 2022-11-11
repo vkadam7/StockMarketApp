@@ -1085,15 +1085,11 @@ class portfolio:
 
 ## Class for setting up quiz - Muneeb Khan (WIP!)
 class Quiz:
-    def __init__(self,db,question,answer,useranswer,correct,nextbutton,submitbutton):
+    def __init__(self,db,quizID,user):
         self.db = db
-        self.data = Quiz.listOfQuestions(self.db,self.quiz)
-        self.question = question
-        self.answer = answer
-        self.useranswer = useranswer
-        self.correct = correct
-        self.nextbutton = nextbutton
-        self.submitbutton = submitbutton
+        self.questions = self.listOfQuestions(quizID)
+        self.quizID = quizID
+        self.user = user
     
     # To store all the questions and answers for the Quiz
     def listOfQuestions(self, db):
