@@ -1092,8 +1092,8 @@ class Quiz:
         self.user = user
     
     # To store all the questions and answers for the Quiz
-    def retrieveQuestions(self, qid):
-        quiz = self.db.collection('Quiz').document(qid).get().to_dict()
+    def retrieveQuestions(self, quizid):
+        quiz = self.db.collection('Quiz').document(quizid).get().to_dict()
 
         questions = []
         for id in quiz['questionIds']:
@@ -1103,18 +1103,16 @@ class Quiz:
         self.questions = pd.DataFrame(questions, columns=['id','text','answers','answer','correctness'])
         return pd.DataFrame(questions, columns=['id','text','answers','answer','correctness'])
 
-    def nextButton(self,db):
-        return (self.question.pop(questionList['question'], self.answer.pop(questionList['answer']), self.answer.pop(questionList['a']),
-        self.answer.pop(questionList['b']), self.answer.pop(questionList['c'])))
+    #def nextButton(self,db):
+    #    return (self.question.pop(questionList['question'], self.answer.pop(questionList['answer']), self.answer.pop(questionList['a']),
+    #    self.answer.pop(questionList['b']), self.answer.pop(questionList['c'])))
 
     # Check if Users answer is correct
-    def answerQuestions(self,db,answer,useranswer,correct):
-        correct = 0
-        if useranswer == answer:
-            print("correct")
-            return correct+1
-        else:
-            print("incorrect")
+    def answerQuestion(self, questionid, answer):
+        question = self.questions.loc[self.questions['id'].isin(questionid)]
+        index = self.questions[self.questions['id'] == questionid].index[0]
+        if answer == question['answer'][0]:
+            self.questions.at['correctness', index] = True
 
     # Check if User got at least 7 correct to pass the quiz
     def submittedQuiz(self,db,correct):
