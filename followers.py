@@ -63,19 +63,15 @@ class FollowUnfollow:
                     user_ref.update({'users': True})
                 
                 
-                
-    def unfollowOption(self, db, user1, user2):
-        if self.option == 'Unfollow':
-            if self.doTheyFollow() == True:
-                return -1
 
-        return -1
+    #def unfollowOption(self, db, user1, user2):
+        #if self.option == 'Unfollow':
+            #if self.doTheyFollow() == True:
+
                 
     
-                
-                
-    def doTheyExist(self, db, user):
-        return -1
+    #def doTheyExist(self, db, user):
+        #return
         
     
     def doTheyFollow(self):

@@ -7,6 +7,7 @@ import math
 from operator import itemgetter, mod
 import re
 from statistics import mean
+#from django.shortcuts import render
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
 import firebase_admin
@@ -54,19 +55,15 @@ def profile():
         results = dbfire.collection('Users').where('Email', '==', session['user'])
         #Author: Viraj Kadam
         cash = dbfire.collection('Simulations').where('user', '==', session['user']). where('ongoing', '==', 'true') #For simulation status section
-       # daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
-        
-        
+        # daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
         #Author: Miqdad Hafiz
         for doc in results.stream(): 
             results = doc.to_dict()
         #Author: Viraj Kadam    
         for doc in cash.stream():
             cash = doc.to_dict()
-       # for doc in daysRemaining.stream():
+        # for doc in daysRemaining.stream():
         #    daysRemaining = daysRemaining.to_dict()
-            
-
         return render_template("profile.html", results = results, cash = cash)
     else:
         redirect(url_for("login"))
@@ -118,6 +115,40 @@ def login():
     else:
         print("Landing on page")
         return render_template('login.html')
+
+
+#Author: Miqdad Hafiz
+@app.route('/social', methods = ["POST", "GET"])
+def social():
+    if('user' in session):
+        if request.method == "POST":
+            search = request.form
+            searchKey = search["searchUser"]
+            doc = dbfire.collection('Users').document(searchKey).get()
+            if doc.exists:
+                grabUser = dbfire.collection('Users').where('userName', '==', searchKey)
+                for docs in grabUser.stream(): 
+                    grabUser = docs.to_dict()
+                searchResult = grabUser['userName']
+                userResult = grabUser
+                found = True
+            else:
+                searchResult = "cantFind"
+                found = False
+        
+            if(found == True ):
+                print("HERE COMES THE USERNAME!")
+                print(searchResult)
+                print(userResult)
+                return render_template("userDisplay.html", searchResult = searchResult, userResult = userResult)
+            else:
+                print("Can't find user.")
+                flash("Can't find the user you searched for.")
+                return render_template("social.html")
+        return render_template("social.html")
+            
+        
+
     
 #Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
@@ -752,10 +783,29 @@ def fourOhFour():
 @app.route('/quiz')
 def quizpage():
     if ('user' in session):
-        quiz = Quiz.retrieveNextQuestion(dbfire, session['user'])
+        
+        quiz = Quiz.listOfQuestions(dbfire, session['user'])               
+        question = quiz.pop('question')
+        answer = quiz.pop('answer')
+        a = quiz.pop('a')
+        b = quiz.pop('b')
+        c = quiz.pop('c')
+        if (request.method == 'a'):
+            return Quiz.answerQuestions(dbfire, session['user'],session['answer'],session['a'])
+        elif (request.method == 'b'):
+            return Quiz.answerQuestions(dbfire, session['user'],session['answer'],session['b'])
+        elif (request.method == 'c'):
+            return Quiz.answerQuestions(dbfire, session['user'],session['answer'],session['c'])
+        
+        if (request.method == 'nextButton'):
+            return Quiz.nextButton(dbfire, session['user'])
+        
+        if (request.method == 'submitButton'):
+            return Quiz.submittedQuiz(dbfire,session['user'])
 
-        return render_template('quiz.html', quiz = quiz, questions = quiz['question'], a = quiz['a'], b = quiz['b'],
-        c = quiz['c'])
+        return render_template('quiz.html',quiz = quiz,question = question, answer = answer, a = a, b = b, c = c)
+       
+            
     else:
         return render_template('404Error.html')
 
