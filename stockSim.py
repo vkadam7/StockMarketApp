@@ -1140,3 +1140,8 @@ class Quiz:
             'score': self.score
         }
         self.db.collection('QuizScores').add(data)
+
+    def retrieveScore(db, user, qid):
+        for entry in db.collection('QuizScores').where('user','==',user).where('qid','==',qid).stream():
+            temp = entry.to_dict()
+            return temp['score']
