@@ -1124,3 +1124,12 @@ class Quiz:
             print("Sorry you didnt pass the quiz, you only scored " + str(correct) + " out of 10.")
             print("You must score at least 7/10 to pass, better luck next time!")
 
+    def score(self):
+        count = 0
+        for entry in self.questions['correctness'].to_list():
+            if entry == True:
+                count += 1
+
+        self.score = round(count/10, 2)
+        return round(count/10, 2)
+
