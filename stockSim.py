@@ -501,7 +501,10 @@ class Simulation:
         for entry in data:
             fin = entry.to_dict()
         print(self.whatTimeIsItRightNow())
-        return fin['prices'][self.whatTimeIsItRightNow()]
+        highestIndex = Simulation.maxIndex(self.db, self.simName)
+        if highestIndex > self.whatTimeIsItRightNow():
+            return fin['prices'][self.whatTimeIsItRightNow()]
+        return fin['prices'][len(fin['prices'])-1]
 
     def retrieveStock(self, ticker):
         stock = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
