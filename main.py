@@ -124,26 +124,32 @@ def social():
         if request.method == "POST":
             search = request.form
             searchKey = search["searchUser"]
-            doc = dbfire.collection('Users').document(searchKey).get()
-            if doc.exists:
-                grabUser = dbfire.collection('Users').where('userName', '==', searchKey)
-                for docs in grabUser.stream(): 
-                    grabUser = docs.to_dict()
-                searchResult = grabUser['userName']
-                userResult = grabUser
+            
+            grabUser = dbfire.collection('Users').where('userName', '==', searchKey).get()
+            found = True
+            size = len(grabUser)
+            print(size, "try block 1")
+            if(size == 0):
+                grabUser = dbfire.collection('Users').where('Name', '==', searchKey).get()
                 found = True
-            else:
-                searchResult = "cantFind"
-                found = False
-        
+                size = len(grabUser)
+                print(size, "try block 2")
+                if(size == 0):
+                    found = False
+
+            
+                
             if(found == True ):
+                for docs in grabUser: 
+                    grabUser = docs.to_dict()
+                userResult = grabUser
                 print("HERE COMES THE USERNAME!")
-                print(searchResult)
                 print(userResult)
-                return render_template("userDisplay.html", searchResult = searchResult, userResult = userResult)
+                return render_template("userDisplay.html",  userResult = userResult)
             else:
-                flash("Can't find the user you searched for.")
-                return redirect(url_for("social"))
+                print("Can't find user.")
+                flash("User not found.")
+                return render_template("social.html")
         return render_template("social.html")
             
         
