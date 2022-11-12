@@ -595,11 +595,7 @@ class Simulation:
 
     def ongoingCheck(db, sim, email):
         index = SimulationFactory(db, email).simulation.whatTimeIsItRightNow()        
-        highestIndex = 0
-        for entry in db.collection('IntradayStockData').where('simulation','==',sim).stream():
-            temp = entry.to_dict()
-            if len(temp['prices']) > highestIndex:
-                highestIndex = len(temp['prices'])
+        highestIndex = Simulation.maxIndex(db,sim)
         if index > highestIndex:
             return False
         return True
