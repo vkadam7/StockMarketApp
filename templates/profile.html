@@ -158,7 +158,17 @@
     </div>
   </section>  
  -->
-
+ {% with messages = get_flashed_messages() %}
+                    {% if messages %}   
+                        {% for message in messages %}
+                        <script>
+                        swal( '{{ message }}', {
+                        button: "Close",
+                        });
+                        </script>
+                        {% endfor %} 
+                    {% endif %} 
+  {% endwith %}
 
  <div class="container">
     <div class="main-body">
@@ -268,19 +278,7 @@
         </div>
     </div>
 
-  
-    
-    {% with messages = get_flashed_messages() %}
-                    {% if messages %}   
-                        {% for message in messages %}
-                        <script>
-                        swal( '{{ message }}', {
-                        button: "Close",
-                        });
-                        </script>
-                        {% endfor %} 
-                    {% endif %} 
-    {% endwith %}
+
     <br><br><br><br>
     <footer class="footer mt-auto py-3" id = "foot">
         <div class="container">
