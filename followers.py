@@ -65,7 +65,7 @@ class FollowUnfollow:
                 if self.doTheyFollow() == False: #Checks if the user already follows that person
                     userName = self.user 
                     data ={
-                        'name': self.name
+                        'names': self.name
                     }
                     for follower in data:
                         doc_ref = self.db.collection('UsersFollowers').where('userName', '==', userName).set(data)
@@ -77,7 +77,7 @@ class FollowUnfollow:
                 if self.doTheyFollow() == True:
                     userName = self.user
                     data = {
-                        'name': self.name
+                        'names': self.name
                     }
                     doc_ref = self.db.collection('UserFollowers').where('userName', '==', userName).get(data)
                     for follower in doc_ref.stream():
