@@ -500,7 +500,7 @@ class Simulation:
         data = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
         for entry in data:
             fin = entry.to_dict()
-            print(fin['prices'][self.whatTimeIsItRightNow()])
+        print(self.whatTimeIsItRightNow())
         return fin['prices'][self.whatTimeIsItRightNow()]
 
     def retrieveStock(self, ticker):
@@ -516,12 +516,6 @@ class Simulation:
 
     def finishSimulation(db, simName):
         data = db.collection('Simulations').document(simName).get().to_dict()
-        data['ongoing'] = False
-        db.collection('Simulations').document(simName).update(data)
-
-        for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
-            temp = entry.id
-            db.collection('IntradayStockData').document(temp).delete()
 
         quantities = []
         currentPrices = []
@@ -537,7 +531,6 @@ class Simulation:
             totalValue += quantities[i] * currentPrices[i]
 
         percentChange = ((float(data['currentCash']) + totalValue) - float(data['initialCash'])) / float(data['initialCash'])
-        data['score'] = percentChange * 100
         scores = percentChange * 100
         scoreRounded = round(scores)
         grabDataEmail = data['user']
@@ -547,6 +540,14 @@ class Simulation:
         grabUserName = emails['userName']
 
         db.collection('Leaderboard').add({"email":grabDataEmail, "score":scoreRounded, "username":grabUserName})
+
+        for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
+            temp = entry.id
+            db.collection('IntradayStockData').document(temp).delete()
+
+        data['score'] = percentChange * 100
+        data['ongoing'] = False
+        db.collection('Simulations').document(simName).update(data)
 
     def checkDates(startDate, endDate):
         if int(startDate[0:4]) >= int(endDate[0:4]):
@@ -584,27 +585,15 @@ class Simulation:
         data = db.collection('Simulations').document(sim).get().to_dict()
         return data['currentCash']
 
-    def ongoingCheck(db, sim):
-        data = db.collection('Simulations').document(sim).get().to_dict()
-        currentTime = datetime.datetime.now()
-        difference = currentTime - data['startTimestamp'].replace(tzinfo=None)
-        index = -1
-        total = difference.total_seconds()
-        days = round(total//86400)
-        total -= days*86400
-        hours = round(total//3600)
-        total -= hours*3600
-        tenMin = round(total//600)
-        for i in range(0,days):
-            index += 40
-        for i in range(0,hours):
-            index += 6
-        index += tenMin
+    def ongoingCheck(db, sim, email):
+        index = SimulationFactory(db, email).simulation.whatTimeIsItRightNow()        
         highestIndex = 0
         for entry in db.collection('IntradayStockData').where('simulation','==',sim).stream():
             temp = entry.to_dict()
             if len(temp['prices']) > highestIndex:
                 highestIndex = len(temp['prices'])
+        print('Index = ' + str(index))
+        print('HighestIndex = ' + str(highestIndex))
         if index > highestIndex:
             return False
         return True
@@ -1079,7 +1068,7 @@ class portfolio:
 
         print(self.get_profit)
         if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
-            print("Gains: +" + self.GainorLoss)
+            print("Gains: +" + self.GainorLoss) 
         elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
             return
 

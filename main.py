@@ -428,8 +428,9 @@ def goToSimulation():
                 session['currentCash'] = "%.2f" % round(sim.currentCash,2)
                 session['initialCash'] = sim.initialCash
                 session['simName'] = sim.simName
-                session['portfolioValue'] = "%.2f" % round(Simulation.getPortfolioValue(dbfire, session['simName']), 2)
-                if Simulation.ongoingCheck(dbfire, session['simName']):
+                print(Simulation.ongoingCheck(dbfire, session['simName'], session['user']))
+                if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
+                    session['portfolioValue'] = "%.2f" % round(Simulation.getPortfolioValue(dbfire, session['simName']), 2)
                     tickers = []
                     quantities = []
                     profits = []
@@ -461,7 +462,7 @@ def goToSimulation():
                     quantities=quantities, profits=profits, sharesPrices=sharesPrices,
                     currentPrices=currentPrices, volatility = volatility)
                 else:
-                    redirect(url_for('finishSimulation'))
+                    return redirect(url_for('.finishSimulation'))
         except KeyError:
             print("KeyError occured: simulation")
             return redirect(url_for('fourOhFour'))
@@ -600,36 +601,13 @@ def stockSearch():
 @app.route('/<ticker>')
 def displayStock(ticker):
     startDate = request.args['startDate']
+    print(startDate)
     endDate = request.args['endDate']
+    print(endDate)
     timespan = request.args['timespan']
     session['ticker'] = ticker
     global stock
-    if session['simulationFlag'] == 0:
-        stockData = StockData(dbfire, ticker)
-        stock = stockData.stockJSON()
-        #session['stock'] = stock
-        stockMatrix = stockData.getData(startDate, endDate, timespan)
-        #print(stockMatrix)
-        if stockMatrix != -1:
-            if timespan != 'hourly':
-                dates = [row[0] for row in stockMatrix]
-                avgs = [row[1] for row in stockMatrix]
-                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
-            else:
-                dates = []
-                tempDates = [row[0] for row in stockMatrix]
-                for row in tempDates:
-                    for i in range(0, len(tempDates[0])):
-                        dates.append(row[i])
-                avgs = []
-                tempAvgs = [row[1] for row in stockMatrix]
-                for row in tempAvgs:
-                    for i in range(0, len(tempAvgs[0])):
-                        avgs.append(row[i])
-                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
-        #else:
-        #    return displayStock(ticker)
-    else:
+    if session['simulationFlag'] == 1:
         stockData = SimulationFactory(dbfire, session['user']).simulation.retrieveStock(ticker)
         existenceFlag = True
         for entry in stockData:
@@ -714,7 +692,7 @@ def displayStock(ticker):
                     return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
         else:
             return redirect(url_for('fourOhFour'))
-    return redirect(url_for('fourOhFour'))
+    return redirect(url_for('stockSimForm'))
 
 ## changeStockView
 #   Description: Retrieves data from stockView page to determine how to change
