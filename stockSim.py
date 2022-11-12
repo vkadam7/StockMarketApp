@@ -1016,54 +1016,36 @@ class portfolio:
 
 
 ## Class for setting up quiz - Muneeb Khan (WIP!)
+## Updated by Ian Mcnulty
 class Quiz:
-    def __init__(self,db,question,answer,a,b,c,useranswer,nextbutton,submitbutton):
+    def __init__(self,db,quizID,user):
         self.db = db
-        self.data = Quiz.listOfQuestions(self.db,self.quiz)
-        if self.data != 'This data entry does not exist':
-            self.question = self.data['question']
-            self.answer = self.data['answer']
-            self.a = self.data['a']
-            self.b = self.data['b']
-            self.c = self.data['c']
-        self.useranswer = useranswer
-        self.nextbutton = nextbutton
-        self.submitbutton = submitbutton
-
+        self.questions = self.retrieveQuestions(quizID)
+        self.quizID = quizID
+        self.user = user
     
     # To store all the questions and answers for the Quiz
-    def listOfQuestions(db,self):
-        global questionsList
-        questionsList = []
+    def retrieveQuestions(self, quizid):
+        quiz = self.db.collection('Quiz').document(quizid).get().to_dict()
 
-        for entry in db.collection('Quiz').stream():
-            temp = entry.to_dict()
-            questionsList.append([temp['question'],temp['answer'],temp['a'],temp['b'],temp['c']])
+        questions = []
+        for id in quiz['questionIds']:
+            question = self.db.collection('Quiz').document(id).get().to_dict()
+            questions.append(id, question['text'], question['answers'], question['answer'], False)
 
-        df = pd.DataFrame(questionsList, columns=['question','answer','a','b','c'])
+        self.questions = pd.DataFrame(questions, columns=['id','text','answers','answer','correctness'])
+        return pd.DataFrame(questions, columns=['id','text','answers','answer','correctness'])
 
-        return df 
-
-    def nextButton(self,db):
-        nextQuestion = questionsList.pop(['question'])
-        nextAnswer = questionsList.pop(['answer'])
-        nextA = questionsList.pop(['a'])
-        nextB = questionsList.pop(['b'])
-        nextC = questionsList.pop(['c'])
-        return nextQuestion,nextAnswer,nextA,nextB,nextC
-
+    #def nextButton(self,db):
+    #    return (self.question.pop(questionList['question'], self.answer.pop(questionList['answer']), self.answer.pop(questionList['a']),
+    #    self.answer.pop(questionList['b']), self.answer.pop(questionList['c'])))
 
     # Check if Users answer is correct
-    def answerQuestions(self,db,answer,useranswer,correct):
-        correct = 0
-        answer = db.collection('Quiz').document('answer')
-        if useranswer == answer:
-            print("correct")
-            correct += 1
-            return print("correct")
-        else:
-            print("incorrect")
-            return print("incorrect")
+    def answerQuestion(self, questionid, answer):
+        question = self.questions.loc[self.questions['id'].isin(questionid)]
+        index = self.questions[self.questions['id'] == questionid].index[0]
+        if answer == question['answer'][0]:
+            self.questions.at['correctness', index] = True
 
     # Check if User got at least 7 correct to pass the quiz
     def submittedQuiz(self,db,correct):
@@ -1072,7 +1054,27 @@ class Quiz:
             print("You passed passed the quiz! with " + str(correct) + " out of 10! great work")
             
         else: 
-
             print("Sorry you didnt pass the quiz, you only scored " + str(correct) + " out of 10.")
             print("You must score at least 7/10 to pass, better luck next time!")
 
+    def scoreCalc(self):
+        count = 0
+        for entry in self.questions['correctness'].to_list():
+            if entry == True:
+                count += 1
+
+        self.score = round(count/10, 2)
+        return round(count/10, 2)
+
+    def submitScore(self):
+        data = {
+            'user': self.user,
+            'qid': self.quizID,
+            'score': self.score
+        }
+        self.db.collection('QuizScores').add(data)
+
+    def retrieveScore(db, user, qid):
+        for entry in db.collection('QuizScores').where('user','==',user).where('qid','==',qid).stream():
+            temp = entry.to_dict()
+            return temp['score']
