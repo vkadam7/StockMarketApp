@@ -146,6 +146,31 @@ def social():
                 flash("Can't find the user you searched for.")
                 return render_template("social.html")
         return render_template("social.html")
+
+#Viraj Kadam
+@app.route('/follow', methods = ['POST', 'GET'])
+def connect():
+    if 'user' in session:
+        follow = FollowUnfollow(dbfire, session['option'], session['user'], session['names'])
+        if session['option'] == 'Follow':
+            flag = follow.followOption()
+            flash('You are now following')
+        elif session['option']:
+            flag = follow.unfollowOption()
+            flash('You have unfollowed this user')
+
+        if flag == 1:
+            names = []
+            for followers in follow.retrievefollowList(dbfire, session['user']):
+                if followers.quantity != 0:
+                    names.append(followers.num)
+
+        return render_template('userDisplay.html', names = names)
+                
+                
+            
+            
+        
             
         
 
@@ -328,6 +353,9 @@ def information():
 @app.route("/social")
 def network():
     if('user' in session):
+        person = dbfire.collection('Users').where('userName', '==', session['user'])
+        
+        
        
         return render_template("social.html")
 
@@ -758,19 +786,7 @@ def orderlists():
 
         return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(),
         tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
-        
-@app.route('/followrequest', methods = ['POST', 'GET'])
-def sendRequest():
-    followUnfollow = FollowUnfollow(dbfire, session['option'], session['Name'])
-    if 'user' in session:
-        followUnfollow = FollowUnfollow(dbfire, session['option'], session['Name'])
-        if session['option'] == 'Follow':
-            flag = FollowUnfollow.followOption()
-        else:
-            flag = FollowUnfollow.unfollowOption()
-    
-    return render_template("social.html")
-            
+
             
             
             
