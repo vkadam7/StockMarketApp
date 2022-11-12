@@ -1,4 +1,3 @@
-<!--Profile page by Miqdad Hafiz-->
 <!--CSS Updated by Miqdad and integrated by Muneeb-->
 <!doctype html>
 <html lang="en" class="h-100">
@@ -33,19 +32,19 @@
                   <li class="nav-item">
                     <a class="nav-link" href="information">Information</a>
                   </li>
-                  {% if session['user'] %}
-          <li class="nav-item">
-            <a class = "nav-link active" method = "POST" href = "profile">Profile</a> 
-          </li>
-        </li class = "nav-item">
-            <a class = "nav-link active" method = "POST" href = "social"> Your Network</a>
-         </li>
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
-          </li>
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
-          </li>
+        {% if session['user'] %}
+        <li class="nav-item">
+          <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
+        </li>
+      </li class = "nav-item">
+          <a class = "nav-link active" method = "POST" href = "social"> Your Network</a>
+       </li>
+        <li class="nav-item">
+          <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
+        </li>
+        <li class="nav-item">
+          <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
+        </li>
           <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
             <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
               <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Start a simulation!</button>
@@ -90,55 +89,71 @@
                     <option value = "MSFT">Microsoft</option>
                     <option value = "NFLX">Netflix</option>
                   </select> 
-                  <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
+                  <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Display Stock</button>
                 </form>
               </div>        
             </div>
           </nav>
     </header>
 
-
 <br><br><br><br><br><br>
 
 <body>
-  <h1>Welcome, {{results['Name']}}</h1>
-  <section class = "vh-100">
-    <div class = "container h-100 mb-5" style = "padding-bottom: 3rem;">
-       <div class = "row d-flex align-items-center justify-content-center h-100">
-           <div class = "col-md-8 col-lg-7 col-xl-6">
-               <img src = "/static/stockLogo.png" class = "img-fluid" alt = "Stock image" width = "350" height = "300">
-           </div>
-           <div class = "col-md-7 col-lg-5 col-xl-5 offset-x;-1">
-             <div class="shadow-lg p-3 mb-5 bg-white rounded">
-               <form method = "POST">
-                   <div class = "form-outline mb-4">
-                     <label class = "form-label" for = "name">Update your name</label>
-                     <input type = "text" id = "Unames" name = "Unames" class = "form-control form-control-lg"/>
-                   </div>
+    
 
-                   <div class = "form-outline mb-4">
-                     <label class = "form-label" for = "name">Update your username</label>
-                     <input type = "text" id = "username" name = "username" class = "form-control form-control-lg" />
-                   </div>
+  <div class = "container-fluid w-50" id = "centers">
+    <div class = "justify-content-center mt-5">
+      <div class = "card">
+        <div class="d-flex justify-content-between align-items-center">
+          <h1>Followers: </h1>
+          <table class = "table table-striped  table-dark table-bordered table-hover">
+            
+            <thead class = "thead-dark">
+            
 
-                   <div class = "form-outline mb-4">
-                    <label class = "form-label" for = "experience">Update your experience</label>
-                    <input type = "text" id = "experience" name = "experience" class = "form-control form-control-lg" />
-                   </div>
 
-                   <div class = "form-outline mb-4">
-                    <label class = "form-label" for = "description">Update information about yourself</label>
-                    <input type = "text" id = "description" name = "description" class = "form-control form-control-lg" />
-                   </div>
-                   
+           </table>
+           <script type = "text/javascript">
+            let namelist = {{names|safe}};
+            let followers = [];
+            for (let i = 0; i < namelist.length; i++){
+                followers.push({
+                    'Names': namelist[i]
+                })
+            }
 
-                   <button type = "submit" class = "btn btn-primary btn-lg btn-block" style = "background-color:rgb(33, 103, 42)">Update</button>
-               </form>
-               </div>
-           </div>
-       </div>
-   </div>
-</section>
+            function generateFollowTable(table, data, key){
+                let thead = table.createTHead();
+                let row = thead.insertRow();
+                for (let key of keys){
+                    let th = = document.createElement();
+                    let text = document.createTextNode();
+                    th.appendChild(text);
+                    row.appendChild(th);
+                }
+
+                for (let element of data){
+                    let row = table.insertRow();
+                    for (key in element){
+                        let cell = row.insertCell();
+                        let text = document.createTextNode(element[key]);
+                        cell.appendChild(text);
+                    }
+                }
+            }
+
+            let table = document.querySelector("table");
+            let data = Object.keys(followers[0]);
+            generateFollowTable(table, followers, data);
+            </script>
+
+
+      </div>
+    </div>
+  </div>
+
+
+  </section>  
  <!--  {% with alerts = get_flashed_messages() %}
         {% for print in alerts %}
             {% if print in get_flashed_messages(category_filter = ['pass']) %} 

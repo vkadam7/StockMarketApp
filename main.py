@@ -13,7 +13,7 @@ import pyrebase
 import firebase_admin
 
 from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, portfolio
-from followers import FollowUnfollow, Recommendation, UserInfo
+from followers import FollowUnfollow, UserInfo
 from firebase_admin import firestore
 from firebase_admin import credentials
 import numpy as np
@@ -146,6 +146,31 @@ def social():
                 flash("Can't find the user you searched for.")
                 return render_template("social.html")
         return render_template("social.html")
+
+#Viraj Kadam
+@app.route('/follow', methods = ['POST', 'GET'])
+def connect():
+    if 'user' in session:
+        follow = FollowUnfollow(dbfire, session['option'], session['user'], session['names'])
+        if session['option'] == 'Follow':
+            flag = follow.followOption()
+            flash('You are now following')
+        elif session['option']:
+            flag = follow.unfollowOption()
+            flash('You have unfollowed this user')
+
+        if flag == 1:
+            names = []
+            for followers in follow.retrievefollowList(dbfire, session['user']):
+                if followers.quantity != 0:
+                    names.append(followers.num)
+
+        return render_template('userDisplay.html', names = names)
+                
+                
+            
+            
+        
             
         
 
@@ -214,9 +239,6 @@ def register():
 @app.route('/verification', methods = ["POST" , "GET"])
 def verification():
     if request.method == "POST":
-
-        result = request.form
-        email = result["email"]
         try:
             user = authen.send_email_verification(email['idToken'])
             print("Verification sent")
@@ -244,6 +266,28 @@ def PasswordRecovery():
             return redirect(url_for("PasswordRecovery"))
           
     return render_template("PasswordRecovery.html")   
+
+@app.route('/update', methods = ['POST', 'GEt'])
+def update():
+    if 'user' in session:
+        if request.method == 'POST':
+            new = request.form
+            username = new['userName']
+            #experience = new['experience']
+            description = new['description']
+            doc = dbfire.collection('Users').document('userName').get()
+            for docs in doc:
+                if docs.to_dict() ['userName'] != username:
+                    db.collection('Users').document(username).update({'userName': username})                    
+            else:
+                uniqueName = "usernameoktouse"
+                
+            if (len(description) < 200):
+                flash("Your description should be at least 200 characters")
+            else:
+                dbfire.collection('Users').set(description)
+                        
+        return render_template("update.html")
 
 #Logout
 # After user logs out session is ended and user is taken to login page
@@ -309,6 +353,9 @@ def information():
 @app.route("/social")
 def network():
     if('user' in session):
+        person = dbfire.collection('Users').where('userName', '==', session['user'])
+        
+        
        
         return render_template("social.html")
 
@@ -769,6 +816,13 @@ def orderHistory():
 
     return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
     tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
+
+            
+            
+            
+            
+        
+        
 
 ## 
 @app.route('/404Error')
