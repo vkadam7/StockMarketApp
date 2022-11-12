@@ -489,7 +489,7 @@ class Simulation:
         data = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
         for entry in data:
             fin = entry.to_dict()
-            print(fin['prices'][self.whatTimeIsItRightNow()])
+        print(self.whatTimeIsItRightNow())
         return fin['prices'][self.whatTimeIsItRightNow()]
 
     def retrieveStock(self, ticker):
@@ -505,12 +505,6 @@ class Simulation:
 
     def finishSimulation(db, simName):
         data = db.collection('Simulations').document(simName).get().to_dict()
-        data['ongoing'] = False
-        db.collection('Simulations').document(simName).update(data)
-
-        for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
-            temp = entry.id
-            db.collection('IntradayStockData').document(temp).delete()
 
         quantities = []
         currentPrices = []
@@ -526,7 +520,6 @@ class Simulation:
             totalValue += quantities[i] * currentPrices[i]
 
         percentChange = ((float(data['currentCash']) + totalValue) - float(data['initialCash'])) / float(data['initialCash'])
-        data['score'] = percentChange * 100
         scores = percentChange * 100
         scoreRounded = round(scores)
         grabDataEmail = data['user']
@@ -536,6 +529,14 @@ class Simulation:
         grabUserName = emails['userName']
 
         db.collection('Leaderboard').add({"email":grabDataEmail, "score":scoreRounded, "username":grabUserName})
+
+        for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
+            temp = entry.id
+            db.collection('IntradayStockData').document(temp).delete()
+
+        data['score'] = percentChange * 100
+        data['ongoing'] = False
+        db.collection('Simulations').document(simName).update(data)
 
     def checkDates(startDate, endDate):
         if int(startDate[0:4]) >= int(endDate[0:4]):
@@ -573,27 +574,15 @@ class Simulation:
         data = db.collection('Simulations').document(sim).get().to_dict()
         return data['currentCash']
 
-    def ongoingCheck(db, sim):
-        data = db.collection('Simulations').document(sim).get().to_dict()
-        currentTime = datetime.datetime.now()
-        difference = currentTime - data['startTimestamp'].replace(tzinfo=None)
-        index = -1
-        total = difference.total_seconds()
-        days = round(total//86400)
-        total -= days*86400
-        hours = round(total//3600)
-        total -= hours*3600
-        tenMin = round(total//600)
-        for i in range(0,days):
-            index += 40
-        for i in range(0,hours):
-            index += 6
-        index += tenMin
+    def ongoingCheck(db, sim, email):
+        index = SimulationFactory(db, email).simulation.whatTimeIsItRightNow()        
         highestIndex = 0
         for entry in db.collection('IntradayStockData').where('simulation','==',sim).stream():
             temp = entry.to_dict()
             if len(temp['prices']) > highestIndex:
                 highestIndex = len(temp['prices'])
+        print('Index = ' + str(index))
+        print('HighestIndex = ' + str(highestIndex))
         if index > highestIndex:
             return False
         return True
@@ -1073,48 +1062,40 @@ class portfolio:
 
         print(self.get_profit)
         if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
-            print("Gains: +" + self.GainorLoss)
+            print("Gains: +" + self.GainorLoss) 
         elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
             return
 
 ## Class for setting up quiz - Muneeb Khan (WIP!)
 class Quiz:
-    def __init__(self,db,question,answer,useranswer,correct,nextbutton,submitbutton):
+    def __init__(self,db,quizID,user):
         self.db = db
-        self.data = Quiz.listOfQuestions(self.db,self.quiz)
-        self.question = question
-        self.answer = answer
-        self.useranswer = useranswer
-        self.correct = correct
-        self.nextbutton = nextbutton
-        self.submitbutton = submitbutton
+        self.questions = self.retrieveQuestions(quizID)
+        self.quizID = quizID
+        self.user = user
     
     # To store all the questions and answers for the Quiz
-    def listOfQuestions(self, db):
-        global questionList 
-        questionList = []
+    def retrieveQuestions(self, quizid):
+        quiz = self.db.collection('Quiz').document(quizid).get().to_dict()
 
-        for entry in db.collection('Quiz').stream():
-            temp = entry.to_dict()
-            questionList.append([temp['question'],temp['answer'],temp['a'],temp['b'],temp['c']])
+        questions = []
+        for id in quiz['questionIds']:
+            question = self.db.collection('Quiz').document(id).get().to_dict()
+            questions.append(id, question['text'], question['answers'], question['answer'], False)
 
-        df = pd.DataFrame(questionList, columns=['question','answer','a','b','c'])
+        self.questions = pd.DataFrame(questions, columns=['id','text','answers','answer','correctness'])
+        return pd.DataFrame(questions, columns=['id','text','answers','answer','correctness'])
 
-        print(df)
-        return df
-
-    def nextButton(self,db):
-        return (self.question.pop(questionList['question'], self.answer.pop(questionList['answer']), self.answer.pop(questionList['a']),
-        self.answer.pop(questionList['b']), self.answer.pop(questionList['c'])))
+    #def nextButton(self,db):
+    #    return (self.question.pop(questionList['question'], self.answer.pop(questionList['answer']), self.answer.pop(questionList['a']),
+    #    self.answer.pop(questionList['b']), self.answer.pop(questionList['c'])))
 
     # Check if Users answer is correct
-    def answerQuestions(self,db,answer,useranswer,correct):
-        correct = 0
-        if useranswer == answer:
-            print("correct")
-            return correct+1
-        else:
-            print("incorrect")
+    def answerQuestion(self, questionid, answer):
+        question = self.questions.loc[self.questions['id'].isin(questionid)]
+        index = self.questions[self.questions['id'] == questionid].index[0]
+        if answer == question['answer'][0]:
+            self.questions.at['correctness', index] = True
 
     # Check if User got at least 7 correct to pass the quiz
     def submittedQuiz(self,db,correct):
@@ -1126,3 +1107,24 @@ class Quiz:
             print("Sorry you didnt pass the quiz, you only scored " + str(correct) + " out of 10.")
             print("You must score at least 7/10 to pass, better luck next time!")
 
+    def scoreCalc(self):
+        count = 0
+        for entry in self.questions['correctness'].to_list():
+            if entry == True:
+                count += 1
+
+        self.score = round(count/10, 2)
+        return round(count/10, 2)
+
+    def submitScore(self):
+        data = {
+            'user': self.user,
+            'qid': self.quizID,
+            'score': self.score
+        }
+        self.db.collection('QuizScores').add(data)
+
+    def retrieveScore(db, user, qid):
+        for entry in db.collection('QuizScores').where('user','==',user).where('qid','==',qid).stream():
+            temp = entry.to_dict()
+            return temp['score']
