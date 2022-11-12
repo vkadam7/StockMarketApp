@@ -585,6 +585,14 @@ class Simulation:
         data = db.collection('Simulations').document(sim).get().to_dict()
         return data['currentCash']
 
+    def maxIndex(db, sim):
+        highestIndex = 0
+        for entry in db.collection('IntradayStockData').where('simulation','==',sim).stream():
+            temp = entry.to_dict()
+            if len(temp['prices']) > highestIndex:
+                highestIndex = len(temp['prices'])
+        return highestIndex
+
     def ongoingCheck(db, sim, email):
         index = SimulationFactory(db, email).simulation.whatTimeIsItRightNow()        
         highestIndex = 0
@@ -592,8 +600,6 @@ class Simulation:
             temp = entry.to_dict()
             if len(temp['prices']) > highestIndex:
                 highestIndex = len(temp['prices'])
-        print('Index = ' + str(index))
-        print('HighestIndex = ' + str(highestIndex))
         if index > highestIndex:
             return False
         return True
