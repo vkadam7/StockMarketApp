@@ -613,7 +613,7 @@ def displayStock(ticker):
         if stockMatrix != -1:
             if timespan != 'hourly':
                 dates = [row[0] for row in stockMatrix]
-                avgs = [mean([row[2], row[3]]) for row in stockMatrix]
+                avgs = [row[1] for row in stockMatrix]
                 return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
             else:
                 dates = []
