@@ -100,13 +100,66 @@
             <div class="container">
               <form action = "/quiz" method ="POST">
                 <div class="questions">
-                      <h2 class = "question" id = "question" value = "question">{{questions}}</h2>
+                      <h2 class = "question" id = "question" value = "question">{{questions[0]}}</h2>
                       <br>
-                        <input type = "radio" id = "a" name = "choices" value = "{{'a'}}">A. {{answer}}
-                        <input type = "radio" id = "b" name = "choices" value = "{{'b'}}">B. {{answer}}
-                        <input type = "radio" id = "c" name = "choices" value = "{{'c'}}">C. {{answer}}
+                        <input type = "radio" id = "a" name = "choices" value = "{{'a'}}">A. {{answerA[0]}}
+                        <input type = "radio" id = "b" name = "choices" value = "{{'b'}}">B. {{answerA[0]}}
+                        <input type = "radio" id = "c" name = "choices" value = "{{'c'}}">C. {{answerA[0]}}
                       <br>
-                
+                      <h2 class = "question" id = "question" value = "question">{{questions[1]}}</h2>
+                      <br>
+                        <input type = "radio" id = "a" name = "choices1" value = "{{'a'}}">A. {{answers[1]}}
+                        <input type = "radio" id = "b" name = "choices1" value = "{{'b'}}">B. {{answers[1]}}
+                        <input type = "radio" id = "c" name = "choices1" value = "{{'c'}}">C. {{answers[1]}}
+                      <br>
+                      <h2 class = "question" id = "question" value = "question">{{questions[2]}}</h2>
+                      <br>
+                        <input type = "radio" id = "a" name = "choices2" value = "{{'a'}}">A. {{answers[2]}}
+                        <input type = "radio" id = "b" name = "choices2" value = "{{'b'}}">B. {{answers[2]}}
+                        <input type = "radio" id = "c" name = "choices2" value = "{{'c'}}">C. {{answers[2]}}
+                      <br>
+                      <h2 class = "question" id = "question" value = "question">{{questions[3]}}</h2>
+                      <br>
+                        <input type = "radio" id = "a" name = "choices3" value = "{{'a'}}">A. {{answers[3]}}
+                        <input type = "radio" id = "b" name = "choices3" value = "{{'b'}}">B. {{answers[3]}}
+                        <input type = "radio" id = "c" name = "choices3" value = "{{'c'}}">C. {{answers[3]}}
+                      <br>
+                      <h2 class = "question" id = "question" value = "question">{{questions[4]}}</h2>
+                      <br>
+                        <input type = "radio" id = "a" name = "choices4" value = "{{'a'}}">A. {{answers[4]}}
+                        <input type = "radio" id = "b" name = "choices4" value = "{{'b'}}">B. {{answers[4]}}
+                        <input type = "radio" id = "c" name = "choices4" value = "{{'c'}}">C. {{answers[4]}}
+                      <br>
+                      <h2 class = "question" id = "question" value = "question">{{questions[5]}}</h2>
+                      <br>
+                        <input type = "radio" id = "a" name = "choices5" value = "{{'a'}}">A. {{answers[5]}}
+                        <input type = "radio" id = "b" name = "choices5" value = "{{'b'}}">B. {{answers[5]}}
+                        <input type = "radio" id = "c" name = "choices5" value = "{{'c'}}">C. {{answers[5]}}
+                      <br>
+                      <h2 class = "question" id = "question" value = "question">{{questions[6]}}</h2>
+                      <br>
+                        <input type = "radio" id = "a" name = "choices6" value = "{{'a'}}">A. {{answers[6]}}
+                        <input type = "radio" id = "b" name = "choices6" value = "{{'b'}}">B. {{answers[6]}}
+                        <input type = "radio" id = "c" name = "choices6" value = "{{'c'}}">C. {{answers[6]}}
+                      <br>
+                      <h2 class = "question" id = "question" value = "question">{{questions[7]}}</h2>
+                      <br>
+                        <input type = "radio" id = "a" name = "choices7" value = "{{'a'}}">A. {{answers[7]}}
+                        <input type = "radio" id = "b" name = "choices7" value = "{{'b'}}">B. {{answers[7]}}
+                        <input type = "radio" id = "c" name = "choices7" value = "{{'c'}}">C. {{answers[7]}}
+                      <br>
+                      <h2 class = "question" id = "question" value = "question">{{questions[8]}}</h2>
+                      <br>
+                        <input type = "radio" id = "a" name = "choices8" value = "{{'a'}}">A. {{answers[8]}}
+                        <input type = "radio" id = "b" name = "choices8" value = "{{'b'}}">B. {{answers[8]}}
+                        <input type = "radio" id = "c" name = "choices8" value = "{{'c'}}">C. {{answers[8]}}
+                      <br>
+                      <h2 class = "question" id = "question" value = "question">{{questions[9]}}</h2>
+                      <br>
+                        <input type = "radio" id = "a" name = "choices9" value = "{{'a'}}">A. {{answers[9]}}
+                        <input type = "radio" id = "b" name = "choices9" value = "{{'b'}}">B. {{answers[9]}}
+                        <input type = "radio" id = "c" name = "choices9" value = "{{'c'}}">C. {{answers[9]}}
+                      <br>
                 <button type = "submit" id = "submitButton" value = "{{request.form['submitButton']}}">Submit {{submitButton}}
               </form>
             </div>
