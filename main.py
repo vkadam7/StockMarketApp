@@ -356,6 +356,7 @@ def startSimulation():
                         session['currentCash'] = request.form['initialCash']
                         session['portfolioValue'] = request.form['initialCash']
                         session['sharesValue'] = "0"
+                        session['currentChange'] = '0'
                         sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
                                                 request.form['simEndDate'], request.form['initialCash'])
                         sim.createSim()
