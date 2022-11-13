@@ -13,7 +13,7 @@ import pyrebase
 import firebase_admin
 
 from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, portfolio
-from followers import FollowUnfollow, Recommendation, UserInfo
+from followers import FollowUnfollow, UserInfo
 from firebase_admin import firestore
 from firebase_admin import credentials
 import numpy as np
@@ -124,28 +124,58 @@ def social():
         if request.method == "POST":
             search = request.form
             searchKey = search["searchUser"]
-            doc = dbfire.collection('Users').document(searchKey).get()
-            if doc.exists:
-                grabUser = dbfire.collection('Users').where('userName', '==', searchKey)
-                for docs in grabUser.stream(): 
-                    grabUser = docs.to_dict()
-                searchResult = grabUser['userName']
-                userResult = grabUser
+            
+            grabUser = dbfire.collection('Users').where('userName', '==', searchKey).get()
+            found = True
+            size = len(grabUser)
+            print(size, "try block 1")
+            if(size == 0):
+                grabUser = dbfire.collection('Users').where('Name', '==', searchKey).get()
                 found = True
-            else:
-                searchResult = "cantFind"
-                found = False
-        
+                size = len(grabUser)
+                print(size, "try block 2")
+                if(size == 0):
+                    found = False
+
+            
+                
             if(found == True ):
+                for docs in grabUser: 
+                    grabUser = docs.to_dict()
+                userResult = grabUser
                 print("HERE COMES THE USERNAME!")
-                print(searchResult)
                 print(userResult)
-                return render_template("userDisplay.html", searchResult = searchResult, userResult = userResult)
+                return render_template("userDisplay.html",  userResult = userResult)
             else:
                 print("Can't find user.")
-                flash("Can't find the user you searched for.")
+                flash("User not found.")
                 return render_template("social.html")
         return render_template("social.html")
+
+#Viraj Kadam
+@app.route('/follow', methods = ['POST', 'GET'])
+def connect():
+    if 'user' in session:
+        follow = FollowUnfollow(dbfire, session['option'], session['user'], session['names'])
+        if session['option'] == 'Follow':
+            flag = follow.followOption()
+            flash('You are now following')
+        elif session['option']:
+            flag = follow.unfollowOption()
+            flash('You have unfollowed this user')
+
+        if flag == 1:
+            names = []
+            for followers in follow.retrievefollowList(dbfire, session['user']):
+                if followers.quantity != 0:
+                    names.append(followers.num)
+
+        return render_template('userDisplay.html', names = names)
+                
+                
+            
+            
+        
             
         
 
@@ -197,7 +227,8 @@ def register():
                 user = authen.create_user_with_email_and_password(email, Password)
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
+                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) #"Followers": 0, "Following": 0
+                #dbfire.collection('UsersFollowers').document(UseN).set("Name": "")
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 flash("Account succesfully created, you may now login" , "pass")
 
@@ -214,9 +245,6 @@ def register():
 @app.route('/verification', methods = ["POST" , "GET"])
 def verification():
     if request.method == "POST":
-
-        result = request.form
-        email = result["email"]
         try:
             user = authen.send_email_verification(email['idToken'])
             print("Verification sent")
@@ -244,6 +272,28 @@ def PasswordRecovery():
             return redirect(url_for("PasswordRecovery"))
           
     return render_template("PasswordRecovery.html")   
+
+@app.route('/update', methods = ['POST', 'GEt'])
+def update():
+    if 'user' in session:
+        if request.method == 'POST':
+            new = request.form
+            username = new['userName']
+            #experience = new['experience']
+            description = new['description']
+            doc = dbfire.collection('Users').document('userName').get()
+            for docs in doc:
+                if docs.to_dict() ['userName'] != username:
+                    db.collection('Users').document(username).update({'userName': username})                    
+            else:
+                uniqueName = "usernameoktouse"
+                
+            if (len(description) < 200):
+                flash("Your description should be at least 200 characters")
+            else:
+                dbfire.collection('Users').set(description)
+                        
+        return render_template("update.html")
 
 #Logout
 # After user logs out session is ended and user is taken to login page
@@ -309,6 +359,9 @@ def information():
 @app.route("/social")
 def network():
     if('user' in session):
+        person = dbfire.collection('Users').where('userName', '==', session['user'])
+        
+        
        
         return render_template("social.html")
 
@@ -724,6 +777,13 @@ def orderHistory():
 
     return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
     tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
+
+            
+            
+            
+            
+        
+        
 
 ## 
 @app.route('/404Error')
