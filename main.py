@@ -366,30 +366,28 @@ def startSimulation():
                         netGainLoss = []
                         sharesPrices = []
                         currentPrices = []
-                        volatility = []
+                        totalValue = []
+                        originalValue = []
+                        percentage = []
                         ##avgPrice = []
-
+                        volatility = []
+                        
                         for entry in Order.stocksBought(dbfire, session['simName']):
                             Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
                             if Portfolio.quantity != 0:
+                                currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
                                 tickers.append(entry)
                                 quantities.append(Portfolio.quantity)
-                                profits.append(Portfolio.profit)
-                                sharesPrices.append(Portfolio.avgSharePrice)
-                                currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
-                                volatility.append(Portfolio.volatility)
-                                #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
-                        print(tickers)
-                        print(quantities)
-                        print(profits)
-                        print(sharesPrices)
-                        print(currentPrices)
-                        print(netGainLoss)
-                        print(volatility)
+                                profits.append("%.2f" % round(Portfolio.profit, 2))
+                                sharesPrices.append("%.2f" % round(Portfolio.avgSharePrice,2))
+                                currentPrices.append("%.2f" % round(currentPrice, 2))
+                                totalValue.append("%.2f" % round(Portfolio.quantity*currentPrice, 2))
+                                originalValue.append("%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
+                                volatility.append("%.2f" % round(Portfolio.volatility,2))
 
                         return render_template('simulation.html', person=session['user'], tickers=tickers, 
                         quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                        currentPrices=currentPrices)      
+                        currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue) 
                     else:
                         flash("Please swap your date values, the starting date must be before the ending date.")
                         return render_template('stockSimForm.html', person=session['user'])
@@ -425,6 +423,7 @@ def goToSimulation():
                 sharesPrices = []
                 currentPrices = []
                 totalValue = []
+                originalValue = []
                 percentage = []
                 ##avgPrice = []
                 volatility = []
@@ -438,22 +437,13 @@ def goToSimulation():
                         profits.append("%.2f" % round(Portfolio.profit, 2))
                         sharesPrices.append("%.2f" % round(Portfolio.avgSharePrice,2))
                         currentPrices.append("%.2f" % round(currentPrice, 2))
-                        print(Portfolio.quantity)
-                        print(currentPrice)
-                        #print("%.2f" % round((Portfolio.quantity)*currentPrice, 2))
                         totalValue.append("%.2f" % round(Portfolio.quantity*currentPrice, 2))
+                        originalValue.append("%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
                         volatility.append("%.2f" % round(Portfolio.volatility,2))
-                #print(tickers)
-                #print(quantities)
-                #print(profits)
-                #print(sharesPrices)
-                #print(currentPrices)
-                #print(netGainLoss)
-                #print(volatility)
 
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                currentPrices=currentPrices, totalValue=totalValue)  
+                currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue)  
             else:
                 return redirect(url_for('.finishSimulation'))
         except KeyError:
