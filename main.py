@@ -418,6 +418,7 @@ def goToSimulation():
                 session['currentCash'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']),2)
                 session['sharesValue'] = "%.2f" % round(Simulation.getPortfolioValue(dbfire, session['simName']),2)
                 session['portfolioValue'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']) + Simulation.getPortfolioValue(dbfire, session['simName']), 2)
+                session['currentChange'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']) + Simulation.getPortfolioValue(dbfire, session['simName']) - float(session['initialCash']), 2)
                 tickers = []
                 quantities = []
                 profits = []
