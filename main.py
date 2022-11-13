@@ -760,34 +760,28 @@ def fourOhFour():
 @app.route('/quiz', methods =['GET','POST'])
 def quizpage():
     if ('user' in session):
-        quiz = Quiz.listOfQuestions(dbfire, session['user'])               
-        question = quiz.pop('question')
-        answer = quiz.pop('answer')
-        a = quiz.pop('a')
-        b = quiz.pop('b')
-        c = quiz.pop('c')
+        quizID = 'Quiz1'
+        quiz = Quiz(dbfire,quizID,session['user'])
+        questions = quiz.questions
 
         if (request.method == 'POST'):
-
-            if ('a' in request.form):
-                usersAnswer = request.form['choices']
-                Quiz.answerQuestions(dbfire, session['answer'],usersAnswer,session['a'])
-
-            elif ('b' in request.form):
-                usersAnswer = request.form['choices']
-                Quiz.answerQuestions(dbfire, session['answer'],usersAnswer,session['b'])
-
-            elif ('c' in request.form):
-                usersAnswer = request.form['choices']
-                Quiz.answerQuestions(dbfire, session['answer'],usersAnswer,session['c'])
-
-            if ('nextButton' in request.form):
-                Quiz.nextButton(dbfire, session['user'])
             
-            if ('submitButton' in request.form):
-                Quiz.submittedQuiz(dbfire,session['user'])
+            choiceA = request.args['a']
+            choiceB = request.args['b']
+            choiceC = request.args['c']
+            submitButton = request.args['submitButton']
 
-        return render_template('quiz.html',quiz = quiz,question = question, answer = answer, a = a, b = b, c = c)
+            if request.method == choiceA:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceA)
+            elif request.method == choiceB:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceB)
+            elif request.method == choiceC:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceC)
+            elif request.method == submitButton:
+                return Quiz.submitScore(dbfire)
+            
+
+        return render_template('quiz.html',quiz = quiz, questions = questions)
                    
     else:
         return render_template('404Error.html')

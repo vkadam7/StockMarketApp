@@ -1031,14 +1031,11 @@ class Quiz:
         questions = []
         for id in quiz['questionIds']:
             question = self.db.collection('Quiz').document(id).get().to_dict()
-            questions.append(id, question['text'], question['answers'], question['answer'], False)
+            questions.append([id, question['text'], question['answers'], question['correct'], False])
 
-        self.questions = pd.DataFrame(questions, columns=['id','text','answers','answer','correctness'])
-        return pd.DataFrame(questions, columns=['id','text','answers','answer','correctness'])
+        self.questions = pd.DataFrame(questions, columns=['id','text','answers','correct','correctness'])
+        return pd.DataFrame(questions, columns=['id','text','answers','correct','correctness'])
 
-    #def nextButton(self,db):
-    #    return (self.question.pop(questionList['question'], self.answer.pop(questionList['answer']), self.answer.pop(questionList['a']),
-    #    self.answer.pop(questionList['b']), self.answer.pop(questionList['c'])))
 
     # Check if Users answer is correct
     def answerQuestion(self, questionid, answer):
@@ -1047,15 +1044,6 @@ class Quiz:
         if answer == question['answer'][0]:
             self.questions.at['correctness', index] = True
 
-    # Check if User got at least 7 correct to pass the quiz
-    def submittedQuiz(self,db,correct):
-        db.collection('Quiz').update({'score' : correct})  
-        if correct >= 7:
-            print("You passed passed the quiz! with " + str(correct) + " out of 10! great work")
-            
-        else: 
-            print("Sorry you didnt pass the quiz, you only scored " + str(correct) + " out of 10.")
-            print("You must score at least 7/10 to pass, better luck next time!")
 
     def scoreCalc(self):
         count = 0

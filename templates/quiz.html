@@ -99,20 +99,20 @@
             <hr>
         </div>
             <div class="container">
-              <form action = "/quiz" method ="POST" onsubmit = "">
+              <form action = "/quiz" method ="POST">
                 <div class="questions">
-                      <h2 class = "question" id = "question" value = "question">{{question[0]}}</h2>
+                      <h2 class = "question" id = "question" value = "question">{{questions}}</h2>
                       <br>
-                        <input type = "radio" id = "a" name = "choices" value = "a">A. {{a[0]}}
-                        <input type = "radio" id = "b" name = "choices" value = "b">B. {{b[0]}}
-                        <input type = "radio" id = "c" name = "choices" value = "c">C. {{c[0]}}
+                        <input type = "radio" id = "a" name = "choices" value = "{{'a'}}">A. {{answer}}
+                        <input type = "radio" id = "b" name = "choices" value = "{{'b'}}">B. {{answer}}
+                        <input type = "radio" id = "c" name = "choices" value = "{{'c'}}">C. {{answer}}
                       <br>
-                <button type = "submit" id = "submitButton" value = "submitButton">Submit {{submitButton}}
-                <button type = "submit" id = "nextButton" value = "nextButton">Next {{nextButton}}
+                
+                <button type = "submit" id = "submitButton" value = "{{request.form['submitButton']}}">Submit {{submitButton}}
               </form>
             </div>
     </body>
-
+      <br><br><br>
     <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
       <div class="container">
         <span>Copyright 2022 by StockSim</span>
