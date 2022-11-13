@@ -355,6 +355,7 @@ def startSimulation():
                         }
                         session['currentCash'] = request.form['initialCash']
                         session['portfolioValue'] = request.form['initialCash']
+                        session['sharesValue'] = "0"
                         sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
                                                 request.form['simEndDate'], request.form['initialCash'])
                         sim.createSim()
@@ -415,7 +416,8 @@ def goToSimulation():
             print(Simulation.ongoingCheck(dbfire, session['simName'], session['user']))
             if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
                 session['currentCash'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']),2)
-                session['portfolioValue'] = "%.2f" % round(Simulation.getPortfolioValue(dbfire, session['simName']),2)
+                session['sharesValue'] = "%.2f" % round(Simulation.getPortfolioValue(dbfire, session['simName']),2)
+                session['portfolioValue'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']) + Simulation.getPortfolioValue(dbfire, session['simName']), 2)
                 tickers = []
                 quantities = []
                 profits = []
