@@ -13,6 +13,11 @@ from google.cloud.firestore import ArrayUnion
 import datetime
 
 import math
+
+
+
+
+
 import matplotlib as plt
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
@@ -20,6 +25,7 @@ from matplotlib import style
 import math
 import mpld3
 from mpld3 import plugins
+
 
 
 DAYS_IN_MONTH = {
