@@ -471,7 +471,6 @@ def goToSimulation():
             sim = SimulationFactory(dbfire, session['user']).simulation
             session['initialCash'] = sim.initialCash
             session['simName'] = sim.simName
-            print(Simulation.ongoingCheck(dbfire, session['simName'], session['user']))
             if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
                 sharesValue = Simulation.getPortfolioValue(dbfire, session['simName'])
                 currentCash = Simulation.retrieveCurrentCash(dbfire, session['simName'])
@@ -537,14 +536,14 @@ def simlists():
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
     session['option'] = request.form['option']
-    session['currentPrice'] = round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
     return render_template('orderForm.html', option=session['option'])
 
 @app.route("/orderCreate", methods=['POST', 'GET'])
 def orderCreate():
     if request.form['stockQuantity'].isnumeric():
         session['orderQuantity'] = request.form['stockQuantity']
-        session['orderPrice'] = round(int(session['orderQuantity']) * session['currentPrice'], 2)
+        session['orderPrice'] = "%.2f" % round(int(session['orderQuantity']) * session['currentPrice'], 2)
         return render_template('orderConfirmation.html', option=session['option'])
     else:
         flash("Please enter a valid quantity amount")
@@ -557,7 +556,6 @@ def orderConfirm():
                     session['option'], session['orderQuantity'], session['currentPrice'])
     if session['option'] == 'Buy':
         flag = order.buyOrder()
-        
     else:
         flag = order.sellOrder()
     if flag == 1:
@@ -591,7 +589,7 @@ def stockSearch():
                 if check[0]:
                     print(check)
                     if session['simulationFlag'] == 1:
-                        return redirect(url_for('displayStock', ticker=check[1], startDate="2021-09-08", endDate="2022-09-16", timespan="hourly"))
+                        return redirect(url_for('displayStock', ticker=check[1], timespan="hourly"))
                     else:
                         return redirect(url_for('stockSimFormFunction'))
                 else:
@@ -620,8 +618,6 @@ def stockSearch():
 @app.route('/displayStock')
 def displayStock():
     ticker = request.args['ticker']
-    startDate = request.args['startDate']
-    endDate = request.args['endDate']
     timespan = request.args['timespan']
     session['ticker'] = ticker
     global stock
@@ -722,7 +718,7 @@ def changeStockView():
     if request.method == 'POST':
         #return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
         
-        return redirect(url_for('.displayStock', ticker=stock['ticker'], startDate=request.form['startDate'], endDate=request.form['endDate'], timespan=request.form['timespan']))
+        return redirect(url_for('.displayStock', ticker=stock['ticker'], timespan=request.form['timespan']))
     return -1
 
 ## stockSim
