@@ -569,6 +569,7 @@ def stockSearch():
             if request.method == 'POST':
                 check = StockData.stockSearch(dbfire, request.form["searchTerm"])
                 if check[0]:
+                    print(check)
                     if session['simulationFlag'] == 1:
                         return redirect(url_for('displayStock', ticker=check[1], startDate="2021-09-08", endDate="2022-09-16", timespan="hourly"))
                     else:
@@ -578,7 +579,6 @@ def stockSearch():
         except KeyError:
             print("KeyError occured: stockSearch")
             return redirect(url_for('fourOhFour'))
-        return redirect(url_for(request.url))
     else:
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
@@ -599,14 +599,12 @@ def stockSearch():
 #   Author: Ian McNulty
 @app.route('/<ticker>')
 def displayStock(ticker):
-    startDate = request.args['startDate']
-    print(startDate)
-    endDate = request.args['endDate']
-    print(endDate)
-    timespan = request.args['timespan']
-    session['ticker'] = ticker
-    global stock
     if session['simulationFlag'] == 1:
+        startDate = request.args['startDate']
+        endDate = request.args['endDate']
+        timespan = request.args['timespan']
+        session['ticker'] = ticker
+        global stock
         if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
             stockData = SimulationFactory(dbfire, session['user']).simulation.retrieveStock(ticker)
             existenceFlag = True
@@ -634,7 +632,6 @@ def displayStock(ticker):
                                 mod = 40*7*int(stock['dates'][i][5:7])
                             #if timespan == 'hourly' and int(stock['dates'][i][11:13]) == 9:
                             #    mod = 3
-                            print(mod)
                             if i % mod == 1:
                                 prices.append(mean(avgPrice))
                                 if timespan != 'hourly':
@@ -694,7 +691,8 @@ def displayStock(ticker):
                 return redirect(url_for('fourOhFour'))
         else:
             return redirect(url_for('finishSimulation'))
-    return redirect(url_for('stockSimForm'))
+    #else:
+        #return redirect(url_for('stockSimForm'))
 
 ## changeStockView
 #   Description: Retrieves data from stockView page to determine how to change

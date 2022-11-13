@@ -436,18 +436,26 @@ class StockData:
     #
     #   Author: Ian McNulty
     def stockSearch(db, searchTerm):
-        tempData1 = db.collection('Stocks').document(searchTerm).get() 
-        if tempData1 != None:
-            return True, searchTerm
 
-        stocksDB = db.collection('Stocks')
+        stocksDB = db.collection('StockSearchInfo')
+        for entry in stocksDB.stream():
+            if entry.id == searchTerm:
+                return True, searchTerm.upper()
+
         for entry in stocksDB.stream():
             temp = entry.to_dict()
-            ticker = temp['ticker'].lower()
-            name = temp['name'].lower()
+            ticker = entry.id.lower()
             tempSearchTerm = searchTerm.lower()
             if tempSearchTerm == ticker:
                 return True, ticker.upper()
+
+        for entry in stocksDB.stream():
+            temp = entry.to_dict()
+            ticker = entry.id.lower()
+            name = temp['name'].lower()
+            tempSearchTerm = searchTerm.lower()
+            print(tempSearchTerm)
+            print(name)
             if tempSearchTerm in name:
                 return True, ticker.upper()
 

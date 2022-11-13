@@ -16,11 +16,11 @@ cred = credentials.Certificate("serviceAccountKey.json")
 app = firebase_admin.initialize_app(cred)
 db = firestore.client() #firestore database
 
-ticker = 'NFLX'
-name = "Netflix, Inc."
-headquarters = 'Los Gatos, CA'
+ticker = 'AMZN'
+name = "Amazon.com, Inc."
+headquarters = 'Seattle, WA'
 listedAt = 'NasdaqGS'
-fileToOpen = 'stockdata/NFLX.csv'
+fileToOpen = 'stockData/AMZN.csv'
 
 file = open(fileToOpen)
 csvreader = csv.reader(file)
@@ -52,3 +52,10 @@ data = {
                 'volumes': volumesD}
 }
 db.collection('Stocks').document(ticker).set(data)
+
+stockSearchData = {
+    'name': name,
+    'headquarters': headquarters,
+    'listedAt': listedAt
+}
+db.collection('StockSearchInfo').document(ticker).set(stockSearchData)
