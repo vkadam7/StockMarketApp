@@ -410,6 +410,7 @@ def startSimulation():
                         session['portfolioValue'] = request.form['initialCash']
                         session['sharesValue'] = "0"
                         session['currentChange'] = '0'
+                        session['percentChange'] = '0'
                         sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
                                                 request.form['simEndDate'], request.form['initialCash'])
                         sim.createSim()
@@ -424,6 +425,7 @@ def startSimulation():
                         originalValue = []
                         percentage = []
                         volatility = []
+                        links = []
                         
                         percentageTotal = 0
                         for entry in Order.stocksBought(dbfire, session['simName']):
@@ -441,12 +443,14 @@ def startSimulation():
                                 percentageTotal += percent
                                 percentage.append("%.2f" % round(percent, 2))
                                 volatility.append("%.2f" % round(Portfolio.volatility,2))
+                                links.append(Portfolio.link)
+
                         session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
 
                         return render_template('simulation.html', person=session['user'], tickers=tickers, 
                         quantities=quantities, profits=profits, sharesPrices=sharesPrices,
                         currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue,
-                        percentage=percentage)   
+                        percentage=percentage, links=links)   
                     else:
                         flash("Please swap your date values, the starting date must be before the ending date.")
                         return render_template('stockSimForm.html', person=session['user'])
@@ -508,6 +512,7 @@ def goToSimulation():
                         links.append(Portfolio.link)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
+                session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
 
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
