@@ -13,7 +13,7 @@ import pyrebase
 import firebase_admin
 
 from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, portfolio
-from followers import FollowUnfollow, Recommendation, UserInfo
+from followers import FollowUnfollow, UserInfo
 from firebase_admin import firestore
 from firebase_admin import credentials
 import numpy as np
@@ -124,28 +124,58 @@ def social():
         if request.method == "POST":
             search = request.form
             searchKey = search["searchUser"]
-            doc = dbfire.collection('Users').document(searchKey).get()
-            if doc.exists:
-                grabUser = dbfire.collection('Users').where('userName', '==', searchKey)
-                for docs in grabUser.stream(): 
-                    grabUser = docs.to_dict()
-                searchResult = grabUser['userName']
-                userResult = grabUser
+            
+            grabUser = dbfire.collection('Users').where('userName', '==', searchKey).get()
+            found = True
+            size = len(grabUser)
+            print(size, "try block 1")
+            if(size == 0):
+                grabUser = dbfire.collection('Users').where('Name', '==', searchKey).get()
                 found = True
-            else:
-                searchResult = "cantFind"
-                found = False
-        
+                size = len(grabUser)
+                print(size, "try block 2")
+                if(size == 0):
+                    found = False
+
+            
+                
             if(found == True ):
+                for docs in grabUser: 
+                    grabUser = docs.to_dict()
+                userResult = grabUser
                 print("HERE COMES THE USERNAME!")
-                print(searchResult)
                 print(userResult)
-                return render_template("userDisplay.html", searchResult = searchResult, userResult = userResult)
+                return render_template("userDisplay.html",  userResult = userResult)
             else:
                 print("Can't find user.")
-                flash("Can't find the user you searched for.")
+                flash("User not found.")
                 return render_template("social.html")
         return render_template("social.html")
+
+#Viraj Kadam
+@app.route('/follow', methods = ['POST', 'GET'])
+def connect():
+    if 'user' in session:
+        follow = FollowUnfollow(dbfire, session['option'], session['user'], session['names'])
+        if session['option'] == 'Follow':
+            flag = follow.followOption()
+            flash('You are now following')
+        elif session['option']:
+            flag = follow.unfollowOption()
+            flash('You have unfollowed this user')
+
+        if flag == 1:
+            names = []
+            for followers in follow.retrievefollowList(dbfire, session['user']):
+                if followers.quantity != 0:
+                    names.append(followers.num)
+
+        return render_template('userDisplay.html', names = names)
+                
+                
+            
+            
+        
             
         
 
@@ -197,7 +227,8 @@ def register():
                 user = authen.create_user_with_email_and_password(email, Password)
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) # still need to figure out how to ad userID and grab data
+                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) #"Followers": 0, "Following": 0
+                #dbfire.collection('UsersFollowers').document(UseN).set("Name": "")
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 flash("Account succesfully created, you may now login" , "pass")
 
@@ -214,9 +245,6 @@ def register():
 @app.route('/verification', methods = ["POST" , "GET"])
 def verification():
     if request.method == "POST":
-
-        result = request.form
-        email = result["email"]
         try:
             user = authen.send_email_verification(email['idToken'])
             print("Verification sent")
@@ -244,6 +272,28 @@ def PasswordRecovery():
             return redirect(url_for("PasswordRecovery"))
           
     return render_template("PasswordRecovery.html")   
+
+@app.route('/update', methods = ['POST', 'GEt'])
+def update():
+    if 'user' in session:
+        if request.method == 'POST':
+            new = request.form
+            username = new['userName']
+            #experience = new['experience']
+            description = new['description']
+            doc = dbfire.collection('Users').document('userName').get()
+            for docs in doc:
+                if docs.to_dict() ['userName'] != username:
+                    db.collection('Users').document(username).update({'userName': username})                    
+            else:
+                uniqueName = "usernameoktouse"
+                
+            if (len(description) < 200):
+                flash("Your description should be at least 200 characters")
+            else:
+                dbfire.collection('Users').set(description)
+                        
+        return render_template("update.html")
 
 #Logout
 # After user logs out session is ended and user is taken to login page
@@ -309,6 +359,9 @@ def information():
 @app.route("/social")
 def network():
     if('user' in session):
+        person = dbfire.collection('Users').where('userName', '==', session['user'])
+        
+        
        
         return render_template("social.html")
 
@@ -337,18 +390,6 @@ def graphPictures():
     else:
         return render_template("graphPictures.html")
 
-## stockSim
-#   Description: Brings the logged in user to the stock sim start page, if the user
-#   isn't logged in, a 404 page error is given.
-#
-#   Author: Ian McNulty
-@app.route("/stockSimForm", methods=['POST'])
-def stockSimForm():
-    if 'user' in session:
-        return render_template('stockSimForm.html', person=session['user'])
-    else:
-        return redirect(url_for('fourOhFour'))
-
 ## startSimulation
 #   Description: 
 @app.route("/startSimulation", methods=['POST'])
@@ -367,6 +408,8 @@ def startSimulation():
                         }
                         session['currentCash'] = request.form['initialCash']
                         session['portfolioValue'] = request.form['initialCash']
+                        session['sharesValue'] = "0"
+                        session['currentChange'] = '0'
                         sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
                                                 request.form['simEndDate'], request.form['initialCash'])
                         sim.createSim()
@@ -378,33 +421,28 @@ def startSimulation():
                         netGainLoss = []
                         sharesPrices = []
                         currentPrices = []
-                        volatility = []
+                        totalValue = []
+                        originalValue = []
                         percentage = []
                         ##avgPrice = []
-
+                        volatility = []
+                        
                         for entry in Order.stocksBought(dbfire, session['simName']):
                             Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
                             if Portfolio.quantity != 0:
+                                currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
                                 tickers.append(entry)
                                 quantities.append(Portfolio.quantity)
-                                profits.append(Portfolio.profit)
-                                sharesPrices.append(Portfolio.avgSharePrice)
-                                currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
-                                volatility.append(Portfolio.volatility)
-                                percentage.append(Portfolio.percentChange)
-                                #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
-                        print(tickers)
-                        print(quantities)
-                        print(profits)
-                        print(sharesPrices)
-                        print(currentPrices)
-                        print(netGainLoss)
-                        print(volatility)
-                        print(percentage)
+                                profits.append("%.2f" % round(Portfolio.profit, 2))
+                                sharesPrices.append("%.2f" % round(Portfolio.avgSharePrice,2))
+                                currentPrices.append("%.2f" % round(currentPrice, 2))
+                                totalValue.append("%.2f" % round(Portfolio.quantity*currentPrice, 2))
+                                originalValue.append("%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
+                                volatility.append("%.2f" % round(Portfolio.volatility,2))
 
                         return render_template('simulation.html', person=session['user'], tickers=tickers, 
                         quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                        currentPrices=currentPrices)      
+                        currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue) 
                     else:
                         flash("Please swap your date values, the starting date must be before the ending date.")
                         return render_template('stockSimForm.html', person=session['user'])
@@ -425,47 +463,46 @@ def startSimulation():
 def goToSimulation():
     if ('user' in session):
         try:
-            if request.method == 'POST':
-                session['simulationFlag'] = 1
-                sim = SimulationFactory(dbfire, session['user']).simulation
-                session['currentCash'] = round(sim.currentCash,2)
-                session['initialCash'] = sim.initialCash
-                session['portfolioValue'] = sim.initialCash
-                session['simName'] = sim.simName
-
+            session['simulationFlag'] = 1
+            sim = SimulationFactory(dbfire, session['user']).simulation
+            session['initialCash'] = sim.initialCash
+            session['simName'] = sim.simName
+            print(Simulation.ongoingCheck(dbfire, session['simName'], session['user']))
+            if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
+                session['currentCash'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']),2)
+                session['sharesValue'] = "%.2f" % round(Simulation.getPortfolioValue(dbfire, session['simName']),2)
+                session['portfolioValue'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']) + Simulation.getPortfolioValue(dbfire, session['simName']), 2)
+                session['currentChange'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']) + Simulation.getPortfolioValue(dbfire, session['simName']) - float(session['initialCash']), 2)
                 tickers = []
                 quantities = []
                 profits = []
                 netGainLoss = []
                 sharesPrices = []
                 currentPrices = []
-                volatility = []
+                totalValue = []
+                originalValue = []
                 percentage = []
-                ##avgPrice = []   
+                ##avgPrice = []
+                volatility = []
                 
                 for entry in Order.stocksBought(dbfire, session['simName']):
                     Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
                     if Portfolio.quantity != 0:
+                        currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
                         tickers.append(entry)
                         quantities.append(Portfolio.quantity)
-                        profits.append(Portfolio.profit)
-                        sharesPrices.append(Portfolio.avgSharePrice)
-                        currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
-                        volatility.append(Portfolio.volatility)
-                        percentage.append(Portfolio.percentChange)
-                        #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
-                print(tickers)
-                print(quantities)
-                print(profits)
-                print(sharesPrices)
-                print(currentPrices)
-                print(netGainLoss)
-                print(volatility)
-                print(percentage)
+                        sharesPrices.append("$%.2f" % round(Portfolio.avgSharePrice,2))
+                        currentPrices.append("$%.2f" % round(currentPrice, 2))
+                        totalValue.append("$%.2f" % round(Portfolio.quantity*currentPrice, 2))
+                        originalValue.append("$%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
+                        profits.append("$%.2f" % round((Portfolio.quantity*currentPrice) - (Portfolio.avgSharePrice*Portfolio.quantity), 2))
+                        volatility.append("%.2f" % round(Portfolio.volatility,2))
 
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                currentPrices=currentPrices, volatility = volatility)
+                currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue)  
+            else:
+                return redirect(url_for('.finishSimulation'))
         except KeyError:
             print("KeyError occured: simulation")
             return redirect(url_for('fourOhFour'))
@@ -478,6 +515,13 @@ def finishSimulation():
     session['simulationFlag'] = 0
     Simulation.finishSimulation(dbfire, session['simName'])
     return redirect(url_for("profile")) 
+
+@app.route("/simulationHistory")
+def simlists():
+    if ('user' in session):
+        sims, dates, scores, links = Simulation.listSims(dbfire, session['user'])             
+        return render_template('simulationHistory.html', person = session['user'],sims = sims, 
+        dates = dates, scores = scores, links=links)
 
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
@@ -506,41 +550,10 @@ def orderConfirm():
     else:
         flag = order.sellOrder()
     if flag == 1:
-        flash("Order Complete!")
-        session['currentCash'] = round(Simulation.retrieveCurrentCash(dbfire, session['simName']),2)
-        tickers = []
-        quantities = []
-        profits = []
-        netGainLoss = []
-        sharesPrices = []
-        currentPrices = []
-        percentage = []
-        ##avgPrice = []
-        volatility = []
-        
-        for entry in Order.stocksBought(dbfire, session['simName']):
-            Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
-            if Portfolio.quantity != 0:
-                tickers.append(entry)
-                quantities.append(Portfolio.quantity)
-                profits.append(Portfolio.profit)
-                sharesPrices.append(Portfolio.avgSharePrice)
-                currentPrices.append(round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
-                #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
-                volatility.append(Portfolio.volatitlity)
-                percentage.append(Portfolio.percentChange)
-        print(tickers)
-        print(quantities)
-        print(profits)
-        print(sharesPrices)
-        print(currentPrices)
-        print(netGainLoss)
-        print(volatility)
-        print(percentage)
+        flash("Order Complete!")  
 
-        return render_template('simulation.html', person=session['user'], tickers=tickers, 
-        quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-        currentPrices=currentPrices, volatility = volatility)    
+        return redirect(url_for('.goToSimulation'))
+
     elif session['option'] == 'Buy' and flag == -1:
         flash("Insufficient funds to complete purchase")
         return render_template('orderForm.html', option=session['option'])
@@ -567,16 +580,16 @@ def stockSearch():
             if request.method == 'POST':
                 check = StockData.stockSearch(dbfire, request.form["searchTerm"])
                 if check[0]:
+                    print(check)
                     if session['simulationFlag'] == 1:
                         return redirect(url_for('displayStock', ticker=check[1], startDate="2021-09-08", endDate="2022-09-16", timespan="hourly"))
                     else:
-                        return redirect(url_for('displayStock', ticker=check[1], startDate="2021-09-08", endDate="2022-09-16", timespan="daily"))
+                        return redirect(url_for('stockSimFormFunction'))
                 else:
                     return redirect(url_for('fourOhFour'))
         except KeyError:
             print("KeyError occured: stockSearch")
             return redirect(url_for('fourOhFour'))
-        return redirect(url_for(request.url))
     else:
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
@@ -595,39 +608,15 @@ def stockSearch():
 #   obtained from Realtime Database located on Firebase app
 #
 #   Author: Ian McNulty
-@app.route('/<ticker>')
-def displayStock(ticker):
+@app.route('/displayStock')
+def displayStock():
+    ticker = request.args['ticker']
     startDate = request.args['startDate']
     endDate = request.args['endDate']
     timespan = request.args['timespan']
     session['ticker'] = ticker
     global stock
-    if session['simulationFlag'] == 0:
-        stockData = StockData(dbfire, ticker)
-        stock = stockData.stockJSON()
-        #session['stock'] = stock
-        stockMatrix = stockData.getData(startDate, endDate, timespan)
-        #print(stockMatrix)
-        if stockMatrix != -1:
-            if timespan != 'hourly':
-                dates = [row[0] for row in stockMatrix]
-                avgs = [mean([row[2], row[3]]) for row in stockMatrix]
-                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
-            else:
-                dates = []
-                tempDates = [row[0] for row in stockMatrix]
-                for row in tempDates:
-                    for i in range(0, len(tempDates[0])):
-                        dates.append(row[i])
-                avgs = []
-                tempAvgs = [row[1] for row in stockMatrix]
-                for row in tempAvgs:
-                    for i in range(0, len(tempAvgs[0])):
-                        avgs.append(row[i])
-                return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=avgs)
-        #else:
-        #    return displayStock(ticker)
-    else:
+    if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
         stockData = SimulationFactory(dbfire, session['user']).simulation.retrieveStock(ticker)
         existenceFlag = True
         for entry in stockData:
@@ -654,7 +643,6 @@ def displayStock(ticker):
                             mod = 40*7*int(stock['dates'][i][5:7])
                         #if timespan == 'hourly' and int(stock['dates'][i][11:13]) == 9:
                         #    mod = 3
-                        print(mod)
                         if i % mod == 1:
                             prices.append(mean(avgPrice))
                             if timespan != 'hourly':
@@ -679,19 +667,25 @@ def displayStock(ticker):
                                 element += (np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]]))/100
                                 prices.append(element)
                             # 15 = index of minute
-                            tempDate = list(stock['dates'][i])
+                            tempDate1 = list(stock['dates'][i])
                             for j in range(1,3):
-                                tempDate[15] = str((j*5)%10)
-                                dates.append("".join(tempDate))
+                                tempDate2 = tempDate1
+                                tempDate2[15] = str((j*5)%10)
+                                if i % 6 != 0:
+                                    tempDate2 = tempDate2[11:19]
+                                dates.append("".join(tempDate2))
                         elif timespan == '1minute':
                             tempInterp = np.interp(range(0,11),[0, 10],[stock['prices'][i-1], stock['prices'][i]])
                             for element in tempInterp:
                                 element += (np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]]))/50
                                 prices.append(element)
-                            tempDate = list(stock['dates'][i])
+                            tempDate1 = list(stock['dates'][i])
                             for j in range(0,10):
-                                tempDate[15] = str(j)
-                                dates.append("".join(tempDate))
+                                tempDate2 = tempDate1
+                                tempDate2[15] = str(j)
+                                if i % 30 != 0:
+                                    tempDate2 = tempDate2[11:19]
+                                dates.append("".join(tempDate2))
                     return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
             else:
                 for entry in stockData:
@@ -706,7 +700,8 @@ def displayStock(ticker):
                     return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
         else:
             return redirect(url_for('fourOhFour'))
-    return redirect(url_for('fourOhFour'))
+    else:
+        return redirect(url_for('finishSimulation'))
 
 ## changeStockView
 #   Description: Retrieves data from stockView page to determine how to change
@@ -720,6 +715,18 @@ def changeStockView():
         
         return redirect(url_for('.displayStock', ticker=stock['ticker'], startDate=request.form['startDate'], endDate=request.form['endDate'], timespan=request.form['timespan']))
     return -1
+
+## stockSim
+#   Description: Brings the logged in user to the stock sim start page, if the user
+#   isn't logged in, a 404 page error is given.
+#
+#   Author: Ian McNulty
+@app.route("/stockSimForm", methods=['POST', 'GET'])
+def stockSimFormFunction():
+    if 'user' in session:
+        return render_template('stockSimForm.html', person=session['user'])
+    else:
+        return redirect(url_for('fourOhFour'))
 
 @app.route("/stockAvailability",methods=['POST'])
 def stockAvailability():
@@ -745,8 +752,29 @@ def orderlists():
     if ('user' in session):
         orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
 
-        return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(),
+        return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
         tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
+
+@app.route("/orderHist/<simName>")
+def orderHist(simName):
+    if ('user' in session):
+        return redirect(url_for('.orderHistory', simName=simName))
+
+@app.route("/orderHistory")
+def orderHistory():
+    simName = request.args['simName']
+    orderlist = Order.orderList(dbfire, simName) # This will have the username show on webpage when logged in - Muneeb Khan
+    print(orderlist)
+
+    return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
+    tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
+
+            
+            
+            
+            
+        
+        
 
 ## 
 @app.route('/404Error')

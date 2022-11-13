@@ -14,23 +14,18 @@ import datetime
 
 import math
 
-#import matplotlib as plt
-
-#import matplotlib as plt
-#import matplotlib.animation as animation
-#from matplotlib import style
-#import math
-#import mpld3
-#from mpld3 import plugins
 
 
-#import math
+
+
 import matplotlib as plt
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
 from matplotlib import style
 import math
 import mpld3
 from mpld3 import plugins
+
 
 
 DAYS_IN_MONTH = {
@@ -436,18 +431,26 @@ class StockData:
     #
     #   Author: Ian McNulty
     def stockSearch(db, searchTerm):
-        tempData1 = db.collection('Stocks').document(searchTerm).get() 
-        if tempData1 != None:
-            return True, searchTerm
 
-        stocksDB = db.collection('Stocks')
+        stocksDB = db.collection('StockSearchInfo')
+        for entry in stocksDB.stream():
+            if entry.id == searchTerm:
+                return True, searchTerm.upper()
+
         for entry in stocksDB.stream():
             temp = entry.to_dict()
-            ticker = temp['ticker'].lower()
-            name = temp['name'].lower()
+            ticker = entry.id.lower()
             tempSearchTerm = searchTerm.lower()
             if tempSearchTerm == ticker:
                 return True, ticker.upper()
+
+        for entry in stocksDB.stream():
+            temp = entry.to_dict()
+            ticker = entry.id.lower()
+            name = temp['name'].lower()
+            tempSearchTerm = searchTerm.lower()
+            print(tempSearchTerm)
+            print(name)
             if tempSearchTerm in name:
                 return True, ticker.upper()
 
@@ -500,8 +503,11 @@ class Simulation:
         data = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
         for entry in data:
             fin = entry.to_dict()
-            print(fin['prices'][self.whatTimeIsItRightNow()])
-        return fin['prices'][self.whatTimeIsItRightNow()]
+        print(self.whatTimeIsItRightNow())
+        highestIndex = Simulation.maxIndex(self.db, self.simName)
+        if highestIndex > self.whatTimeIsItRightNow():
+            return fin['prices'][self.whatTimeIsItRightNow()]
+        return fin['prices'][len(fin['prices'])-1]
 
     def retrieveStock(self, ticker):
         stock = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
@@ -516,12 +522,6 @@ class Simulation:
 
     def finishSimulation(db, simName):
         data = db.collection('Simulations').document(simName).get().to_dict()
-        data['ongoing'] = False
-        db.collection('Simulations').document(simName).update(data)
-
-        for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
-            temp = entry.id
-            db.collection('IntradayStockData').document(temp).delete()
 
         quantities = []
         currentPrices = []
@@ -534,10 +534,9 @@ class Simulation:
                 currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
         
         for i in range(len(quantities)):
-            totalValue += quantities(i) * currentPrices(i)
+            totalValue += quantities[i] * currentPrices[i]
 
         percentChange = ((float(data['currentCash']) + totalValue) - float(data['initialCash'])) / float(data['initialCash'])
-        data['score'] = percentChange * 100
         scores = percentChange * 100
         scoreRounded = round(scores)
         grabDataEmail = data['user']
@@ -547,6 +546,14 @@ class Simulation:
         grabUserName = emails['userName']
 
         db.collection('Leaderboard').add({"email":grabDataEmail, "score":scoreRounded, "username":grabUserName})
+
+        for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
+            temp = entry.id
+            db.collection('IntradayStockData').document(temp).delete()
+
+        data['score'] = percentChange * 100
+        data['ongoing'] = False
+        db.collection('Simulations').document(simName).update(data)
 
     def checkDates(startDate, endDate):
         if int(startDate[0:4]) >= int(endDate[0:4]):
@@ -583,6 +590,63 @@ class Simulation:
     def retrieveCurrentCash(db, sim):
         data = db.collection('Simulations').document(sim).get().to_dict()
         return data['currentCash']
+
+    def maxIndex(db, sim):
+        highestIndex = 0
+        for entry in db.collection('IntradayStockData').where('simulation','==',sim).stream():
+            temp = entry.to_dict()
+            if len(temp['prices']) > highestIndex:
+                highestIndex = len(temp['prices'])
+        return highestIndex
+
+    def ongoingCheck(db, sim, email):
+        index = SimulationFactory(db, email).simulation.whatTimeIsItRightNow()        
+        highestIndex = Simulation.maxIndex(db,sim)
+        if index > highestIndex:
+            return False
+        return True
+
+    def listSims(db, user):
+        sims = []
+        dates = []
+        scores = []
+        links = []
+        i = 1
+        for entry in db.collection('Simulations').where('user','==',user).where('ongoing','==',False).stream():
+            temp = entry.to_dict()
+            sims.append(str(i))
+            date = str(datetime.datetime.fromtimestamp(temp['startTimestamp'].timestamp()).strftime("%Y-%m-%d %H:%M:%S"))
+            dates.append(date)
+            scores.append(temp['score'])
+            link = str('/orderHist/'+entry.id)
+            links.append(link)
+            i+=1
+        return sims, dates, scores, links
+
+    def completedCheck(db, user):
+        count = 0
+        for query in db.collection('Simulations').where('ongoing','==',False).where('user','==',user).stream():
+            count += 1
+        if count >= 1:
+            return True
+        return False
+
+    def getPortfolioValue(db, simName):
+        quantities = []
+        currentPrices = []
+        totalValue = 0
+        data = db.collection('Simulations').document(simName).get().to_dict()
+        
+        for entry in Order.stocksBought(db, simName):
+            Portfolio = portfolio(db, entry, data['user'], simName, data['initialCash'])
+            if Portfolio.quantity != 0:
+                quantities.append(Portfolio.quantity)
+                currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
+        
+        for i in range(len(quantities)):
+            totalValue += quantities[i] * currentPrices[i]
+
+        return totalValue
 
 class SimulationFactory:
     def __init__(self, db, email):
@@ -817,9 +881,10 @@ class Order:
         if ownageFlag == True:
             for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
                 temp = entry.to_dict()
-                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],temp['totalPrice']])
+                date = str(datetime.datetime.fromtimestamp(temp['dayOfPurchase'].timestamp()).strftime("%Y-%m-%d %H:%M:%S"))
+                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],"%.2f" % round(float(temp['totalPrice']),2),date])
             
-            df = pd.DataFrame(orderslist, columns=['buyOrSell','quantity','ticker','totalPrice'])
+            df = pd.DataFrame(orderslist, columns=['buyOrSell','quantity','ticker','totalPrice', 'dayOfPurchase'])
             
             return df
 
@@ -836,8 +901,8 @@ class portfolio:
             self.quantity = self.weight()
             self.profit = self.get_profit()
             self.avgSharePrice = self.returnValue()
-            self.volatility = self.volatitlity()
-            self.percent = self.percentChange()
+            self.volatility = 0
+
     
     #def retrieve(self, id):
     #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
@@ -987,7 +1052,7 @@ class portfolio:
         
     #Author: Viraj Kadam    
     #Graph of user stocks   (Need buy and sell info)
-    def user_graph(self, db):
+    def user_graph(self, db, startDate, endDate):
         prices = self.db.collection('IntradayStockData').document('prices').get()
         dates = self.db.collection('IntradayStockData').document('dates').get()
         
@@ -995,8 +1060,13 @@ class portfolio:
             temp = entry.to_dict()
             xlabel = prices
             ylabel = dates
+            fig = plt.figure()
             plt.xlabel('Date')
             plt.ylabel('Price')
+            fig = plt.plot(prices[i], dates[i])
+            for i in range(db.collection('Simulations').collections('simName').collection('startDate'), db.collection('Simulations').collections('simName').collection('endDate')):
+                fig[i].set_color(color[i])
+            
             plt.show
            
            
@@ -1010,10 +1080,9 @@ class portfolio:
 
         print(self.get_profit)
         if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
-            print("Gains: +" + self.GainorLoss)
+            print("Gains: +" + self.GainorLoss) 
         elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
             return
-
 
 ## Class for setting up quiz - Muneeb Khan (WIP!)
 ## Updated by Ian Mcnulty
@@ -1036,14 +1105,12 @@ class Quiz:
         self.questions = pd.DataFrame(questions, columns=['id','text','answers','correct','correctness'])
         return pd.DataFrame(questions, columns=['id','text','answers','correct','correctness'])
 
-
     # Check if Users answer is correct
     def answerQuestion(self, questionid, answer):
         question = self.questions.loc[self.questions['id'].isin(questionid)]
         index = self.questions[self.questions['id'] == questionid].index[0]
         if answer == question['answer'][0]:
             self.questions.at['correctness', index] = True
-
 
     def scoreCalc(self):
         count = 0
