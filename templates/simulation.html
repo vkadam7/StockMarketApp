@@ -74,22 +74,10 @@
         </li>
       {% endif %}
               </ul>
-              <form action="/stockSearch" method="post" id = "dropStock">
-                <select id = "dropSelect" class = "form" type="search" name="searchTerm" value="{{ request.form['searchTerm'] }}">
-                  <option selected>Find a stock</option>
-                  <option value = "AMZN">Amazon</option>
-                  <option value = "F">Ford</option>
-                  <option value = "BAC">Bank of America</option>
-                  <option value = "DIS">Disney</option>
-                  <option value = "GE">General Electric Company</option>
-                  <option value = "GOOG">Google</option>
-                  <option value = "JPM">JPMorgan Chase & Co</option>
-                  <option value = "KO">Coca-Cola</option>
-                  <option value = "MCD">McDonald's</option>
-                  <option value = "MSFT">Microsoft</option>
-                  <option value = "NFLX">Netflix</option>
-                </select> 
-                <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Display Stock</button>
+              <form action="/stockSearch" method="post">
+                  <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+                          value="{{ request.form['searchTerm'] }}">
+                          <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
               </form>
 
 
@@ -103,9 +91,6 @@
         <div class="stockList">
             <h3>Available stocks:</h3>
         </div>
-        <div class = 'sessionInfo'>
-          <h5>Remaining Cash: ${{ session['currentCash'] }} Current Portfolio Value: ${{ session['portfolioValue'] }} </h5>
-        </div>
         <div class= "portfolio">
           <div class="row justify-content-center">
           <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
@@ -118,9 +103,11 @@
           <script type="text/javascript">
             let tickersList = {{tickers|safe}};
             let quantList = {{quantities|safe}};
-            //let profitList = {{profits|safe}};
+            let profitList = {{profits|safe}};
             let sharesList = {{sharesPrices|safe}};
             let currentPricesList = {{currentPrices|safe}};
+            let totalValuesList = {{totalValue|safe}};
+            let originalValuesList = {{originalValue|safe}};
             //let volatilityList = {{volatility|safe}};
             
             let portfolio = [];
@@ -128,9 +115,11 @@
               portfolio.push({
                 Stock: tickersList[i],
                 Quantity: quantList[i],
-                //'Gain/Loss': profitList[i],
                 'Average Price': sharesList[i],
-                'Current Price': currentPricesList[i]
+                'Current Price': currentPricesList[i],
+                'Current Value': totalValuesList[i],
+                'Cost Basis': originalValuesList[i],
+                'Change': profitList[i]
                 //Volatility: volatilityList[i]
               })
             }
@@ -159,6 +148,36 @@
             generatePortfolio(table, portfolio, data); 
             </script>
           </div>
+          <div class="row justify-content-center">
+        <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
+          <tr>
+          <th>
+            Remaining Cash:
+          </th>
+          <td>
+            ${{ session['currentCash'] }} 
+          </td>
+          <th>
+            Total Value in Shares:
+          </th>
+          <td>
+            ${{ session['sharesValue'] }}
+          </td>
+          <th>
+            Current Portfolio Value: 
+          </th>
+          <td>
+            ${{ session['portfolioValue'] }}
+          </td>
+          <th>
+            Current Change:
+          </th>
+          <td>
+            ${{ session['currentChange'] }}
+          </td>
+          </tr>
+        </table>
+        </div>
           <br><br>
           </div>
             <div class="orderListButton">

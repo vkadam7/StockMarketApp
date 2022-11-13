@@ -73,23 +73,11 @@
                   </li>
                 {% endif %}
                 </ul>
-                <form action="/stockSearch" method="post" id = "dropStock">
-                  <select id = "dropSelect" class = "form" type="search" name="searchTerm" value="{{ request.form['searchTerm'] }}">
-                    <option selected>Find a stock</option>
-                    <option value = "AMZN">Amazon</option>
-                    <option value = "F">Ford</option>
-                    <option value = "BAC">Bank of America</option>
-                    <option value = "DIS">Disney</option>
-                    <option value = "GE">General Electric Company</option>
-                    <option value = "GOOG">Google</option>
-                    <option value = "JPM">JPMorgan Chase & Co</option>
-                    <option value = "KO">Coca-Cola</option>
-                    <option value = "MCD">McDonald's</option>
-                    <option value = "MSFT">Microsoft</option>
-                    <option value = "NFLX">Netflix</option>
-                  </select> 
-                  <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Display Stock</button>
-                </form>
+                <form action="/stockSearch" method="post">
+          <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+                  value="{{ request.form['searchTerm'] }}">
+                  <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
+      </form>
               </div>        
             </div>
           </nav>

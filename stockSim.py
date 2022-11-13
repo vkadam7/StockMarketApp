@@ -431,18 +431,26 @@ class StockData:
     #
     #   Author: Ian McNulty
     def stockSearch(db, searchTerm):
-        tempData1 = db.collection('Stocks').document(searchTerm).get() 
-        if tempData1 != None:
-            return True, searchTerm
 
-        stocksDB = db.collection('Stocks')
+        stocksDB = db.collection('StockSearchInfo')
+        for entry in stocksDB.stream():
+            if entry.id == searchTerm:
+                return True, searchTerm.upper()
+
         for entry in stocksDB.stream():
             temp = entry.to_dict()
-            ticker = temp['ticker'].lower()
-            name = temp['name'].lower()
+            ticker = entry.id.lower()
             tempSearchTerm = searchTerm.lower()
             if tempSearchTerm == ticker:
                 return True, ticker.upper()
+
+        for entry in stocksDB.stream():
+            temp = entry.to_dict()
+            ticker = entry.id.lower()
+            name = temp['name'].lower()
+            tempSearchTerm = searchTerm.lower()
+            print(tempSearchTerm)
+            print(name)
             if tempSearchTerm in name:
                 return True, ticker.upper()
 
@@ -496,7 +504,10 @@ class Simulation:
         for entry in data:
             fin = entry.to_dict()
         print(self.whatTimeIsItRightNow())
-        return fin['prices'][self.whatTimeIsItRightNow()]
+        highestIndex = Simulation.maxIndex(self.db, self.simName)
+        if highestIndex > self.whatTimeIsItRightNow():
+            return fin['prices'][self.whatTimeIsItRightNow()]
+        return fin['prices'][len(fin['prices'])-1]
 
     def retrieveStock(self, ticker):
         stock = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
@@ -580,15 +591,17 @@ class Simulation:
         data = db.collection('Simulations').document(sim).get().to_dict()
         return data['currentCash']
 
-    def ongoingCheck(db, sim, email):
-        index = SimulationFactory(db, email).simulation.whatTimeIsItRightNow()        
+    def maxIndex(db, sim):
         highestIndex = 0
         for entry in db.collection('IntradayStockData').where('simulation','==',sim).stream():
             temp = entry.to_dict()
             if len(temp['prices']) > highestIndex:
                 highestIndex = len(temp['prices'])
-        print('Index = ' + str(index))
-        print('HighestIndex = ' + str(highestIndex))
+        return highestIndex
+
+    def ongoingCheck(db, sim, email):
+        index = SimulationFactory(db, email).simulation.whatTimeIsItRightNow()        
+        highestIndex = Simulation.maxIndex(db,sim)
         if index > highestIndex:
             return False
         return True
