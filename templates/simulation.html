@@ -108,7 +108,8 @@
             let currentPricesList = {{currentPrices|safe}};
             let totalValuesList = {{totalValue|safe}};
             let originalValuesList = {{originalValue|safe}};
-            let percentageList = {{percentage|safe}}
+            let percentageList = {{percentage|safe}};
+            let linkList = {{links|safe}};
             //let volatilityList = {{volatility|safe}};
             
             let portfolio = [];
@@ -121,7 +122,8 @@
                 'Current Value': totalValuesList[i],
                 'Cost Basis': originalValuesList[i],
                 'Change': profitList[i],
-                'Percent of Porfolio Value:' : percentageList[i]
+                '% of Account:' : percentageList[i],
+                'Link to Chart' : linkList[i]
                 //Volatility: volatilityList[i]
               })
             }
@@ -137,10 +139,21 @@
               }
               for (let element of data) {
                 let row = table.insertRow();
+                i = 0;
                 for (key in element) {
-                  let cell = row.insertCell();
-                  let text = document.createTextNode(element[key]);
-                  cell.appendChild(text);
+                  if (i < 8) {
+                    let cell = row.insertCell();
+                    let text = document.createTextNode(element[key]);
+                    cell.appendChild(text);
+                  } else {
+                    var orderListCell = row.insertCell();
+                    var orderListLink = document.createElement('a');
+                    var orderListLinkText = document.createTextNode('Stock Display');
+                    orderListLink.setAttribute('href', element[key]);
+                    orderListLink.appendChild(orderListLinkText);
+                    orderListCell.appendChild(orderListLink);
+                  }
+                  i = i + 1;
                 }
               }
             }
@@ -180,13 +193,13 @@
           </tr>
           <tr>
             <th>
-              Cash as % of Portfolio Value: 
+              Cash as % of Account: 
             </th>
             <td>
               %{{ session['cashPercentage']}}
             </td>
             <th>
-              Stocks as % of Portfolio Value:
+              Stocks as % of Account:
             </th>
             <td>
               %{{ session['stockPercentage']}}

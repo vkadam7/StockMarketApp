@@ -901,6 +901,7 @@ class portfolio:
             self.quantity = self.weight()
             self.profit = self.get_profit()
             self.avgSharePrice = self.returnValue()
+            self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
 
             self.volatility = 0
     

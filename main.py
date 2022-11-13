@@ -487,6 +487,7 @@ def goToSimulation():
                 originalValue = []
                 percentage = []
                 volatility = []
+                links = []
                 
                 percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
@@ -504,13 +505,14 @@ def goToSimulation():
                         percentageTotal += percent
                         percentage.append("%.2f" % round(percent, 2))
                         volatility.append("%.2f" % round(Portfolio.volatility,2))
+                        links.append(Portfolio.link)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
 
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
                 currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue,
-                percentage=percentage)  
+                percentage=percentage, links=links)  
             else:
                 return redirect(url_for('.finishSimulation'))
         except KeyError:
