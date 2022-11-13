@@ -103,7 +103,7 @@
           <script type="text/javascript">
             let tickersList = {{tickers|safe}};
             let quantList = {{quantities|safe}};
-            //let profitList = {{profits|safe}};
+            let profitList = {{profits|safe}};
             let sharesList = {{sharesPrices|safe}};
             let currentPricesList = {{currentPrices|safe}};
             let totalValuesList = {{totalValue|safe}};
@@ -115,11 +115,11 @@
               portfolio.push({
                 Stock: tickersList[i],
                 Quantity: quantList[i],
-                //'Gain/Loss': profitList[i],
                 'Average Price': sharesList[i],
                 'Current Price': currentPricesList[i],
                 'Current Value': totalValuesList[i],
-                'Cost Basis': originalValuesList[i]
+                'Cost Basis': originalValuesList[i],
+                'Change': profitList[i]
                 //Volatility: volatilityList[i]
               })
             }

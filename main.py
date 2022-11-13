@@ -437,11 +437,11 @@ def goToSimulation():
                         currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
                         tickers.append(entry)
                         quantities.append(Portfolio.quantity)
-                        profits.append("%.2f" % round(Portfolio.profit, 2))
-                        sharesPrices.append("%.2f" % round(Portfolio.avgSharePrice,2))
-                        currentPrices.append("%.2f" % round(currentPrice, 2))
-                        totalValue.append("%.2f" % round(Portfolio.quantity*currentPrice, 2))
-                        originalValue.append("%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
+                        sharesPrices.append("$%.2f" % round(Portfolio.avgSharePrice,2))
+                        currentPrices.append("$%.2f" % round(currentPrice, 2))
+                        totalValue.append("$%.2f" % round(Portfolio.quantity*currentPrice, 2))
+                        originalValue.append("$%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
+                        profits.append("$%.2f" % round((Portfolio.quantity*currentPrice) - (Portfolio.avgSharePrice*Portfolio.quantity), 2))
                         volatility.append("%.2f" % round(Portfolio.volatility,2))
 
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
