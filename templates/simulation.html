@@ -106,6 +106,7 @@
             //let profitList = {{profits|safe}};
             let sharesList = {{sharesPrices|safe}};
             let currentPricesList = {{currentPrices|safe}};
+            let totalValuesList = {{totalValue|safe}};
             //let volatilityList = {{volatility|safe}};
             
             let portfolio = [];
@@ -115,7 +116,8 @@
                 Quantity: quantList[i],
                 //'Gain/Loss': profitList[i],
                 'Average Price': sharesList[i],
-                'Current Price': currentPricesList[i]
+                'Current Price': currentPricesList[i],
+                'Total Value of Shares': totalValuesList[i]
                 //Volatility: volatilityList[i]
               })
             }
