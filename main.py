@@ -791,8 +791,17 @@ def quizpage():
         quizID = 'Quiz1'
         quiz = Quiz(dbfire,quizID,session['user'])
         questions = quiz.questions['text']
-        answerA = quiz.questions['answers']
         answers = quiz.questions['answers']
+        answers1 = [answers[0]]
+        answers2 = [answers[1]]
+        answers3 = [answers[2]]
+        answers4 = [answers[3]]
+        answers5 = [answers[4]]
+        answers6 = [answers[5]]
+        answers7 = [answers[6]]
+        answers8 = [answers[7]]
+        answers9 = [answers[8]]
+        answers10 = [answers[9]]
 
 
         if (request.method == 'POST'):
@@ -812,7 +821,9 @@ def quizpage():
                 return Quiz.submitScore(dbfire)
             
 
-        return render_template('quiz.html',quiz = quiz, questions = questions, answerA = answerA, answers = answers)
+        return render_template('quiz.html',quiz = quiz, questions = questions, answers = answers,
+        answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
+        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10)
                    
     else:
         return render_template('404Error.html')
