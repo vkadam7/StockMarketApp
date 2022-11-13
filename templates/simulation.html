@@ -108,6 +108,7 @@
             let currentPricesList = {{currentPrices|safe}};
             let totalValuesList = {{totalValue|safe}};
             let originalValuesList = {{originalValue|safe}};
+            let percentageList = {{percentage|safe}}
             //let volatilityList = {{volatility|safe}};
             
             let portfolio = [];
@@ -119,7 +120,8 @@
                 'Current Price': currentPricesList[i],
                 'Current Value': totalValuesList[i],
                 'Cost Basis': originalValuesList[i],
-                'Change': profitList[i]
+                'Change': profitList[i],
+                'Percent of Porfolio Value:' : percentageList[i]
                 //Volatility: volatilityList[i]
               })
             }
@@ -175,6 +177,20 @@
           <td>
             ${{ session['currentChange'] }}
           </td>
+          </tr>
+          <tr>
+            <th>
+              Cash as % of Portfolio Value: 
+            </th>
+            <td>
+              %{{ session['cashPercentage']}}
+            </td>
+            <th>
+              Stocks as % of Portfolio Value:
+            </th>
+            <td>
+              %{{ session['stockPercentage']}}
+            </td>
           </tr>
         </table>
         </div>
