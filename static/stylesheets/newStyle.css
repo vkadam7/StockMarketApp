@@ -139,14 +139,12 @@ footer{
 .stockSearchBar {
   padding: 5px;
   border-radius: 5px;
-  display: flex;
 }
 
 .stockSearchButton {
-  background-color: #0d6efd;
-  border-color:#0d6efd;
-  padding:5px;
-  display: flex;
+  background-color: rgb(33, 103, 42);
+  border-color:rgb(33, 103, 42);
+  padding:7px;
   color: white;
   border-radius: 5px;
 }
