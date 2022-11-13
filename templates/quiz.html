@@ -97,20 +97,20 @@
             <h4>Ready to test your knowledge?</h4>
             <hr>
         </div>
+            {% for i in quiz%}
             <div class="container">
+              <form action = "/quiz" method ="POST">
                 <div class="questions">
-                  <div class = "card-body">
-                    <div class = "card-text">
-                      <h2>{{quiz['questions']}}</h2>  
-                    </div>
-                  </div>
-                    <div id="btn-sm" class="btn-grid">
-                        <button class = "btn-lg">{{quiz['a']}}</button>
-                        <button class = "btn-lg">{{quiz['b']}}</button>
-                        <button class = "btn-lg">{{quiz['c']}}</button>
-                    </div>
-                </div>
+                      <h2 class = "question" id = "question" value = "question">{{question[0]}}</h2>
+                      <br>
+                        <input type = "radio" id = "a" value = "{{ request.form['a'] }}">A. {{a[0]}}
+                        <input type = "radio" id = "a" value = "{{ request.form['b'] }}">B. {{b[0]}}
+                        <input type = "radio" id = "a" value = "{{ request.form['c'] }}">C. {{c[0]}}
+                <input type = "submit" id = "submitButton" value = {{ request.form['submitButton'] }}>
+                <input type = "button" id = "nextButton" value = {{ request.form['nextButton'] }}>
+              </form>
             </div>
+            {% endfor %}
     </body>
 
     <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">

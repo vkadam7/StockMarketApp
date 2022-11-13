@@ -106,7 +106,6 @@
   <!--
   <h1>Welcome, {{results['Name']}}</h1>
   <section class = "vh-100" style = "background-color: #eee;">
-    <div class = "container py-6 h-100">
       <div class = "row">
         <div class = "col-lg-6">
           <div class = "card mb-4" style = "border-radius: .5rem;">
@@ -115,36 +114,29 @@
               <h3>Username: {{results['userName']}}</h3>
               <h3>Email: {{results['Email']}}</h3>
             </div>
-          </div>
-  </div>
-  <div class = "container py-6 h-100">
-    <div class = "row">
-      <div class = "col-lg-6">
-        <div class = "card mb-4" style = "border-radius: .5rem;">
-          <h1><a href = "update.html">Update Profile </a></h1>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
-  <div class = "row">
-      <div class = "col-md-6">
-        <div class = "card mb-4 mb-md-0" style = "border-radius: .5rem; text-align = center;">
-          <div class = "card-body">
-          <h3>Simulation Status</h3>
-          <h4>Start Date: {{cash['simStartDate']}}</h4>
-          <h4>Days Remaining: {{daysRemaining}}</h4>
-          <h4>Current Money: ${{ cash['currentCash'] }} </h4>
-          <h4>Score: {{cash['score']}}</h4>
+            <div class = "container py-6 h-100">
+              <div class = "row">
+                <div class = "col-lg-6">
+                  <div class = "card mb-4" style = "border-radius: .5rem;">
+                    <a href="update.html" class="btn btn-submit" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255)">Update Profile</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class = "col-lg-8">
+              <div class = "card mb-4">
+                <div class = "card-body">
+                <h3>Simulation Status</h3>
+                <h4>Start Date: {{cash['simStartDate']}}</h4>
+                <h4>Days Remaining: {{daysRemaining}}</h4>
+                <h4>Current Money: ${{ cash['currentCash'] }} </h4>
+                <h4>Score: {{cash['score']}}</h4>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
 
-
-  <div class = "row">
+  
       <div class = "col-md-6">
         <div class = "card mb-4 mb-md-0" style = "border-radius: .5rem;">
           <div class = "card-body">
@@ -156,6 +148,16 @@
         </div>
       </div>
     </div>
+    <div class = 'row'>
+      <div class = "col-md-6">
+          <div class = "card mb-4 mb-md-0" style = "border-radius: .5rem;">
+            <div class = "card-body">
+            <a class "nav-link"  href= "/simulationHistory">Simulation History</a>
+            </div>
+          </div>
+        </div>
+    </div>
+
   </section>  
  -->
  {% with messages = get_flashed_messages() %}

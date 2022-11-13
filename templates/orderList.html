@@ -105,9 +105,9 @@
         <h3>Order list</h3>
         <div class = "orderlist">
           <div class="row justify-content-center">
-          <table class = "table table-striped w-75 table-dark table-bordered table-hover">
+          <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
 
-            <thead class = "thead-dark">
+            <thead class = "bg-light">
 
            </table>
 
@@ -117,6 +117,7 @@
             let quantList = {{quantities|safe}};
             let buyList = {{buys|safe}};
             let totalList = {{prices|safe}};
+            let datesList = {{dates|safe}};
             
             let orderlist = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -124,7 +125,8 @@
                 Stock: tickersList[i],
                 Quantity: quantList[i],
                 'Transaction Type': buyList[i],
-                Total: totalList[i]
+                Total: totalList[i],
+                'Date of Order' : datesList[i]
               })
             }
 
@@ -152,7 +154,14 @@
             generateOrderlist(table, orderlist, data); 
             </script>
           </div>
+          <br><br>
+          <div class="simListButton">
+              <form action="simList">
+            <button class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;" href="simulationHistory.html">Simulation History</button>
+            </form>
+            </div>
           </div>
+          <br><br>
           <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
         <div class="container">
           <span>Copyright 2022 by StockSim</span>
