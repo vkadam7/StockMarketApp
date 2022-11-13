@@ -91,9 +91,6 @@
         <div class="stockList">
             <h3>Available stocks:</h3>
         </div>
-        <div class = 'sessionInfo'>
-          <h5>Remaining Cash: ${{ session['currentCash'] }} Current Portfolio Value: ${{ session['portfolioValue'] }} </h5>
-        </div>
         <div class= "portfolio">
           <div class="row justify-content-center">
           <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
@@ -147,6 +144,30 @@
             generatePortfolio(table, portfolio, data); 
             </script>
           </div>
+          <div class="row justify-content-center">
+        <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
+          <tr>
+          <th>
+            Remaining Cash:
+          </th>
+          <td>
+            ${{ session['currentCash'] }} 
+          </td>
+          <th>
+            Total Value in Shares:
+          </th>
+          <td>
+            ${{ session['sharesValue'] }}
+          </td>
+          <th>
+            Current Portfolio Value: 
+          </th>
+          <td>
+            ${{ session['portfolioValue'] }}
+          </td>
+          </tr>
+        </table>
+        </div>
           <br><br>
           </div>
             <div class="orderListButton">
