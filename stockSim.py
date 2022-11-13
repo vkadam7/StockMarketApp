@@ -14,23 +14,18 @@ import datetime
 
 import math
 
-#import matplotlib as plt
-
-#import matplotlib as plt
-#import matplotlib.animation as animation
-#from matplotlib import style
-#import math
-#import mpld3
-#from mpld3 import plugins
 
 
-#import math
+
+
 import matplotlib as plt
 import matplotlib.animation as animation
+import matplotlib.pyplot as plt
 from matplotlib import style
 import math
 import mpld3
 from mpld3 import plugins
+
 
 
 DAYS_IN_MONTH = {
@@ -1058,7 +1053,7 @@ class portfolio:
         
     #Author: Viraj Kadam    
     #Graph of user stocks   (Need buy and sell info)
-    def user_graph(self, db):
+    def user_graph(self, db, startDate, endDate):
         prices = self.db.collection('IntradayStockData').document('prices').get()
         dates = self.db.collection('IntradayStockData').document('dates').get()
         
@@ -1066,8 +1061,13 @@ class portfolio:
             temp = entry.to_dict()
             xlabel = prices
             ylabel = dates
+            fig = plt.figure()
             plt.xlabel('Date')
             plt.ylabel('Price')
+            fig = plt.plot(prices[i], dates[i])
+            for i in range(db.collection('Simulations').collections('simName').collection('startDate'), db.collection('Simulations').collections('simName').collection('endDate')):
+                fig[i].set_color(color[i])
+            
             plt.show
            
            

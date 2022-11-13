@@ -5,8 +5,9 @@ import firebase_admin
 from firebase_admin import firestore
 from firebase_admin import credentials
 import pyrebase
-
-
+from google.cloud import firestore
+from stockSim import User
+from re import search
 
 class UserInfo():
     def __init__(self, db, username):
@@ -47,42 +48,91 @@ class UserInfo():
         return False, -1
     
 class FollowUnfollow:
-    def __init__(self, db, followOrUnfollow, user1, user2):
+    def __init__(self, db, followOrUnfollow, user, name, num):
         self.db = db
         self.option = self.followOrUnfollow
-        self.user1 = user1
-        self.user2 = user2
+        self.user = user
+        self.name = name
+        self.num = num
+        
+        
         
     
     
-    def followOption(self, db, user1, user2):
+    def followOption(self):
         if self.option == 'Follow':
+            if self.doTheyhaveAnaccount() == True: #Checks if user has an account
+                if self.doTheyFollow() == False: #Checks if the user already follows that person
+                    userName = self.user 
+                    data ={
+                        'names': self.name
+                    }
+                    for follower in data:
+                        doc_ref = self.db.collection('UsersFollowers').where('userName', '==', userName).set(data)
+        return -1
+                                    
+    def unfollowOption(self):
+        if self.option == 'Unfollow':
             if self.doTheyhaveAnaccount() == True:
-                if self.doTheyFollow() == False:
-                    user_ref = db.collection('Followers').document('users')
-                    user_ref.update({'users': True})
-                
-                
-
-    #def unfollowOption(self, db, user1, user2):
-        #if self.option == 'Unfollow':
-            #if self.doTheyFollow() == True:
-
-                
+                if self.doTheyFollow() == True:
+                    userName = self.user
+                    data = {
+                        'names': self.name
+                    }
+                    doc_ref = self.db.collection('UserFollowers').where('userName', '==', userName).get(data)
+                    for follower in doc_ref.stream():
+                        follower_ref = self.db.collection('UserFollowers').where('userName', '==', userName)
+                        follower_ref.update({u'names': firestore.DELETE_FIELD})
+        return -1
+                    
+                        
     
-    #def doTheyExist(self, db, user):
-        #return
+    def retrievefollowList(self, user):
+       followers = []
+       userName = self.user
+       doc_ref = self.db.collection('UserFollowers').where('userName', '==', userName).get()
+       for doc in doc_ref:
+           followers = doc.to_dict()
+           return followers
+       
+       
+    
+    #Will delete this function later once everything is working properly
+    #Miqdad's user search accounts for this
+   # def doTheyhaveAnaccount(self, db, user):
+   #     accountFlag = False
+   #     tempdata = self.db.collection('Users').document('userName').get()
+   #     doc_ref =  self.db.collection('Users').document('userName').get()
+   #     temp = tempdata.get()
+   #     if temp.exists():
+   #         accountFlag = True
+   #         return accountFlag
+   #     else:
+   #         print("User does not have an account in StockSim")
+       
         
     
-    def doTheyFollow(self):
-        followCheck = self.db.collection('Following').collection('users').get()
-        followingCheck = self.db.collection('Followers').collection('users').get()
-        if followCheck == followCheck:
-            return True
-        else:
-            return False
-
-
-class Recommendation:
-    def __init__(self, db, recommend, ):
-        return
+    def doTheyFollow(self, db, user):
+        followingFlag = False
+        for person in self.db.collection('UserFollowers').document('userName', '==', user).stream():
+            temp = person.to_dict()
+            if temp.get('userName') != None:
+                numfollowing = int(temp['followingList'])
+                followingFlag = True
+            else:
+                followingFlag = False
+    
+    
+    def countFollowers(self, db, user, name):
+        numofFollowers = 0
+        for person in self.db.collection('UserFollowers').where('userName', '==', user).stream():
+            temp = [person.to_dict()]
+            count = len(temp)
+        numofFollowers = count
+        return numofFollowers 
+            
+        
+        
+        
+        
+        
