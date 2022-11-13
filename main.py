@@ -410,47 +410,52 @@ def startSimulation():
 def goToSimulation():
     if ('user' in session):
         try:
-            if request.method == 'POST':
-                session['simulationFlag'] = 1
-                sim = SimulationFactory(dbfire, session['user']).simulation
-                session['currentCash'] = "%.2f" % round(sim.currentCash,2)
-                session['initialCash'] = sim.initialCash
-                session['simName'] = sim.simName
-                print(Simulation.ongoingCheck(dbfire, session['simName'], session['user']))
-                if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
-                    session['portfolioValue'] = "%.2f" % round(Simulation.getPortfolioValue(dbfire, session['simName']), 2)
-                    tickers = []
-                    quantities = []
-                    profits = []
-                    netGainLoss = []
-                    sharesPrices = []
-                    currentPrices = []
-                    volatility = []
-                    ##avgPrice = []   
-                    
-                    for entry in Order.stocksBought(dbfire, session['simName']):
-                        Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
-                        if Portfolio.quantity != 0:
-                            tickers.append(entry)
-                            quantities.append(Portfolio.quantity)
-                            profits.append("%.2f" % round(Portfolio.profit, 2))
-                            sharesPrices.append("%.2f" % round(Portfolio.avgSharePrice,2))
-                            currentPrices.append("%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
-                            volatility.append("%.2f" % round(Portfolio.volatility,2))
-                            #netGainLoss.append(Portfolio.percentChange(quantities, session['avgStockPrice'], session['totalPrice'] ))
-                    #print(tickers)
-                    #print(quantities)
-                    #print(profits)
-                    #print(sharesPrices)
-                    #print(currentPrices)
-                    #print(netGainLoss)
-                    #print(volatility)
+            session['simulationFlag'] = 1
+            sim = SimulationFactory(dbfire, session['user']).simulation
+            session['initialCash'] = sim.initialCash
+            session['simName'] = sim.simName
+            print(Simulation.ongoingCheck(dbfire, session['simName'], session['user']))
+            if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
+                session['currentCash'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']),2)
+                session['portfolioValue'] = "%.2f" % round(Simulation.getPortfolioValue(dbfire, session['simName']),2)
+                tickers = []
+                quantities = []
+                profits = []
+                netGainLoss = []
+                sharesPrices = []
+                currentPrices = []
+                totalValue = []
+                percentage = []
+                ##avgPrice = []
+                volatility = []
+                
+                for entry in Order.stocksBought(dbfire, session['simName']):
+                    Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
+                    if Portfolio.quantity != 0:
+                        currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
+                        tickers.append(entry)
+                        quantities.append(Portfolio.quantity)
+                        profits.append("%.2f" % round(Portfolio.profit, 2))
+                        sharesPrices.append("%.2f" % round(Portfolio.avgSharePrice,2))
+                        currentPrices.append("%.2f" % round(currentPrice, 2))
+                        print(Portfolio.quantity)
+                        print(currentPrice)
+                        #print("%.2f" % round((Portfolio.quantity)*currentPrice, 2))
+                        totalValue.append("%.2f" % round(Portfolio.quantity*currentPrice, 2))
+                        volatility.append("%.2f" % round(Portfolio.volatility,2))
+                #print(tickers)
+                #print(quantities)
+                #print(profits)
+                #print(sharesPrices)
+                #print(currentPrices)
+                #print(netGainLoss)
+                #print(volatility)
 
-                    return render_template('simulation.html', person=session['user'], tickers=tickers, 
-                    quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                    currentPrices=currentPrices, volatility = volatility)
-                else:
-                    return redirect(url_for('.finishSimulation'))
+                return render_template('simulation.html', person=session['user'], tickers=tickers, 
+                quantities=quantities, profits=profits, sharesPrices=sharesPrices,
+                currentPrices=currentPrices, totalValue=totalValue)  
+            else:
+                return redirect(url_for('.finishSimulation'))
         except KeyError:
             print("KeyError occured: simulation")
             return redirect(url_for('fourOhFour'))
@@ -499,38 +504,7 @@ def orderConfirm():
         flag = order.sellOrder()
     if flag == 1:
         flash("Order Complete!")
-        session['currentCash'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']),2)
-        session['portfolioValue'] = "%.2f" % round(Simulation.getPortfolioValue(dbfire, session['simName']),2)
-        tickers = []
-        quantities = []
-        profits = []
-        netGainLoss = []
-        sharesPrices = []
-        currentPrices = []
-        percentage = []
-        ##avgPrice = []
-        volatility = []
-        
-        for entry in Order.stocksBought(dbfire, session['simName']):
-            Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
-            if Portfolio.quantity != 0:
-                tickers.append(entry)
-                quantities.append(Portfolio.quantity)
-                profits.append("%.2f" % round(Portfolio.profit, 2))
-                sharesPrices.append("%.2f" % round(Portfolio.avgSharePrice,2))
-                currentPrices.append("%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry), 2))
-                volatility.append("%.2f" % round(Portfolio.volatility,2))
-        #print(tickers)
-        #print(quantities)
-        #print(profits)
-        #print(sharesPrices)
-        #print(currentPrices)
-        #print(netGainLoss)
-        #print(volatility)
-
-        return render_template('simulation.html', person=session['user'], tickers=tickers, 
-        quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-        currentPrices=currentPrices, volatility = volatility)    
+        return redirect(url_for('.goToSimulation'))
     elif session['option'] == 'Buy' and flag == -1:
         flash("Insufficient funds to complete purchase")
         return render_template('orderForm.html', option=session['option'])
