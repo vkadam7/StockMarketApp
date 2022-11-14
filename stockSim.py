@@ -503,7 +503,6 @@ class Simulation:
         data = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
         for entry in data:
             fin = entry.to_dict()
-        print(self.whatTimeIsItRightNow())
         highestIndex = Simulation.maxIndex(self.db, self.simName)
         if highestIndex > self.whatTimeIsItRightNow():
             return fin['prices'][self.whatTimeIsItRightNow()]
@@ -647,6 +646,20 @@ class Simulation:
             totalValue += quantities[i] * currentPrices[i]
 
         return totalValue
+
+    def getAvailableStockList(db, simName, email):
+        index = SimulationFactory(db, email).simulation.whatTimeIsItRightNow()        
+        tickers = []
+        prices = []
+        links = []
+        for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
+            temp = entry.to_dict()
+            if temp.get('unavailable') == None:
+                if len(temp['prices']) > index:
+                    tickers.append(temp['ticker'])
+                    prices.append(temp['prices'][index])
+                    links.append(str('/displayStock?ticker='+temp['ticker']+'&timespan=hourly'))
+        return tickers, prices, links
 
 class SimulationFactory:
     def __init__(self, db, email):
@@ -901,6 +914,7 @@ class portfolio:
             self.quantity = self.weight()
             self.profit = self.get_profit()
             self.avgSharePrice = self.returnValue()
+            self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
             self.volatility = 0
 
     

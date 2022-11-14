@@ -410,6 +410,7 @@ def startSimulation():
                         session['portfolioValue'] = request.form['initialCash']
                         session['sharesValue'] = "0"
                         session['currentChange'] = '0'
+                        session['percentChange'] = '0'
                         sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
                                                 request.form['simEndDate'], request.form['initialCash'])
                         sim.createSim()
@@ -418,31 +419,38 @@ def startSimulation():
                         tickers = []
                         quantities = []
                         profits = []
-                        netGainLoss = []
                         sharesPrices = []
                         currentPrices = []
                         totalValue = []
                         originalValue = []
                         percentage = []
-                        ##avgPrice = []
                         volatility = []
+                        links = []
                         
+                        percentageTotal = 0
                         for entry in Order.stocksBought(dbfire, session['simName']):
                             Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
                             if Portfolio.quantity != 0:
                                 currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
                                 tickers.append(entry)
                                 quantities.append(Portfolio.quantity)
-                                profits.append("%.2f" % round(Portfolio.profit, 2))
-                                sharesPrices.append("%.2f" % round(Portfolio.avgSharePrice,2))
-                                currentPrices.append("%.2f" % round(currentPrice, 2))
-                                totalValue.append("%.2f" % round(Portfolio.quantity*currentPrice, 2))
-                                originalValue.append("%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
+                                sharesPrices.append("$%.2f" % round(Portfolio.avgSharePrice,2))
+                                currentPrices.append("$%.2f" % round(currentPrice, 2))
+                                totalValue.append("$%.2f" % round(Portfolio.quantity*currentPrice, 2))
+                                originalValue.append("$%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
+                                profits.append("$%.2f" % round((Portfolio.quantity*currentPrice) - (Portfolio.avgSharePrice*Portfolio.quantity), 2))
+                                percent = Portfolio.quantity*currentPrice / (float(request.form['initialCash'])) * 100
+                                percentageTotal += percent
+                                percentage.append("%.2f" % round(percent, 2))
                                 volatility.append("%.2f" % round(Portfolio.volatility,2))
+                                links.append(Portfolio.link)
+
+                        session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
 
                         return render_template('simulation.html', person=session['user'], tickers=tickers, 
                         quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                        currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue) 
+                        currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue,
+                        percentage=percentage, links=links)   
                     else:
                         flash("Please swap your date values, the starting date must be before the ending date.")
                         return render_template('stockSimForm.html', person=session['user'])
@@ -467,24 +475,25 @@ def goToSimulation():
             sim = SimulationFactory(dbfire, session['user']).simulation
             session['initialCash'] = sim.initialCash
             session['simName'] = sim.simName
-            print(Simulation.ongoingCheck(dbfire, session['simName'], session['user']))
             if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
-                session['currentCash'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']),2)
-                session['sharesValue'] = "%.2f" % round(Simulation.getPortfolioValue(dbfire, session['simName']),2)
-                session['portfolioValue'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']) + Simulation.getPortfolioValue(dbfire, session['simName']), 2)
-                session['currentChange'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']) + Simulation.getPortfolioValue(dbfire, session['simName']) - float(session['initialCash']), 2)
+                sharesValue = Simulation.getPortfolioValue(dbfire, session['simName'])
+                currentCash = Simulation.retrieveCurrentCash(dbfire, session['simName'])
+                session['currentCash'] = "%.2f" % round(currentCash,2)
+                session['sharesValue'] = "%.2f" % round(sharesValue,2)
+                session['portfolioValue'] = "%.2f" % round(currentCash + sharesValue, 2)
+                session['currentChange'] = "%.2f" % round(currentCash + sharesValue - float(session['initialCash']), 2)
                 tickers = []
                 quantities = []
                 profits = []
-                netGainLoss = []
                 sharesPrices = []
                 currentPrices = []
                 totalValue = []
                 originalValue = []
                 percentage = []
-                ##avgPrice = []
                 volatility = []
+                links = []
                 
+                percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
                     Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
                     if Portfolio.quantity != 0:
@@ -496,11 +505,19 @@ def goToSimulation():
                         totalValue.append("$%.2f" % round(Portfolio.quantity*currentPrice, 2))
                         originalValue.append("$%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
                         profits.append("$%.2f" % round((Portfolio.quantity*currentPrice) - (Portfolio.avgSharePrice*Portfolio.quantity), 2))
+                        percent = Portfolio.quantity*currentPrice / (currentCash+sharesValue) * 100
+                        percentageTotal += percent
+                        percentage.append("%.2f" % round(percent, 2))
                         volatility.append("%.2f" % round(Portfolio.volatility,2))
+                        links.append(Portfolio.link)
+                session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
+                session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
+                session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
 
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue)  
+                currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue,
+                percentage=percentage, links=links)  
             else:
                 return redirect(url_for('.finishSimulation'))
         except KeyError:
@@ -526,14 +543,14 @@ def simlists():
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
     session['option'] = request.form['option']
-    session['currentPrice'] = round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
     return render_template('orderForm.html', option=session['option'])
 
 @app.route("/orderCreate", methods=['POST', 'GET'])
 def orderCreate():
     if request.form['stockQuantity'].isnumeric():
         session['orderQuantity'] = request.form['stockQuantity']
-        session['orderPrice'] = round(int(session['orderQuantity']) * session['currentPrice'], 2)
+        session['orderPrice'] = "%.2f" % round(int(session['orderQuantity']) * session['currentPrice'], 2)
         return render_template('orderConfirmation.html', option=session['option'])
     else:
         flash("Please enter a valid quantity amount")
@@ -546,7 +563,6 @@ def orderConfirm():
                     session['option'], session['orderQuantity'], session['currentPrice'])
     if session['option'] == 'Buy':
         flag = order.buyOrder()
-        
     else:
         flag = order.sellOrder()
     if flag == 1:
@@ -582,7 +598,7 @@ def stockSearch():
                 if check[0]:
                     print(check)
                     if session['simulationFlag'] == 1:
-                        return redirect(url_for('displayStock', ticker=check[1], startDate="2021-09-08", endDate="2022-09-16", timespan="hourly"))
+                        return redirect(url_for('displayStock', ticker=check[1], timespan="hourly"))
                     else:
                         return redirect(url_for('stockSimFormFunction'))
                 else:
@@ -611,8 +627,6 @@ def stockSearch():
 @app.route('/displayStock')
 def displayStock():
     ticker = request.args['ticker']
-    startDate = request.args['startDate']
-    endDate = request.args['endDate']
     timespan = request.args['timespan']
     session['ticker'] = ticker
     global stock
@@ -713,8 +727,18 @@ def changeStockView():
     if request.method == 'POST':
         #return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
         
-        return redirect(url_for('.displayStock', ticker=stock['ticker'], startDate=request.form['startDate'], endDate=request.form['endDate'], timespan=request.form['timespan']))
+        return redirect(url_for('.displayStock', ticker=stock['ticker'], timespan=request.form['timespan']))
     return -1
+
+@app.route('/stockList', methods=['POST','GET'])
+def stockListing():
+    if session['simulationFlag'] == 1:
+        sim = SimulationFactory(dbfire, session['user']).simulation
+        session['simName'] = sim.simName
+        tickers, prices, links = Simulation.getAvailableStockList(dbfire, session['simName'], session['user'])
+        return render_template('stockList.html', tickers=tickers, currentPrices=prices, links=links)
+    else:
+        return redirect(url_for('stockSimFormFunction'))
 
 ## stockSim
 #   Description: Brings the logged in user to the stock sim start page, if the user
@@ -767,14 +791,7 @@ def orderHistory():
     print(orderlist)
 
     return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
-    tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
-
-            
-            
-            
-            
-        
-        
+    tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())       
 
 ## 
 @app.route('/404Error')
