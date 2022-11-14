@@ -784,6 +784,24 @@ def fourOhFour():
 #@app.route('/startSimulation')
 #def portfolioGraph():
 #    if 'user' in session:
+
+@app.route('/quizSubmit', methods = ['GET', 'POST'])
+def quizSubmit():
+    quiz = Quiz(dbfire,'Quiz1',session['user'])
+    answers = []
+    ids = quiz.questions['id']
+    for i in range(10):
+        temp = "choices" + str(i)
+        answers.append(request.form[temp])
+        quiz.answerQuestion(ids[i], request.form[temp])
+    print(quiz.scoreCalc())
+    score = quiz.scoreCalc()
+    if score > 7:
+        flash("Congratulations! You passed the Quiz, your score was " + str(score))
+        return redirect(url_for('information', person = session['user']))
+    else:
+        flash("Sorry! You did not pass the Quiz, your score was " + str(score))
+        return redirect(url_for('information', person = session['user']))
         
 @app.route('/quiz', methods =['GET','POST'])
 def quizpage():

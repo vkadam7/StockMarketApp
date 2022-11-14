@@ -92,7 +92,17 @@
             <h1>Information</h1>
         </div>
 
-
+        {% with messages = get_flashed_messages() %}
+                    {% if messages %}   
+                        {% for message in messages %}
+                        <script>
+                        swal( '{{ message }}', {
+                        button: "Close",
+                        });
+                        </script>
+                        {% endfor %} 
+                    {% endif %} 
+                {% endwith %} 
         <div class = "card w-25 text-align left" style = "position: fixed;">
                   <h6>Table of contents</h6>
                     <p class = "card-text" style = "text-align: left;">

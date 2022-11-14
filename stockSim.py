@@ -1092,6 +1092,7 @@ class Quiz:
         self.questions = self.retrieveQuestions(quizID)
         self.quizID = quizID
         self.user = user
+        self.correct = []
     
     # To store all the questions and answers for the Quiz
     def retrieveQuestions(self, quizid):
@@ -1100,26 +1101,24 @@ class Quiz:
         questions = []
         for id in quiz['questionIds']:
             question = self.db.collection('Quiz').document(id).get().to_dict()
-            questions.append([id, question['text'], question['answers'], question['correct'], False])
+            questions.append([id, question['text'], question['answers'], question['correct']])
 
-        self.questions = pd.DataFrame(questions, columns=['id','text','answers','correct','correctness'])
-        return pd.DataFrame(questions, columns=['id','text','answers','correct','correctness'])
+        self.questions = pd.DataFrame(questions, columns=['id','text','answers','correct'])
+        return pd.DataFrame(questions, columns=['id','text','answers','correct'])
 
     # Check if Users answer is correct
     def answerQuestion(self, questionid, answer):
-        question = self.questions.loc[self.questions['id'].isin(questionid)]
+        question = self.questions.loc[self.questions['id'].isin([questionid])]
         index = self.questions[self.questions['id'] == questionid].index[0]
-        if answer == question['answer'][0]:
-            self.questions.at['correctness', index] = True
+        correct = question['correct'].to_list()
+        if answer == correct[0]:
+            self.correct.append(True)
 
     def scoreCalc(self):
-        count = 0
-        for entry in self.questions['correctness'].to_list():
-            if entry == True:
-                count += 1
+        count = len(self.correct)
 
-        self.score = round(count/10, 2)
-        return round(count/10, 2)
+        self.score = round(count, 2)
+        return round(count, 2)
 
     def submitScore(self):
         data = {

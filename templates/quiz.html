@@ -98,106 +98,106 @@
             <hr>
         </div>
             <div class="container">
-              <form action = "/quiz" method ="POST">
+              <form action = "/quizSubmit" method ="POST">
                 <div class="questions">
                       <h2 class = "question" id = "question" value = "question">{{questions[0]}}</h2>
                       <br>
                       {% for answer in answers1%}
-                        <input type = "radio" id = "a" name = "choices" value = "{{'a'}}">A. {{answer['a']}}
+                        <input type = "radio" id = "a" name = "choices0" value = "a">A. {{answer['a']}}
                         <br>
-                        <input type = "radio" id = "b" name = "choices" value = "{{'b'}}">B. {{answer['b']}}
+                        <input type = "radio" id = "b" name = "choices0" value = "b">B. {{answer['b']}}
                         <br>
-                        <input type = "radio" id = "c" name = "choices" value = "{{'c'}}">C. {{answer['c']}}
+                        <input type = "radio" id = "c" name = "choices0" value = "c">C. {{answer['c']}}
                       <br>
                       {% endfor %}
                       <h2 class = "question" id = "question" value = "question">{{questions[1]}}</h2>
                       <br>
                       {% for answer in answers2%}
-                        <input type = "radio" id = "a" name = "choices1" value = "{{'a'}}">A. {{answer['a']}}
+                        <input type = "radio" id = "a" name = "choices1" value = "a">A. {{answer['a']}}
                         <br>
-                        <input type = "radio" id = "b" name = "choices1" value = "{{'b'}}">B. {{answer['b']}}
+                        <input type = "radio" id = "b" name = "choices1" value = "b">B. {{answer['b']}}
                         <br>
-                        <input type = "radio" id = "c" name = "choices1" value = "{{'c'}}">C. {{answer['c']}}
+                        <input type = "radio" id = "c" name = "choices1" value = "c">C. {{answer['c']}}
                       <br>
                       {% endfor %}
                       <h2 class = "question" id = "question" value = "question">{{questions[2]}}</h2>
                       <br>
                       {% for answer in answers3%}
-                        <input type = "radio" id = "a" name = "choices2" value = "{{'a'}}">A. {{answer['a']}}
+                        <input type = "radio" id = "a" name = "choices2" value = "a">A. {{answer['a']}}
                         <br>
-                        <input type = "radio" id = "b" name = "choices2" value = "{{'b'}}">B. {{answer['b']}}
+                        <input type = "radio" id = "b" name = "choices2" value = "b">B. {{answer['b']}}
                         <br>
-                        <input type = "radio" id = "c" name = "choices2" value = "{{'c'}}">C. {{answer['c']}}
+                        <input type = "radio" id = "c" name = "choices2" value = "c">C. {{answer['c']}}
                       <br>
                       {% endfor %}
                       <h2 class = "question" id = "question" value = "question">{{questions[3]}}</h2>
                       <br>
                       {% for answer in answers4%}
-                        <input type = "radio" id = "a" name = "choices3" value = "{{'a'}}">A. {{answer['a']}}
+                        <input type = "radio" id = "a" name = "choices3" value = "a">A. {{answer['a']}}
                         <br>
-                        <input type = "radio" id = "b" name = "choices3" value = "{{'b'}}">B. {{answer['b']}}
+                        <input type = "radio" id = "b" name = "choices3" value = "b">B. {{answer['b']}}
                         <br>
-                        <input type = "radio" id = "c" name = "choices3" value = "{{'c'}}">C. {{answer['c']}}
+                        <input type = "radio" id = "c" name = "choices3" value = "c">C. {{answer['c']}}
                       <br>
                       {% endfor %}
                       <h2 class = "question" id = "question" value = "question">{{questions[4]}}</h2>
                       <br>
                       {% for answer in answers5%}
-                        <input type = "radio" id = "a" name = "choices4" value = "{{'a'}}">A. {{answer['a']}}
+                        <input type = "radio" id = "a" name = "choices4" value = "a">A. {{answer['a']}}
                         <br>
-                        <input type = "radio" id = "b" name = "choices4" value = "{{'b'}}">B. {{answer['b']}}
+                        <input type = "radio" id = "b" name = "choices4" value = "b">B. {{answer['b']}}
                         <br>
-                        <input type = "radio" id = "c" name = "choices4" value = "{{'c'}}">C. {{answer['c']}}
+                        <input type = "radio" id = "c" name = "choices4" value = "c">C. {{answer['c']}}
                       <br>
                       {% endfor %}
                       <h2 class = "question" id = "question" value = "question">{{questions[5]}}</h2>
                       <br>
                       {% for answer in answers6%}
-                        <input type = "radio" id = "a" name = "choices5" value = "{{'a'}}">A. {{answer['a']}}
+                        <input type = "radio" id = "a" name = "choices5" value = "a">A. {{answer['a']}}
                         <br>
-                        <input type = "radio" id = "b" name = "choices5" value = "{{'b'}}">B. {{answer['b']}}
+                        <input type = "radio" id = "b" name = "choices5" value = "b">B. {{answer['b']}}
                         <br>
-                        <input type = "radio" id = "c" name = "choices5" value = "{{'c'}}">C. {{answer['c']}}
+                        <input type = "radio" id = "c" name = "choices5" value = "c">C. {{answer['c']}}
                       <br>
                       {% endfor %}
                       <h2 class = "question" id = "question" value = "question">{{questions[6]}}</h2>
                       <br>
                       {% for answer in answers7%}
-                        <input type = "radio" id = "a" name = "choices6" value = "{{'a'}}">A. {{answer['a']}}
+                        <input type = "radio" id = "a" name = "choices6" value = "a">A. {{answer['a']}}
                         <br>
-                        <input type = "radio" id = "b" name = "choices6" value = "{{'b'}}">B. {{answer['b']}}
+                        <input type = "radio" id = "b" name = "choices6" value = "b">B. {{answer['b']}}
                         <br>
-                        <input type = "radio" id = "c" name = "choices6" value = "{{'c'}}">C. {{answer['c']}}
+                        <input type = "radio" id = "c" name = "choices6" value = "c">C. {{answer['c']}}
                       <br>
                       {% endfor %}
                       <h2 class = "question" id = "question" value = "question">{{questions[7]}}</h2>
                       <br>
                       {% for answer in answers8%}
-                        <input type = "radio" id = "a" name = "choices7" value = "{{'a'}}">A. {{answer['a']}}
+                        <input type = "radio" id = "a" name = "choices7" value = "a">A. {{answer['a']}}
                         <br>
-                        <input type = "radio" id = "b" name = "choices7" value = "{{'b'}}">B. {{answer['b']}}
+                        <input type = "radio" id = "b" name = "choices7" value = "b">B. {{answer['b']}}
                         <br>
-                        <input type = "radio" id = "c" name = "choices7" value = "{{'c'}}">C. {{answer['c']}}
+                        <input type = "radio" id = "c" name = "choices7" value = "c">C. {{answer['c']}}
                       <br>
                       {% endfor %}
                       <h2 class = "question" id = "question" value = "question">{{questions[8]}}</h2>
                       <br>
                       {% for answer in answers9%}
-                        <input type = "radio" id = "a" name = "choices8" value = "{{'a'}}">A. {{answer['a']}}
+                        <input type = "radio" id = "a" name = "choices8" value = "a">A. {{answer['a']}}
                         <br>
-                        <input type = "radio" id = "b" name = "choices8" value = "{{'b'}}">B. {{answer['b']}}
+                        <input type = "radio" id = "b" name = "choices8" value = "b">B. {{answer['b']}}
                         <br>
-                        <input type = "radio" id = "c" name = "choices8" value = "{{'c'}}">C. {{answer['c']}}
+                        <input type = "radio" id = "c" name = "choices8" value = "c">C. {{answer['c']}}
                       <br>
                       {% endfor %}
                       <h2 class = "question" id = "question" value = "question">{{questions[9]}}</h2>
                       <br>
                       {% for answer in answers10%}
-                        <input type = "radio" id = "a" name = "choices9" value = "{{'a'}}">A. {{answer['a']}}
+                        <input type = "radio" id = "a" name = "choices9" value = "a">A. {{answer['a']}}
                         <br>
-                        <input type = "radio" id = "b" name = "choices9" value = "{{'b'}}">B. {{answer['b']}}
+                        <input type = "radio" id = "b" name = "choices9" value = "b">B. {{answer['b']}}
                         <br>
-                        <input type = "radio" id = "c" name = "choices9" value = "{{'c'}}">C. {{answer['c']}}
+                        <input type = "radio" id = "c" name = "choices9" value = "c">C. {{answer['c']}}
                       <br>
                       {% endfor %}
                 <button type = "submit" id = "submitButton" value = "{{request.form['submitButton']}}">Submit {{submitButton}}
