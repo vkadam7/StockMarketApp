@@ -105,9 +105,9 @@
             let currentPricesList = {{currentPrices|safe}};
             let linkList = {{links|safe}};
             
-            let portfolio = [];
+            let stockList = [];
             for (let i = 0; i < tickersList.length; i++) {
-              portfolio.push({
+              stockList.push({
                 Stock: tickersList[i],
                 'Current Price': currentPricesList[i],
                 'Link to Chart' : linkList[i]
@@ -118,30 +118,34 @@
                 let thead = table.createTHead();
                 let row = thead.insertRow();
                 for (let key of keys) {
-                let th = document.createElement("th");
-                let text = document.createTextNode(key);
-                th.appendChild(text);
-                row.appendChild(th);
+                    let th = document.createElement("th");
+                    let text = document.createTextNode(key);
+                    th.appendChild(text);
+                    row.appendChild(th);
                 }
-                for (key in element) {
-                    if (i < 3) {
-                    let cell = row.insertCell();
-                    let text = document.createTextNode(element[key]);
-                    cell.appendChild(text);
-                    } else {
-                    var orderListCell = row.insertCell();
-                    var orderListLink = document.createElement('a');
-                    var orderListLinkText = document.createTextNode('Stock Display');
-                    orderListLink.setAttribute('href', element[key]);
-                    orderListLink.appendChild(orderListLinkText);
-                    orderListCell.appendChild(orderListLink);
+                for (element of data) {
+                    let row = table.insertRow();
+                    i = 0;
+                    for (key in element) {
+                        if (i < 2) {
+                        let cell = row.insertCell();
+                        let text = document.createTextNode(element[key]);
+                        cell.appendChild(text);
+                        } else {
+                        var orderListCell = row.insertCell();
+                        var orderListLink = document.createElement('a');
+                        var orderListLinkText = document.createTextNode('Stock Display');
+                        orderListLink.setAttribute('href', element[key]);
+                        orderListLink.appendChild(orderListLinkText);
+                        orderListCell.appendChild(orderListLink);
+                        }
+                        i = i + 1;
                     }
-                    i = i + 1;
                 }
             }
 
             let table = document.querySelector("table");
-            let data = Object.keys(portfolio[0]);
+            let data = Object.keys(stockList[0]);
             generateStockList(table, stockList, data); 
             </script>
           </div>
@@ -158,7 +162,7 @@
                 {% endwith %} 
       </div>
     </body>
-    <br><br>
+    <br><br><br><br><br><br>
     
     <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
         <div class="container">
