@@ -602,7 +602,7 @@ def stockSearch():
                     else:
                         return redirect(url_for('stockSimFormFunction'))
                 else:
-                    return redirect(url_for('fourOhFour'))
+                    return redirect(url_for('stockListing'))
         except KeyError:
             print("KeyError occured: stockSearch")
             return redirect(url_for('fourOhFour'))
@@ -736,7 +736,10 @@ def stockListing():
         sim = SimulationFactory(dbfire, session['user']).simulation
         session['simName'] = sim.simName
         tickers, prices, links = Simulation.getAvailableStockList(dbfire, session['simName'], session['user'])
-        return render_template('stockList.html', tickers=tickers, currentPrices=prices, links=links)
+        print(tickers)
+        print(prices)
+        print(links)
+        return render_template('stockList.html', person=session['user'], tickers=tickers, currentPrices=prices, links=links)
     else:
         return redirect(url_for('stockSimFormFunction'))
 
