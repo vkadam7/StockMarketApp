@@ -54,7 +54,7 @@ def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
         results = dbfire.collection('Users').where('Email', '==', session['user'])
         #Author: Viraj Kadam
-        cash = dbfire.collection('Simulations').where('user', '==', session['user']). where('ongoing', '==', 'true') #For simulation status section
+        cash = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', 'true') #For simulation status section
         # daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
         #Author: Miqdad Hafiz
         for doc in results.stream(): 
@@ -143,8 +143,11 @@ def social():
                 for docs in grabUser: 
                     grabUser = docs.to_dict()
                 userResult = grabUser
+                session['userResults'] = userResult
                 print("HERE COMES THE USERNAME!")
                 print(userResult)
+                print("HERE COMES THE SESSION VARIABLE")
+                print(session['userResults'])
                 return render_template("userDisplay.html",  userResult = userResult)
             else:
                 print("Can't find user.")
@@ -173,8 +176,24 @@ def connect():
         return render_template('userDisplay.html', names = names)
                 
                 
-            
-            
+@app.route('/follow', methods = ["POST","GET"])
+def follow():
+    if 'user' in session:
+        # First add 1 to followers number of user searched
+        UserSearched = session['userResults']
+        userNamed = UserSearched['userName']
+        updateFollower = UserSearched['Followers'] + 1
+        grabUser = dbfire.collection('Users').where('userName', '==', searchKey).get()
+
+        userChange = db.collections('Users').where('userName', '==', userNamed).update({'Followers': updateFollower})
+
+
+        # Second add 1 to following of the user (YOU)
+
+
+
+        #Last add name to user follower array
+
         
             
         
@@ -227,8 +246,8 @@ def register():
                 user = authen.create_user_with_email_and_password(email, Password)
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) #"Followers": 0, "Following": 0
-                #dbfire.collection('UsersFollowers').document(UseN).set("Name": "")
+                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0})
+                dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 flash("Account succesfully created, you may now login" , "pass")
 
