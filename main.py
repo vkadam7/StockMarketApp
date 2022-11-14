@@ -184,13 +184,13 @@ def follow():
         userNamed = UserSearched['userName']
         updateFollower = UserSearched['Followers'] + 1
         
-        userChange = dbfire.collection('Users').where('userName', '==', userNamed).update({'Followers': updateFollower})
+        userChange = dbfire.collection('Users').where('userName', '==', userNamed).update({'Followers':firestore.Increment(1)})
 
 
         # Second add 1 to following of the user (YOU)
         myself = dbfire.collection('Users').where('Email', '==', session['user'])
         updateFollowing = myself['Following'] + 1
-        updateUser = dbfire.collection('Users').where('Email', '==', session['user']).update({'Following': updateFollowing})
+        updateUser = dbfire.collection('Users').where('Email', '==', session['user']).update({'Following': firestore.Increment(1)})
 
         #Last add name to searched user follower array
 
