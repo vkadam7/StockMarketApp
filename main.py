@@ -804,13 +804,48 @@ def fourOhFour():
 #@app.route('/startSimulation')
 #def portfolioGraph():
 #    if 'user' in session:
-        
+
+# Submission check route for Quiz by Ian Mcnulty
+@app.route('/quizSubmit', methods = ['GET', 'POST'])
+def quizSubmit():
+    quiz = Quiz(dbfire,'Quiz1',session['user'])
+    answers = []
+    ids = quiz.questions['id']
+    for i in range(10):
+        temp = "choices" + str(i)
+        answers.append(request.form[temp])
+        quiz.answerQuestion(ids[i], request.form[temp])
+
+    score = quiz.scoreCalc()
+    if score > 7:
+        flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
+        " You are now ready to invest, please click the start simulation button above to start investing.")
+        return redirect(url_for('information', person = session['user']))
+    else:
+        flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
+        " You need to score at least a 7/10 to pass.")
+        return redirect(url_for('information', person = session['user']))
+
+
+# Quiz page route by Muneeb Khan
 @app.route('/quiz', methods =['GET','POST'])
 def quizpage():
     if ('user' in session):
         quizID = 'Quiz1'
         quiz = Quiz(dbfire,quizID,session['user'])
-        questions = quiz.questions
+        questions = quiz.questions['text']
+        answers = quiz.questions['answers']
+        answers1 = [answers[0]]
+        answers2 = [answers[1]]
+        answers3 = [answers[2]]
+        answers4 = [answers[3]]
+        answers5 = [answers[4]]
+        answers6 = [answers[5]]
+        answers7 = [answers[6]]
+        answers8 = [answers[7]]
+        answers9 = [answers[8]]
+        answers10 = [answers[9]]
+
 
         if (request.method == 'POST'):
             
@@ -829,7 +864,9 @@ def quizpage():
                 return Quiz.submitScore(dbfire)
             
 
-        return render_template('quiz.html',quiz = quiz, questions = questions)
+        return render_template('quiz.html',quiz = quiz, questions = questions, answers = answers,
+        answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
+        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10)
                    
     else:
         return render_template('404Error.html')

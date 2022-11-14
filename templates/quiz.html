@@ -12,7 +12,7 @@
     </head>
     <header>
 
-      <a class="navbar-brand" href="home" style = "color: black; padding: 10px;">
+      <a class="navbar-brand" href="home" style = "color: white; padding: 10px;">
         StockSim: Learn How to Trade
       </a>
         <nav class="navbar navbar-expand-md navbar-dark" id = "navBar">
@@ -97,22 +97,129 @@
             <h4>Ready to test your knowledge?</h4>
             <hr>
         </div>
+          <div class = "card w-75" style= "padding-top: 10px; padding-bottom: 10px;">
             <div class="container">
-              <form action = "/quiz" method ="POST">
+              <form action = "/quizSubmit" method ="POST">
                 <div class="questions">
-                      <h2 class = "question" id = "question" value = "question">{{questions}}</h2>
+                  
+                      <h5 class = "question" id = "question" value = "question">1. {{questions[0]}}</h5>
+                      {% for answer in answers1%}
+                        <input type = "radio" id = "a" name = "choices0" value = "a">A. {{answer['a']}}
+                        <br>
+                        <input type = "radio" id = "b" name = "choices0" value = "b">B. {{answer['b']}}
+                        <br>
+                        <input type = "radio" id = "c" name = "choices0" value = "c">C. {{answer['c']}}
                       <br>
-                        <input type = "radio" id = "a" name = "choices" value = "{{'a'}}">A. {{answer}}
-                        <input type = "radio" id = "b" name = "choices" value = "{{'b'}}">B. {{answer}}
-                        <input type = "radio" id = "c" name = "choices" value = "{{'c'}}">C. {{answer}}
+                      {% endfor %}
+                      <br><br>
+
+                      <h5 class = "question" id = "question" value = "question">2. {{questions[1]}}</h5>
+                      {% for answer in answers2%}
+                        <input type = "radio" id = "a" name = "choices1" value = "a">A. {{answer['a']}}
+                        <br>
+                        <input type = "radio" id = "b" name = "choices1" value = "b">B. {{answer['b']}}
+                        <br>
+                        <input type = "radio" id = "c" name = "choices1" value = "c">C. {{answer['c']}}
                       <br>
-                
+                      {% endfor %}
+                      <br><br>
+
+                      <h5 class = "question" id = "question" value = "question">3. {{questions[2]}}</h5>
+                      {% for answer in answers3%}
+                        <input type = "radio" id = "a" name = "choices2" value = "a">A. {{answer['a']}}
+                        <br>
+                        <input type = "radio" id = "b" name = "choices2" value = "b">B. {{answer['b']}}
+                        <br>
+                        <input type = "radio" id = "c" name = "choices2" value = "c">C. {{answer['c']}}
+                      <br>
+                      {% endfor %}
+                      <br><br>
+
+                      <h5 class = "question" id = "question" value = "question">4. {{questions[3]}}</h5>
+                      {% for answer in answers4%}
+                        <input type = "radio" id = "a" name = "choices3" value = "a">A. {{answer['a']}}
+                        <br>
+                        <input type = "radio" id = "b" name = "choices3" value = "b">B. {{answer['b']}}
+                        <br>
+                        <input type = "radio" id = "c" name = "choices3" value = "c">C. {{answer['c']}}
+                      <br>
+                      {% endfor %}
+                      <br><br>
+
+                      <h5 class = "question" id = "question" value = "question">5. {{questions[4]}}</h5>
+                      {% for answer in answers5%}
+                        <input type = "radio" id = "a" name = "choices4" value = "a">A. {{answer['a']}}
+                        <br>
+                        <input type = "radio" id = "b" name = "choices4" value = "b">B. {{answer['b']}}
+                        <br>
+                        <input type = "radio" id = "c" name = "choices4" value = "c">C. {{answer['c']}}
+                      <br>
+                      {% endfor %}
+                      <br><br>
+
+                      <h5 class = "question" id = "question" value = "question">6. {{questions[5]}}</h5>
+                      {% for answer in answers6%}
+                        <input type = "radio" id = "a" name = "choices5" value = "a">A. {{answer['a']}}
+                        <br>
+                        <input type = "radio" id = "b" name = "choices5" value = "b">B. {{answer['b']}}
+                        <br>
+                        <input type = "radio" id = "c" name = "choices5" value = "c">C. {{answer['c']}}
+                      <br>
+                      {% endfor %}
+                      <br><br>
+
+                      <h5 class = "question" id = "question" value = "question">7. {{questions[6]}}</h5>
+                      {% for answer in answers7%}
+                        <input type = "radio" id = "a" name = "choices6" value = "a">A. {{answer['a']}}
+                        <br>
+                        <input type = "radio" id = "b" name = "choices6" value = "b">B. {{answer['b']}}
+                        <br>
+                        <input type = "radio" id = "c" name = "choices6" value = "c">C. {{answer['c']}}
+                      <br>
+                      {% endfor %}
+                      <br><br>
+
+                      <h5 class = "question" id = "question" value = "question">8. {{questions[7]}}</h5>
+                      {% for answer in answers8%}
+                        <input type = "radio" id = "a" name = "choices7" value = "a">A. {{answer['a']}}
+                        <br>
+                        <input type = "radio" id = "b" name = "choices7" value = "b">B. {{answer['b']}}
+                        <br>
+                        <input type = "radio" id = "c" name = "choices7" value = "c">C. {{answer['c']}}
+                      <br>
+                      {% endfor %}
+                      <br><br>
+
+                      <h5 class = "question" id = "question" value = "question">9. {{questions[8]}}</h5>
+                      {% for answer in answers9%}
+                        <input type = "radio" id = "a" name = "choices8" value = "a">A. {{answer['a']}}
+                        <br>
+                        <input type = "radio" id = "b" name = "choices8" value = "b">B. {{answer['b']}}
+                        <br>
+                        <input type = "radio" id = "c" name = "choices8" value = "c">C. {{answer['c']}}
+                      <br>
+                      {% endfor %}
+                      <br><br>
+
+                      <h5 class = "question" id = "question" value = "question">10. {{questions[9]}}</h5>
+                      {% for answer in answers10%}
+                        <input type = "radio" id = "a" name = "choices9" value = "a">A. {{answer['a']}}
+                        <br>
+                        <input type = "radio" id = "b" name = "choices9" value = "b">B. {{answer['b']}}
+                        <br>
+                        <input type = "radio" id = "c" name = "choices9" value = "c">C. {{answer['c']}}
+                      <br>
+                      {% endfor %}
+                      <br>
+
                 <button type = "submit" id = "submitButton" value = "{{request.form['submitButton']}}">Submit {{submitButton}}
               </form>
             </div>
+            </div>
+            
     </body>
       <br><br><br>
-    <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
+    <footer class="footer mt-auto py-3" id = "foot">
       <div class="container">
         <span>Copyright 2022 by StockSim</span>
       </div>

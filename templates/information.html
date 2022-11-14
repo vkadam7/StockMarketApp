@@ -10,6 +10,7 @@
     <link rel = "stylesheet" href = "/static/stylesheets/newStyle.css">
     <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
     </head>
     <header>
 
@@ -90,8 +91,18 @@
     <section>
         <div>
             <h1>Information</h1>
+            {% with messages = get_flashed_messages() %}
+                    {% if messages %}   
+                        {% for message in messages %}
+                        <script>
+                        swal( '{{ message }}', {
+                        button: "Close",
+                        });
+                        </script>
+                        {% endfor %} 
+                    {% endif %} 
+                {% endwith %} 
         </div>
-
 
         <div class = "card w-25 text-align left" style = "position: fixed;">
                   <h6>Table of contents</h6>
