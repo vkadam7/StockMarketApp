@@ -733,6 +733,8 @@ def stockListing():
     if session['simulationFlag'] == 1:
         sim = SimulationFactory(dbfire, session['user']).simulation
         session['simName'] = sim.simName
+        tickers, prices, links = Simulation.getAvailableStockList(dbfire, session['simName'], session['user'])
+        return render_template('stockList.html', tickers=tickers, currentPrices=prices, links=links)
     else:
         return redirect(url_for('stockSimFormFunction'))
 
