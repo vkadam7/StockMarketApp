@@ -227,11 +227,18 @@
             </form>
             </div>
             <br>
+            <div class="stockListButton">
+              <form action="/stockList">
+                <button class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 153, 42);color: white;">See the available stocks!</button>
+                </form>
+            </div>
+            <br>
             <div class="finishSimButton">
               <form action="/finishSimulation">
                 <button class="btn btn btn-lg" name="option" value="Buy" style = "color:rgb(33, 103, 42);background-color:antiquewhite;">Finish the Simulation!</button>
                 </form>
               </div>
+
               {% with messages = get_flashed_messages() %}
                     {% if messages %}   
                         {% for message in messages %}

@@ -653,7 +653,7 @@ class Simulation:
         prices = []
         links = []
         for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
-            temp = entry.to_list()
+            temp = entry.to_dict()
             if temp.get('unavailable') == None:
                 if len(temp['prices']) > index:
                     tickers.append(temp['ticker'])
