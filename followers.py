@@ -35,7 +35,7 @@ class FollowUnfollow:
         self.user2 = user2
         self.num = num
         
-    def followOption(self, db):
+    def followOption(self, db, user1, user2):
         data = db.collection('Users').document('username').get()
         for user in db.collection('Users').document('userName').stream():
              user1 = user.to_dict()
@@ -77,7 +77,6 @@ class FollowUnfollow:
                 unfollow_ref =  db.collection('UserFollowers').document(user1).where('names', '==', user2).delete()
             else:
                 print("You do not follow this user")                    
-        
         #if self.option == 'Unfollow':
         #    if self.doTheyFollow() == True:
         #        userName = self.user1

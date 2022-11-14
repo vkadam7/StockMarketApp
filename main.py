@@ -81,7 +81,7 @@ def Leaderboard():
     else:
         redirect(url_for("login"))
 
-@app.route('followList')
+@app.route("/followList")
 def followList():
     if 'user' in session:
         followersB = dbfire.collection('UserFollowers').get()
@@ -159,20 +159,20 @@ def social():
         return render_template("social.html")
 
 #Viraj Kadam
-@app.route('/social', methods = ['POST', 'GET'])
-def connect():
-    if 'user' in session:
-        if request.method == 'POST':
-            follow = FollowUnfollow(dbfire, session['option'], session['user'], session['names'], session['follower'])
-            if "Follow" in request.form:
-                follow.followOption()
-                flag = follow.followOption()
-                increment_ref = db.collection('Users').document('followers')
-                increment_ref.update({'followers': firestore.Increment(1)})
-                flash('You are now following' + session['names'])
-                return redirect('profile.html', follow = follow)
-        
-        return render_template('userDislay.html')     
+#@app.route("/social", methods = ['POST', 'GET'])
+#def connect():
+#    if 'user' in session:
+#        if request.method == 'POST':
+#            follow = FollowUnfollow(dbfire, session['option'], session['user'], session['names'], session['follower'])
+#            if "Follow" in request.form:
+#                follow.followOption(dbfire, session['user'], session['searchTerm'])
+#                flag = follow.followOption()
+#                increment_ref = db.collection('Users').document('followers')
+#                increment_ref.update({'followers': firestore.Increment(1)})
+#                flash('You are now following' + session['names'])
+#                return redirect('profile.html', follow = follow)
+#        
+ #       return render_template('userDislay.html')     
     
 
          
