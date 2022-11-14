@@ -193,7 +193,7 @@ def follow():
         updateUser = dbfire.collection('Users').where('Email', '==', session['user']).update({'Following': firestore.Increment(1)})
 
         #Last add name to searched user follower array
-        updateFollowArray = dbfire.collection('UsersFollowers').document(userNamed).update({'Names': firestore.ArrayUnion([myslef['userName']])})
+        updateFollowArray = dbfire.collection('UsersFollowers').document(userNamed).update({'Names': firestore.ArrayUnion([myself['userName']])})
         
             
         
