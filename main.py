@@ -66,6 +66,7 @@ def profile():
         #    daysRemaining = daysRemaining.to_dict()
         return render_template("profile.html", results = results, cash = cash)
     else:
+
         redirect(url_for("login"))
 
 @app.route("/Leaderboard")
@@ -80,6 +81,14 @@ def Leaderboard():
     else:
         redirect(url_for("login"))
 
+@app.route('followList')
+def followList():
+    if 'user' in session:
+        followersB = dbfire.collection('UserFollowers').get()
+        documentRef = list(doc.to_dict() for doc in followersB)
+        documentRef.sort(key=itemgetter('names'))
+        print(documentRef)
+        return render_template('followers')
 
 
 # Login
@@ -141,6 +150,8 @@ def social():
                 print(searchResult)
                 print(userResult)
                 return render_template("userDisplay.html", searchResult = searchResult, userResult = userResult)
+            
+
             else:
                 print("Can't find user.")
                 flash("Can't find the user you searched for.")
@@ -148,33 +159,32 @@ def social():
         return render_template("social.html")
 
 #Viraj Kadam
-@app.route('/follow', methods = ['POST', 'GET'])
+@app.route('/social', methods = ['POST', 'GET'])
 def connect():
     if 'user' in session:
-        follow = FollowUnfollow(dbfire, session['option'], session['user'], session['names'])
-        if session['option'] == 'Follow':
-            flag = follow.followOption()
-            flash('You are now following')
-        elif session['option']:
-            flag = follow.unfollowOption()
-            flash('You have unfollowed this user')
-
-        if flag == 1:
-            names = []
-            for followers in follow.retrievefollowList(dbfire, session['user']):
-                if followers.quantity != 0:
-                    names.append(followers.num)
-
-        return render_template('userDisplay.html', names = names)
-                
-                
-            
-            
+        if request.method == 'POST':
+            follow = FollowUnfollow(dbfire, session['option'], session['user'], session['names'], session['follower'])
+            if "Follow" in request.form:
+                follow.followOption()
+                flag = follow.followOption()
+                increment_ref = db.collection('Users').document('followers')
+                increment_ref.update({'followers': firestore.Increment(1)})
+                flash('You are now following' + session['names'])
+                return redirect('profile.html', follow = follow)
         
-            
-        
-
+        return render_template('userDislay.html')     
     
+
+         
+#@app.route('/followerlist')
+#def followerList():
+#    if 'user' in session:
+#        userFollowers = FollowUnfollow.retrievefollowList(dbfire, session['user'])
+#        return render_template('followerList.html', names = userFollowers['names'].to_list())
+#    else:
+#        return ('404Error.html')
+        
+        
 #Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
 def register():
@@ -349,16 +359,6 @@ def information():
     else:
         return render_template("information.html")
     
-    
-@app.route("/social")
-def network():
-    if('user' in session):
-        person = dbfire.collection('Users').where('userName', '==', session['user'])
-        
-        
-       
-        return render_template("social.html")
-
 @app.route("/StockDefinitions")
 def StockDefinitions():
     if('user' in session):
@@ -816,13 +816,6 @@ def orderHistory():
 
     return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
     tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
-
-            
-            
-            
-            
-        
-        
 
 ## 
 @app.route('/404Error')
