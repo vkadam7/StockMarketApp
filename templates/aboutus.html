@@ -78,7 +78,7 @@
               <form action="/stockSearch" method="post">
                   <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                           value="{{ request.form['searchTerm'] }}">
-                          <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
+                          <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
               </form>
 
 
@@ -113,8 +113,9 @@
             </div>
             <div class = "card-body">
             <h5 class = "card-text" style = "text-align: left;">Unlike our competitors we want to provide an easy to use website that can help new users with making the right
-            investments that best fits their needs. Stocksim will show users the different options they can choose.
-            Users may refer to our information page which will provide the educational information they will need to know.
+            investments that best fits their needs. Stocksim will allow users to compete in a stock simulation that will allow the users to choose from different stock companies 
+            They may either choose to purchase or sell a stock from that company. The price of the company's stock will constantly change overtime. Users may refer to our 
+            information page which will help them learn about the stock market in general.
             </h5>
             </div>
             </div>
@@ -133,6 +134,7 @@
             </div>
         </div>
         </div>
+        <br><br>
     </main>
     <footer class="footer mt-auto py-3" id = "foot">
         <div class="container">

@@ -82,7 +82,7 @@
                     <option value = "MSFT">Microsoft</option>
                     <option value = "NFLX">Netflix</option>
                   </select> 
-                  <button>Display Stock</button>
+                  <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
                 </form>
               </div>        
             </div>
@@ -97,22 +97,21 @@
             <h4>Ready to test your knowledge?</h4>
             <hr>
         </div>
-            {% for i in quiz%}
             <div class="container">
               <form action = "/quiz" method ="POST">
                 <div class="questions">
-                      <h2 class = "question" id = "question" value = "question">{{question[0]}}</h2>
+                      <h2 class = "question" id = "question" value = "question">{{questions}}</h2>
                       <br>
-                        <input type = "radio" id = "a" value = "{{ request.form['a'] }}">A. {{a[0]}}
-                        <input type = "radio" id = "a" value = "{{ request.form['b'] }}">B. {{b[0]}}
-                        <input type = "radio" id = "a" value = "{{ request.form['c'] }}">C. {{c[0]}}
-                <input type = "submit" id = "submitButton" value = {{ request.form['submitButton'] }}>
-                <input type = "button" id = "nextButton" value = {{ request.form['nextButton'] }}>
+                        <input type = "radio" id = "a" name = "choices" value = "{{'a'}}">A. {{answer}}
+                        <input type = "radio" id = "b" name = "choices" value = "{{'b'}}">B. {{answer}}
+                        <input type = "radio" id = "c" name = "choices" value = "{{'c'}}">C. {{answer}}
+                      <br>
+                
+                <button type = "submit" id = "submitButton" value = "{{request.form['submitButton']}}">Submit {{submitButton}}
               </form>
             </div>
-            {% endfor %}
     </body>
-
+      <br><br><br>
     <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
       <div class="container">
         <span>Copyright 2022 by StockSim</span>

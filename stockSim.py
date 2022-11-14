@@ -915,8 +915,8 @@ class portfolio:
             self.profit = self.get_profit()
             self.avgSharePrice = self.returnValue()
             self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
-
             self.volatility = 0
+
     
     #def retrieve(self, id):
     #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
@@ -1050,20 +1050,19 @@ class portfolio:
            
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
-    def percentChange(self,db):
+    def percentChange(db,simName):
  
-        initialAmount = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock),2)
-        day = []
-        for entry in db.collection('IntradayStockData').get():
+        currentAmount = round(db.collection('IntradayStockData').document('prices').where('simulation','==',simName).where('ticker','==',db.ticker).stream())
+        dates = []
+        for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
             tempdays = entry.to_dict()
-            day.append(tempdays['dates'])
-        finalAmount = []
+            dates.append(tempdays['dates'])
 
-        for i in day:
-                finalAmount = (initialAmount[i+1]/initialAmount[i]) * 100
-                return str(finalAmount) + " %"
-        else:
-            return -1     
+        for i in dates:
+            finalAmount = round(float(((currentAmount[i+1]-currentAmount[i])/currentAmount[i]) * 100),2)
+
+        print(str(finalAmount) + " %")
+        return (str(finalAmount) + " %")   
         
     #Author: Viraj Kadam    
     #Graph of user stocks   (Need buy and sell info)
@@ -1100,6 +1099,7 @@ class portfolio:
             return
 
 ## Class for setting up quiz - Muneeb Khan (WIP!)
+## Updated by Ian Mcnulty
 class Quiz:
     def __init__(self,db,quizID,user):
         self.db = db
@@ -1114,14 +1114,10 @@ class Quiz:
         questions = []
         for id in quiz['questionIds']:
             question = self.db.collection('Quiz').document(id).get().to_dict()
-            questions.append(id, question['text'], question['answers'], question['answer'], False)
+            questions.append([id, question['text'], question['answers'], question['correct'], False])
 
-        self.questions = pd.DataFrame(questions, columns=['id','text','answers','answer','correctness'])
-        return pd.DataFrame(questions, columns=['id','text','answers','answer','correctness'])
-
-    #def nextButton(self,db):
-    #    return (self.question.pop(questionList['question'], self.answer.pop(questionList['answer']), self.answer.pop(questionList['a']),
-    #    self.answer.pop(questionList['b']), self.answer.pop(questionList['c'])))
+        self.questions = pd.DataFrame(questions, columns=['id','text','answers','correct','correctness'])
+        return pd.DataFrame(questions, columns=['id','text','answers','correct','correctness'])
 
     # Check if Users answer is correct
     def answerQuestion(self, questionid, answer):
@@ -1129,16 +1125,6 @@ class Quiz:
         index = self.questions[self.questions['id'] == questionid].index[0]
         if answer == question['answer'][0]:
             self.questions.at['correctness', index] = True
-
-    # Check if User got at least 7 correct to pass the quiz
-    def submittedQuiz(self,db,correct):
-        db.collection('Quiz').update({'score' : correct})  
-        if correct >= 7:
-            print("You passed passed the quiz! with " + str(correct) + " out of 10! great work")
-            
-        else: 
-            print("Sorry you didnt pass the quiz, you only scored " + str(correct) + " out of 10.")
-            print("You must score at least 7/10 to pass, better luck next time!")
 
     def scoreCalc(self):
         count = 0

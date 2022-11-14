@@ -80,7 +80,7 @@
                 <form action="/stockSearch" method="post">
                     <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                             value="{{ request.form['searchTerm'] }}">
-                            <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
+                            <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
                 </form>
               </div>        
             </div>
@@ -88,6 +88,9 @@
     </header>
 
 <body>  
+        <br><br><br>
+        
+        <h3>Order history</h3>
         <div class = "orderlist">
           <div class="row justify-content-center">
           <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
