@@ -600,7 +600,7 @@ def stockSearch():
                     else:
                         return redirect(url_for('stockSimFormFunction'))
                 else:
-                    return redirect(url_for('fourOhFour'))
+                    return redirect(url_for('stockListing'))
         except KeyError:
             print("KeyError occured: stockSearch")
             return redirect(url_for('fourOhFour'))
