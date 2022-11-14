@@ -728,6 +728,14 @@ def changeStockView():
         return redirect(url_for('.displayStock', ticker=stock['ticker'], timespan=request.form['timespan']))
     return -1
 
+@app.route('/stockList', methods=['POST','GET'])
+def stockListing():
+    if session['simulationFlag'] == 1:
+        sim = SimulationFactory(dbfire, session['user']).simulation
+        session['simName'] = sim.simName
+    else:
+        return redirect(url_for('stockSimFormFunction'))
+
 ## stockSim
 #   Description: Brings the logged in user to the stock sim start page, if the user
 #   isn't logged in, a 404 page error is given.
@@ -779,14 +787,7 @@ def orderHistory():
     print(orderlist)
 
     return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
-    tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
-
-            
-            
-            
-            
-        
-        
+    tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())       
 
 ## 
 @app.route('/404Error')
