@@ -10,15 +10,15 @@
     <link rel = "stylesheet" href = "/static/stylesheets/newStyle.css">
     <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
     </head>
     <header>
 
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top" id = "navBar">
-            <div class="container-fluid">
-              <a class="navbar-brand" href="home">
-                <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
-                StockSim: Learn How to Trade
-              </a>
+      <a class="navbar-brand" href="home" style = "color: black; padding: 10px;">
+        StockSim: Learn How to Trade
+      </a>
+        <nav class="navbar navbar-expand-md navbar-dark" id = "navBar">
+          <img src = "/static/stockLogo.png" alt = "stock symbol" width = "45" height = "45" class="d-inline-block align-top">
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
@@ -84,7 +84,7 @@
                     <option value = "MSFT">Microsoft</option>
                     <option value = "NFLX">Netflix</option>
                   </select> 
-                  <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
+                  <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
                 </form>
               </div>        
             </div>
@@ -100,10 +100,11 @@
     {% with messages = get_flashed_messages() %}
                     {% if messages %}   
                         {% for message in messages %}
-                        <div class ="alert alert-warning alert-dismissible" style = "text-align: center" role="alert">
-                            {{ message }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
-                        </div>
+                        <script>
+                        swal( '{{ message }}', {
+                        button: "Close",
+                        });
+                        </script>
                         {% endfor %} 
                     {% endif %} 
     {% endwith %} 
@@ -145,8 +146,10 @@
                         <div class = "d-flex justify-content-around align-items-center mb-4">
                             <a href = "login"> Already have an account?</a>
                         </div>
+                        <div class = "d-flex justify-content-end">
                         <button type = "submit" class = "btn btn-primary btn-lg btn-block" style = "background-color:rgb(33, 103, 42)">Register</button>
-                    </form>
+                        </div>
+                  </form>
                     </div>
                 </div>
             </div>
@@ -163,9 +166,7 @@
 
 </body>
 <br>
-<footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
-      <span>Copyright 2022 by StockSim</span>
-  </footer>
+
   
   
   <script src="/static/jsStyle/bootstrap.bundle.min.js"></script>

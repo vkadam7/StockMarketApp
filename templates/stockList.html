@@ -77,7 +77,7 @@
               <form action="/stockSearch" method="post">
                   <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                           value="{{ request.form['searchTerm'] }}">
-                          <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
+                          <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
               </form>
 
 
@@ -85,11 +85,11 @@
           </div>
         </nav>
   </header>
-    <br><br><br>
+  <br><br><br>
     <body>
     <div class = "centering">
         <div class="stockList">
-            <h3>Your Portfolio:</h3>
+            <h3>Available stocks:</h3>
         </div>
         <div class= "portfolio">
           <div class="row justify-content-center">
@@ -102,143 +102,53 @@
            </table>
           <script type="text/javascript">
             let tickersList = {{tickers|safe}};
-            let quantList = {{quantities|safe}};
-            let profitList = {{profits|safe}};
-            let sharesList = {{sharesPrices|safe}};
             let currentPricesList = {{currentPrices|safe}};
-            let totalValuesList = {{totalValue|safe}};
-            let originalValuesList = {{originalValue|safe}};
-            let percentageList = {{percentage|safe}};
             let linkList = {{links|safe}};
-            //let volatilityList = {{volatility|safe}};
             
-            let portfolio = [];
+            let stockList = [];
             for (let i = 0; i < tickersList.length; i++) {
-              portfolio.push({
+              stockList.push({
                 Stock: tickersList[i],
-                Quantity: quantList[i],
-                'Average Price': sharesList[i],
                 'Current Price': currentPricesList[i],
-                'Current Value': totalValuesList[i],
-                'Cost Basis': originalValuesList[i],
-                'Change': profitList[i],
-                '% of Account' : percentageList[i],
                 'Link to Chart' : linkList[i]
-                //Volatility: volatilityList[i]
               })
             }
 
-            function generatePortfolio(table, data, keys) {
-              let thead = table.createTHead();
-              let row = thead.insertRow();
-              for (let key of keys) {
-                let th = document.createElement("th");
-                let text = document.createTextNode(key);
-                th.appendChild(text);
-                row.appendChild(th);
-              }
-              for (let element of data) {
-                let row = table.insertRow();
-                i = 0;
-                for (key in element) {
-                  if (i < 8) {
-                    let cell = row.insertCell();
-                    let text = document.createTextNode(element[key]);
-                    cell.appendChild(text);
-                  } else {
-                    var orderListCell = row.insertCell();
-                    var orderListLink = document.createElement('a');
-                    var orderListLinkText = document.createTextNode('Stock Display');
-                    orderListLink.setAttribute('href', element[key]);
-                    orderListLink.appendChild(orderListLinkText);
-                    orderListCell.appendChild(orderListLink);
-                  }
-                  i = i + 1;
+            function generateStockList(table, data, keys) {
+                let thead = table.createTHead();
+                let row = thead.insertRow();
+                for (let key of keys) {
+                    let th = document.createElement("th");
+                    let text = document.createTextNode(key);
+                    th.appendChild(text);
+                    row.appendChild(th);
                 }
-              }
+                for (element of data) {
+                    let row = table.insertRow();
+                    i = 0;
+                    for (key in element) {
+                        if (i < 2) {
+                        let cell = row.insertCell();
+                        let text = document.createTextNode(element[key]);
+                        cell.appendChild(text);
+                        } else {
+                        var orderListCell = row.insertCell();
+                        var orderListLink = document.createElement('a');
+                        var orderListLinkText = document.createTextNode('Stock Display');
+                        orderListLink.setAttribute('href', element[key]);
+                        orderListLink.appendChild(orderListLinkText);
+                        orderListCell.appendChild(orderListLink);
+                        }
+                        i = i + 1;
+                    }
+                }
             }
 
             let table = document.querySelector("table");
-            let data = Object.keys(portfolio[0]);
-            generatePortfolio(table, portfolio, data); 
+            let data = Object.keys(stockList[0]);
+            generateStockList(table, stockList, data); 
             </script>
           </div>
-          <div class="row justify-content-center">
-        <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
-          <tr>
-            <th>
-              Remaining Cash:
-            </th>
-            <td>
-              ${{ session['currentCash'] }} 
-            </td>
-            <th>
-              Total Value in Shares:
-            </th>
-            <td>
-              ${{ session['sharesValue'] }}
-            </td>
-            <th>
-              Current Portfolio Value: 
-            </th>
-            <td>
-              ${{ session['portfolioValue'] }}
-            </td>
-            <th>
-              Current Change:
-            </th>
-            <td>
-              ${{ session['currentChange'] }}
-            </td>
-          </tr>
-          <tr>
-            <th>
-              Cash as % of Account: 
-            </th>
-            <td>
-              %{{ session['cashPercentage']}}
-            </td>
-            <th>
-              Stocks as % of Account:
-            </th>
-            <td>
-              %{{ session['stockPercentage']}}
-            </td>
-            <th>
-              Initial Portfolio Value:
-            </th>
-            <td>
-              ${{ session['initialCash']}}
-            </td>
-            <th>
-              Current % Change:
-            </th>
-            <td>
-              %{{ session['percentGrowth']}}
-            </td>
-          </tr>
-        </table>
-        </div>
-          <br><br>
-          </div>
-            <div class="orderListButton">
-              <form action="orderList">
-            <button class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;" href="orderList">Order History</button>
-            </form>
-            </div>
-            <br>
-            <div class="stockListButton">
-              <form action="/stockList">
-                <button class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 153, 42);color: white;">See the available stocks!</button>
-                </form>
-            </div>
-            <br>
-            <div class="finishSimButton">
-              <form action="/finishSimulation">
-                <button class="btn btn btn-lg" name="option" value="Buy" style = "color:rgb(33, 103, 42);background-color:antiquewhite;">Finish the Simulation!</button>
-                </form>
-              </div>
-
               {% with messages = get_flashed_messages() %}
                     {% if messages %}   
                         {% for message in messages %}
@@ -252,7 +162,7 @@
                 {% endwith %} 
       </div>
     </body>
-    <br><br>
+    <br><br><br><br><br><br>
     
     <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
         <div class="container">

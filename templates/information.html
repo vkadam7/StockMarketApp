@@ -13,12 +13,11 @@
     </head>
     <header>
 
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top" id = "navBar">
-            <div class="container-fluid">
-              <a class="navbar-brand" href="home">
-                <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
-                StockSim: Learn How to Trade
-              </a>
+      <a class="navbar-brand" href="home" style = "color: black; padding: 10px;">
+        StockSim: Learn How to Trade
+      </a>
+        <nav class="navbar navbar-expand-md navbar-dark" id = "navBar">
+          <img src = "/static/stockLogo.png" alt = "stock symbol" width = "45" height = "45" class="d-inline-block align-top">
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
@@ -75,23 +74,11 @@
           </li>
         {% endif %}
                 </ul>
-                <form action="/stockSearch" method="post" id = "dropStock">
-                  <select id = "dropSelect" class = "form" type="search" name="searchTerm" value="{{ request.form['searchTerm'] }}">
-                    <option selected>Find a stock</option>
-                    <option value = "AMZN">Amazon</option>
-                    <option value = "F">Ford</option>
-                    <option value = "BAC">Bank of America</option>
-                    <option value = "DIS">Disney</option>
-                    <option value = "GE">General Electric Company</option>
-                    <option value = "GOOG">Google</option>
-                    <option value = "JPM">JPMorgan Chase & Co</option>
-                    <option value = "KO">Coca-Cola</option>
-                    <option value = "MCD">McDonald's</option>
-                    <option value = "MSFT">Microsoft</option>
-                    <option value = "NFLX">Netflix</option>
-                  </select> 
-                  <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Display Stock</button>
-                </form>
+                <form action="/stockSearch" method="post">
+                  <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+                          value="{{ request.form['searchTerm'] }}">
+                          <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
+              </form>
               </div>        
             </div>
           </nav>
@@ -120,7 +107,7 @@
                 </div>
 
         <div class = infomain>
-            <div class = "card w-75 d-flex justify-content-left" style= "padding-top: 20px; padding-bottom: 20px;">
+            <div class = "card w-75" style= "margin-right: 25px; padding-top: 10px; padding-bottom: 10px;">
 
               <div class = "card-header">
               <h2><h2 id = "infosection1">What Should I Know?</h2></h2>
@@ -176,22 +163,25 @@
                     which is the quickest method of buying stocks.
                     <br>
                     <br>
-                    Below is a video which shows a basic example of paper trading
+                    Below is a video which shows a basic example of paper trading</h5>
                     <br>
                     <br>
-                    <iframe width = "480" height = "320" display = "d-flex" src = "https://www.youtube.com/embed/cNkZf7TRwA4"></iframe>
+                    <iframe width = "75%" height = "320" src = "https://www.youtube.com/embed/cNkZf7TRwA4"
+                    frameborder = "0" allowfullscreen =""></iframe>
                     <br>
                     <br>
-                    Below is another video which shows a basic example of the stock market
+                    <h5 class = "card-text" style = "text-align: left;">Below is another video which shows a basic example of the stock market</h5>
                     <br>
                     <br>
-                    <iframe width = "480" height = "320" display = "d-flex" src = "https://www.youtube.com/embed/p7HKvqRI_Bo"></iframe> 
+                    <iframe width = "75%" height = "320" src = "https://www.youtube.com/embed/p7HKvqRI_Bo"
+                    frameborder = "0" allowfullscreen =""></iframe> 
                     <br>
                     <br>
-                    Another good video from TD Ameritrade also shows a basic example of investments.
+                    <h5 class = "card-text" style = "text-align: left;">Another good video from TD Ameritrade also shows a basic example of investments.</h5>
                     <br>
                     <br>
-                    <iframe width = "480" height = "320" display = "d-flex" src = "https://www.youtube.com/embed/hE2NsJGpEq4"></iframe> 
+                    <iframe width = "75%" height = "320" src = "https://www.youtube.com/embed/hE2NsJGpEq4"
+                    frameborder = "0" allowfullscreen =""></iframe> 
                     <br><br>
                     </h5>
                   </div>
@@ -200,10 +190,9 @@
                   <h2 id = "infosection4">Defintions of Stocks?</h2>
                   <br>
                   <h5 class = "card-text" style = "text-align: left;">To see some defintions of stocks, please click the button below to visit
-                    our stock definitions page.
+                    our stock definitions page.</h5>
                     <br><br>
-                    <a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "StockDefinitions">StockDefinitions</a>
-                  </h5>
+                    <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "StockDefinitions">StockDefinitions</a></h5>
                 </div>
 
                 <div class = "card-body" id = "info5" style = "background-color: rgb(243, 243, 243); border-bottom: solid black;">
@@ -212,12 +201,12 @@
                   <h5 class = "card-text" style = "text-align: left;">We have sources below of other good websites where you may find more information
                   <br>on stocks.
                   <br><br>
-                  <br>Below is a link to the Investor.gov website which also gives basic information on stocks.
+                  <br>Below is a link to the Investor.gov website which also gives basic information on stocks.</h5>
                   <br><a href = https://www.investor.gov/introduction-investing/investing-basics/investment-products/stocks>Visit Investor.gov</a>
                   <br><br>
-                  <br>Another good site to learn basic information would be the Washington state department of financial institutions
+                  <br><h5 class = "card-text" style = "text-align: left;">Another good site to learn basic information would be the Washington state department of financial institutions</h5>
                   <br><a href = https://dfi.wa.gov/financial-education/information/basics-investing-stocks>Visit DFI.gov</a>
-                  </h5>
+  
                 </div>
 
                 <div class = "card-body" id = "info6" style = "border-bottom: solid black;">
@@ -226,11 +215,10 @@
                   <h5 class = "card-text" style = "text-align: left;">We have a 10 question quiz you may take to test your knowledge
                   <br>of stocks. The questions will relate to what was discussed on this page and the definitions
                   <br>page. Once you fully understand the terms of stocks. You are ready to make investments.
-                  <br>Click the button below to begin the quiz.
+                  <br>Click the button below to begin the quiz.</h5>
                   <br>
                   <br>
-                  <a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST">Take the quiz</a>
-                  </h5>
+                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST" href = "quiz">Take the quiz</a></h5>
                 </div>
 
                 <div class = "card-body" id = "info7" style = "background-color: rgb(243, 243, 243); border-bottom: solid black;">
@@ -258,9 +246,9 @@
                 </div>
              </div>
         </div>
-
+        <br>
     </section>
-    <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
+    <footer class="footer mt-auto py-3" id = "foot">
         <div class="container">
           <span>Copyright 2022 by StockSim</span>
         </div>
