@@ -436,7 +436,9 @@ def goToSimulation():
             sim = SimulationFactory(dbfire, session['user']).simulation
             session['initialCash'] = sim.initialCash
             session['simName'] = sim.simName
+            print('prior to ongoingCheck')
             if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
+                print('inside if loop')
                 sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
                 sharesValue = float(sharesValue)
                 currentCash = float(currentCash)
@@ -556,7 +558,7 @@ def stockSearch():
     if ('user' in session):
         try:
             if request.method == 'POST':
-                check = StockData.stockSearch(dbfire, request.form["searchTerm"])
+                check = StockData.stockSearch(dbfire, request.form["searchTerm"], session['simName'])
                 if check[0]:
                     print(check)
                     if session['simulationFlag'] == 1:
