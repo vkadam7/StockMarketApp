@@ -66,6 +66,7 @@ def profile():
         #    daysRemaining = daysRemaining.to_dict()
         return render_template("profile.html", results = results, cash = cash)
     else:
+
         redirect(url_for("login"))
 
 @app.route("/Leaderboard")
@@ -80,6 +81,14 @@ def Leaderboard():
     else:
         redirect(url_for("login"))
 
+@app.route("/followList")
+def followList():
+    if 'user' in session:
+        followersB = dbfire.collection('UserFollowers').get()
+        documentRef = list(doc.to_dict() for doc in followersB)
+        documentRef.sort(key=itemgetter('names'))
+        print(documentRef)
+        return render_template('followers')
 
 
 # Login
@@ -156,6 +165,7 @@ def social():
         return render_template("social.html")
 
 
+
 #Miqdad Hafiz            
 @app.route('/follow', methods = ["POST","GET"])
 def follow():
@@ -193,9 +203,37 @@ def follow():
         
         return redirect(url_for("social"))
             
-        
 
-    
+
+@app.route("/unfollow", methods = ['POST', 'GET'])
+def unfollow():
+    if 'user' in session:
+        UserSearched = session['userResults']
+        userNamed = UserSearched['userName']
+        print(userNamed)
+        
+        userChange = dbfire.collection('Users').where('userName', '==', userNamed).get()
+        for doc in userChange:
+            key = doc.id
+        print(key)
+        userchanged = dbfire.collection('Users').document(key).update({'Followers': firestore.Decrement(1)})
+
+        myself = dbfire.collection('Users').where('Email', '==', session['user']).get()
+        for doc1 in myself:
+            key1 = doc1.id
+        myself = doc1.to_dict()
+        print(key1)
+        me = dbfire.collection('Users').where(key1).update({'Following': firestore.Decrement(1)})
+        
+        followArray = dbfire.collection('Users').where('userName', '==', userNamed).get()
+        for f in followArray:
+            new = f.id
+        print(new)
+        Name = me['userName']
+        newArray = dbfire.collection('Users').document(new).update({'FollowerNames': firestore.ArrayRemove([myself['userName']])})
+        return redirect('social.html')
+
+        
 #Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
 def register():
@@ -371,16 +409,6 @@ def information():
     else:
         return render_template("information.html")
     
-    
-@app.route("/social")
-def network():
-    if('user' in session):
-        person = dbfire.collection('Users').where('userName', '==', session['user'])
-        
-        
-       
-        return render_template("social.html")
-
 @app.route("/StockDefinitions")
 def StockDefinitions():
     if('user' in session):
@@ -422,43 +450,12 @@ def startSimulation():
                             'simEndDate': request.form['simEndDate'],
                             'initialCash': request.form['initialCash']
                         }
-                        session['currentCash'] = request.form['initialCash']
-                        session['portfolioValue'] = request.form['initialCash']
-                        session['sharesValue'] = "0"
-                        session['currentChange'] = '0'
                         sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
-                                                request.form['simEndDate'], request.form['initialCash'])
+                            request.form['simEndDate'], request.form['initialCash'])
                         sim.createSim()
                         session['simName'] = sim.simName
                         
-                        tickers = []
-                        quantities = []
-                        profits = []
-                        netGainLoss = []
-                        sharesPrices = []
-                        currentPrices = []
-                        totalValue = []
-                        originalValue = []
-                        percentage = []
-                        ##avgPrice = []
-                        volatility = []
-                        
-                        for entry in Order.stocksBought(dbfire, session['simName']):
-                            Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
-                            if Portfolio.quantity != 0:
-                                currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
-                                tickers.append(entry)
-                                quantities.append(Portfolio.quantity)
-                                profits.append("%.2f" % round(Portfolio.profit, 2))
-                                sharesPrices.append("%.2f" % round(Portfolio.avgSharePrice,2))
-                                currentPrices.append("%.2f" % round(currentPrice, 2))
-                                totalValue.append("%.2f" % round(Portfolio.quantity*currentPrice, 2))
-                                originalValue.append("%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
-                                volatility.append("%.2f" % round(Portfolio.volatility,2))
-
-                        return render_template('simulation.html', person=session['user'], tickers=tickers, 
-                        quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                        currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue) 
+                        return redirect(url_for('.goToSimulation'))
                     else:
                         flash("Please swap your date values, the starting date must be before the ending date.")
                         return render_template('stockSimForm.html', person=session['user'])
@@ -483,26 +480,28 @@ def goToSimulation():
             sim = SimulationFactory(dbfire, session['user']).simulation
             session['initialCash'] = sim.initialCash
             session['simName'] = sim.simName
-            print(Simulation.ongoingCheck(dbfire, session['simName'], session['user']))
             if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
-                session['currentCash'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']),2)
-                session['sharesValue'] = "%.2f" % round(Simulation.getPortfolioValue(dbfire, session['simName']),2)
-                session['portfolioValue'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']) + Simulation.getPortfolioValue(dbfire, session['simName']), 2)
-                session['currentChange'] = "%.2f" % round(Simulation.retrieveCurrentCash(dbfire, session['simName']) + Simulation.getPortfolioValue(dbfire, session['simName']) - float(session['initialCash']), 2)
+                sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
+                sharesValue = float(sharesValue)
+                currentCash = float(currentCash)
+                session['currentCash'] = "%.2f" % round(currentCash,2)
+                session['sharesValue'] = "%.2f" % round(sharesValue,2)
+                session['portfolioValue'] = "%.2f" % round(currentCash + sharesValue, 2)
+                session['currentChange'] = "%.2f" % round(currentCash + sharesValue - float(session['initialCash']), 2)
                 tickers = []
                 quantities = []
                 profits = []
-                netGainLoss = []
                 sharesPrices = []
                 currentPrices = []
                 totalValue = []
                 originalValue = []
                 percentage = []
-                ##avgPrice = []
                 volatility = []
+                links = []
                 
+                percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
-                    Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
+                    Portfolio = portfolio(dbfire, entry, session['user'], session['simName'])
                     if Portfolio.quantity != 0:
                         currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
                         tickers.append(entry)
@@ -512,11 +511,19 @@ def goToSimulation():
                         totalValue.append("$%.2f" % round(Portfolio.quantity*currentPrice, 2))
                         originalValue.append("$%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
                         profits.append("$%.2f" % round((Portfolio.quantity*currentPrice) - (Portfolio.avgSharePrice*Portfolio.quantity), 2))
+                        percent = Portfolio.quantity*currentPrice / (currentCash+sharesValue) * 100
+                        percentageTotal += percent
+                        percentage.append("%.2f" % round(percent, 2))
                         volatility.append("%.2f" % round(Portfolio.volatility,2))
+                        links.append(Portfolio.link)
+                session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
+                session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
+                session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
 
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue)  
+                currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue,
+                percentage=percentage, links=links)  
             else:
                 return redirect(url_for('.finishSimulation'))
         except KeyError:
@@ -542,14 +549,14 @@ def simlists():
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
     session['option'] = request.form['option']
-    session['currentPrice'] = round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
     return render_template('orderForm.html', option=session['option'])
 
 @app.route("/orderCreate", methods=['POST', 'GET'])
 def orderCreate():
     if request.form['stockQuantity'].isnumeric():
         session['orderQuantity'] = request.form['stockQuantity']
-        session['orderPrice'] = round(int(session['orderQuantity']) * session['currentPrice'], 2)
+        session['orderPrice'] = "%.2f" % round(float(session['orderQuantity']) * float(session['currentPrice']), 2)
         return render_template('orderConfirmation.html', option=session['option'])
     else:
         flash("Please enter a valid quantity amount")
@@ -562,7 +569,6 @@ def orderConfirm():
                     session['option'], session['orderQuantity'], session['currentPrice'])
     if session['option'] == 'Buy':
         flag = order.buyOrder()
-        
     else:
         flag = order.sellOrder()
     if flag == 1:
@@ -598,11 +604,11 @@ def stockSearch():
                 if check[0]:
                     print(check)
                     if session['simulationFlag'] == 1:
-                        return redirect(url_for('displayStock', ticker=check[1], startDate="2021-09-08", endDate="2022-09-16", timespan="hourly"))
+                        return redirect(url_for('displayStock', ticker=check[1], timespan="hourly"))
                     else:
                         return redirect(url_for('stockSimFormFunction'))
                 else:
-                    return redirect(url_for('fourOhFour'))
+                    return redirect(url_for('stockListing'))
         except KeyError:
             print("KeyError occured: stockSearch")
             return redirect(url_for('fourOhFour'))
@@ -627,8 +633,6 @@ def stockSearch():
 @app.route('/displayStock')
 def displayStock():
     ticker = request.args['ticker']
-    startDate = request.args['startDate']
-    endDate = request.args['endDate']
     timespan = request.args['timespan']
     session['ticker'] = ticker
     global stock
@@ -729,8 +733,21 @@ def changeStockView():
     if request.method == 'POST':
         #return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
         
-        return redirect(url_for('.displayStock', ticker=stock['ticker'], startDate=request.form['startDate'], endDate=request.form['endDate'], timespan=request.form['timespan']))
+        return redirect(url_for('.displayStock', ticker=stock['ticker'], timespan=request.form['timespan']))
     return -1
+
+@app.route('/stockList', methods=['POST','GET'])
+def stockListing():
+    if session['simulationFlag'] == 1:
+        sim = SimulationFactory(dbfire, session['user']).simulation
+        session['simName'] = sim.simName
+        tickers, prices, links = Simulation.getAvailableStockList(dbfire, session['simName'], session['user'])
+        print(tickers)
+        print(prices)
+        print(links)
+        return render_template('stockList.html', person=session['user'], tickers=tickers, currentPrices=prices, links=links)
+    else:
+        return redirect(url_for('stockSimFormFunction'))
 
 ## stockSim
 #   Description: Brings the logged in user to the stock sim start page, if the user
@@ -783,14 +800,7 @@ def orderHistory():
     print(orderlist)
 
     return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
-    tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
-
-            
-            
-            
-            
-        
-        
+    tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())       
 
 ## 
 @app.route('/404Error')
@@ -800,13 +810,48 @@ def fourOhFour():
 #@app.route('/startSimulation')
 #def portfolioGraph():
 #    if 'user' in session:
-        
+
+# Submission check route for Quiz by Ian Mcnulty
+@app.route('/quizSubmit', methods = ['GET', 'POST'])
+def quizSubmit():
+    quiz = Quiz(dbfire,'Quiz1',session['user'])
+    answers = []
+    ids = quiz.questions['id']
+    for i in range(10):
+        temp = "choices" + str(i)
+        answers.append(request.form[temp])
+        quiz.answerQuestion(ids[i], request.form[temp])
+
+    score = quiz.scoreCalc()
+    if score > 7:
+        flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
+        " You are now ready to invest, please click the start simulation button above to start investing.")
+        return redirect(url_for('information', person = session['user']))
+    else:
+        flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
+        " You need to score at least a 7/10 to pass.")
+        return redirect(url_for('information', person = session['user']))
+
+
+# Quiz page route by Muneeb Khan
 @app.route('/quiz', methods =['GET','POST'])
 def quizpage():
     if ('user' in session):
         quizID = 'Quiz1'
         quiz = Quiz(dbfire,quizID,session['user'])
-        questions = quiz.questions
+        questions = quiz.questions['text']
+        answers = quiz.questions['answers']
+        answers1 = [answers[0]]
+        answers2 = [answers[1]]
+        answers3 = [answers[2]]
+        answers4 = [answers[3]]
+        answers5 = [answers[4]]
+        answers6 = [answers[5]]
+        answers7 = [answers[6]]
+        answers8 = [answers[7]]
+        answers9 = [answers[8]]
+        answers10 = [answers[9]]
+
 
         if (request.method == 'POST'):
             
@@ -825,7 +870,9 @@ def quizpage():
                 return Quiz.submitScore(dbfire)
             
 
-        return render_template('quiz.html',quiz = quiz, questions = questions)
+        return render_template('quiz.html',quiz = quiz, questions = questions, answers = answers,
+        answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
+        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10)
                    
     else:
         return render_template('404Error.html')
