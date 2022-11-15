@@ -849,7 +849,8 @@ def quizpage():
         answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10)
                    
     else:
-        return render_template('404Error.html')
+        flash("Sorry you must be logged in to take the quiz.")
+        return redirect(url_for("login"))
 
 #Author: Viraj Kadam   
 #Updates user profile  
