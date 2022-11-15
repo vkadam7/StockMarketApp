@@ -406,51 +406,12 @@ def startSimulation():
                             'simEndDate': request.form['simEndDate'],
                             'initialCash': request.form['initialCash']
                         }
-                        session['currentCash'] = request.form['initialCash']
-                        session['portfolioValue'] = request.form['initialCash']
-                        session['sharesValue'] = "0"
-                        session['currentChange'] = '0'
-                        session['percentChange'] = '0'
                         sim = Simulation(dbfire, session['user'], request.form['simStartDate'],
-                                                request.form['simEndDate'], request.form['initialCash'])
+                            request.form['simEndDate'], request.form['initialCash'])
                         sim.createSim()
                         session['simName'] = sim.simName
                         
-                        tickers = []
-                        quantities = []
-                        profits = []
-                        sharesPrices = []
-                        currentPrices = []
-                        totalValue = []
-                        originalValue = []
-                        percentage = []
-                        volatility = []
-                        links = []
-                        
-                        percentageTotal = 0
-                        for entry in Order.stocksBought(dbfire, session['simName']):
-                            Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
-                            if Portfolio.quantity != 0:
-                                currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
-                                tickers.append(entry)
-                                quantities.append(Portfolio.quantity)
-                                sharesPrices.append("$%.2f" % round(Portfolio.avgSharePrice,2))
-                                currentPrices.append("$%.2f" % round(currentPrice, 2))
-                                totalValue.append("$%.2f" % round(Portfolio.quantity*currentPrice, 2))
-                                originalValue.append("$%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
-                                profits.append("$%.2f" % round((Portfolio.quantity*currentPrice) - (Portfolio.avgSharePrice*Portfolio.quantity), 2))
-                                percent = Portfolio.quantity*currentPrice / (float(request.form['initialCash'])) * 100
-                                percentageTotal += percent
-                                percentage.append("%.2f" % round(percent, 2))
-                                volatility.append("%.2f" % round(Portfolio.volatility,2))
-                                links.append(Portfolio.link)
-
-                        session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
-
-                        return render_template('simulation.html', person=session['user'], tickers=tickers, 
-                        quantities=quantities, profits=profits, sharesPrices=sharesPrices,
-                        currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue,
-                        percentage=percentage, links=links)   
+                        return redirect(url_for('.goToSimulation'))
                     else:
                         flash("Please swap your date values, the starting date must be before the ending date.")
                         return render_template('stockSimForm.html', person=session['user'])
@@ -477,6 +438,8 @@ def goToSimulation():
             session['simName'] = sim.simName
             if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
                 sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
+                sharesValue = float(sharesValue)
+                currentCash = float(currentCash)
                 session['currentCash'] = "%.2f" % round(currentCash,2)
                 session['sharesValue'] = "%.2f" % round(sharesValue,2)
                 session['portfolioValue'] = "%.2f" % round(currentCash + sharesValue, 2)
