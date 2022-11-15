@@ -16,11 +16,11 @@ cred = credentials.Certificate("serviceAccountKey.json")
 app = firebase_admin.initialize_app(cred)
 db = firestore.client() #firestore database
 
-ticker = 'AMZN'
-name = "Amazon.com, Inc."
-headquarters = 'Seattle, WA'
-listedAt = 'NasdaqGS'
-fileToOpen = 'stockData/AMZN.csv'
+ticker = 'DB'
+name = "Deutsche Bank Aktiengesellschaft"
+headquarters = 'Frankfurt am Main, Germany'
+listedAt = 'NYSE'
+fileToOpen = 'stockData/DB.csv'
 
 file = open(fileToOpen)
 csvreader = csv.reader(file)
