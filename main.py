@@ -54,7 +54,7 @@ def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
         results = dbfire.collection('Users').where('Email', '==', session['user'])
         #Author: Viraj Kadam
-        cash = dbfire.collection('Simulations').where('user', '==', session['user']). where('ongoing', '==', 'true') #For simulation status section
+        cash = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', 'true') #For simulation status section
         # daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
         #Author: Miqdad Hafiz
         for doc in results.stream(): 
@@ -152,8 +152,11 @@ def social():
                 for docs in grabUser: 
                     grabUser = docs.to_dict()
                 userResult = grabUser
+                session['userResults'] = userResult
                 print("HERE COMES THE USERNAME!")
                 print(userResult)
+                print("HERE COMES THE SESSION VARIABLE")
+                print(session['userResults'])
                 return render_template("userDisplay.html",  userResult = userResult)
             else:
                 print("Can't find user.")
@@ -161,31 +164,46 @@ def social():
                 return render_template("social.html")
         return render_template("social.html")
 
-#Viraj Kadam
-#@app.route("/social", methods = ['POST', 'GET'])
-#def connect():
-#    if 'user' in session:
-#        if request.method == 'POST':
-#            follow = FollowUnfollow(dbfire, session['option'], session['user'], session['names'], session['follower'])
-#            if "Follow" in request.form:
-#                follow.followOption(dbfire, session['user'], session['searchTerm'])
-#                flag = follow.followOption()
-#                increment_ref = db.collection('Users').document('followers')
-#                increment_ref.update({'followers': firestore.Increment(1)})
-#                flash('You are now following' + session['names'])
-#                return redirect('profile.html', follow = follow)
-#        
- #       return render_template('userDislay.html')     
-    
 
-         
-#@app.route('/followerlist')
-#def followerList():
-#    if 'user' in session:
-#        userFollowers = FollowUnfollow.retrievefollowList(dbfire, session['user'])
-#        return render_template('followerList.html', names = userFollowers['names'].to_list())
-#    else:
-#        return ('404Error.html')
+
+#Miqdad Hafiz            
+@app.route('/follow', methods = ["POST","GET"])
+def follow():
+    if 'user' in session:
+        # First add 1 to followers number of user searched
+        UserSearched = session['userResults']
+        userNamed = UserSearched['userName']
+        print(userNamed)
+        
+        #userChange = dbfire.collection('Users').update({'Followers':firestore.Increment(1)}).where('userName', '==', userNamed)
+        userChange = dbfire.collection('Users').where('userName', '==', userNamed).get()
+        for doc in userChange:
+            key = doc.id
+        print(key)
+        userChanged = dbfire.collection('Users').document(key).update({'Followers':firestore.Increment(1)})
+
+        # Second add 1 to following of the user (YOU)
+        myself = dbfire.collection('Users').where('Email', '==', session['user']).get()
+        for docus in myself:
+            key2 = docus.id
+            myself = docus.to_dict()
+        print(key2)
+        myself2 = dbfire.collection('Users').document(key2).update({'Following': firestore.Increment(1)})
+        
+
+        #Last add name to searched user follower array
+        updateFollowArray = dbfire.collection('Users').where('userName', '==', userNamed).get()
+        for docu in updateFollowArray:
+            key3 = docu.id
+        print(key3)
+        uName =  myself['userName']
+        print("HERE COMES LAST PART")
+        print(uName)
+        updateFollowArray2 = dbfire.collection('Users').document(key3).update({'FollowerNames': firestore.ArrayUnion([uName])})
+        
+        return redirect(url_for("social"))
+            
+
 
 @app.route("/unfollow", methods = ['POST', 'GET'])
 def unfollow():
@@ -214,6 +232,7 @@ def unfollow():
         Name = me['userName']
         newArray = dbfire.collection('Users').document(new).update({'FollowerNames': firestore.ArrayRemove([myself['userName']])})
         return redirect('social.html')
+
         
 #Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
@@ -262,8 +281,8 @@ def register():
                 user = authen.create_user_with_email_and_password(email, Password)
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN}) #"Followers": 0, "Following": 0
-                #dbfire.collection('UsersFollowers').document(UseN).set("Name": "")
+                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": []})
+                #dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 flash("Account succesfully created, you may now login" , "pass")
 
