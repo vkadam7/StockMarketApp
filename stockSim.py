@@ -637,7 +637,7 @@ class Simulation:
         data = db.collection('Simulations').document(simName).get().to_dict()
         
         for entry in Order.stocksBought(db, simName):
-            Portfolio = portfolio(db, entry, data['user'], simName, data['initialCash'])
+            Portfolio = portfolio(db, entry, data['user'], simName)
             if Portfolio.quantity != 0:
                 quantities.append(Portfolio.quantity)
                 currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
@@ -780,7 +780,7 @@ class Order:
         self.option = buyOrSell
         self.quantity = quantity
         self.avgStockPrice = stockPrice
-        self.totalPrice = float(quantity)*stockPrice
+        self.totalPrice = float(quantity)*float(stockPrice)
 
     def buyOrder(self):
         if self.option == 'Buy':
@@ -907,15 +907,14 @@ class Order:
             return df
 
 class portfolio:
-    def __init__(self, db, stock, user, simulation, initialCash):
-            self.firebase = db
-            self.stock = stock
-            self.user = user
-            self.initialCash = initialCash
-            self.sim = simulation 
-            self.profit, self.avgSharePrice, self.quantity = self.getVariables()
-            self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
-            self.volatility = 0
+    def __init__(self, db, stock, user, simulation):
+        self.firebase = db
+        self.stock = stock
+        self.user = user
+        self.sim = simulation 
+        self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
+        self.profit, self.avgSharePrice, self.quantity = self.getVariables()
+        self.volatility = 0
 
     def getVariables(self):
         currentPriceOfStock = SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock)
@@ -926,17 +925,21 @@ class portfolio:
         for entry in Order.retrieve(self.firebase, self.sim, self.stock):
             temp = entry.to_dict()
             prices.append(float(temp['totalPrice']))
-            if temp.get('newQuantity') != None:
-                amountOfSharesOwned += int(temp['newQuantity'])
-                quantity += int(temp['newQuantity'])
-            else:
-                amountOfSharesOwned += int(temp['quantity'])
-                quantity += int(temp['quantity'])
             avgStockPrices.append(float(temp['avgStockPrice']))
+            if temp.get('newQuantity') != None:
+                if temp.get('sold') != None:
+                    if temp['sold'] == False:
+                        amountOfSharesOwned += int(temp['newQuantity'])
+            else:
+                if temp.get('sold') != None:
+                    if temp['sold'] == False:
+                        amountOfSharesOwned += int(temp['quantity'])             
         avgPriceOfOrders = mean(prices)
         currentValueOfShares = currentPriceOfStock * amountOfSharesOwned
         if avgStockPrices:
-            return currentValueOfShares - avgPriceOfOrders, mean(avgStockPrices), quantity
+            return currentValueOfShares - avgPriceOfOrders, mean(avgStockPrices), amountOfSharesOwned
+        else:
+            return currentValueOfShares - avgPriceOfOrders, 0, amountOfSharesOwned
             
     #Displays amount of shares owned (To also be implemented later)
     #def weight(self):

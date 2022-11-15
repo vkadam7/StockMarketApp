@@ -494,7 +494,7 @@ def goToSimulation():
                 
                 percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
-                    Portfolio = portfolio(dbfire, entry, session['user'], session['simName'], session['initialCash'])
+                    Portfolio = portfolio(dbfire, entry, session['user'], session['simName'])
                     if Portfolio.quantity != 0:
                         currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
                         tickers.append(entry)
@@ -549,7 +549,7 @@ def orderFormFill():
 def orderCreate():
     if request.form['stockQuantity'].isnumeric():
         session['orderQuantity'] = request.form['stockQuantity']
-        session['orderPrice'] = "%.2f" % round(int(session['orderQuantity']) * session['currentPrice'], 2)
+        session['orderPrice'] = "%.2f" % round(float(session['orderQuantity']) * float(session['currentPrice']), 2)
         return render_template('orderConfirmation.html', option=session['option'])
     else:
         flash("Please enter a valid quantity amount")
