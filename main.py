@@ -173,9 +173,10 @@ def follow():
         userChanged = dbfire.collection('Users').document(key).update({'Followers':firestore.Increment(1)})
 
         # Second add 1 to following of the user (YOU)
-        myself = dbfire.collection('Users').where('Email', '==', session['user'])
-        for docs in myself:
-            key2 = docs.id
+        myself = dbfire.collection('Users').where('Email', '==', session['user']).get()
+        for docus in myself:
+            key2 = docus.id
+            myself = docus.to_dict()
         print(key2)
         myself2 = dbfire.collection('Users').document(key2).update({'Following': firestore.Increment(1)})
         
@@ -185,9 +186,12 @@ def follow():
         for docu in updateFollowArray:
             key3 = docu.id
         print(key3)
-        updateFollowArray2 = dbfire.collection('Users').document(key3).update({'FollowerNames': firestore.ArrayUnion([myself['userName']])})
+        uName =  myself['userName']
+        print("HERE COMES LAST PART")
+        print(uName)
+        updateFollowArray2 = dbfire.collection('Users').document(key3).update({'FollowerNames': firestore.ArrayUnion([uName])})
         
-        return render_template("social.html")
+        return redirect(url_for("social"))
             
         
 
