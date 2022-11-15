@@ -645,7 +645,7 @@ class Simulation:
         for i in range(len(quantities)):
             totalValue += quantities[i] * currentPrices[i]
 
-        return totalValue
+        return totalValue, data['currentCash']
 
     def getAvailableStockList(db, simName, email):
         index = SimulationFactory(db, email).simulation.whatTimeIsItRightNow()        
@@ -913,7 +913,6 @@ class portfolio:
             self.user = user
             self.initialCash = initialCash
             self.sim = simulation 
-            self.currentCash = Simulation.retrieveCurrentCash(db, simulation)
             self.profit, self.avgSharePrice, self.quantity = self.getVariables()
             self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
             self.volatility = 0

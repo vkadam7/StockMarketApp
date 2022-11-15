@@ -476,8 +476,7 @@ def goToSimulation():
             session['initialCash'] = sim.initialCash
             session['simName'] = sim.simName
             if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
-                sharesValue = Simulation.getPortfolioValue(dbfire, session['simName'])
-                currentCash = Simulation.retrieveCurrentCash(dbfire, session['simName'])
+                sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
                 session['currentCash'] = "%.2f" % round(currentCash,2)
                 session['sharesValue'] = "%.2f" % round(sharesValue,2)
                 session['portfolioValue'] = "%.2f" % round(currentCash + sharesValue, 2)
