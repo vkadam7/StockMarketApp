@@ -66,6 +66,7 @@ def profile():
         #    daysRemaining = daysRemaining.to_dict()
         return render_template("profile.html", results = results, cash = cash)
     else:
+
         redirect(url_for("login"))
 
 @app.route("/Leaderboard")
@@ -80,6 +81,14 @@ def Leaderboard():
     else:
         redirect(url_for("login"))
 
+@app.route("/followList")
+def followList():
+    if 'user' in session:
+        followersB = dbfire.collection('UserFollowers').get()
+        documentRef = list(doc.to_dict() for doc in followersB)
+        documentRef.sort(key=itemgetter('names'))
+        print(documentRef)
+        return render_template('followers')
 
 
 # Login
@@ -153,33 +162,59 @@ def social():
         return render_template("social.html")
 
 #Viraj Kadam
-@app.route('/follow', methods = ['POST', 'GET'])
-def connect():
-    if 'user' in session:
-        follow = FollowUnfollow(dbfire, session['option'], session['user'], session['names'])
-        if session['option'] == 'Follow':
-            flag = follow.followOption()
-            flash('You are now following')
-        elif session['option']:
-            flag = follow.unfollowOption()
-            flash('You have unfollowed this user')
-
-        if flag == 1:
-            names = []
-            for followers in follow.retrievefollowList(dbfire, session['user']):
-                if followers.quantity != 0:
-                    names.append(followers.num)
-
-        return render_template('userDisplay.html', names = names)
-                
-                
-            
-            
-        
-            
-        
-
+#@app.route("/social", methods = ['POST', 'GET'])
+#def connect():
+#    if 'user' in session:
+#        if request.method == 'POST':
+#            follow = FollowUnfollow(dbfire, session['option'], session['user'], session['names'], session['follower'])
+#            if "Follow" in request.form:
+#                follow.followOption(dbfire, session['user'], session['searchTerm'])
+#                flag = follow.followOption()
+#                increment_ref = db.collection('Users').document('followers')
+#                increment_ref.update({'followers': firestore.Increment(1)})
+#                flash('You are now following' + session['names'])
+#                return redirect('profile.html', follow = follow)
+#        
+ #       return render_template('userDislay.html')     
     
+
+         
+#@app.route('/followerlist')
+#def followerList():
+#    if 'user' in session:
+#        userFollowers = FollowUnfollow.retrievefollowList(dbfire, session['user'])
+#        return render_template('followerList.html', names = userFollowers['names'].to_list())
+#    else:
+#        return ('404Error.html')
+
+@app.route("/unfollow", methods = ['POST', 'GET'])
+def unfollow():
+    if 'user' in session:
+        UserSearched = session['userResults']
+        userNamed = UserSearched['userName']
+        print(userNamed)
+        
+        userChange = dbfire.collection('Users').where('userName', '==', userNamed).get()
+        for doc in userChange:
+            key = doc.id
+        print(key)
+        userchanged = dbfire.collection('Users').document(key).update({'Followers': firestore.Decrement(1)})
+
+        myself = dbfire.collection('Users').where('Email', '==', session['user']).get()
+        for doc1 in myself:
+            key1 = doc1.id
+        myself = doc1.to_dict()
+        print(key1)
+        me = dbfire.collection('Users').where(key1).update({'Following': firestore.Decrement(1)})
+        
+        followArray = dbfire.collection('Users').where('userName', '==', userNamed).get()
+        for f in followArray:
+            new = f.id
+        print(new)
+        Name = me['userName']
+        newArray = dbfire.collection('Users').document(new).update({'FollowerNames': firestore.ArrayRemove([myself['userName']])})
+        return redirect('social.html')
+        
 #Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
 def register():
@@ -355,16 +390,6 @@ def information():
     else:
         return render_template("information.html")
     
-    
-@app.route("/social")
-def network():
-    if('user' in session):
-        person = dbfire.collection('Users').where('userName', '==', session['user'])
-        
-        
-       
-        return render_template("social.html")
-
 @app.route("/StockDefinitions")
 def StockDefinitions():
     if('user' in session):
