@@ -177,11 +177,15 @@ def follow():
         for docs in myself:
             key2 = docs.id
         print(key2)
-        myself2 = dbfire.collection('Users').document(key).update({'Following': firestore.Increment(1)})
+        myself2 = dbfire.collection('Users').document(key2).update({'Following': firestore.Increment(1)})
         
 
         #Last add name to searched user follower array
-        updateFollowArray = dbfire.collection('Users').document(userNamed).update({'FollowerNames': firestore.ArrayUnion([myself['userName']])})
+        updateFollowArray = dbfire.collection('Users').where('userName', '==', userNamed).get()
+        for docu in updateFollowArray:
+            key3 = docu.id
+        print(key3)
+        updateFollowArray2 = dbfire.collection('Users').document(key3).update({'FollowerNames': firestore.ArrayUnion([myself['userName']])})
         
         return render_template("social.html")
             
