@@ -241,20 +241,20 @@ def register():
     return render_template('register.html')   
 
 
-## Attempt on email verification function by Muneeb Khan (WIP!)
-@app.route('/verification', methods = ["POST" , "GET"])
-def verification():
-    if request.method == "POST":
-        try:
-            user = authen.send_email_verification(email['idToken'])
-            print("Verification sent")
-            return redirect(url_for("login"))
+# ## Attempt on email verification function by Muneeb Khan (WIP!)
+# @app.route('/verification', methods = ["POST" , "GET"])
+# def verification():
+#     if request.method == "POST":
+#         try:
+#             user = authen.send_email_verification(email['idToken'])
+#             print("Verification sent")
+#             return redirect(url_for("login"))
 
-        except:
-            print("Invalid token please try again!")
-            return redirect(url_for("verification"))
+#         except:
+#             print("Invalid token please try again!")
+#             return redirect(url_for("verification"))
 
-    return render_template("verification.html")
+#     return render_template("verification.html")
 
 ## Password Recovery Function by Muneeb Khan
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
