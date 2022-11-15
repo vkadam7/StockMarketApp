@@ -884,7 +884,6 @@ class Order:
         for entry in db.collection('Orders').where('simulation','==',sim).stream():
             temp = entry.to_dict()
             tickers.append(temp['ticker'])
-        print(tickers)
         return [*set(tickers)]
 
     # List of Orders by Muneeb Khan
@@ -918,14 +917,13 @@ class portfolio:
 
     def getVariables(self):
         currentPriceOfStock = SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock)
-        quantity = 0
         prices = []
         avgStockPrices = []
         amountOfSharesOwned = 0
         for entry in Order.retrieve(self.firebase, self.sim, self.stock):
             temp = entry.to_dict()
-            prices.append(float(temp['totalPrice']))
             avgStockPrices.append(float(temp['avgStockPrice']))
+            prices.append(float(temp['totalPrice']))
             if temp.get('newQuantity') != None:
                 if temp.get('sold') != None:
                     if temp['sold'] == False:
