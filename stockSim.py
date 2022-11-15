@@ -527,7 +527,7 @@ class Simulation:
         totalValue = 0
         
         for entry in Order.stocksBought(db, simName):
-            Portfolio = portfolio(db, entry, data['user'], simName, data['initialCash'])
+            Portfolio = portfolio(db, entry, data['user'], simName)
             if Portfolio.quantity != 0:
                 quantities.append(Portfolio.quantity)
                 currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
