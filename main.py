@@ -155,46 +155,35 @@ def social():
                 return render_template("social.html")
         return render_template("social.html")
 
-#Viraj Kadam
-@app.route('/follow', methods = ['POST', 'GET'])
-def connect():
-    if 'user' in session:
-        follow = FollowUnfollow(dbfire, session['option'], session['user'], session['names'])
-        if session['option'] == 'Follow':
-            flag = follow.followOption()
-            flash('You are now following')
-        elif session['option']:
-            flag = follow.unfollowOption()
-            flash('You have unfollowed this user')
 
-        if flag == 1:
-            names = []
-            for followers in follow.retrievefollowList(dbfire, session['user']):
-                if followers.quantity != 0:
-                    names.append(followers.num)
-
-        return render_template('userDisplay.html', names = names)
-                
-                
+#Miqdad Hafiz            
 @app.route('/follow', methods = ["POST","GET"])
 def follow():
     if 'user' in session:
         # First add 1 to followers number of user searched
         UserSearched = session['userResults']
         userNamed = UserSearched['userName']
-        updateFollower = UserSearched['Followers'] + 1
+        print(userNamed)
         
-        userChange = dbfire.collection('Users').where('userName', '==', userNamed).update({'Followers':firestore.Increment(1)})
-
+        #userChange = dbfire.collection('Users').update({'Followers':firestore.Increment(1)}).where('userName', '==', userNamed)
+        userChange = dbfire.collection('Users').where('userName', '==', userNamed).get()
+        for doc in userChange:
+            key = doc.id
+        print(key)
+        userChanged = dbfire.collection('Users').document(key).update({'Followers':firestore.Increment(1)})
 
         # Second add 1 to following of the user (YOU)
         myself = dbfire.collection('Users').where('Email', '==', session['user'])
-        updateFollowing = myself['Following'] + 1
-        updateUser = dbfire.collection('Users').where('Email', '==', session['user']).update({'Following': firestore.Increment(1)})
+        for docs in myself:
+            key2 = docs.id
+        print(key2)
+        myself2 = dbfire.collection('Users').document(key).update({'Following': firestore.Increment(1)})
+        
 
         #Last add name to searched user follower array
         updateFollowArray = dbfire.collection('Users').document(userNamed).update({'FollowerNames': firestore.ArrayUnion([myself['userName']])})
         
+        return render_template("social.html")
             
         
 
