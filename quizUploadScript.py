@@ -1,6 +1,7 @@
 ## QuizUploadScript
 #
 #   Author: Ian McNulty
+#   Update by Muneeb Khan
 import numpy as np
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -12,94 +13,97 @@ db = firestore.client() #firestore database
 
 questions = [
 { # Question 1
-    'text' : 'What is a Shareholder?',
+    'text' : 'What is an Index?',
     'answers' : {
-        'a' : 'A person who shares investments across different companies',
-        'b' : 'A person who owns at least one share of a companys stock',
-        'c' : 'A person who sells a companies stock to another shareholder'
-    },
-    'correct' : 'b'
-},
-{ # Question 2
-    'text' : 'What is the best way to start investments?',
-    'answers' : {
-        'a' : 'Paper trading',
-        'b' : 'Bitcoin trading',
-        'c' : 'Selling'
+        'a' : 'A point on the stock graph to indicate the amount',
+        'b' : 'A companys highest price point for the day',
+        'c' : 'A companys lowest price point for the day'
     },
     'correct' : 'a'
 },
-{ # Question 3
-    'text' : 'What is the name of our website?',
+{ # Question 2
+    'text' : 'What is a Market order?',
     'answers' : {
-        'a' : 'StockMarket',
-        'b' : 'StockSim',
-        'c' : 'StockTrades'
+        'a' : 'An order that is bought from a store',
+        'b' : 'An order that is bought based on the companys price',
+        'c' : 'An order that is bought based on the markets price'
     },
-    'correct' : 'b'
+    'correct' : 'c'
+},
+{ # Question 3
+    'text' : 'What is a liquidity?',
+    'answers' : {
+        'a' : 'The measure of how much time it takes to buy a stock',
+        'b' : 'Taking advantage of a big price difference',
+        'c' : 'The measure of how easy it is to buy or sell a stock'
+    },
+    'correct' : 'c'
 },
 { # Question 4
-    'text' : 'What is Arbitrage?',
+    'text' : 'What is an ownership of a part of the companies investments?',
     'answers' : {
-        'a' : 'Taking advantage of a small price difference',
-        'b' : 'Selling a stock',
-        'c' : 'The measure of how easy it is to buy or sell a stock'
+        'a' : 'Stocks',
+        'b' : 'Yields',
+        'c' : 'Volatility'
     },
     'correct' : 'a'
 },
 { # Question 5
-    'text' : 'Which of the following is an investors records of stocks bought and sold in a period of time?',
+    'text' : 'Who was the founder of stocks?',
     'answers' : {
-        'a' : 'High',
-        'b' : 'Order',
-        'c' : 'Portfolio'
+        'a' : 'Benjamin Franklin',
+        'b' : 'The Dutch East India Company',
+        'c' : 'New York Stock exchange'
     },
-    'correct' : 'c'
+    'correct' : 'b'
 },
 { # Question 6
-    'text' : 'What is a share?',
+    'text' : 'For dividends what is the cut off date before the record date called?',
     'answers' : {
-        'a' : 'A coupon to the company store',
-        'b' : 'A ticket to become the CEO',
-        'c' : 'A portion of ownership of a company'
+        'a' : 'Dividend date',
+        'b' : 'Ex-dividend date',
+        'c' : 'Dividend reinvestment date'
     },
-    'correct' : 'c'
+    'correct' : 'b'
 }, 
 { # Question 7
-    'text' : 'What is the number one rule of stock trading?',
+    'text' : 'Which of the following usually have high liquidity',
     'answers' : {
-        'a' : 'Buy low, sell high',
-        'b' : 'Buy high, sell low',
-        'c' : 'The only way to win is not to play'
+        'a' : 'Cash & stocks',
+        'b' : 'Real estates',
+        'c' : 'Interest rates'
     },
     'correct' : 'a'
 },
 { # Question 8
-    'text' : 'What is a dividend?',
+    'text' : 'What is the highest point of a companys price called?',
     'answers' : {
-        'a' : 'A share of a company',
-        'b' : 'A portion of a stock',
-        'c' : 'A payout from the company for shareholders'
+        'a' : 'Open',
+        'b' : 'Max',
+        'c' : 'High'
     },
     'correct' : 'c'
 }, 
 { # Question 9
-    'text' : 'What is volatility?',
+    'text' : 'Stock graphs can be displayed as',
     'answers' : {
-        'a' : 'A statistical measure of how much a stock stays the same',
-        'b' : 'A statistical measure of how much a stock moves up or down',
-        'c' : 'A statistical measure of how little a stock moves up or down'
+        'a' : 'Line charts',
+        'b' : 'Bar charts',
+        'c' : 'Pie charts',
+        'd' : 'all of the above',
+        'e' : 'a & b only'
     },
-    'correct' : 'b'
+    'correct' : 'e'
 },
 { # Question 10
-    'text' : 'What is yield?',
+    'text' : 'What is the ticker for the Walt Disney company?',
     'answers' : {
-        'a' : 'The amount of return on an investment',
-        'b' : 'The amount of shares you hold in a stock',
-        'c' : 'A type of American road sign'
+        'a' : 'DISNE',
+        'b' : 'DI',
+        'c' : 'DISN',
+        'd' : 'DIS'
     },
-    'correct' : 'a'
+    'correct' : 'd'
 }]
 
 ids = []
@@ -112,5 +116,5 @@ quiz = {
 }
 
 # Name of quiz entry
-quizName = 'Quiz1'
+quizName = 'Quiz2'
 db.collection('Quiz').document(quizName).set(quiz)
