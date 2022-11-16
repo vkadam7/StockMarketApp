@@ -55,22 +55,20 @@ def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
         results = dbfire.collection('Users').where('Email', '==', session['user'])
         #Author: Viraj Kadam
-        cash = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', 'true') #For simulation status section
-        # daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
+        cash = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True) #For simulation status section
+        #daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
         #Author: Miqdad Hafiz
         for doc in results.stream(): 
             results = doc.to_dict()
         #Author: Viraj Kadam    
         for doc in cash.stream():
             cash = doc.to_dict()
-        # for doc in daysRemaining.stream():
-        #    daysRemaining = daysRemaining.to_dict()
-        #endDateFetch = dbfire.collection('Simulations').document('simName').document('endDate')
-        #startDateFetch = dbfire.collection('Simulations').document('simName').document('startDate')
         
-        
-        
-        
+        #endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
+        #startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
+        #while(startDateFetch >= endDateFetch):
+        #    startDate = 
+            
         return render_template("profile.html", results = results, cash = cash)
     else:
 
@@ -91,11 +89,12 @@ def Leaderboard():
 @app.route("/followList")
 def followList():
     if 'user' in session:
-        followersB = dbfire.collection('UserFollowers').get()
-        documentRef = list(doc.to_dict() for doc in followersB)
-        documentRef.sort(key=itemgetter('names'))
-        print(documentRef)
-        return render_template('followers')
+        followersList = []
+        for entry in dbfire.collection('Users').where('email','==',session['user']).document('Followers').to_dict():
+            temp = entry.to_dict()
+            followersList.append(temp['Followers'])      
+
+        return render_template('followers',followersList = followersList)
 
 
 # Login
@@ -471,6 +470,10 @@ def graphPictures():
     else:
         return render_template("graphPictures.html")
 
+@app.route("/simulationSuggestion", methods=['POST', 'GET'])
+def simSuggest():
+    return -1
+
 ## startSimulation
 #   Description: 
 @app.route("/startSimulation", methods=['POST'])
@@ -517,7 +520,9 @@ def goToSimulation():
             sim = SimulationFactory(dbfire, session['user']).simulation
             session['initialCash'] = sim.initialCash
             session['simName'] = sim.simName
+            print('prior to ongoingCheck')
             if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
+                print('inside if loop')
                 sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
                 sharesValue = float(sharesValue)
                 currentCash = float(currentCash)
@@ -644,7 +649,7 @@ def stockSearch():
     if ('user' in session):
         try:
             if request.method == 'POST':
-                check = StockData.stockSearch(dbfire, request.form["searchTerm"])
+                check = StockData.stockSearch(dbfire, request.form["searchTerm"], session['simName'])
                 if check[0]:
                     print(check)
                     if session['simulationFlag'] == 1:
@@ -798,11 +803,8 @@ def stockListing():
     if session['simulationFlag'] == 1:
         sim = SimulationFactory(dbfire, session['user']).simulation
         session['simName'] = sim.simName
-        tickers, prices, links = Simulation.getAvailableStockList(dbfire, session['simName'], session['user'])
-        print(tickers)
-        print(prices)
-        print(links)
-        return render_template('stockList.html', person=session['user'], tickers=tickers, currentPrices=prices, links=links)
+        tickers, prices, links, names = Simulation.getAvailableStockList(dbfire, session['simName'], session['user'])
+        return render_template('stockList.html', person=session['user'], tickers=tickers, currentPrices=prices, links=links, names=names)
     else:
         return redirect(url_for('stockSimFormFunction'))
 
@@ -878,8 +880,12 @@ def quizSubmit():
     ids = quiz.questions['id']
     for i in range(10):
         temp = "choices" + str(i)
-        answers.append(request.form[temp])
-        quiz.answerQuestion(ids[i], request.form[temp])
+        if request.form.get(temp) != None:
+            answers.append(request.form[temp])
+            quiz.answerQuestion(ids[i], request.form[temp])
+        else: 
+            answers.append('f')
+            quiz.answerQuestion(ids[i], 'f')
 
     score = quiz.scoreCalc()
     if score > 7:
