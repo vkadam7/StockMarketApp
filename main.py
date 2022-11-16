@@ -467,6 +467,10 @@ def graphPictures():
     else:
         return render_template("graphPictures.html")
 
+@app.route("/simulationSuggestion", methods=['POST', 'GET'])
+def simSuggest():
+    return -1
+
 ## startSimulation
 #   Description: 
 @app.route("/startSimulation", methods=['POST'])
@@ -513,7 +517,9 @@ def goToSimulation():
             sim = SimulationFactory(dbfire, session['user']).simulation
             session['initialCash'] = sim.initialCash
             session['simName'] = sim.simName
+            print('prior to ongoingCheck')
             if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
+                print('inside if loop')
                 sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
                 sharesValue = float(sharesValue)
                 currentCash = float(currentCash)
@@ -633,7 +639,7 @@ def stockSearch():
     if ('user' in session):
         try:
             if request.method == 'POST':
-                check = StockData.stockSearch(dbfire, request.form["searchTerm"])
+                check = StockData.stockSearch(dbfire, request.form["searchTerm"], session['simName'])
                 if check[0]:
                     print(check)
                     if session['simulationFlag'] == 1:
@@ -787,11 +793,8 @@ def stockListing():
     if session['simulationFlag'] == 1:
         sim = SimulationFactory(dbfire, session['user']).simulation
         session['simName'] = sim.simName
-        tickers, prices, links = Simulation.getAvailableStockList(dbfire, session['simName'], session['user'])
-        print(tickers)
-        print(prices)
-        print(links)
-        return render_template('stockList.html', person=session['user'], tickers=tickers, currentPrices=prices, links=links)
+        tickers, prices, links, names = Simulation.getAvailableStockList(dbfire, session['simName'], session['user'])
+        return render_template('stockList.html', person=session['user'], tickers=tickers, currentPrices=prices, links=links, names=names)
     else:
         return redirect(url_for('stockSimFormFunction'))
 
