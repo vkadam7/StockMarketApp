@@ -76,7 +76,7 @@
                 <form action="/stockSearch" method="post">
           <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
-                  <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
+                  <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
       </form>
               </div>        
             </div>
@@ -112,9 +112,14 @@
                                         </div>
                                     
                                     </div>
+                                    <form action = "/follow" method = "POST">
                                     <div class = "d-flex justify-content-end">
-                                        <button class = "btn btn-primary" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Follow</button>    
+                                      <form>
+                                        <button class = "btn btn-primary" input type = "submit" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Follow</button> 
+                                         
+                                      </form>  
                                     </div>
+                                    </form>
                                 </div>
                             </div>    
                         </div>    

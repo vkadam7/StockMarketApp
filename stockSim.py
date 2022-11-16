@@ -18,13 +18,13 @@ import math
 
 
 
-import matplotlib as plt
-import matplotlib.animation as animation
-import matplotlib.pyplot as plt
-from matplotlib import style
-import math
-import mpld3
-from mpld3 import plugins
+#import matplotlib as plt
+#import matplotlib.animation as animation
+#import matplotlib.pyplot as plt
+#from matplotlib import style
+#import math
+#import mpld3
+#from mpld3 import plugins
 
 
 
@@ -497,7 +497,6 @@ class Simulation:
         data = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
         for entry in data:
             fin = entry.to_dict()
-        print(self.whatTimeIsItRightNow())
         highestIndex = Simulation.maxIndex(self.db, self.simName)
         if highestIndex > self.whatTimeIsItRightNow():
             return fin['prices'][self.whatTimeIsItRightNow()]
@@ -522,7 +521,7 @@ class Simulation:
         totalValue = 0
         
         for entry in Order.stocksBought(db, simName):
-            Portfolio = portfolio(db, entry, data['user'], simName, data['initialCash'])
+            Portfolio = portfolio(db, entry, data['user'], simName)
             if Portfolio.quantity != 0:
                 quantities.append(Portfolio.quantity)
                 currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
@@ -632,7 +631,7 @@ class Simulation:
         data = db.collection('Simulations').document(simName).get().to_dict()
         
         for entry in Order.stocksBought(db, simName):
-            Portfolio = portfolio(db, entry, data['user'], simName, data['initialCash'])
+            Portfolio = portfolio(db, entry, data['user'], simName)
             if Portfolio.quantity != 0:
                 quantities.append(Portfolio.quantity)
                 currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
@@ -640,7 +639,26 @@ class Simulation:
         for i in range(len(quantities)):
             totalValue += quantities[i] * currentPrices[i]
 
-        return totalValue
+        return totalValue, data['currentCash']
+
+    def getAvailableStockList(db, simName, email):
+        index = SimulationFactory(db, email).simulation.whatTimeIsItRightNow()        
+        tickers = []
+        prices = []
+        links = []
+        for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
+            temp = entry.to_dict()
+            print(temp.get('unavailable'))
+            if temp.get('unavailable') == None:
+                print(str(len(temp['prices'])) + " and index is " + str(index))
+                if len(temp['prices']) > index:
+                    tickers.append(str(temp['ticker']))
+                    print(temp['ticker'])
+                    prices.append("%.2f" % round(temp['prices'][index],2))
+                    print("%.2f" % round(temp['prices'][index],2))
+                    links.append(str('/displayStock?ticker='+temp['ticker']+'&timespan=hourly'))
+                    print(str('/displayStock?ticker='+temp['ticker']+'&timespan=hourly'))
+        return tickers, prices, links
 
 class SimulationFactory:
     def __init__(self, db, email):
@@ -750,7 +768,7 @@ class Order:
         self.option = buyOrSell
         self.quantity = quantity
         self.avgStockPrice = stockPrice
-        self.totalPrice = float(quantity)*stockPrice
+        self.totalPrice = float(quantity)*float(stockPrice)
 
     def buyOrder(self):
         if self.option == 'Buy':
@@ -854,7 +872,6 @@ class Order:
         for entry in db.collection('Orders').where('simulation','==',sim).stream():
             temp = entry.to_dict()
             tickers.append(temp['ticker'])
-        print(tickers)
         return [*set(tickers)]
 
     # List of Orders by Muneeb Khan
@@ -877,61 +894,62 @@ class Order:
             return df
 
 class portfolio:
-    def __init__(self, db, stock, user, simulation, initialCash):
-            self.firebase = db
-            self.stock = stock
-            self.user = user
-            self.initialCash = initialCash
-            self.sim = simulation 
-            #self.fundsRemaining = fundsRemaining
-            #self.dayofPurchase = datetime.datetime.now()
-            self.currentCash = Simulation.retrieveCurrentCash(db, simulation)
-            self.quantity = self.weight()
-            self.profit = self.get_profit()
-            self.avgSharePrice = self.returnValue()
-            self.volatility = 0
+    def __init__(self, db, stock, user, simulation):
+        self.firebase = db
+        self.stock = stock
+        self.user = user
+        self.sim = simulation 
+        self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
+        self.profit, self.avgSharePrice, self.quantity = self.getVariables()
+        self.volatility = 0
 
-    
-    #def retrieve(self, id):
-    #    stockRetrieved = self.db.collection('Simulations').document(simName).document('intradayStockDataTableKey').get()
-    #    return stockRetrieved
-
-    #round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
-    #Returns profit from the simulator(Need to test and fix if needed )
-    def get_profit(self):
-        currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
+    def getVariables(self):
+        currentPriceOfStock = SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock)
         prices = []
+        avgStockPrices = []
         amountOfSharesOwned = 0
         for entry in Order.retrieve(self.firebase, self.sim, self.stock):
             temp = entry.to_dict()
+            avgStockPrices.append(float(temp['avgStockPrice']))
             prices.append(float(temp['totalPrice']))
             if temp.get('newQuantity') != None:
-                amountOfSharesOwned += int(temp['newQuantity'])
+                if temp.get('sold') != None:
+                    if temp['sold'] == False:
+                        amountOfSharesOwned += int(temp['newQuantity'])
             else:
-                amountOfSharesOwned += int(temp['quantity'])
+                if temp.get('sold') != None:
+                    if temp['sold'] == False:
+                        amountOfSharesOwned += int(temp['quantity'])             
         avgPriceOfOrders = mean(prices)
         currentValueOfShares = currentPriceOfStock * amountOfSharesOwned
-        return round(currentValueOfShares - avgPriceOfOrders, 2)
+        if avgStockPrices:
+            return currentValueOfShares - avgPriceOfOrders, mean(avgStockPrices), amountOfSharesOwned
+        else:
+            return currentValueOfShares - avgPriceOfOrders, 0, amountOfSharesOwned
             
     #Displays amount of shares owned (To also be implemented later)
-    def weight(self):
-        quantity = 0
-        for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
-            temp = entry.to_dict()
-            if temp.get('newQuantity') != None:
-                quantity += int(temp['newQuantity'])
-            else:
-                quantity += int(temp['quantity'])
-        return quantity 
+    #def weight(self):
+    #    quantity = 0
+    #    prices = []
+    #    for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
+    #        temp = entry.to_dict()
+    #        if temp.get('newQuantity') != None:
+    #            quantity += int(temp['newQuantity'])
+    #        else:
+    #            quantity += int(temp['quantity'])
+    #        prices.append(float(temp['avgStockPrice']))
+    #    if prices:
+    #        return quantity, round(mean(prices),2) 
+    #    else:
+    #        return quantity, round(mean(prices),2)
         
-    def returnValue(self):
-        prices = []
-        for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
-            temp = entry.to_dict()
-            prices.append(float(temp['avgStockPrice']))
-        if prices:
-            return round(mean(prices),2)
-        return 0
+    #def returnValue(self):
+    #    for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
+    #        temp = entry.to_dict()
+    #        prices.append(float(temp['avgStockPrice']))
+    #    if prices:
+    #        return round(mean(prices),2)
+    #    return 0
 
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
     def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):

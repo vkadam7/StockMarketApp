@@ -11,73 +11,72 @@
     </head>
     <header>
 
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top" id = "navBar">
-            <div class="container-fluid">
-              <a class="navbar-brand" href="home">
-                <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
-                StockSim: Learn How to Trade
-              </a>
-              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse" id="navbarCollapse">
-                <ul class="navbar-nav me-auto mb-2 mb-md-0">
-                  <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="home">Home</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="aboutus">About Us</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="information">Information</a>
-                  </li>
-        {% if session['user'] %}
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
-          </li>
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
-          </li>
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
-          </li>
-          <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
-            <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
-              <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Start a simulation!</button>
-            </form>
-            <script type="text/javascript">
-              if ({{ session['loginFlagPy'] }} == 0 || {{ session['simulationFlag'] }} == 1 ) { 
-                document.getElementById('stockSimButton').style.display = "none";
-              }
-            </script>
-          </li>
-          <li>
-            <form id="nav-link" action="/simulation" method="post"> 
-              <button class = "btn btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="goToSim">Go to Current Sim!</button>
-            </form>
-            <script type="text/javascript">
-              if ({{ session['simulationFlag'] }} == 0 ) { 
-                document.getElementById('goToSim').style.display = "none";
-              }
-            </script>  
-          </li>
-          {% else %}
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "login">Login</a> 
-          </li>
-          <li class = "nav-item">
-            <a class = "nav-link" method = "POST" href = "register">Register</a>
-          </li>
-        {% endif %}
-                </ul>
-                <form action="/stockSearch" method="post">
-          <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
-                  value="{{ request.form['searchTerm'] }}">
-                  <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
-      </form>
-              </div>        
-            </div>
-          </nav>
+      <nav class="navbar navbar-expand-md navbar-dark" id = "navBar">
+        <img src = "/static/stockLogo.png" alt = "stock symbol" width = "45" height = "45" class="d-inline-block align-top">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+              <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item">
+                  <a class="nav-link" aria-current="page" href="home">Home</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="aboutus">About Us</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="information">Information</a>
+                </li>
+      {% if session['user'] %}
+      <li class="nav-item">
+        <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
+      </li>
+    </li class = "nav-item">
+        <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
+     </li>
+      <li class="nav-item">
+        <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
+      </li>
+      <li class="nav-item">
+        <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
+      </li>
+        <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
+          <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
+            <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Start a simulation!</button>
+          </form>
+          <script type="text/javascript">
+            if ({{ session['loginFlagPy'] }} == 0 || {{ session['simulationFlag'] }} == 1 ) { 
+              document.getElementById('stockSimButton').style.display = "none";
+            }
+          </script>
+        </li>
+        <li>
+          <form id="nav-link" action="/simulation" method="post"> 
+            <button class = "btn btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="goToSim">Go to Current Sim!</button>
+          </form>
+          <script type="text/javascript">
+            if ({{ session['simulationFlag'] }} == 0 ) { 
+              document.getElementById('goToSim').style.display = "none";
+            }
+          </script>  
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class = "nav-link" method = "POST" href = "login">Login</a> 
+        </li>
+        <li class = "nav-item">
+          <a class = "nav-link" method = "POST" href = "register">Register</a>
+        </li>
+      {% endif %}
+              </ul>
+              <form action="/stockSearch" method="post">
+                  <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+                          value="{{ request.form['searchTerm'] }}">
+                          <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
+              </form>
+            </div>        
+          </div>
+        </nav>
     </header>
 
 <body>  
@@ -148,6 +147,11 @@
             </script>
           </div>
           </div>
+          <div class="centering">
+            <form action="/profile">
+                  <button class="btn btn btn-lg justify-content-center" name="option" value="Buy" style = "color:rgb(33, 103, 42);background-color:antiquewhite;">Back to Profile Page</button>
+                  </form>
+                  </div>
           <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
         <div class="container">
           <span>Copyright 2022 by StockSim</span>
