@@ -594,6 +594,19 @@ def stockSearch():
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
 
+
+@app.route('/_stockSearchSuggestions', methods=['GET'])
+def stockSearchSuggestions():
+    if ('user' in session):
+        if request.method == 'GET':
+            tickers = []
+            for entry in db.collection("Stocks").document("tickers").stream():
+                temp = entry.to_dict()
+                tickers.append(temp)
+                
+            return render_template("home.html", tickers = tickers)
+
+
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
 #   webpage from given stock object
