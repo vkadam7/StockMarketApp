@@ -604,6 +604,7 @@ class Simulation:
         dates = []
         scores = []
         links = []
+        button = []
         i = 1
         for entry in db.collection('Simulations').where('user','==',user).where('ongoing','==',False).stream():
             temp = entry.to_dict()
@@ -613,6 +614,8 @@ class Simulation:
             scores.append(temp['score'])
             link = str('/orderHist/'+entry.id)
             links.append(link)
+            buySell = str('/orderForm/' + entry.id)
+            button.append(buySell)
             i+=1
         return sims, dates, scores, links
 
