@@ -153,6 +153,20 @@ def social():
                     grabUser = docs.to_dict()
                 userResult = grabUser
                 session['userResults'] = userResult
+
+                #check to see if user searched themselves
+                userEmail = session['user']
+                matching = False
+                if(userEmail == userResult['Email']):
+                    matching = True
+                #check if user already follows
+                myself = dbfire.collection('Users').where('Email', '==', userEmail)
+                for doc in myself.stream():
+                    myself = doc.to_dict()
+                myUsername = myself['userName']
+                     
+                
+
                 print("HERE COMES THE USERNAME!")
                 print(userResult)
                 print("HERE COMES THE SESSION VARIABLE")
