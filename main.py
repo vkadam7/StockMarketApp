@@ -64,8 +64,9 @@ def profile():
             cash = doc.to_dict()
         
         #endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
-        ##startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
+        #startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
         #while(startDateFetch >= endDateFetch):
+        #    startDate = 
             
         return render_template("profile.html", results = results, cash = cash)
     else:
