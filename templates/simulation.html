@@ -155,6 +155,23 @@
                   }
                   i = i + 1;
                 }
+                for (let element of data) {
+                  let row = table.insertRow();
+                  i = 0;
+                  for (key in element) {
+                    if (i < 8) {
+                      let cell = row.insertCell();
+                      let text = document.createTextNode(element[key]);
+                      cell.appendChild(text);
+                    } else {
+                      var buySellCell = row.insertCell();
+                      var buySellLink = document.createElement('a');
+                      var buySellLinkText = document.createTextNode('Buy or Sell');
+                      orderListLink.setAttribute('href', element[key]);
+                      orderListLink.appendChild(buySellLinkText);
+                      orderListCell.appendChild(buySellLink);
+                    }
+                    i = i + 1;
               }
             }
 
