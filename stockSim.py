@@ -408,13 +408,7 @@ class StockData:
 
     # Stock availability by Muneeb Khan
     def stockList(db):
-        #data = {
-        #    "ticker": self.ticker,
-        #    "name": self.name,
-        #    "startDate": self.startDate,
-        #    "endDate": self.endDate,
-        #    "timespan": self.timespan
-        #}
+
         tickers = []
 
         for entry in db.collection('Stocks').get():
@@ -734,12 +728,6 @@ class User:
 
     # User list by Muneeb Khan
     def userList(db):
-        #data = {
-        #     'Email' : self.email,
-        #     'userName' : self.username,
-        #     'Name' : self.name,
-        #     'UserID' : self.userID,
-        #}
 
         # The usernames list function will loop through the usernames in firebase and store each one
         # under the usernameslist [] array. - Muneeb Khan
@@ -1084,7 +1072,7 @@ class portfolio:
         elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
             return
 
-## Class for setting up quiz - Muneeb Khan (WIP!)
+## Class for setting up quiz - Muneeb Khan
 ## Updated by Ian Mcnulty
 class Quiz:
     def __init__(self,db,quizID,user):
