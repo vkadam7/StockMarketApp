@@ -868,8 +868,12 @@ def quizSubmit():
     ids = quiz.questions['id']
     for i in range(10):
         temp = "choices" + str(i)
-        answers.append(request.form[temp])
-        quiz.answerQuestion(ids[i], request.form[temp])
+        if request.form.get(temp) != None:
+            answers.append(request.form[temp])
+            quiz.answerQuestion(ids[i], request.form[temp])
+        else: 
+            answers.append('f')
+            quiz.answerQuestion(ids[i], 'f')
 
     score = quiz.scoreCalc()
     if score > 7:
