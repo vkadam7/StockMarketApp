@@ -666,19 +666,16 @@ class Simulation:
         tickers = []
         prices = []
         links = []
+        names = []
         for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
             temp = entry.to_dict()
-            print(temp.get('unavailable'))
             if temp.get('unavailable') == None:
-                print(str(len(temp['prices'])) + " and index is " + str(index))
                 if len(temp['prices']) > index:
                     tickers.append(str(temp['ticker']))
-                    print(temp['ticker'])
                     prices.append("%.2f" % round(temp['prices'][index],2))
-                    print("%.2f" % round(temp['prices'][index],2))
                     links.append(str('/displayStock?ticker='+temp['ticker']+'&timespan=hourly'))
-                    print(str('/displayStock?ticker='+temp['ticker']+'&timespan=hourly'))
-        return tickers, prices, links
+                    names.append(str(temp['name']))
+        return tickers, prices, links, names
 
 class SimulationFactory:
     def __init__(self, db, email):

@@ -390,6 +390,10 @@ def graphPictures():
     else:
         return render_template("graphPictures.html")
 
+@app.route("/simulationSuggestion", methods=['POST', 'GET'])
+def simSuggest():
+    return -1
+
 ## startSimulation
 #   Description: 
 @app.route("/startSimulation", methods=['POST'])
@@ -699,11 +703,8 @@ def stockListing():
     if session['simulationFlag'] == 1:
         sim = SimulationFactory(dbfire, session['user']).simulation
         session['simName'] = sim.simName
-        tickers, prices, links = Simulation.getAvailableStockList(dbfire, session['simName'], session['user'])
-        print(tickers)
-        print(prices)
-        print(links)
-        return render_template('stockList.html', person=session['user'], tickers=tickers, currentPrices=prices, links=links)
+        tickers, prices, links, names = Simulation.getAvailableStockList(dbfire, session['simName'], session['user'])
+        return render_template('stockList.html', person=session['user'], tickers=tickers, currentPrices=prices, links=links, names=names)
     else:
         return redirect(url_for('stockSimFormFunction'))
 

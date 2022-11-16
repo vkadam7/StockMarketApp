@@ -99,15 +99,17 @@
             
 
 
-           </table>
+           </table>;
           <script type="text/javascript">
             let tickersList = {{tickers|safe}};
             let currentPricesList = {{currentPrices|safe}};
             let linkList = {{links|safe}};
+            let namesList = {{names|safe}}
             
             let stockList = [];
             for (let i = 0; i < tickersList.length; i++) {
               stockList.push({
+                'Company Name': namesList[i],
                 Stock: tickersList[i],
                 'Current Price': currentPricesList[i],
                 'Link to Chart' : linkList[i]
@@ -127,7 +129,7 @@
                     let row = table.insertRow();
                     i = 0;
                     for (key in element) {
-                        if (i < 2) {
+                        if (i < 3) {
                         let cell = row.insertCell();
                         let text = document.createTextNode(element[key]);
                         cell.appendChild(text);
