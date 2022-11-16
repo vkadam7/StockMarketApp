@@ -175,8 +175,6 @@ def social():
                     else:
                         alreadyFollows = False
                      
-                
-
                 print("HERE COMES THE USERNAME!")
                 print(userResult)
                 print("HERE COMES THE SESSION VARIABLE")
