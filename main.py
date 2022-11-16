@@ -157,6 +157,7 @@ def social():
                 #check to see if user searched themselves
                 userEmail = session['user']
                 matching = False
+                alreadyFollows = False
                 if(userEmail == userResult['Email']):
                     matching = True
                 #check if user already follows
@@ -164,6 +165,12 @@ def social():
                 for doc in myself.stream():
                     myself = doc.to_dict()
                 myUsername = myself['userName']
+
+                for key in userResult['FollowerNames']:
+                    if(key == myUsername):
+                        alreadyFollows = True
+                    else:
+                        alreadyFollows = False
                      
                 
 
