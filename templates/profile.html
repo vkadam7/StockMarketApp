@@ -135,7 +135,11 @@
                 </div>
               </div>
               <div class="card mt-3">
-                Put leaderboard here
+                 Leaderboard
+                <script>
+                  var tableHTML = document.getElementById('tableL').innerHTML;
+                  window.localStorage["sharedTable"] = tableHTML
+                </script>
               </div>
             </div>
             <div class="col-md-8">
