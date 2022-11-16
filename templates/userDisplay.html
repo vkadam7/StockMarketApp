@@ -97,10 +97,10 @@
                                 <div class = "flex-grow-1 ms-3">
                                     
                                     <h5 class = "mb-1"> {{userResult['Name']}}</h5>
-                                    <div class = "d-flex justify-content-start rounded-3 p-2 mb-2" style="background-color: #efefef;">
+                                    <div class = "d-flex justify-content-start rounded-3 p-2 mb-2" style="background-color: #efefef; margin-left: 5px;">
                                         <div>
-                                            <p class = "small text-muted mb-1">Followers</p>
-                                            <p class = "mb-0">{{userResult['Followers']}}</p>
+                                            <p class = "small text-muted mb-1">Followers  </p>
+                                            <p class = "mb-0">{{userResult['Followers']}}  </p>
                                         </div>
                                         <div>
                                             <p class = "small text-muted mb-1">Following</p>
@@ -118,7 +118,7 @@
                                     </div>
                                     {% if matching %}
                                     <div class = "d-flex justify-content-end">
-                                    <a href="social.html">
+                                    <a href="/social">
                                     <button class = "btn btn-primary" input type = "submit" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Close</button>
                                     </a>  
                                     </div>
