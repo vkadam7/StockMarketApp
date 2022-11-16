@@ -222,7 +222,7 @@ def follow():
         print("HERE COMES LAST PART")
         print(uName)
         updateFollowArray2 = dbfire.collection('Users').document(key3).update({'FollowerNames': firestore.ArrayUnion([uName])})
-        flash("You have followed." + userNamed)
+        flash("You have followed " + userNamed)
         return redirect(url_for("social"))
             
 
@@ -238,23 +238,23 @@ def unfollow():
         for doc in userChange:
             key = doc.id
         print(key)
-        userchanged = dbfire.collection('Users').document(key).update({'Followers': firestore.Decrement(1)})
+        userchanged = dbfire.collection('Users').document(key).update({'Followers': firestore.Increment(-1)})
 
         myself = dbfire.collection('Users').where('Email', '==', session['user']).get()
         for doc1 in myself:
             key1 = doc1.id
         myself = doc1.to_dict()
         print(key1)
-        me = dbfire.collection('Users').where(key1).update({'Following': firestore.Decrement(1)})
+        me = dbfire.collection('Users').document(key1).update({'Following': firestore.Increment(-1)})
         
         followArray = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for f in followArray:
             new = f.id
         print(new)
-        Name = me['userName']
-        newArray = dbfire.collection('Users').document(new).update({'FollowerNames': firestore.ArrayRemove([myself['userName']])})
+        Names = myself['userName']
+        newArray = dbfire.collection('Users').document(new).update({'FollowerNames': firestore.ArrayRemove([Names])})
         
-        flash("You have unfollowed." + userNamed)
+        flash("You have unfollowed " + userNamed)
         return redirect(url_for("social"))
 
         

@@ -117,25 +117,23 @@
                                     
                                     </div>
                                     {% if matching %}
-
-                                    <button onclick="social.html" class = "btn btn-primary" input type = "submit" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Close</button>
-                                    
+                                    <div class = "d-flex justify-content-end">
+                                    <a href="social.html">
+                                    <button class = "btn btn-primary" input type = "submit" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Close</button>
+                                    </a>  
+                                    </div>
                                     {% elif alreadyFollows %}
-                                    
                                     <form action = "/unfollow" method = "POST">
                                     <div class = "d-flex justify-content-end">
                                         <button class = "btn btn-primary" input type = "submit" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Unfollow</button> 
                                     </div>
                                     </form>
-                                    
                                     {% else %}
-                                    
                                     <form action = "/follow" method = "POST">
                                     <div class = "d-flex justify-content-end">
                                         <button class = "btn btn-primary" input type = "submit" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Follow</button> 
                                     </div>
                                     </form>
-                                    
                                     {% endif %}
                                 </div>
                             </div>    
@@ -146,7 +144,7 @@
         </div>
     </section>
 
-    
+
     {% with messages = get_flashed_messages() %}
                     {% if messages %}   
                         {% for message in messages %}
