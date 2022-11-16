@@ -93,7 +93,7 @@ def followList():
             temp = entry.to_dict()
             followersList.append(temp['Followers'])      
 
-        return render_template('followers',followersList = followersList)
+        return render_template('followers.html',followersList = followersList)
 
 
 # Login
