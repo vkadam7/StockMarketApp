@@ -100,7 +100,11 @@
                                     <div class = "d-flex justify-content-start rounded-3 p-2 mb-2" style="background-color: #efefef;">
                                         <div>
                                             <p class = "small text-muted mb-1">Followers</p>
-                                            <p class = "mb-0"></p>
+                                            <p class = "mb-0">{{userResult['Followers']}}</p>
+                                        </div>
+                                        <div>
+                                            <p class = "small text-muted mb-1">Following</p>
+                                            <p class = "mb-0">{{userResult['Following']}}</p>
                                         </div>
                                         <div class = "px-3">
                                             <p class = "small text-muted mb-1">User Name</p>
@@ -112,9 +116,25 @@
                                         </div>
                                     
                                     </div>
+                                    {% if matching %}
                                     <div class = "d-flex justify-content-end">
-                                        <button class = "btn btn-primary" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Follow</button>    
+                                    <a href="social.html">
+                                    <button class = "btn btn-primary" input type = "submit" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Close</button>
+                                    </a>  
                                     </div>
+                                    {% elif alreadyFollows %}
+                                    <form action = "/unfollow" method = "POST">
+                                    <div class = "d-flex justify-content-end">
+                                        <button class = "btn btn-primary" input type = "submit" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Unfollow</button> 
+                                    </div>
+                                    </form>
+                                    {% else %}
+                                    <form action = "/follow" method = "POST">
+                                    <div class = "d-flex justify-content-end">
+                                        <button class = "btn btn-primary" input type = "submit" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Follow</button> 
+                                    </div>
+                                    </form>
+                                    {% endif %}
                                 </div>
                             </div>    
                         </div>    
@@ -124,6 +144,18 @@
         </div>
     </section>
 
+
+    {% with messages = get_flashed_messages() %}
+                    {% if messages %}   
+                        {% for message in messages %}
+                        <script>
+                        swal( '{{ message }}', {
+                        button: "Close",
+                        });
+                        </script>
+                        {% endfor %} 
+                    {% endif %} 
+    {% endwith %}
 
 
 </body>

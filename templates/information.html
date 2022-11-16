@@ -10,6 +10,7 @@
     <link rel = "stylesheet" href = "/static/stylesheets/newStyle.css">
     <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
     </head>
     <header>
 
@@ -90,12 +91,22 @@
     <section>
         <div>
             <h1>Information</h1>
+            {% with messages = get_flashed_messages() %}
+                    {% if messages %}   
+                        {% for message in messages %}
+                        <script>
+                        swal( '{{ message }}', {
+                        button: "Close",
+                        });
+                        </script>
+                        {% endfor %} 
+                    {% endif %} 
+                {% endwith %} 
         </div>
 
-
         <div class = "card w-25 text-align left" style = "position: fixed;">
-                  <h6>Table of contents</h6>
-                    <p class = "card-text" style = "text-align: left;">
+                  <h3>Table of contents</h6>
+                    <h5 class = "card-text" style = "text-align: left;">
                         <a href = "#infosection1">1. What should I know</a>
                     <br><a href = "#infosection2">2. The Basics of Stock markets</a>
                     <br><a href = "#infosection3">3. How to start investing</a>
@@ -103,7 +114,7 @@
                     <br><a href = "#infosection5">5. Other sources</a>
                     <br><a href = "#infosection6">6. Quiz</a>
                     <br><a href = "#infosection7">7. Stock simulator</a>
-                    </p>
+                    </h5>
                 </div>
 
         <div class = infomain>
@@ -121,7 +132,7 @@
                       we want to ensure that we can help all our users get a better understanding.
                       <br><br>
                       If the information doesn't help then you may contact us directly by email through our contact us page 
-                      and we will provide assitance. You may also contact us if you have any questions regarding our website.
+                      and we will provide assistance. You may also contact us if you have any questions regarding our website.
                     </h5>
                 </div>
 
@@ -202,10 +213,10 @@
                   <br>on stocks.
                   <br><br>
                   <br>Below is a link to the Investor.gov website which also gives basic information on stocks.</h5>
-                  <br><a href = https://www.investor.gov/introduction-investing/investing-basics/investment-products/stocks>Visit Investor.gov</a>
+                  <br><h5><a href = https://www.investor.gov/introduction-investing/investing-basics/investment-products/stocks>Visit Investor.gov</a></h5>
                   <br><br>
                   <br><h5 class = "card-text" style = "text-align: left;">Another good site to learn basic information would be the Washington state department of financial institutions</h5>
-                  <br><a href = https://dfi.wa.gov/financial-education/information/basics-investing-stocks>Visit DFI.gov</a>
+                  <br><h5><a href = https://dfi.wa.gov/financial-education/information/basics-investing-stocks>Visit DFI.gov</a></h5>
   
                 </div>
 
