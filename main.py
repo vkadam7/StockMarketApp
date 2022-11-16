@@ -312,6 +312,10 @@ def PasswordRecovery():
 def update():
     if 'user' in session:
         if request.method == 'POST':
+            results = dbfire.collection('Users').where('Email', '==', session['user'])
+            for doc in results.stream(): 
+                results = doc.to_dict()
+            
             new = request.form
             username = new['userName']
             #experience = new['experience']
@@ -328,7 +332,9 @@ def update():
             else:
                 dbfire.collection('Users').set(description)
                         
-        return render_template("update.html")
+            return render_template("update.html", results = results)
+    else:
+        return redirect('profile.html')
 
 #Logout
 # After user logs out session is ended and user is taken to login page
