@@ -87,11 +87,12 @@ def Leaderboard():
 @app.route("/followList")
 def followList():
     if 'user' in session:
-        followersB = dbfire.collection('UserFollowers').get()
-        documentRef = list(doc.to_dict() for doc in followersB)
-        documentRef.sort(key=itemgetter('names'))
-        print(documentRef)
-        return render_template('followers')
+        followersList = []
+        for entry in dbfire.collection('Users').where('email','==',session['user']).document('Followers').to_dict():
+            temp = entry.to_dict()
+            followersList.append(temp['Followers'])      
+
+        return render_template('followers',followersList = followersList)
 
 
 # Login
