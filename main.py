@@ -160,11 +160,14 @@ def social():
                 alreadyFollows = False
                 if(userEmail == userResult['Email']):
                     matching = True
+                else:
+                    matching = False
+                
                 #check if user already follows
-                myself = dbfire.collection('Users').where('Email', '==', userEmail)
-                for doc in myself.stream():
-                    myself = doc.to_dict()
-                myUsername = myself['userName']
+                myselfs = dbfire.collection('Users').where('Email', '==', userEmail)
+                for doc in myselfs.stream():
+                    myselfs = doc.to_dict()
+                myUsername = myselfs['userName']
 
                 for key in userResult['FollowerNames']:
                     if(key == myUsername):
@@ -178,7 +181,7 @@ def social():
                 print(userResult)
                 print("HERE COMES THE SESSION VARIABLE")
                 print(session['userResults'])
-                return render_template("userDisplay.html",  userResult = userResult)
+                return render_template("userDisplay.html",  userResult = userResult, matching = matching, alreadyFollows = alreadyFollows)
             else:
                 print("Can't find user.")
                 flash("User not found.")
@@ -221,7 +224,7 @@ def follow():
         print("HERE COMES LAST PART")
         print(uName)
         updateFollowArray2 = dbfire.collection('Users').document(key3).update({'FollowerNames': firestore.ArrayUnion([uName])})
-        
+        flash("You have followed." + userNamed)
         return redirect(url_for("social"))
             
 
@@ -252,7 +255,9 @@ def unfollow():
         print(new)
         Name = me['userName']
         newArray = dbfire.collection('Users').document(new).update({'FollowerNames': firestore.ArrayRemove([myself['userName']])})
-        return redirect('social.html')
+        
+        flash("You have unfollowed." + userNamed)
+        return redirect(url_for("social"))
 
         
 #Author: Viraj Kadam
@@ -302,7 +307,7 @@ def register():
                 user = authen.create_user_with_email_and_password(email, Password)
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": []})
+                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""]})
                 #dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 flash("Account succesfully created, you may now login" , "pass")
