@@ -7,6 +7,7 @@ import math
 from operator import itemgetter, mod
 import re
 from statistics import mean
+from datetime import timedelta
 #from django.shortcuts import render
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
@@ -64,6 +65,12 @@ def profile():
             cash = doc.to_dict()
         # for doc in daysRemaining.stream():
         #    daysRemaining = daysRemaining.to_dict()
+        #endDateFetch = dbfire.collection('Simulations').document('simName').document('endDate')
+        #startDateFetch = dbfire.collection('Simulations').document('simName').document('startDate')
+        
+        
+        
+        
         return render_template("profile.html", results = results, cash = cash)
     else:
 
@@ -351,7 +358,7 @@ def PasswordRecovery():
           
     return render_template("PasswordRecovery.html")   
 
-@app.route('/update', methods = ['POST', 'GEt'])
+@app.route('/update', methods = ['POST', 'GET'])
 def update():
     if 'user' in session:
         if request.method == 'POST':
@@ -373,7 +380,7 @@ def update():
             if (len(description) < 200):
                 flash("Your description should be at least 200 characters")
             else:
-                dbfire.collection('Users').set(description)
+                dbfire.collection('Users').add(description)
                         
             return render_template("update.html", results = results)
     else:
@@ -528,6 +535,7 @@ def goToSimulation():
                 percentage = []
                 volatility = []
                 links = []
+                #buySell = []
                 
                 percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
@@ -546,6 +554,7 @@ def goToSimulation():
                         percentage.append("%.2f" % round(percent, 2))
                         volatility.append("%.2f" % round(Portfolio.volatility,2))
                         links.append(Portfolio.link)
+                       # buySell.append(Portfolio.buySell)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
@@ -575,6 +584,11 @@ def simlists():
         sims, dates, scores, links = Simulation.listSims(dbfire, session['user'])             
         return render_template('simulationHistory.html', person = session['user'],sims = sims, 
         dates = dates, scores = scores, links=links)
+
+#@app.route("/buySell/<simName>")
+#def buySell(simName):
+#    if 'user' in session:
+#        return redirect(url_for('.ordeForm'))
 
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
@@ -835,6 +849,8 @@ def orderlists():
 def orderHist(simName):
     if ('user' in session):
         return redirect(url_for('.orderHistory', simName=simName))
+
+
 
 @app.route("/orderHistory")
 def orderHistory():
