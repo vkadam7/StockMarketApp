@@ -295,20 +295,20 @@ def register():
     return render_template('register.html')   
 
 
-## Attempt on email verification function by Muneeb Khan (WIP!)
-@app.route('/verification', methods = ["POST" , "GET"])
-def verification():
-    if request.method == "POST":
-        try:
-            user = authen.send_email_verification(email['idToken'])
-            print("Verification sent")
-            return redirect(url_for("login"))
+# ## Attempt on email verification function by Muneeb Khan (WIP!)
+# @app.route('/verification', methods = ["POST" , "GET"])
+# def verification():
+#     if request.method == "POST":
+#         try:
+#             user = authen.send_email_verification(email['idToken'])
+#             print("Verification sent")
+#             return redirect(url_for("login"))
 
-        except:
-            print("Invalid token please try again!")
-            return redirect(url_for("verification"))
+#         except:
+#             print("Invalid token please try again!")
+#             return redirect(url_for("verification"))
 
-    return render_template("verification.html")
+#     return render_template("verification.html")
 
 ## Password Recovery Function by Muneeb Khan
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
@@ -622,6 +622,19 @@ def stockSearch():
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
 
+
+@app.route('/_stockSearchSuggestions', methods=['GET'])
+def stockSearchSuggestions():
+    if ('user' in session):
+        if request.method == 'GET':
+            tickers = []
+            for entry in db.collection("Stocks").document("tickers").stream():
+                temp = entry.to_dict()
+                tickers.append(temp)
+                
+            return render_template("home.html", tickers = tickers)
+
+
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
 #   webpage from given stock object
@@ -881,7 +894,8 @@ def quizpage():
         answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10)
                    
     else:
-        return render_template('404Error.html')
+        flash("Sorry you must be logged in to take the quiz.")
+        return redirect(url_for("login"))
 
 #Author: Viraj Kadam   
 #Updates user profile  
