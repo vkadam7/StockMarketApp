@@ -54,16 +54,19 @@ def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
         results = dbfire.collection('Users').where('Email', '==', session['user'])
         #Author: Viraj Kadam
-        cash = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', 'true') #For simulation status section
-        # daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
+        cash = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True) #For simulation status section
+        #daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
         #Author: Miqdad Hafiz
         for doc in results.stream(): 
             results = doc.to_dict()
         #Author: Viraj Kadam    
         for doc in cash.stream():
             cash = doc.to_dict()
-        # for doc in daysRemaining.stream():
-        #    daysRemaining = daysRemaining.to_dict()
+        
+        #endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
+        ##startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
+        #while(startDateFetch >= endDateFetch):
+            
         return render_template("profile.html", results = results, cash = cash)
     else:
 
