@@ -195,13 +195,13 @@ def follow():
         # First add 1 to followers number of user searched
         UserSearched = session['userResults']
         userNamed = UserSearched['userName']
-        print(userNamed)
+        print(userNamed + " userNamed")
         
         #userChange = dbfire.collection('Users').update({'Followers':firestore.Increment(1)}).where('userName', '==', userNamed)
         userChange = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for doc in userChange:
             key = doc.id
-        print(key)
+        print(key + " key1")
         userChanged = dbfire.collection('Users').document(key).update({'Followers':firestore.Increment(1)})
 
         # Second add 1 to following of the user (YOU)
@@ -209,18 +209,19 @@ def follow():
         for docus in myself:
             key2 = docus.id
             myself = docus.to_dict()
-        print(key2)
+        print(key2 + " key2")
         myself2 = dbfire.collection('Users').document(key2).update({'Following': firestore.Increment(1)})
+        myself2 = dbfire.collection('Users').document(key2).update({'FollowingNames': firestore.ArrayUnion([userNamed])})
         
 
         #Last add name to searched user follower array
         updateFollowArray = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for docu in updateFollowArray:
             key3 = docu.id
-        print(key3)
+        print(key3 + " key3")
         uName =  myself['userName']
         print("HERE COMES LAST PART")
-        print(uName)
+        print(uName + " uName")
         updateFollowArray2 = dbfire.collection('Users').document(key3).update({'FollowerNames': firestore.ArrayUnion([uName])})
         flash("You have followed " + userNamed)
         return redirect(url_for("social"))
@@ -305,7 +306,7 @@ def register():
                 user = authen.create_user_with_email_and_password(email, Password)
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""]})
+                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""]})
                 #dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 flash("Account succesfully created, you may now login" , "pass")
