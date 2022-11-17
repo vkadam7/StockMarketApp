@@ -101,6 +101,14 @@ def followList():
 
         return render_template('followers.html',followersList = followersList)
 
+@app.route("/followingList")
+def followingList():
+    if 'user' in session:
+        followingList = []
+        for entry in dbfire.collection('Users').where('email', '==', session['user']).document('Following').to_dict():
+            following = entry.to_dict()
+            followingList.append(following['Following'])
+        return render_template('followers.html', followingList = followingList)
 
 # Login
 #  This function allows the user to log into the app with correct credentials
