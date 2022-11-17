@@ -81,15 +81,23 @@ def Leaderboard():
     else:
         redirect(url_for("login"))
 
+
+# Follow list function updated by Viraj and Muneeb
 @app.route("/followList")
 def followList():
     if 'user' in session:
         followersList = []
-        for entry in dbfire.collection('Users').where('email','==',session['user']).document('Followers').to_dict():
+        followernames = dbfire.collection('Users').document('FollowerNames')
+        for entry in dbfire.collection('Users').where('email','==',session['user']).where('FollowerNames','==',followernames).get():
             temp = entry.to_dict()
-            followersList.append(temp['Followers'])      
-
-        return render_template('followers',followersList = followersList)
+            if (followernames == True):
+                followersList.append(temp['FollowerNames'])
+            else:
+                print("No followers")
+                flash("No followers")
+                return render_template('followers.html')     
+        print(followersList)
+        return render_template('followers.html',followersList = followersList)
 
 
 # Login

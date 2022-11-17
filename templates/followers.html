@@ -114,7 +114,8 @@
 
            </table>
            <script type = "text/javascript">
-            let namelist = {{names|safe}};
+            let namelist = {{followersList|safe}};
+
             let followers = [];
             for (let i = 0; i < namelist.length; i++){
                 followers.push({
@@ -126,7 +127,7 @@
                 let thead = table.createTHead();
                 let row = thead.insertRow();
                 for (let key of keys){
-                    let th = = document.createElement();
+                    let th = document.createElement();
                     let text = document.createTextNode();
                     th.appendChild(text);
                     row.appendChild(th);
