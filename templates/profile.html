@@ -204,22 +204,25 @@
                   </div> 
                 </div>
               </hr>
+            
               <hr>
-                <div class = "row">
-                  <div class = "col-sm-3">
-                    <h6 class = "mb-0">Start Date of Simulation </h6>  
-                  </div>
-                  <div class = "col-sm-9 text-secondary">
-                    {{cash['startTimestamp']}}
-                  </div> 
-                </div>
-                <hr>
                 <div class = "row">
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Score </h6>  
                   </div>
                   <div class = "col-sm-9 text-secondary">
-                    {{ cash['score'] }} 
+                    {{ leaderboard['score'] }} 
+                  </div> 
+                </div>
+              </hr>
+
+              <hr>
+                <div class = "row">
+                  <div class = "col-sm-3">
+                    <h6 class = "mb-0">Days Remaining </h6>  
+                  </div>
+                  <div class = "col-sm-9 text-secondary">
+                    {{daysRemaining}} 
                   </div> 
                 </div>
               </hr>
