@@ -57,18 +57,23 @@ def profile():
         cash = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True) #For simulation status section
         #daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
         #Author: Miqdad Hafiz
+        
+        leaderboard = dbfire.collection('Leaderboard').where('email', '==', session['user'])
         for doc in results.stream(): 
             results = doc.to_dict()
         #Author: Viraj Kadam    
         for doc in cash.stream():
             cash = doc.to_dict()
-        
-        #endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
-        #startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
-        #while(startDateFetch >= endDateFetch):
-        #    startDate = 
+        for doc in leaderboard.stream():
+            leaderboard = doc.to_dict()
+        endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
+        startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
+        while(startDateFetch >= endDateFetch):
+            startDate = startDateFetch[0]
+            endDate = endDateFetch[0]
             
-        return render_template("profile.html", results = results, cash = cash)
+            
+        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard)
     else:
 
         redirect(url_for("login"))
