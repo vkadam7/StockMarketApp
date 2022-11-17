@@ -85,13 +85,13 @@
           </div>
         </nav>
   </header>
-    <br><br><br>
+    <br>
     <body>
-    <div class = "centering">
-        <div class="stockList">
+    <div class="centering">
+        <div class="stockList" style="justify-content: left;">
             <h3>Your Portfolio:</h3>
         </div>
-        <div class= "portfolio">
+        <div class= "centering">
           <div class="row justify-content-center">
           <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
             
@@ -219,25 +219,25 @@
           </tr>
         </table>
         </div>
-          <br><br>
-          </div>
-            <div class="orderListButton">
+        <br>
+        <div class="row justify-content-center">
+            <div class="col-md-2 padding-0">
               <form action="orderList">
             <button class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;" href="orderList">Order History</button>
             </form>
             </div>
-            <br>
-            <div class="stockListButton">
+            <div class="col-md-2 padding-0">
               <form action="/stockList">
-                <button class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 153, 42);color: white;">See the available stocks!</button>
+                <button class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 153, 42);color: white;">Stock Listing</button>
                 </form>
             </div>
-            <br>
-            <div class="finishSimButton">
+              <div class="col-md-2 padding-0">
               <form action="/finishSimulation">
-                <button class="btn btn btn-lg" name="option" value="Buy" style = "color:rgb(33, 103, 42);background-color:antiquewhite;">Finish the Simulation!</button>
+                <button class="btn btn btn-lg" name="option" value="Buy" style = "color:rgb(33, 103, 42);background-color:antiquewhite;">Finish Simulation</button>
                 </form>
               </div>
+              </div>
+
 
               {% with messages = get_flashed_messages() %}
                     {% if messages %}   
