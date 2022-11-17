@@ -655,7 +655,6 @@ def stockSearch():
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
 
-
 @app.route('/_stockSearchSuggestions', methods=['GET'])
 def stockSearchSuggestions():
     if ('user' in session):
@@ -666,7 +665,6 @@ def stockSearchSuggestions():
                 tickers.append(temp)
                 
             return render_template("home.html", tickers = tickers)
-
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
@@ -846,9 +844,8 @@ def orderHist(simName):
 def orderHistory():
     simName = request.args['simName']
     orderlist = Order.orderList(dbfire, simName) # This will have the username show on webpage when logged in - Muneeb Khan
-    print(orderlist)
 
-    return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
+    return render_template('orderHistory.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
     tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())       
 
 ## 
