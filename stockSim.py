@@ -624,7 +624,7 @@ class Simulation:
             sims.append(str(i))
             date = str(datetime.datetime.fromtimestamp(temp['startTimestamp'].timestamp()).strftime("%Y-%m-%d %H:%M:%S"))
             dates.append(date)
-            scores.append(temp['score'])
+            scores.append("%.2f" % round(float(temp['score']), 2))
             link = str('/orderHist/'+entry.id)
             links.append(link)
             i+=1
