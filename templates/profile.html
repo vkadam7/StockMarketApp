@@ -135,7 +135,13 @@
                 </div>
               </div>
               <div class="card mt-3">
-                Put leaderboard here
+                {% for user in personalLB1 %}
+                
+                <p class = "fw-noraml mb-1"> {{user['username']}}</p>
+                <p class = "fw-normal mb-1"> {{user['score']}}</p>
+                
+                
+                {% endfor %}
               </div>
             </div>
             <div class="col-md-8">
