@@ -91,14 +91,16 @@ def Leaderboard():
     else:
         redirect(url_for("login"))
 
-@app.route("/followList")
+
+# Follow list function updated by Viraj and Muneeb
+@app.route("/followers")
 def followList():
     if 'user' in session:
         followersList = []
-        for entry in dbfire.collection('Users').where('email','==',session['user']).document('Followers').to_dict():
+        for entry in dbfire.collection('Users').where('Email','==',session['user']).stream():
             temp = entry.to_dict()
-            followersList.append(temp['Followers'])      
-
+            followersList.append(temp['FollowerNames'])
+        print(followersList) 
         return render_template('followers.html',followersList = followersList)
 
 @app.route("/followingList")
@@ -900,6 +902,7 @@ def fourOhFour():
 #    if 'user' in session:
 
 # Submission check route for Quiz by Ian Mcnulty
+# Updates by Muneeb Khan
 @app.route('/quizSubmit', methods = ['GET', 'POST'])
 def quizSubmit():
     quiz = Quiz(dbfire,'Quiz1',session['user'])
@@ -915,13 +918,35 @@ def quizSubmit():
             quiz.answerQuestion(ids[i], 'f')
 
     score = quiz.scoreCalc()
-    if score > 7:
+    if score >= 7:
         flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
-        " You are now ready to invest, please click the start simulation button above to start investing.")
+        " You are now ready to invest, please click the start simulation button above to start investing." +
+        "Correct answers were: " +
+        "1 B " + 
+        "2 A " +
+        "3 B " +
+        "4 A " +
+        "5 C " +
+        "6 C " +
+        "7 A " +
+        "8 C " +
+        "9 B " +
+        "10 A ")
         return redirect(url_for('information', person = session['user']))
     else:
         flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
-        " You need to score at least a 7/10 to pass.")
+        " You need to score at least a 7/10 to pass. Please try again."  + 
+        "Correct answers were: " +
+        "1 B " + 
+        "2 A " +
+        "3 B " +
+        "4 A " +
+        "5 C " +
+        "6 C " +
+        "7 A " +
+        "8 C " +
+        "9 B " +
+        "10 A ")
         return redirect(url_for('information', person = session['user']))
 
 
