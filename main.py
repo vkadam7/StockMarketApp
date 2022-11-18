@@ -197,7 +197,7 @@ def follow():
         userNamed = UserSearched['userName']
         print(userNamed + " userNamed")
         
-        #userChange = dbfire.collection('Users').update({'Followers':firestore.Increment(1)}).where('userName', '==', userNamed)
+        
         userChange = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for doc in userChange:
             key = doc.id
@@ -233,25 +233,26 @@ def unfollow():
     if 'user' in session:
         UserSearched = session['userResults']
         userNamed = UserSearched['userName']
-        print(userNamed)
+        print(userNamed + " userNamed")
         
         userChange = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for doc in userChange:
             key = doc.id
-        print(key)
+        print(key + " key")
         userchanged = dbfire.collection('Users').document(key).update({'Followers': firestore.Increment(-1)})
 
         myself = dbfire.collection('Users').where('Email', '==', session['user']).get()
         for doc1 in myself:
             key1 = doc1.id
         myself = doc1.to_dict()
-        print(key1)
+        print(key1 + " key1")
         me = dbfire.collection('Users').document(key1).update({'Following': firestore.Increment(-1)})
+        myself2 = dbfire.collection('Users').document(key1).update({'FollowingNames': firestore.ArrayRemove([userNamed])})
         
         followArray = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for f in followArray:
             new = f.id
-        print(new)
+        print(new + " new")
         Names = myself['userName']
         newArray = dbfire.collection('Users').document(new).update({'FollowerNames': firestore.ArrayRemove([Names])})
         
