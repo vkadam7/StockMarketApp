@@ -67,11 +67,11 @@ def profile():
             cash = doc.to_dict()
         for doc in leaderboard.stream():
             leaderboard = doc.to_dict()
-        endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
-        startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
-        while(startDateFetch >= endDateFetch):
-            startDate = startDateFetch[0]
-            endDate = endDateFetch[0]
+        #endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
+        #startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
+        #while(startDateFetch >= endDateFetch):
+        #    startDate = startDateFetch[0]
+        #    endDate = endDateFetch[0]
             
             
         return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard)
@@ -370,34 +370,46 @@ def PasswordRecovery():
           
     return render_template("PasswordRecovery.html")   
 
-@app.route('/update', methods = ['POST', 'GET'])
+@app.route('/update', methods = ["POST", "GET"])
 def update():
     if 'user' in session:
         if request.method == 'POST':
-            results = dbfire.collection('Users').where('Email', '==', session['user'])
-            for doc in results.stream(): 
-                results = doc.to_dict()
+            results = request.form
+            email = results['email']
+            username = results['Unames']
+            experience = results['experience']
             
-            new = request.form
-            username = new['userName']
-            #experience = new['experience']
-            description = new['description']
-            doc = dbfire.collection('Users').document('userName').get()
-            for docs in doc:
-                if docs.to_dict() ['userName'] != username:
-                    db.collection('Users').document(username).update({'userName': username})                    
+            doc = dbfire.collection('Users').document(username).get()
+            if doc.exists:
+                checkName = dbfire.collection('Users').where('userName', '==', username)
+                for docs in grabName.stream(): 
+                    grabName = docs.to_dict()
+                goodName = grabName['userName']
             else:
-                uniqueName = "usernameoktouse"
-                
-            if (len(description) < 200):
-                flash("Your description should be at least 200 characters")
-            else:
-                dbfire.collection('Users').add(description)
-                        
-            return render_template("update.html", results = results)
-    else:
-        return redirect('profile.html')
+                goodName = "Ok"
+            
+            
+        if (len(experience) < 300):
+           flash("300 character limit")
+        
+        elif (goodName == username):
+            flash("Username is already taken. Please enter a valid username.") #check to see if username is taken
 
+        else:
+
+            try: 
+        
+                dbfire.collection('Users').document(session['user']).update({"userName": username, "Email": email})
+                dbfire.collection('Users').where('userName', '==', username).set({'experience': experience})
+                flash("Account details updated")
+
+                return redirect(url_for("profile"))
+
+            except:
+                flash("Invalid Registration" , "fail")
+                return redirect(url_for("update"))
+          
+    return render_template('update.html')   
 #Logout
 # After user logs out session is ended and user is taken to login page
 # Author: Miqdad 
