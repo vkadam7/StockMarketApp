@@ -32,6 +32,10 @@ h3{
   font-size: large;
 }
 
+.questions h5{
+  text-align: left;
+}
+
 .section1 p{
   font-size:large;
   text-align:center;
@@ -268,6 +272,8 @@ background: #eee;
 
 #tableL{
   text-align: center;
+  margin-bottom: 20px;
+  
 }
 
 table{

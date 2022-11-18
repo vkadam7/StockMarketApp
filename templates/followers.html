@@ -98,15 +98,13 @@
             
             <thead class = "bg-light">
 
-
            </table>
            <script type = "text/javascript">
-            let namelist = {{followersList|safe}};
-
+            let followlist = {{followersList|safe}};
             let followers = [];
-            for (let i = 0; i < namelist.length; i++){
+            for (let i = 0; i < followlist.length; i++){
                 followers.push({
-                    'Names': namelist[i]
+                    'Names': followlist[i]
                 })
             }
 

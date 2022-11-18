@@ -135,7 +135,18 @@
                 </div>
               </div>
               <div class="card mt-3">
-                Put leaderboard here
+                 Leaderboard
+                <script>
+                  var tableHTML = document.getElementById('tableL').innerHTML;
+                  window.localStorage["sharedTable"] = tableHTML
+                </script>
+                {% for user in personalLB1 %}
+                
+                <p class = "fw-noraml mb-1"> {{user['username']}}</p>
+                <p class = "fw-normal mb-1"> {{user['score']}}</p>
+                
+                
+                {% endfor %}
               </div>
             </div>
             <div class="col-md-8">
@@ -178,7 +189,7 @@
                     <div class="card-body">
                       <div class = "row">
                   <div class = "col-sm-3">
-                    <h6 class = "mb-0">Simulation Status</h6>  
+                    <h6 class = "mb-0">Simulation Info</h6>  
                   </div>  
                 </div>
                 <hr>
@@ -187,18 +198,41 @@
                     <h6 class = "mb-0">Start Date</h6>  
                   </div>
                   <div class = "col-sm-9 text-secondary">
-                    {{cash['simStartDate']}}  
+                    {{cash['startDate']}}  
                   </div> 
                 </div> 
                 <hr>
                 <div class = "row">
                   <div class = "col-sm-3">
+                    <h6 class = "mb-0">End Date </h6>  
+                  </div>
+                  <div class = "col-sm-9 text-secondary">
+                    {{ cash['endDate'] }} 
+                  </div> 
+                </div>
+              </hr>
+            
+              <hr>
+                <div class = "row">
+                  <div class = "col-sm-3">
+                    <h6 class = "mb-0">Score </h6>  
+                  </div>
+                  <div class = "col-sm-9 text-secondary">
+                    {{ leaderboard['score'] }} 
+                  </div> 
+                </div>
+              </hr>
+
+              <hr>
+                <div class = "row">
+                  <div class = "col-sm-3">
                     <h6 class = "mb-0">Days Remaining </h6>  
                   </div>
                   <div class = "col-sm-9 text-secondary">
-                    {{daysRemaining}}  
+                    {{daysRemaining}} 
                   </div> 
                 </div>
+              </hr>
                 <hr>
                 <div class = "row">
                   <div class = "col-sm-3">

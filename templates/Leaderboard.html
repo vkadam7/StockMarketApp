@@ -94,8 +94,8 @@
 
 
 
-<table class = "table table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
-  <thead class = "bg-light">
+<table class = "table table-bordered table-hover align-middle mb-0 bg-white justify-content-center" id = "tableL">
+  <thead class = "bg-light justify-content-center">
   <tr>
     <th> Rank </th>
     <th> Username </th>
@@ -116,6 +116,11 @@
   </tbody>
   {% endfor %}
 </table>
+<script>
+  var tableHTML = window.localStorage["sharedTable"];
+  var table = document.createElement('table');
+  table.innerHTML = tableHTML;
+</script>
 <br>
 </body>
 

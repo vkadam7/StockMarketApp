@@ -77,7 +77,7 @@
               <form action="/stockSearch" method="post">
                   <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                           value="{{ request.form['searchTerm'] }}">
-                          <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
+                          <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
               </form>
 
 
@@ -99,15 +99,17 @@
             
 
 
-           </table>
+           </table>;
           <script type="text/javascript">
             let tickersList = {{tickers|safe}};
             let currentPricesList = {{currentPrices|safe}};
             let linkList = {{links|safe}};
+            let namesList = {{names|safe}}
             
             let stockList = [];
             for (let i = 0; i < tickersList.length; i++) {
               stockList.push({
+                'Company Name': namesList[i],
                 Stock: tickersList[i],
                 'Current Price': currentPricesList[i],
                 'Link to Chart' : linkList[i]
@@ -127,7 +129,7 @@
                     let row = table.insertRow();
                     i = 0;
                     for (key in element) {
-                        if (i < 2) {
+                        if (i < 3) {
                         let cell = row.insertCell();
                         let text = document.createTextNode(element[key]);
                         cell.appendChild(text);
@@ -164,7 +166,7 @@
     </body>
     <br><br><br><br><br><br>
     
-    <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
+    <footer class="footer mt-auto py-3" id = "foot">
         <div class="container">
           <span>Copyright 2022 by StockSim</span>
         </div>
