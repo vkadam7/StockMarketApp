@@ -272,13 +272,16 @@ class StockData:
                 availabilityFlag = True
 
                 ## Checks if the stock is available for this timespan
-                if int(initialDate[0:4]) >= int(endDate[0:4]):
+                if int(initialDate[0:4]) > int(endDate[0:4]):
+                    availabilityFlag = False
+                if int(initialDate[0:4]) == int(endDate[0:4]):
                     if int(initialDate[5:7]) > int(endDate[5:7]):
                         availabilityFlag = False
                     elif int(initialDate[5:7]) == int(endDate[5:7]):
                         if int(initialDate[8:10]) > int(endDate[8:10]):
                             availabilityFlag = False
-                
+
+                print(availabilityFlag)
                 ## If the stock is unavailable, code creates an empty entry with a
                 ##  true value in the unavailable field
                 if availabilityFlag == False:
@@ -408,13 +411,7 @@ class StockData:
 
     # Stock availability by Muneeb Khan
     def stockList(db):
-        #data = {
-        #    "ticker": self.ticker,
-        #    "name": self.name,
-        #    "startDate": self.startDate,
-        #    "endDate": self.endDate,
-        #    "timespan": self.timespan
-        #}
+
         tickers = []
 
         for entry in db.collection('Stocks').get():
@@ -430,29 +427,39 @@ class StockData:
     #   ticker - stock ticker to be searched for in database
     #
     #   Author: Ian McNulty
-    def stockSearch(db, searchTerm):
+    def stockSearch(db, searchTerm, simName):
 
-        stocksDB = db.collection('StockSearchInfo')
+        stocksDB = db.collection('IntradayStockData').where('simulation','==',simName)
         for entry in stocksDB.stream():
-            if entry.id == searchTerm:
-                return True, searchTerm.upper()
+            temp = entry.to_dict()
+            if temp['ticker'] == searchTerm:
+                if temp.get('unavailable') != None:
+                    return False, -1
+                else:
+                    return True, searchTerm.upper()
 
         for entry in stocksDB.stream():
             temp = entry.to_dict()
-            ticker = entry.id.lower()
+            ticker = temp['ticker'].lower()
             tempSearchTerm = searchTerm.lower()
             if tempSearchTerm == ticker:
-                return True, ticker.upper()
+                if temp.get('unavailable') != None:
+                    return False, -1
+                else:
+                    return True, ticker.upper()
 
         for entry in stocksDB.stream():
             temp = entry.to_dict()
-            ticker = entry.id.lower()
+            ticker = temp['ticker'].lower()
             name = temp['name'].lower()
             tempSearchTerm = searchTerm.lower()
             print(tempSearchTerm)
             print(name)
             if tempSearchTerm in name:
-                return True, ticker.upper()
+                if temp.get('unavailable') != None:
+                    return False, -1
+                else:
+                    return True, ticker.upper()
 
         return False, -1
         
@@ -594,8 +601,9 @@ class Simulation:
         highestIndex = 0
         for entry in db.collection('IntradayStockData').where('simulation','==',sim).stream():
             temp = entry.to_dict()
-            if len(temp['prices']) > highestIndex:
-                highestIndex = len(temp['prices'])
+            if temp.get('unavailable') == None:
+                if len(temp['prices']) > highestIndex:
+                    highestIndex = len(temp['prices'])
         return highestIndex
 
     def ongoingCheck(db, sim, email):
@@ -652,19 +660,16 @@ class Simulation:
         tickers = []
         prices = []
         links = []
+        names = []
         for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
             temp = entry.to_dict()
-            print(temp.get('unavailable'))
             if temp.get('unavailable') == None:
-                print(str(len(temp['prices'])) + " and index is " + str(index))
                 if len(temp['prices']) > index:
                     tickers.append(str(temp['ticker']))
-                    print(temp['ticker'])
                     prices.append("%.2f" % round(temp['prices'][index],2))
-                    print("%.2f" % round(temp['prices'][index],2))
                     links.append(str('/displayStock?ticker='+temp['ticker']+'&timespan=hourly'))
-                    print(str('/displayStock?ticker='+temp['ticker']+'&timespan=hourly'))
-        return tickers, prices, links
+                    names.append(str(temp['name']))
+        return tickers, prices, links, names
 
 class SimulationFactory:
     def __init__(self, db, email):
@@ -752,12 +757,6 @@ class User:
 
     # User list by Muneeb Khan
     def userList(db):
-        #data = {
-        #     'Email' : self.email,
-        #     'userName' : self.username,
-        #     'Name' : self.name,
-        #     'UserID' : self.userID,
-        #}
 
         # The usernames list function will loop through the usernames in firebase and store each one
         # under the usernameslist [] array. - Muneeb Khan
@@ -1102,7 +1101,7 @@ class portfolio:
         elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
             return
 
-## Class for setting up quiz - Muneeb Khan (WIP!)
+## Class for setting up quiz - Muneeb Khan
 ## Updated by Ian Mcnulty
 class Quiz:
     def __init__(self,db,quizID,user):

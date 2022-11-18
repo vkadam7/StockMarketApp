@@ -54,14 +54,15 @@ def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
         results = dbfire.collection('Users').where('Email', '==', session['user'])
         #Author: Viraj Kadam
-        cash = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', 'true') #For simulation status section
-        # daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
+        cash = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True) #For simulation status section
+        #daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
         #Author: Miqdad Hafiz
         for doc in results.stream(): 
             results = doc.to_dict()
         #Author: Viraj Kadam    
         for doc in cash.stream():
             cash = doc.to_dict()
+
         # for doc in daysRemaining.stream():
         #    daysRemaining = daysRemaining.to_dict()
 
@@ -86,7 +87,15 @@ def profile():
         print("Here comes personal B")
         print(personalLB1)
         
+        
+        
+        #endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
+        #startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
+        #while(startDateFetch >= endDateFetch):
+        #    startDate = 
+            
         return render_template("profile.html", results = results, cash = cash, personalLB1 = personalLB1)
+
     else:
 
         redirect(url_for("login"))
@@ -106,11 +115,12 @@ def Leaderboard():
 @app.route("/followList")
 def followList():
     if 'user' in session:
-        followersB = dbfire.collection('UserFollowers').get()
-        documentRef = list(doc.to_dict() for doc in followersB)
-        documentRef.sort(key=itemgetter('names'))
-        print(documentRef)
-        return render_template('followers')
+        followersList = []
+        for entry in dbfire.collection('Users').where('email','==',session['user']).document('Followers').to_dict():
+            temp = entry.to_dict()
+            followersList.append(temp['Followers'])      
+
+        return render_template('followers.html',followersList = followersList)
 
 
 # Login
@@ -343,20 +353,20 @@ def register():
     return render_template('register.html')   
 
 
-## Attempt on email verification function by Muneeb Khan (WIP!)
-@app.route('/verification', methods = ["POST" , "GET"])
-def verification():
-    if request.method == "POST":
-        try:
-            user = authen.send_email_verification(email['idToken'])
-            print("Verification sent")
-            return redirect(url_for("login"))
+# ## Attempt on email verification function by Muneeb Khan (WIP!)
+# @app.route('/verification', methods = ["POST" , "GET"])
+# def verification():
+#     if request.method == "POST":
+#         try:
+#             user = authen.send_email_verification(email['idToken'])
+#             print("Verification sent")
+#             return redirect(url_for("login"))
 
-        except:
-            print("Invalid token please try again!")
-            return redirect(url_for("verification"))
+#         except:
+#             print("Invalid token please try again!")
+#             return redirect(url_for("verification"))
 
-    return render_template("verification.html")
+#     return render_template("verification.html")
 
 ## Password Recovery Function by Muneeb Khan
 @app.route('/PasswordRecovery', methods = ["POST", "GET"])
@@ -379,6 +389,10 @@ def PasswordRecovery():
 def update():
     if 'user' in session:
         if request.method == 'POST':
+            results = dbfire.collection('Users').where('Email', '==', session['user'])
+            for doc in results.stream(): 
+                results = doc.to_dict()
+            
             new = request.form
             username = new['userName']
             #experience = new['experience']
@@ -395,7 +409,9 @@ def update():
             else:
                 dbfire.collection('Users').set(description)
                         
-        return render_template("update.html")
+            return render_template("update.html", results = results)
+    else:
+        return redirect('profile.html')
 
 #Logout
 # After user logs out session is ended and user is taken to login page
@@ -482,6 +498,10 @@ def graphPictures():
     else:
         return render_template("graphPictures.html")
 
+@app.route("/simulationSuggestion", methods=['POST', 'GET'])
+def simSuggest():
+    return -1
+
 ## startSimulation
 #   Description: 
 @app.route("/startSimulation", methods=['POST'])
@@ -528,7 +548,9 @@ def goToSimulation():
             sim = SimulationFactory(dbfire, session['user']).simulation
             session['initialCash'] = sim.initialCash
             session['simName'] = sim.simName
+            print('prior to ongoingCheck')
             if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
+                print('inside if loop')
                 sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
                 sharesValue = float(sharesValue)
                 currentCash = float(currentCash)
@@ -648,7 +670,7 @@ def stockSearch():
     if ('user' in session):
         try:
             if request.method == 'POST':
-                check = StockData.stockSearch(dbfire, request.form["searchTerm"])
+                check = StockData.stockSearch(dbfire, request.form["searchTerm"], session['simName'])
                 if check[0]:
                     print(check)
                     if session['simulationFlag'] == 1:
@@ -663,6 +685,19 @@ def stockSearch():
     else:
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
+
+
+@app.route('/_stockSearchSuggestions', methods=['GET'])
+def stockSearchSuggestions():
+    if ('user' in session):
+        if request.method == 'GET':
+            tickers = []
+            for entry in db.collection("Stocks").document("tickers").stream():
+                temp = entry.to_dict()
+                tickers.append(temp)
+                
+            return render_template("home.html", tickers = tickers)
+
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
@@ -789,11 +824,8 @@ def stockListing():
     if session['simulationFlag'] == 1:
         sim = SimulationFactory(dbfire, session['user']).simulation
         session['simName'] = sim.simName
-        tickers, prices, links = Simulation.getAvailableStockList(dbfire, session['simName'], session['user'])
-        print(tickers)
-        print(prices)
-        print(links)
-        return render_template('stockList.html', person=session['user'], tickers=tickers, currentPrices=prices, links=links)
+        tickers, prices, links, names = Simulation.getAvailableStockList(dbfire, session['simName'], session['user'])
+        return render_template('stockList.html', person=session['user'], tickers=tickers, currentPrices=prices, links=links, names=names)
     else:
         return redirect(url_for('stockSimFormFunction'))
 
@@ -867,8 +899,12 @@ def quizSubmit():
     ids = quiz.questions['id']
     for i in range(10):
         temp = "choices" + str(i)
-        answers.append(request.form[temp])
-        quiz.answerQuestion(ids[i], request.form[temp])
+        if request.form.get(temp) != None:
+            answers.append(request.form[temp])
+            quiz.answerQuestion(ids[i], request.form[temp])
+        else: 
+            answers.append('f')
+            quiz.answerQuestion(ids[i], 'f')
 
     score = quiz.scoreCalc()
     if score > 7:
@@ -923,7 +959,8 @@ def quizpage():
         answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10)
                    
     else:
-        return render_template('404Error.html')
+        flash("Sorry you must be logged in to take the quiz.")
+        return redirect(url_for("login"))
 
 #Author: Viraj Kadam   
 #Updates user profile  
