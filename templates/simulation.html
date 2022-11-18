@@ -145,6 +145,19 @@
                     let cell = row.insertCell();
                     let text = document.createTextNode(element[key]);
                     cell.appendChild(text);
+                    if (i == 6 && parseFloat(cell.innerHTML) < 0.0) {
+                      temp = cell.innerHTML;
+                      cell.style.color = "red";
+                      cell.innerHTML = "$" + temp;
+                    } else if (i == 6 && parseFloat(cell.innerHTML) >= 0) {
+                      temp = cell.innerHTML;
+                      cell.style.color = "green";
+                      cell.innerHTML = "$" + temp;
+                    } 
+                    if (i == 7) {
+                      temp = cell.innerHTML;
+                      cell.innerHTML = temp + "%";
+                    }
                   } else {
                     var orderListCell = row.insertCell();
                     var orderListLink = document.createElement('a');
@@ -167,28 +180,28 @@
         <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
           <tr>
             <th>
-              Remaining Cash:
+              <p>Remaining Cash:</p>
             </th>
             <td>
-              ${{ session['currentCash'] }} 
+              <p>${{ session['currentCash'] }}</p>
             </td>
             <th>
-              Total Value in Shares:
+              <p>Total Value in Shares:</p>
             </th>
             <td>
-              ${{ session['sharesValue'] }}
+              <p>${{ session['sharesValue'] }}</p>
             </td>
             <th>
-              Current Portfolio Value: 
+              <p>Current Portfolio Value:</p>
             </th>
             <td>
-              ${{ session['portfolioValue'] }}
+              <p>${{ session['portfolioValue'] }}</p>
             </td>
             <th>
-              Current Change:
+              <p>Current Change:</p>
             </th>
             <td>
-              ${{ session['currentChange'] }}
+              <p id="currentChange">{{ session['currentChange'] }}</p>
             </td>
           </tr>
           <tr>
@@ -196,28 +209,44 @@
               Cash as % of Account: 
             </th>
             <td>
-              %{{ session['cashPercentage']}}
+              <p>{{ session['cashPercentage']}}%</p>
             </td>
             <th>
-              Stocks as % of Account:
+              <p>Stocks as % of Account:</p>
             </th>
             <td>
-              %{{ session['stockPercentage']}}
+              <p>{{ session['stockPercentage']}}%</p>
             </td>
             <th>
-              Initial Portfolio Value:
+              <p>Initial Portfolio Value:</p>
             </th>
             <td>
-              ${{ session['initialCash']}}
+              <p>${{ session['initialCash']}}</p>
             </td>
             <th>
-              Current % Change:
+              <p>Current % Change:</p>
             </th>
             <td>
-              %{{ session['percentGrowth']}}
+              <p id="percentGrowth">{{ session['percentGrowth']}}</p>
             </td>
           </tr>
         </table>
+        <script>
+          
+          const currentChange = document.getElementById('currentChange');
+          const percentGrowth = document.getElementById('percentGrowth');
+          if (+(currentChange.textContent) < 0) {
+            currentChange.style.color = "red";
+            percentGrowth.style.color = "red";
+          } else {
+            currentChange.style.color = "green";
+            percentGrowth.style.color = "green";
+          }
+          temp1 = currentChange.textContent;
+          temp2 = percentGrowth.textContent;
+          currentChange.textContent = "$" + temp1;
+          percentGrowth.textContent = temp2 + "%";
+          </script>
         </div>
         <br>
         <div class="row justify-content-center">
