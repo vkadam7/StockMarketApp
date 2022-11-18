@@ -840,6 +840,7 @@ def fourOhFour():
 #    if 'user' in session:
 
 # Submission check route for Quiz by Ian Mcnulty
+# Updates by Muneeb Khan
 @app.route('/quizSubmit', methods = ['GET', 'POST'])
 def quizSubmit():
     quiz = Quiz(dbfire,'Quiz1',session['user'])
@@ -851,13 +852,35 @@ def quizSubmit():
         quiz.answerQuestion(ids[i], request.form[temp])
 
     score = quiz.scoreCalc()
-    if score > 7:
+    if score >= 7:
         flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
-        " You are now ready to invest, please click the start simulation button above to start investing.")
+        " You are now ready to invest, please click the start simulation button above to start investing." +
+        "Correct answers were: " +
+        "1 B " + 
+        "2 A " +
+        "3 B " +
+        "4 A " +
+        "5 C " +
+        "6 C " +
+        "7 A " +
+        "8 C " +
+        "9 B " +
+        "10 A ")
         return redirect(url_for('information', person = session['user']))
     else:
         flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
-        " You need to score at least a 7/10 to pass.")
+        " You need to score at least a 7/10 to pass. Please try again."  + 
+        "Correct answers were: " +
+        "1 B " + 
+        "2 A " +
+        "3 B " +
+        "4 A " +
+        "5 C " +
+        "6 C " +
+        "7 A " +
+        "8 C " +
+        "9 B " +
+        "10 A ")
         return redirect(url_for('information', person = session['user']))
 
 
