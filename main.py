@@ -76,23 +76,17 @@ def profile():
 
 
         print("Here comes the leaderboard hopefully")
-        personalLB1 = dict()
+        personalLB1 = []
         for x in followingArray:
             personalLB = dbfire.collection('Leaderboard').where('username', '==', x).get()
             for docus in personalLB:
                 personalLB = docus.to_dict()
-                personalLB1.setdefault('username',[])
-                personalLB1.setdefault('score',[])
-                personalLB1.setdefault('email',[])
-                personalLB1['username'].append(personalLB['username'])
-                personalLB1['score'].append(personalLB['score'])
-                personalLB1['email'].append(personalLB['email'])
-                #print(personalLB, " first dict")
-                #print(personalLB1, " second dict")
+                personalLB1.append(personalLB)
+                
         print("Here comes personal B")
         print(personalLB1)
         
-        return render_template("profile.html", results = results, cash = cash)
+        return render_template("profile.html", results = results, cash = cash, personalLB1 = personalLB1)
     else:
 
         redirect(url_for("login"))
