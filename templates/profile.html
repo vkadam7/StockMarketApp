@@ -135,6 +135,11 @@
                 </div>
               </div>
               <div class="card mt-3">
+                 Leaderboard
+                <script>
+                  var tableHTML = document.getElementById('tableL').innerHTML;
+                  window.localStorage["sharedTable"] = tableHTML
+                </script>
                 {% for user in personalLB1 %}
                 
                 <p class = "fw-noraml mb-1"> {{user['username']}}</p>

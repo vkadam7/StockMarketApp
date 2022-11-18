@@ -7,6 +7,7 @@ import math
 from operator import itemgetter, mod
 import re
 from statistics import mean
+from datetime import timedelta
 #from django.shortcuts import render
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
@@ -64,40 +65,16 @@ def profile():
         #Author: Viraj Kadam    
         for doc in cash.stream():
             cash = doc.to_dict()
-
-        # for doc in daysRemaining.stream():
-        #    daysRemaining = daysRemaining.to_dict()
-
-        #adding the following leaderboard
-        followingArray = []
-        userF = dbfire.collection('Users').where('Email', '==', session['user'])
-        for docs in userF.stream():
-            userF = docs.to_dict()
-            followingArray.extend(userF['FollowingNames'])
-        print("Printing miqdads following list ")
-        print(followingArray)
-
-
-        print("Here comes the leaderboard hopefully")
-        personalLB1 = []
-        for x in followingArray:
-            personalLB = dbfire.collection('Leaderboard').where('username', '==', x).get()
-            for docus in personalLB:
-                personalLB = docus.to_dict()
-                personalLB1.append(personalLB)
-                
-        print("Here comes personal B")
-        print(personalLB1)
-        
-        
-        
+        for doc in leaderboard.stream():
+            leaderboard = doc.to_dict()
         #endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
         #startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
         #while(startDateFetch >= endDateFetch):
-        #    startDate = 
+        #    startDate = startDateFetch[0]
+        #    endDate = endDateFetch[0]
             
-        return render_template("profile.html", results = results, cash = cash, personalLB1 = personalLB1)
-
+            
+        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard)
     else:
 
         redirect(url_for("login"))
@@ -124,6 +101,14 @@ def followList():
 
         return render_template('followers.html',followersList = followersList)
 
+@app.route("/followingList")
+def followingList():
+    if 'user' in session:
+        followingList = []
+        for entry in dbfire.collection('Users').where('email', '==', session['user']).document('Following').to_dict():
+            following = entry.to_dict()
+            followingList.append(following['Following'])
+        return render_template('followers.html', followingList = followingList)
 
 # Login
 #  This function allows the user to log into the app with correct credentials
@@ -387,34 +372,46 @@ def PasswordRecovery():
           
     return render_template("PasswordRecovery.html")   
 
-@app.route('/update', methods = ['POST', 'GEt'])
+@app.route('/update', methods = ["POST", "GET"])
 def update():
     if 'user' in session:
         if request.method == 'POST':
-            results = dbfire.collection('Users').where('Email', '==', session['user'])
-            for doc in results.stream(): 
-                results = doc.to_dict()
+            results = request.form
+            email = results['email']
+            username = results['Unames']
+            experience = results['experience']
             
-            new = request.form
-            username = new['userName']
-            #experience = new['experience']
-            description = new['description']
-            doc = dbfire.collection('Users').document('userName').get()
-            for docs in doc:
-                if docs.to_dict() ['userName'] != username:
-                    db.collection('Users').document(username).update({'userName': username})                    
+            doc = dbfire.collection('Users').document(username).get()
+            if doc.exists:
+                checkName = dbfire.collection('Users').where('userName', '==', username)
+                for docs in grabName.stream(): 
+                    grabName = docs.to_dict()
+                goodName = grabName['userName']
             else:
-                uniqueName = "usernameoktouse"
-                
-            if (len(description) < 200):
-                flash("Your description should be at least 200 characters")
-            else:
-                dbfire.collection('Users').set(description)
-                        
-            return render_template("update.html", results = results)
-    else:
-        return redirect('profile.html')
+                goodName = "Ok"
+            
+            
+        if (len(experience) < 300):
+           flash("300 character limit")
+        
+        elif (goodName == username):
+            flash("Username is already taken. Please enter a valid username.") #check to see if username is taken
 
+        else:
+
+            try: 
+        
+                dbfire.collection('Users').document(session['user']).update({"userName": username, "Email": email})
+                dbfire.collection('Users').where('userName', '==', username).set({'experience': experience})
+                flash("Account details updated")
+
+                return redirect(url_for("profile"))
+
+            except:
+                flash("Invalid Registration" , "fail")
+                return redirect(url_for("update"))
+          
+    return render_template('update.html')   
 #Logout
 # After user logs out session is ended and user is taken to login page
 # Author: Miqdad 
@@ -570,6 +567,7 @@ def goToSimulation():
                 percentage = []
                 volatility = []
                 links = []
+                #buySell = []
                 
                 percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
@@ -588,6 +586,7 @@ def goToSimulation():
                         percentage.append("%.2f" % round(percent, 2))
                         volatility.append("%.2f" % round(Portfolio.volatility,2))
                         links.append(Portfolio.link)
+                       # buySell.append(Portfolio.buySell)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
@@ -617,6 +616,11 @@ def simlists():
         sims, dates, scores, links = Simulation.listSims(dbfire, session['user'])             
         return render_template('simulationHistory.html', person = session['user'],sims = sims, 
         dates = dates, scores = scores, links=links)
+
+#@app.route("/buySell/<simName>")
+#def buySell(simName):
+#    if 'user' in session:
+#        return redirect(url_for('.ordeForm'))
 
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
@@ -874,6 +878,8 @@ def orderlists():
 def orderHist(simName):
     if ('user' in session):
         return redirect(url_for('.orderHistory', simName=simName))
+
+
 
 @app.route("/orderHistory")
 def orderHistory():
