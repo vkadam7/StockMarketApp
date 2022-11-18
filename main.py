@@ -66,13 +66,25 @@ def profile():
         #    daysRemaining = daysRemaining.to_dict()
 
         #adding the following leaderboard
-        followingArray = np.array([])
+        followingArray = []
         userF = dbfire.collection('Users').where('Email', '==', session['user'])
         for docs in userF.stream():
             userF = docs.to_dict()
-            followingArray = np.append(followingArray,userF['FollowingNames'])
+            followingArray.extend(userF['FollowingNames'])
+        print("Printing miqdads following list ")
         print(followingArray)
 
+
+        print("Here comes the leaderboard hopefully")
+        for x in followingArray:
+            print(x)
+            personalLB = dbfire.collection('Leaderboard').where('username', '==', x).get()
+            for docus in personalLB:
+                personalLB = docus.to_dict()
+                print(personalLB)
+        print("Here comes personal B")
+        print(personalLB)
+        
         return render_template("profile.html", results = results, cash = cash)
     else:
 
