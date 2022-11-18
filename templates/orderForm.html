@@ -87,9 +87,9 @@
 <body>
     <br>
 
-    <div class = "centering">
-    <h3>{{ session['option'] }} order for {{ session['ticker'] }}</h3>
-    
+    <h3>{{ session['option'] }} Order for {{ session['ticker'] }}</h3>
+    <div style="margin-left: 50px;">
+
     <br>
     <form action="orderConfirm" method="post">
         <p>Current Available Cash: ${{session['currentCash'] }} </p>
@@ -98,15 +98,28 @@
         <label for="quantity">Quantity:</label>
         <input class="quantity" name="stockQuantity" value="{{ request.form['stockQuantity'] }}">
         <br><br>
-        <button class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Create Order</button>
+        <button id='submitButton' class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Create Order</button>
+        <br><br>
+        <p id="priceNotice" style="color:red;"></p>
         <script>
           const quantity = document.querySelector('.quantity');
           const totalPrice = document.getElementById('totalPrice');
+          const maxPrice = +{{ session['currentCash']|safe }};
           const currentPrice = +({{ session['currentPrice']|safe }});
+          const button = document.getElementById('submitButton');
+          const notice = document.getElementById('priceNotice');
           quantity.addEventListener('input', updatePrice);
 
           function updatePrice(delta) {
-            totalPrice.textContent = "Order Price: $" + delta.target.value * currentPrice;
+            totalPrice.textContent = "Order Price: $" + (delta.target.value * currentPrice).toFixed(2);
+            if (maxPrice < delta.target.value * currentPrice) {
+              button.disabled = true;
+              notice.textContent = "You do not have enough money to complete this order."
+            } 
+            if (maxPrice >= delta.target.value * currentPrice) {
+              button.disabled = false;
+              notice.textContent = "";
+            }
           }
         </script>
         </form>
