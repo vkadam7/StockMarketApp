@@ -591,35 +591,34 @@ def orderFormFill():
     session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
     return render_template('orderForm.html', option=session['option'])
 
-@app.route("/orderCreate", methods=['POST', 'GET'])
-def orderCreate():
-    if request.form['stockQuantity'].isnumeric():
-        session['orderQuantity'] = request.form['stockQuantity']
-        session['orderPrice'] = "%.2f" % round(float(session['orderQuantity']) * float(session['currentPrice']), 2)
-        return render_template('orderConfirmation.html', option=session['option'])
-    else:
-        flash("Please enter a valid quantity amount")
-        return render_template('orderForm.html', option=session['option'])
+#@app.route("/orderCreate", methods=['POST', 'GET'])
+#def orderCreate():
+#    return render_template('orderConfirmation.html', option=session['option'])
 
 @app.route("/orderConfirm", methods=['POST', 'GET'])
 def orderConfirm():
-    
-    order = Order(dbfire, session['simName'], stock, 
-                    session['option'], session['orderQuantity'], session['currentPrice'])
-    if session['option'] == 'Buy':
-        flag = order.buyOrder()
+    if request.form['stockQuantity'].isnumeric():
+        session['orderQuantity'] = request.form['stockQuantity']
+        session['orderPrice'] = "%.2f" % round(float(session['orderQuantity']) * float(session['currentPrice']), 2)
+        order = Order(dbfire, session['simName'], stock, 
+                        session['option'], session['orderQuantity'], session['currentPrice'])
+        if session['option'] == 'Buy':
+            flag = order.buyOrder()
+        else:
+            flag = order.sellOrder()
+        if flag == 1:
+            flash("Order Complete!")  
+
+            return redirect(url_for('.goToSimulation'))
+
+        elif session['option'] == 'Buy' and flag == -1:
+            flash("Insufficient funds to complete purchase")
+            return render_template('orderForm.html', option=session['option'])
+        elif session['option'] == 'Sell' and flag == -1:
+            flash("Insufficient shares to complete sale")
+            return render_template('orderForm.html', option=session['option'])
     else:
-        flag = order.sellOrder()
-    if flag == 1:
-        flash("Order Complete!")  
-
-        return redirect(url_for('.goToSimulation'))
-
-    elif session['option'] == 'Buy' and flag == -1:
-        flash("Insufficient funds to complete purchase")
-        return render_template('orderForm.html', option=session['option'])
-    elif session['option'] == 'Sell' and flag == -1:
-        flash("Insufficient shares to complete sale")
+        flash("Please enter a valid quantity amount")
         return render_template('orderForm.html', option=session['option'])
     
 ## stockSearch

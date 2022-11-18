@@ -85,20 +85,31 @@
 
 
 <body>
-    <br><br><br><br><br><br>
+    <br>
 
     <div class = "centering">
     <h3>{{ session['option'] }} order for {{ session['ticker'] }}</h3>
     
     <br>
-    <form action="orderCreate" method="post">
-        <h4>Price: {{ session['currentPrice'] }} </h4>
-        <br>
+    <form action="orderConfirm" method="post">
+        <p>Current Available Cash: ${{session['currentCash'] }} </p>
+        <p id="totalPrice">Order Price: $0</p>
+        <p>Current Stock Price: ${{ session['currentPrice'] }} </p>
         <label for="quantity">Quantity:</label>
-        <input type="quantity" name="stockQuantity" value="{{ request.form['stockQuantity'] }}">
+        <input class="quantity" name="stockQuantity" value="{{ request.form['stockQuantity'] }}">
         <br><br>
         <button class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Create Order</button>
-    </form>
+        <script>
+          const quantity = document.querySelector('.quantity');
+          const totalPrice = document.getElementById('totalPrice');
+          const currentPrice = +({{ session['currentPrice']|safe }});
+          quantity.addEventListener('input', updatePrice);
+
+          function updatePrice(delta) {
+            totalPrice.textContent = "Order Price: $" + delta.target.value * currentPrice;
+          }
+        </script>
+        </form>
 
     {% with messages = get_flashed_messages() %}
                     {% if messages %}   
