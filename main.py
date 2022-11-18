@@ -64,16 +64,40 @@ def profile():
         #Author: Viraj Kadam    
         for doc in cash.stream():
             cash = doc.to_dict()
-        for doc in leaderboard.stream():
-            leaderboard = doc.to_dict()
-        endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
-        startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
-        while(startDateFetch >= endDateFetch):
-            startDate = startDateFetch[0]
-            endDate = endDateFetch[0]
+
+        # for doc in daysRemaining.stream():
+        #    daysRemaining = daysRemaining.to_dict()
+
+        #adding the following leaderboard
+        followingArray = []
+        userF = dbfire.collection('Users').where('Email', '==', session['user'])
+        for docs in userF.stream():
+            userF = docs.to_dict()
+            followingArray.extend(userF['FollowingNames'])
+        print("Printing miqdads following list ")
+        print(followingArray)
+
+
+        print("Here comes the leaderboard hopefully")
+        personalLB1 = []
+        for x in followingArray:
+            personalLB = dbfire.collection('Leaderboard').where('username', '==', x).get()
+            for docus in personalLB:
+                personalLB = docus.to_dict()
+                personalLB1.append(personalLB)
+                
+        print("Here comes personal B")
+        print(personalLB1)
+        
+        
+        
+        #endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
+        #startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
+        #while(startDateFetch >= endDateFetch):
+        #    startDate = 
             
-            
-        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard)
+        return render_template("profile.html", results = results, cash = cash, personalLB1 = personalLB1)
+
     else:
 
         redirect(url_for("login"))
@@ -205,13 +229,13 @@ def follow():
         # First add 1 to followers number of user searched
         UserSearched = session['userResults']
         userNamed = UserSearched['userName']
-        print(userNamed)
+        print(userNamed + " userNamed")
         
-        #userChange = dbfire.collection('Users').update({'Followers':firestore.Increment(1)}).where('userName', '==', userNamed)
+        
         userChange = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for doc in userChange:
             key = doc.id
-        print(key)
+        print(key + " key1")
         userChanged = dbfire.collection('Users').document(key).update({'Followers':firestore.Increment(1)})
 
         # Second add 1 to following of the user (YOU)
@@ -219,18 +243,19 @@ def follow():
         for docus in myself:
             key2 = docus.id
             myself = docus.to_dict()
-        print(key2)
+        print(key2 + " key2")
         myself2 = dbfire.collection('Users').document(key2).update({'Following': firestore.Increment(1)})
+        myself2 = dbfire.collection('Users').document(key2).update({'FollowingNames': firestore.ArrayUnion([userNamed])})
         
 
         #Last add name to searched user follower array
         updateFollowArray = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for docu in updateFollowArray:
             key3 = docu.id
-        print(key3)
+        print(key3 + " key3")
         uName =  myself['userName']
         print("HERE COMES LAST PART")
-        print(uName)
+        print(uName + " uName")
         updateFollowArray2 = dbfire.collection('Users').document(key3).update({'FollowerNames': firestore.ArrayUnion([uName])})
         flash("You have followed " + userNamed)
         return redirect(url_for("social"))
@@ -242,25 +267,26 @@ def unfollow():
     if 'user' in session:
         UserSearched = session['userResults']
         userNamed = UserSearched['userName']
-        print(userNamed)
+        print(userNamed + " userNamed")
         
         userChange = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for doc in userChange:
             key = doc.id
-        print(key)
+        print(key + " key")
         userchanged = dbfire.collection('Users').document(key).update({'Followers': firestore.Increment(-1)})
 
         myself = dbfire.collection('Users').where('Email', '==', session['user']).get()
         for doc1 in myself:
             key1 = doc1.id
         myself = doc1.to_dict()
-        print(key1)
+        print(key1 + " key1")
         me = dbfire.collection('Users').document(key1).update({'Following': firestore.Increment(-1)})
+        myself2 = dbfire.collection('Users').document(key1).update({'FollowingNames': firestore.ArrayRemove([userNamed])})
         
         followArray = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for f in followArray:
             new = f.id
-        print(new)
+        print(new + " new")
         Names = myself['userName']
         newArray = dbfire.collection('Users').document(new).update({'FollowerNames': firestore.ArrayRemove([Names])})
         
@@ -315,7 +341,7 @@ def register():
                 user = authen.create_user_with_email_and_password(email, Password)
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""]})
+                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""]})
                 #dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 flash("Account succesfully created, you may now login" , "pass")
