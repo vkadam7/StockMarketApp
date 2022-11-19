@@ -526,6 +526,20 @@ class Simulation:
             self.stocks.append(tempData)
             self.db.collection('IntradayStockData').add(tempData)
 
+    def amountOwned(self, ticker):
+        quantityOwned = 0
+        for entry in Order.retrieve(self.db, self.simName, ticker):
+            temp = entry.to_dict()
+            if temp.get('newQuantity') != None:
+                if temp.get('sold') != None:
+                    if temp['sold'] == False:
+                        quantityOwned += int(temp['newQuantity'])
+            else:
+                if temp.get('sold') != None:
+                    if temp['sold'] == False:
+                        quantityOwned += int(temp['quantity'])   
+        return quantityOwned
+
     def finishSimulation(db, simName):
         data = db.collection('Simulations').document(simName).get().to_dict()
 
