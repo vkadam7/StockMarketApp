@@ -566,7 +566,7 @@ class Simulation:
             if int(startDate[5:7]) > int(endDate[5:7]):
                 return False
             elif int(startDate[5:7]) == int(endDate[5:7]):
-                if int(startDate[8:10]) > int(endDate[8:10]):
+                if int(startDate[8:10]) >= int(endDate[8:10]):
                     return False
         return True
 
