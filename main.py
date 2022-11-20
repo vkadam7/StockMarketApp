@@ -588,7 +588,12 @@ def simlists():
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
     session['option'] = request.form['option']
+    if session['option'] == 'Buy':
+        session['optionType'] = 0
+    else:
+        session['optionType'] = 1
     session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+    session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
     return render_template('orderForm.html', option=session['option'])
 
 #@app.route("/orderCreate", methods=['POST', 'GET'])
