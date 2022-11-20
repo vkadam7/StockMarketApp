@@ -135,6 +135,10 @@
                 notice.textContent = "";
               }
             }
+            if (delta.target.value.includes('.')) {
+              button.disabled = true;
+              notice.textContent = "You must submit a whole number."
+            }
           }
         </script>
         </form>
