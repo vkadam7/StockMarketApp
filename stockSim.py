@@ -526,6 +526,20 @@ class Simulation:
             self.stocks.append(tempData)
             self.db.collection('IntradayStockData').add(tempData)
 
+    def amountOwned(self, ticker):
+        quantityOwned = 0
+        for entry in Order.retrieve(self.db, self.simName, ticker):
+            temp = entry.to_dict()
+            if temp.get('newQuantity') != None:
+                if temp.get('sold') != None:
+                    if temp['sold'] == False:
+                        quantityOwned += int(temp['newQuantity'])
+            else:
+                if temp.get('sold') != None:
+                    if temp['sold'] == False:
+                        quantityOwned += int(temp['quantity'])   
+        return quantityOwned
+
     def finishSimulation(db, simName):
         data = db.collection('Simulations').document(simName).get().to_dict()
 
@@ -566,7 +580,7 @@ class Simulation:
             if int(startDate[5:7]) > int(endDate[5:7]):
                 return False
             elif int(startDate[5:7]) == int(endDate[5:7]):
-                if int(startDate[8:10]) > int(endDate[8:10]):
+                if int(startDate[8:10]) >= int(endDate[8:10]):
                     return False
         return True
 
@@ -625,7 +639,7 @@ class Simulation:
             sims.append(str(i))
             date = str(datetime.datetime.fromtimestamp(temp['startTimestamp'].timestamp()).strftime("%Y-%m-%d %H:%M:%S"))
             dates.append(date)
-            scores.append(temp['score'])
+            scores.append("%.2f" % round(float(temp['score']), 2))
             link = str('/orderHist/'+entry.id)
             links.append(link)
             buySell = str('/orderForm/' + entry.id)

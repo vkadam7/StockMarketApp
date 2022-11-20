@@ -85,20 +85,63 @@
 
 
 <body>
-    <br><br><br><br><br><br>
-
-    <div class = "centering">
-    <h3>{{ session['option'] }} order for {{ session['ticker'] }}</h3>
-    
     <br>
-    <form action="orderCreate" method="post">
-        <h4>Price: {{ session['currentPrice'] }} </h4>
-        <br>
+
+    <h3>{{ session['option'] }} Order for {{ session['ticker'] }}</h3>
+    <div style="margin-left: 50px;">
+
+    <br>
+    <form action="orderConfirm" method="post">
+        <p>Current Available Cash: ${{session['currentCash'] }} </p>
+        <p>Currently Owned Amount of Shares of this Stock: {{session['currentAmount']}}</p>
+        <p id="totalPrice">Order Price: $0</p>
+        <p>Current Stock Price: ${{ session['currentPrice'] }} </p>
         <label for="quantity">Quantity:</label>
-        <input type="quantity" name="stockQuantity" value="{{ request.form['stockQuantity'] }}">
+        <input class="quantity" name="stockQuantity" value="{{ request.form['stockQuantity'] }}">
         <br><br>
-        <button class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Create Order</button>
-    </form>
+        <button id='submitButton' class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Create Order</button>
+        <br><br>
+        <p id="priceNotice" style="color:red;"></p>
+        <script>
+          let maxPrice = +({{ session['currentCash']|safe }});
+          let currentPrice = +({{ session['currentPrice']|safe }});
+          let ownedShares = {{ session['currentAmount']|safe }};
+          let orderType = {{ session['optionType']|safe }};
+          const quantity = document.querySelector('.quantity');
+          const totalPrice = document.getElementById('totalPrice');
+          const button = document.getElementById('submitButton');
+          const notice = document.getElementById('priceNotice');
+
+          quantity.addEventListener('input', updatePrice);
+
+          function updatePrice(delta) {
+            totalPrice.textContent = "Order Price: $" + (delta.target.value * currentPrice).toFixed(2);
+            if (orderType == 0) {
+              if (maxPrice < delta.target.value * currentPrice) {
+                button.disabled = true;
+                notice.textContent = "You do not have enough money to complete this order."
+              } 
+              if (maxPrice >= delta.target.value * currentPrice) {
+                button.disabled = false;
+                notice.textContent = "";
+              }
+            } else {
+              if (+(ownedShares) < delta.target.value) {
+                button.disabled = true;
+                notice.textContent = "You do not have enough shares to complete this order."
+              } 
+              if (+(ownedShares) >= delta.target.value) {
+                button.disabled = false;
+                notice.textContent = "";
+              }
+            }
+            if (delta.target.value.includes('.')) {
+              button.disabled = true;
+              notice.textContent = "You must submit a whole number."
+            }
+          }
+        </script>
+        </form>
 
     {% with messages = get_flashed_messages() %}
                     {% if messages %}   
