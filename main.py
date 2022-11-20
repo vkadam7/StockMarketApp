@@ -102,6 +102,8 @@ def followList():
             followersList.append(temp['FollowerNames'])
         print(followersList) 
         return render_template('followers.html',followersList = followersList)
+    else:
+        redirect(url_for("login"))
 
 @app.route("/followingList")
 def followingList():
@@ -695,16 +697,15 @@ def stockSearch():
         return redirect(url_for("login"))
 
 
-@app.route('/_stockSearchSuggestions', methods=['GET'])
+@app.route('/_stockSearchSuggestions', methods=['POST','GET'])
 def stockSearchSuggestions():
     if ('user' in session):
         if request.method == 'GET':
-            tickers = []
-            for entry in db.collection("Stocks").document("tickers").stream():
+            stockNames = []
+            for entry in db.collection("Stocks").document("ticker").get():
                 temp = entry.to_dict()
-                tickers.append(temp)
-                
-            return render_template("home.html", tickers = tickers)
+                stockNames.append(temp) 
+            return render_template("home.html", stockNames = stockNames)
 
 
 ## displayStock
