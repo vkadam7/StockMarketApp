@@ -108,7 +108,16 @@ def followingList():
         for entry in dbfire.collection('Users').where('email', '==', session['user']).document('Following').to_dict():
             following = entry.to_dict()
             followingList.append(following['Following'])
-        return render_template('followers.html', followingList = followingList)
+        return render_template('followingList.html', followingList = followingList)
+    
+#Route for the Order list - Muneeb Khan
+@app.route("/orderList")
+def orderlists():
+    if ('user' in session):
+        orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
+
+        return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
+        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
 
 # Login
 #  This function allows the user to log into the app with correct credentials
@@ -970,30 +979,6 @@ def quizpage():
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
 
-#Author: Viraj Kadam   
-#Updates user profile  
-#class User(Flaskform):
-    #picture =  
-#    description = StringField('Description')
-#    experience = StringField('Experience')
-#    submit = SubmitField("Submit")   
-    
-#@app.route('/update/<int:id>', methods = ['GET', 'POST'])
-#def update():
-#   updateinfo = User.query.get(id)
-#   if request.method == 'POST':
-#        update.description = request.form('Description')
-#        update.experience = request.form('Experience')
-#        try:
-#            db.session.commit()
-#            flash("User profile updates")
-#            return render_template('profile.html')
-#        except:
-#            flash("Error, unable to update your profile")
-
-#@app.route('/')
-#def method_name():
-#    pass
     
 if __name__ == '__main__':
     app.run(debug=True)
