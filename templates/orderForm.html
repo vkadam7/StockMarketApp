@@ -99,7 +99,7 @@
         <label for="quantity">Quantity:</label>
         <input class="quantity" name="stockQuantity" value="{{ request.form['stockQuantity'] }}">
         <br><br>
-        <button id='submitButton' class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Create Order</button>
+        <button id='submitButton' class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;" disabled="true">Create Order</button>
         <br><br>
         <p id="priceNotice" style="color:red;"></p>
         <script>
@@ -111,6 +111,8 @@
           const totalPrice = document.getElementById('totalPrice');
           const button = document.getElementById('submitButton');
           const notice = document.getElementById('priceNotice');
+
+          const regexForInteger = /[a-z]+|[A-Z]+|[0-9]+./;
 
           quantity.addEventListener('input', updatePrice);
 
@@ -135,7 +137,10 @@
                 notice.textContent = "";
               }
             }
-            if (delta.target.value.includes('.')) {
+            if (delta.target.value.length == 0) {
+              button.disabled = true;
+            }
+            if (delta.target.value.match(regexForInteger) != null) {
               button.disabled = true;
               notice.textContent = "You must submit a whole number."
             }
