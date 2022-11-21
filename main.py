@@ -105,19 +105,19 @@ def followList():
 def followingList():
     if 'user' in session:
         followingList = []
-        for entry in dbfire.collection('Users').where('email', '==', session['user']).document('Following').to_dict():
+        for entry in dbfire.collection('Users').where('Name', '==', session['user']).document('FollowingNames').get():
             following = entry.to_dict()
-            followingList.append(following['Following'])
+            followingList.append(following['FollowingNames'])
         return render_template('followingList.html', followingList = followingList)
     
 #Route for the Order list - Muneeb Khan
-@app.route("/orderList")
-def orderlists():
-    if ('user' in session):
-        orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
+#@app.route("/orderList")
+#def orderlists():
+#    if ('user' in session):
+#        orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
 
-        return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
-        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
+#        return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
+#        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
 
 # Login
 #  This function allows the user to log into the app with correct credentials
