@@ -107,8 +107,11 @@ def postBLog():
             results = dbfire.collection('Users').where('Email', '==', session['user'])
             Author = results['userName']
             datePosted = date.today()
-            dbfire.collection('Blog').add({"Author": Author,"DatePosted":datePosted,"Post":post,"Likes":0})
-            
+            timePosted = datetime.now()
+            current = timePosted.strftime("%H:%M:%S")
+            dbfire.collection('Blog').add({"Author": Author,"DatePosted['Date']":datePosted,"DatePosted[Time]":current,"Post":post,"Likes":0})
+            return render_template("postBlog.html")
+    return render_template("postBlog.html")
 
 @app.route("/Leaderboard")
 def Leaderboard():
