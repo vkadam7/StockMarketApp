@@ -95,13 +95,25 @@ def Leaderboard():
 # Follow list function updated by Viraj and Muneeb
 @app.route("/followers")
 def followList():
-    if 'user' in session:
+    if ('user' in session):
         followersList = []
         for entry in dbfire.collection('Users').where('Email','==',session['user']).stream():
             temp = entry.to_dict()
-            followersList.append(temp['FollowerNames'])
-        print(followersList) 
-        return render_template('followers.html',followersList = followersList)
+            followersList.extend(temp['FollowerNames'])
+        print(followersList)
+
+
+        FollowerNames = []
+        for followers in followersList:
+            names = dbfire.collection('Users').where('userName','==',followers).get()
+            for name in names:
+                names = name.to_dict()
+                FollowerNames.append(names)
+        print(FollowerNames)    
+        
+        return render_template('followers.html',followersList = followersList, FollowerNames = FollowerNames)
+    else:
+        redirect(url_for("login"))
 
 @app.route("/followingList")
 def followingList():
@@ -707,16 +719,15 @@ def stockSearch():
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
 
-@app.route('/_stockSearchSuggestions', methods=['GET'])
+@app.route('/_stockSearchSuggestions', methods=['POST','GET'])
 def stockSearchSuggestions():
     if ('user' in session):
         if request.method == 'GET':
-            tickers = []
-            for entry in db.collection("Stocks").document("tickers").stream():
+            stockNames = []
+            for entry in db.collection("Stocks").document("ticker").get():
                 temp = entry.to_dict()
-                tickers.append(temp)
-                
-            return render_template("home.html", tickers = tickers)
+                stockNames.append(temp) 
+            return render_template("home.html", stockNames = stockNames)
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
