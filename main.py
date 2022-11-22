@@ -418,7 +418,7 @@ def update():
             else:
                 goodName = "Ok"
             
-            if (len(experience) < 300):
+            if (len(experience) > 300):
                 flash("300 character limit") #Adds experience to profile
             else:
                 flash("Experience added")
