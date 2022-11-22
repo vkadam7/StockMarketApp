@@ -105,12 +105,12 @@ def postBLog():
             result = request.form
             post = result["blogPost"]
             results = dbfire.collection('Users').where('Email', '==', session['user'])
+            for docs in results.stream():
+                results = docs.to_dict()
             Author = results['userName']
-            datePosted = date.today()
-            timePosted = datetime.now()
-            current = timePosted.strftime("%H:%M:%S")
-            dbfire.collection('Blog').add({"Author": Author,"DatePosted['Date']":datePosted,"DatePosted[Time]":current,"Post":post,"Likes":0})
-            return render_template("postBlog.html")
+           
+            dbfire.collection('Blog').add({"Author": Author,"DatePosted":firestore.SERVER_TIMESTAMP,"Post":post,"Likes":0})
+            flash("Posted.", "pass")
     return render_template("postBlog.html")
 
 @app.route("/Leaderboard")
