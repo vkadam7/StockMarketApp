@@ -98,6 +98,14 @@ def profile():
 
         redirect(url_for("login"))
 
+@app.route("/postBlog", methods = ["POST","GET"])
+def postBLog():
+    if('user' in session):
+        if(request.method == "POST"):
+            results = dbfire.collection('Users').where('Email', '==', session['user'])
+            Author = results['userName']
+
+
 @app.route("/Leaderboard")
 def Leaderboard():
     if('user' in session):
