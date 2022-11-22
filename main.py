@@ -107,6 +107,8 @@ def postBLog():
             results = dbfire.collection('Users').where('Email', '==', session['user'])
             Author = results['userName']
             datePosted = date.today()
+            dbfire.collection('Blog').add({"Author": Author,"DatePosted":datePosted,"Post":post,"Likes":0})
+            
 
 @app.route("/Leaderboard")
 def Leaderboard():
