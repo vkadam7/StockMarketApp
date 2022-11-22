@@ -99,24 +99,56 @@
               <div class = "form-row align-items-center" style = "box-sizing: 0;">
                 <div class = "form-group col-md-5">
                   <label for="dateInput">Starting Date of Simulation:</label>
-                  <input type="date" class = "form-control"  name="simStartDate" value="{{ request.form['simStartDate'] }}" placeholder="yyyy-mm-dd">
+                  <input id='startDate' type="date" class = "form-control"  name="simStartDate" value="{{ request.form['simStartDate'] }}" placeholder="yyyy-mm-dd">
                 </div>
                 <br>
                 <div class = "form-group col-md-5">
                   <label for="dateInput">Ending Date of Simulation:</label>
-                  <input type="date" class = "form-control" name="simEndDate" value="{{ request.form['simEndDate'] }}" placeholder="yyyy-mm-dd">
+                  <input id='endDate' type="date" class = "form-control" name="simEndDate" value="{{ request.form['simEndDate'] }}" placeholder="yyyy-mm-dd">
                 </div>
               </div>
               <br>
               <div class = "form-row align-items-center" style = "box-sizing: 0;">
                 <div class = "form-group col-md-8">
                   <label for="Money">Simulation Starting Cash:</label>
-                  <input type="Money" name="initialCash" value="{{ request.form['initialCash'] }}" placeholder="Enter an amount...">
+                  <input id='money' type="Money" name="initialCash" value="{{ request.form['initialCash'] }}" placeholder="Enter an amount...">
                 </div>
                 <br>
-                <button class = "btn btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Start Simulation!</button>
+                <button id='simButton' disabled='true' class = "btn btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Start Simulation!</button>
               </div>
+              <p id="notice" style="color: red;"></p>
             </form>
+            <script>
+              const startDate = document.getElementById('startDate');
+              const endDate = document.getElementById('endDate');
+              const money = document.getElementById('money');
+              const simButton = document.getElementById('simButton');
+              const notice = document.getElementById('notice');
+
+              const regexForString = /[a-z]+|[A-Z]+/;
+              const regexForDecimal = /[0-9]+./;
+              const regex2 = /[0-9]+/;
+
+              money.addEventListener('input', moneyCheck);
+
+              function moneyCheck(check) {
+                if (money.value.length == 0) {
+                  simButton.disabled = true;
+                  notice.textContent = "";
+                }
+                if (money.value.match(regexForString) != null) {
+                  simButton.disabled = true;
+                  notice.textContent = "Please enter a valid quantity.";
+                } else if (money.value.match(regexForDecimal) != null) {
+                  simButton.disabled = true;
+                  notice.textContent = "Please enter a whole number.";
+                } 
+                if (+(money.value) > 0 && money.value.includes('.') == false) {
+                  simButton.disabled = false;
+                  notice.textContent = "";
+                }
+              }
+            </script>
 
             {% with messages = get_flashed_messages() %}
                     {% if messages %}   
