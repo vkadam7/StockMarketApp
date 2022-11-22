@@ -110,6 +110,9 @@ def followingList():
         for entry in dbfire.collection('Users').where('Name', '==', session['user']).document('FollowingNames').get():
             following = entry.to_dict()
             followingList.append(following['FollowingNames'])
+            
+        followingListNames = []
+        
         return render_template('followingList.html', followingList = followingList)
     
 #Route for the Order list - Muneeb Khan
@@ -383,14 +386,16 @@ def PasswordRecovery():
           
     return render_template("PasswordRecovery.html")   
 
+#Author: Viraj Kadam
 @app.route('/update', methods = ["POST", "GET"])
 def update():
     if 'user' in session:
-        if request.method == 'POST':
+        if request.method == "POST":
+            global experience
             results = request.form
             email = results['email']
             username = results['Unames']
-            experience = results['experience']
+            experience = results["experience"]  
             
             doc = dbfire.collection('Users').document(username).get()
             if doc.exists:
@@ -401,26 +406,27 @@ def update():
             else:
                 goodName = "Ok"
             
-            
-        if (len(experience) < 300):
-           flash("300 character limit")
+            if (len(experience) < 300):
+                flash("300 character limit")
+            else:
+                flash("Experience added")
         
-        elif (goodName == username):
-            flash("Username is already taken. Please enter a valid username.") #check to see if username is taken
+            if (goodName == username):
+                flash("Username is already taken. Please enter a valid username.") #check to see if username is taken
 
-        else:
+            else:
 
-            try: 
+                try: 
         
-                dbfire.collection('Users').document(session['user']).update({"userName": username, "Email": email})
-                dbfire.collection('Users').where('userName', '==', username).set({'experience': experience})
-                flash("Account details updated")
+                    dbfire.collection('Users').document(session['user']).update({"userName": username, "Email": email})
+                    dbfire.collection('Users').where('userName', '==', username).set({'experience': experience})
+                    flash("Account details updated")
 
-                return redirect(url_for("profile"))
+                    return redirect(url_for("profile"))
 
-            except:
-                flash("Invalid Registration" , "fail")
-                return redirect(url_for("update"))
+                except:
+                    flash("Invalid Registration" , "fail")
+                    return redirect(url_for("update"))
           
     return render_template('update.html')   
 #Logout
