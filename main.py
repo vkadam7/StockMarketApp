@@ -2,7 +2,7 @@ from asyncio.windows_events import NULL
 #from crypt import methods
 #from crypt import methods
 #from re import T
-from datetime import datetime
+from datetime import datetime,date
 import math
 from operator import itemgetter, mod
 import re
@@ -102,9 +102,11 @@ def profile():
 def postBLog():
     if('user' in session):
         if(request.method == "POST"):
+            result = request.form
+            post = result["blogPost"]
             results = dbfire.collection('Users').where('Email', '==', session['user'])
             Author = results['userName']
-
+            datePosted = date.today()
 
 @app.route("/Leaderboard")
 def Leaderboard():
