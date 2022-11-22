@@ -73,8 +73,27 @@ def profile():
         #    startDate = startDateFetch[0]
         #    endDate = endDateFetch[0]
             
-            
-        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard)
+        followingArray = []
+        userF = dbfire.collection('Users').where('Email', '==', session['user'])
+        for docs in userF.stream():
+            userF = docs.to_dict()
+            followingArray.extend(userF['FollowingNames'])
+        print("Printing miqdads following list ")
+        print(followingArray)
+
+
+        print("Here comes the leaderboard hopefully")
+        personalLB1 = []
+        for x in followingArray:
+            personalLB = dbfire.collection('Leaderboard').where('username', '==', x).get()
+            for docus in personalLB:
+                personalLB = docus.to_dict()
+                personalLB1.append(personalLB)
+                
+        print("Here comes personal B")
+        print(personalLB1)    
+        
+        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard,personalLB1 = personalLB1)
     else:
 
         redirect(url_for("login"))
@@ -1008,6 +1027,5 @@ def quizpage():
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
 
-    
 if __name__ == '__main__':
     app.run(debug=True)
