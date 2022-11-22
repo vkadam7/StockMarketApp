@@ -85,7 +85,7 @@
     <body>
       <br><br><br>
         <div class="stockDisplay">
-            <h1>{{ stock['ticker'] }} - {{ stock['name'] }}</h1>
+            <h1>{{ stock['ticker'] }} - {{ stock['name'] }} - ${{session['currentPrice']}}</h1>
             <h3>Headquarters: {{ stock['headquarters'] }}</h3>
             <h3>Listed at: {{ stock['listedAt'] }}</h3>
             <canvas id="stockChart" width="200" height="50"></canvas>        

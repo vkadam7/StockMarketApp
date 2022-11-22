@@ -90,8 +90,8 @@
 <body>  
         <br><br><br>
         
-        <h3>Current Orders in this Simulation:</h3>
-        <div class = "orderlist">
+        <h3>People You Follow</h3>
+        <div class = "followinglist">
           <div class="row justify-content-center">
           <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
 
@@ -99,26 +99,18 @@
 
            </table>
 
-          <!--The following JavaScript code will generate a table for the Orderlist - Muneeb Khan -->
           <script type="text/javascript">
-            let tickersList = {{tickers|safe}};
-            let quantList = {{quantities|safe}};
-            let buyList = {{buys|safe}};
-            let totalList = {{prices|safe}};
-            let datesList = {{dates|safe}};
+            let followingList = {{followingList|safe}};
+
+            let list = [];
             
-            let orderlist = [];
-            for (let i = 0; i < tickersList.length; i++) {
-              orderlist.push({
-                Stock: tickersList[i],
-                Quantity: quantList[i],
-                'Transaction Type': buyList[i],
-                Total: totalList[i],
-                'Date of Order' : datesList[i]
+            for (let i = 0; i < followingList.length; i++) {
+              list.push({
+                Name: followingList[i]
               })
             }
 
-            function generateOrderlist(table, data, keys) {
+            function generateFollowinglist(table, data, keys) {
               let thead = table.createTHead();
               let row = thead.insertRow();
               for (let key of keys) {
@@ -138,18 +130,10 @@
             }
 
             let table = document.querySelector("table");
-            let data = Object.keys(orderlist[0]);
-            generateOrderlist(table, orderlist, data); 
+            let data = Object.keys(list[0]);
+            generateOrderlist(table, list, data); 
             </script>
           </div>
-          <br><br>
-          <div class="centering">
-            <form action="/simulation">
-                  <button class="btn btn btn-lg justify-content-margin-left" name="option" value="Buy" style = "color:rgb(33, 103, 42);background-color:antiquewhite;">Back to Portfolio Page</button>
-                  </form>
-                  </div>
-          <br><br>
-          
           <br><br>
           <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
         <div class="container">

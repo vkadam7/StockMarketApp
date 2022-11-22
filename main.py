@@ -119,10 +119,19 @@ def followList():
 def followingList():
     if 'user' in session:
         followingList = []
-        for entry in dbfire.collection('Users').where('email', '==', session['user']).document('Following').to_dict():
+        for entry in dbfire.collection('Users').where('Name', '==', session['user']).document('FollowingNames').get():
             following = entry.to_dict()
-            followingList.append(following['Following'])
-        return render_template('followers.html', followingList = followingList)
+            followingList.append(following['FollowingNames'])
+        return render_template('followingList.html', followingList = followingList)
+    
+#Route for the Order list - Muneeb Khan
+#@app.route("/orderList")
+#def orderlists():
+#    if ('user' in session):
+#        orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
+
+#        return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
+#        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
 
 # Login
 #  This function allows the user to log into the app with correct credentials
@@ -594,7 +603,7 @@ def goToSimulation():
                         currentPrices.append("$%.2f" % round(currentPrice, 2))
                         totalValue.append("$%.2f" % round(Portfolio.quantity*currentPrice, 2))
                         originalValue.append("$%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
-                        profits.append("$%.2f" % round((Portfolio.quantity*currentPrice) - (Portfolio.avgSharePrice*Portfolio.quantity), 2))
+                        profits.append("%.2f" % round((Portfolio.quantity*currentPrice) - (Portfolio.avgSharePrice*Portfolio.quantity), 2))
                         percent = Portfolio.quantity*currentPrice / (currentCash+sharesValue) * 100
                         percentageTotal += percent
                         percentage.append("%.2f" % round(percent, 2))
@@ -639,38 +648,42 @@ def simlists():
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
     session['option'] = request.form['option']
+    if session['option'] == 'Buy':
+        session['optionType'] = 0
+    else:
+        session['optionType'] = 1
     session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+    session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
     return render_template('orderForm.html', option=session['option'])
 
-@app.route("/orderCreate", methods=['POST', 'GET'])
-def orderCreate():
-    if request.form['stockQuantity'].isnumeric():
-        session['orderQuantity'] = request.form['stockQuantity']
-        session['orderPrice'] = "%.2f" % round(float(session['orderQuantity']) * float(session['currentPrice']), 2)
-        return render_template('orderConfirmation.html', option=session['option'])
-    else:
-        flash("Please enter a valid quantity amount")
-        return render_template('orderForm.html', option=session['option'])
+#@app.route("/orderCreate", methods=['POST', 'GET'])
+#def orderCreate():
+#    return render_template('orderConfirmation.html', option=session['option'])
 
 @app.route("/orderConfirm", methods=['POST', 'GET'])
 def orderConfirm():
-    
-    order = Order(dbfire, session['simName'], stock, 
-                    session['option'], session['orderQuantity'], session['currentPrice'])
-    if session['option'] == 'Buy':
-        flag = order.buyOrder()
+    if request.form['stockQuantity'].isnumeric():
+        session['orderQuantity'] = request.form['stockQuantity']
+        session['orderPrice'] = "%.2f" % round(float(session['orderQuantity']) * float(session['currentPrice']), 2)
+        order = Order(dbfire, session['simName'], stock, 
+                        session['option'], session['orderQuantity'], session['currentPrice'])
+        if session['option'] == 'Buy':
+            flag = order.buyOrder()
+        else:
+            flag = order.sellOrder()
+        if flag == 1:
+            flash("Order Complete!")  
+
+            return redirect(url_for('.goToSimulation'))
+
+        elif session['option'] == 'Buy' and flag == -1:
+            flash("Insufficient funds to complete purchase")
+            return render_template('orderForm.html', option=session['option'])
+        elif session['option'] == 'Sell' and flag == -1:
+            flash("Insufficient shares to complete sale")
+            return render_template('orderForm.html', option=session['option'])
     else:
-        flag = order.sellOrder()
-    if flag == 1:
-        flash("Order Complete!")  
-
-        return redirect(url_for('.goToSimulation'))
-
-    elif session['option'] == 'Buy' and flag == -1:
-        flash("Insufficient funds to complete purchase")
-        return render_template('orderForm.html', option=session['option'])
-    elif session['option'] == 'Sell' and flag == -1:
-        flash("Insufficient shares to complete sale")
+        flash("Please enter a valid quantity amount")
         return render_template('orderForm.html', option=session['option'])
     
 ## stockSearch
@@ -706,7 +719,6 @@ def stockSearch():
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
 
-
 @app.route('/_stockSearchSuggestions', methods=['POST','GET'])
 def stockSearchSuggestions():
     if ('user' in session):
@@ -716,7 +728,6 @@ def stockSearchSuggestions():
                 temp = entry.to_dict()
                 stockNames.append(temp) 
             return render_template("home.html", stockNames = stockNames)
-
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
@@ -774,6 +785,7 @@ def displayStock():
                             avgPrice = []
                         #    if int(stock['dates'][i][11:13]) == 9:
                         #        mod = 6
+                    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
                     return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
             elif timespan == '1minute' or timespan == '5minute':
                 for entry in stockData:
@@ -808,6 +820,7 @@ def displayStock():
                                 if i % 30 != 0:
                                     tempDate2 = tempDate2[11:19]
                                 dates.append("".join(tempDate2))
+                    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
                     return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
             else:
                 for entry in stockData:
@@ -819,6 +832,7 @@ def displayStock():
                     for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
                         dates.append(stock['dates'][i])
                         prices.append(stock['prices'][i])
+                    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
                     return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
         else:
             return redirect(url_for('fourOhFour'))
@@ -898,9 +912,8 @@ def orderHist(simName):
 def orderHistory():
     simName = request.args['simName']
     orderlist = Order.orderList(dbfire, simName) # This will have the username show on webpage when logged in - Muneeb Khan
-    print(orderlist)
 
-    return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
+    return render_template('orderHistory.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
     tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())       
 
 ## 
@@ -1006,30 +1019,6 @@ def quizpage():
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
 
-#Author: Viraj Kadam   
-#Updates user profile  
-#class User(Flaskform):
-    #picture =  
-#    description = StringField('Description')
-#    experience = StringField('Experience')
-#    submit = SubmitField("Submit")   
-    
-#@app.route('/update/<int:id>', methods = ['GET', 'POST'])
-#def update():
-#   updateinfo = User.query.get(id)
-#   if request.method == 'POST':
-#        update.description = request.form('Description')
-#        update.experience = request.form('Experience')
-#        try:
-#            db.session.commit()
-#            flash("User profile updates")
-#            return render_template('profile.html')
-#        except:
-#            flash("Error, unable to update your profile")
-
-#@app.route('/')
-#def method_name():
-#    pass
     
 if __name__ == '__main__':
     app.run(debug=True)
