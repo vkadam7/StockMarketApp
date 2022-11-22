@@ -419,12 +419,12 @@ def update():
                 goodName = "Ok"
             
             if (len(experience) < 300):
-                flash("300 character limit")
+                flash("300 character limit") #Adds experience to profile
             else:
                 flash("Experience added")
         
             if (goodName == username):
-                flash("Username is already taken. Please enter a valid username.") #check to see if username is taken
+                flash("Username is already taken. Please enter a valid username.") #check to see if new username is taken
 
             else:
 
