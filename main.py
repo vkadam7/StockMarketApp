@@ -98,6 +98,10 @@ def profile():
 
         redirect(url_for("login"))
 
+
+
+
+
 @app.route("/postBlog", methods = ["POST","GET"])
 def postBLog():
     if('user' in session):
