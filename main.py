@@ -100,18 +100,9 @@ def followList():
         for entry in dbfire.collection('Users').where('Email','==',session['user']).stream():
             temp = entry.to_dict()
             followersList.extend(temp['FollowerNames'])
-        print(followersList)
-
-
-        FollowerNames = []
-        for followers in followersList:
-            names = dbfire.collection('Users').where('userName','==',followers).get()
-            for name in names:
-                names = name.to_dict()
-                FollowerNames.append(names)
-        print(FollowerNames)    
-        
-        return render_template('followers.html',followersList = followersList, FollowerNames = FollowerNames)
+        splitNames = [item.split(',') for item in followersList]
+        print(splitNames)
+        return render_template('followers.html',splitNames = splitNames)
     else:
         redirect(url_for("login"))
 
@@ -724,7 +715,7 @@ def stockSearchSuggestions():
     if ('user' in session):
         if request.method == 'GET':
             stockNames = []
-            for entry in db.collection("Stocks").document("ticker").get():
+            for entry in db.collection("StockSearchInfo").get():
                 temp = entry.to_dict()
                 stockNames.append(temp) 
             return render_template("home.html", stockNames = stockNames)
