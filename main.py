@@ -112,14 +112,14 @@ def Blog():
         print("Here comes the BLOG.")
         blog = []
         for x in followingArray:
-            showBLog = dbfire.collection('Blog').where('username', '==', x).get()
-            for docus in personalLB:
-                personalLB = docus.to_dict()
-                blog.append(personalLB)
+            showBlog = dbfire.collection('Blog').where('Author', '==', x).get()
+            for docus in showBlog:
+                showBlog = docus.to_dict()
+                blog.append(showBlog)
                 
         print("Here comes personal B")
-        print(blog)    
-
+        print(blog)   
+        return render_template("home.html")
 
 
 @app.route("/postBlog", methods = ["POST","GET"])
