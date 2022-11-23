@@ -109,6 +109,17 @@ def Blog():
         print("Printing user's following list ")
         print(followingArray)
 
+        print("Here comes the BLOG.")
+        blog = []
+        for x in followingArray:
+            showBLog = dbfire.collection('Blog').where('username', '==', x).get()
+            for docus in personalLB:
+                personalLB = docus.to_dict()
+                blog.append(personalLB)
+                
+        print("Here comes personal B")
+        print(blog)    
+
 
 
 @app.route("/postBlog", methods = ["POST","GET"])
