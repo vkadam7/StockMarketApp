@@ -118,14 +118,23 @@ def followList():
 @app.route("/followingList")
 def followingList():
     if 'user' in session:
-        followingList = []
-        for entry in dbfire.collection('Users').where('Name', '==', session['user']).document('FollowingNames').get():
-            following = entry.to_dict()
-            followingList.append(following['FollowingNames'])
+        #followingList = []
+        #for entry in dbfire.collection('Users').where('Name', '==', session['user']).stream():
+        #    following = entry.to_dict()
+        #    followingList.extend(following['FollowingNames'])
             
-        followingListNames = []
+        #followingListNames = []
         
-        return render_template('followingList.html', followingList = followingList)
+        #return render_template('followingList.html', followingList = followingList)
+        
+        followingList= []
+        doc = dbfire.collection('Users').where('Name', '==', session['user']).get()
+        for name in doc.stream():
+            temp = name.to_dict()
+            followingList.extend(name['FollowingNames'])
+        names = [item.split(',') for item in followingList]
+        print(names)
+        return render_template('followingList.html', names = names)
     
 #Route for the Order list - Muneeb Khan
 #@app.route("/orderList")
@@ -403,7 +412,6 @@ def PasswordRecovery():
 def update():
     if 'user' in session:
         if request.method == "POST":
-            global experience
             results = request.form
             email = results['email']
             username = results['Unames']
@@ -418,7 +426,7 @@ def update():
             else:
                 goodName = "Ok"
             
-            if (len(experience) < 300):
+            if (len(experience) > 300):
                 flash("300 character limit") #Adds experience to profile
             else:
                 flash("Experience added")

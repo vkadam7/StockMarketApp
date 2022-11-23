@@ -96,11 +96,20 @@
           <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
 
             <thead class = "bg-light">
+              <tr><th>Name: </th></tr>
+            </thead>
+            {%for user in names%}
+            <tbody>
+              <tr>
+                <td> <h3> {{user[0]}}</h3></td>
+              </tr>
+            </tbody>
+            {%endfor%}
 
            </table>
 
           <script type="text/javascript">
-            let followingList = {{followingList|safe}};
+           <!-- let followingList = {{followingList|safe}};
 
             let list = [];
             
@@ -131,7 +140,9 @@
 
             let table = document.querySelector("table");
             let data = Object.keys(list[0]);
-            generateOrderlist(table, list, data); 
+            generateOrderlist(table, list, data); -->
+
+
             </script>
           </div>
           <br><br>
