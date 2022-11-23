@@ -98,7 +98,16 @@ def profile():
 
         redirect(url_for("login"))
 
-
+@app.route("/Blog", methods = ["POST","GET"])
+def Blog():
+    if('user' in session):
+        followingArray = []
+        userF = dbfire.collection('Users').where('Email', '==', session['user'])
+        for docs in userF.stream():
+            userF = docs.to_dict()
+            followingArray.extend(userF['FollowingNames'])
+        print("Printing user's following list ")
+        print(followingArray)
 
 
 
