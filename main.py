@@ -119,7 +119,7 @@ def Blog():
                 
         print("Here comes personal B")
         print(blog)   
-        return render_template("home.html")
+        return render_template("Blog.html", blog = blog)
 
 
 @app.route("/postBlog", methods = ["POST","GET"])
