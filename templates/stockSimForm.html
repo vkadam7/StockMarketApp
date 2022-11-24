@@ -84,7 +84,7 @@
           </nav>
     </header>
 
-<br><br><br><br><br><br>
+<br>
 
     <body>
         <div class = "centering">
@@ -92,9 +92,12 @@
             <h4>Just need to enter some details to get the simulation started!</h4>
             <hr>
         </div>
-        
+        <div id="overlay">
+            <div class="loader" style="text-align: center;"></div> 
+            </div>
+            <br>
             <div class="container">
-            <div class="row justify-content-center" style = "margin-left: 40%;margin-right: 20%;">
+            <div class="row justify-content-center" >
             <form action="/startSimulation" method="post">
               <div class = "form-row align-items-center" style = "box-sizing: 0;">
                 <div class = "form-group col-md-5">
@@ -109,43 +112,52 @@
               </div>
               <br>
               <div class = "form-row align-items-center" style = "box-sizing: 0;">
-                <div class = "form-group col-md-8">
+                <div class = "form-group col-md-6">
                   <label for="Money">Simulation Starting Cash:</label>
                   <input id='money' type="Money" name="initialCash" value="{{ request.form['initialCash'] }}" placeholder="Enter an amount...">
                 </div>
                 <br>
                 <button id='simButton' disabled='true' class = "btn btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Start Simulation!</button>
               </div>
-              <p id="notice" style="color: red;"></p>
+              <br>
+              <br>
+              <p id="cashNotice" style="color: red;"></p>
+              <br>
+              <p id="dateNotice" style="color: red;"></p>
             </form>
             <script>
               const startDate = document.getElementById('startDate');
               const endDate = document.getElementById('endDate');
               const money = document.getElementById('money');
               const simButton = document.getElementById('simButton');
-              const notice = document.getElementById('notice');
+              const cashNotice = document.getElementById('cashNotice');
+              const dateNotice = document.getElementById('dateNotice');
 
               const regexForString = /[a-z]+|[A-Z]+/;
               const regexForDecimal = /[0-9]+./;
               const regex2 = /[0-9]+/;
 
               money.addEventListener('input', moneyCheck);
+              simButton.addEventListener('click', loadingScreen);
 
+              function loadingScreen() {
+                document.getElementById("overlay").style.display = "block";
+              }
               function moneyCheck(check) {
                 if (money.value.length == 0) {
                   simButton.disabled = true;
-                  notice.textContent = "";
+                  cashNotice.textContent = "";
                 }
                 if (money.value.match(regexForString) != null) {
                   simButton.disabled = true;
-                  notice.textContent = "Please enter a valid quantity.";
+                  cashNotice.textContent = "Please enter a valid quantity.";
                 } else if (money.value.match(regexForDecimal) != null) {
                   simButton.disabled = true;
-                  notice.textContent = "Please enter a whole number.";
+                  cashNotice.textContent = "Please enter a whole number.";
                 } 
                 if (+(money.value) > 0 && money.value.includes('.') == false) {
                   simButton.disabled = false;
-                  notice.textContent = "";
+                  cashNotice.textContent = "";
                 }
               }
             </script>
