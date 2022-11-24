@@ -78,11 +78,11 @@ def profile():
         for docs in userF.stream():
             userF = docs.to_dict()
             followingArray.extend(userF['FollowingNames'])
-        print("Printing miqdads following list ")
-        print(followingArray)
+        #print("Printing miqdads following list ")
+        #print(followingArray)
 
 
-        print("Here comes the leaderboard hopefully")
+        #print("Here comes the leaderboard hopefully")
         personalLB1 = []
         for x in followingArray:
             personalLB = dbfire.collection('Leaderboard').where('username', '==', x).get()
@@ -90,8 +90,8 @@ def profile():
                 personalLB = docus.to_dict()
                 personalLB1.append(personalLB)
                 
-        print("Here comes personal B")
-        print(personalLB1)    
+        #print("Here comes personal B")
+        #print(personalLB1)    
         
         return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard,personalLB1 = personalLB1)
     else:
