@@ -934,6 +934,11 @@ def quizSubmit():
 
     score = quiz.scoreCalc()
     if score >= 7:
+        yourscore = dbfire.collection('Users').where('Email', '==', session['user']).get()
+        for scores in yourscore:
+            updatescore = scores.id
+            yourscore = scores.to_dict()
+        dbfire.collection('Users').document(updatescore).update({'QuizScore': firestore.Increment(score)})
         flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
         " You are now ready to invest, please click the start simulation button above to start investing." +
         "Correct answers were: " +
@@ -949,6 +954,11 @@ def quizSubmit():
         "10 A ")
         return redirect(url_for('information', person = session['user']))
     else:
+        yourscore = dbfire.collection('Users').where('Email', '==', session['user']).get()
+        for scores in yourscore:
+            updatescore = scores.id
+            yourscore = scores.to_dict()
+        dbfire.collection('Users').document(updatescore).update({'QuizScore': firestore.Increment(score)})
         flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
         " You need to score at least a 7/10 to pass. Please try again."  + 
         "Correct answers were: " +
