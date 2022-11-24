@@ -128,8 +128,8 @@ def followingList():
         #return render_template('followingList.html', followingList = followingList)
         
         followingList= []
-        doc = dbfire.collection('Users').where('Name', '==', session['user']).get()
-        for name in doc.stream():
+        
+        for name in dbfire.collection('Users').where('Name', '==', session['user']).stream():
             temp = name.to_dict()
             followingList.extend(name['FollowingNames'])
         names = [item.split(',') for item in followingList]
@@ -413,13 +413,13 @@ def update():
     if 'user' in session:
         if request.method == "POST":
             results = request.form
-            email = results['email']
-            username = results['Unames']
+            newEmail = results['email']
+            newUsername = results['Unames']
             experience = results["experience"]  
             
-            doc = dbfire.collection('Users').document(username).get()
+            doc = dbfire.collection('Users').document(newUsername).get()
             if doc.exists:
-                checkName = dbfire.collection('Users').where('userName', '==', username)
+                checkName = dbfire.collection('Users').where('userName', '==', newUsername)
                 for docs in grabName.stream(): 
                     grabName = docs.to_dict()
                 goodName = grabName['userName']
@@ -431,15 +431,15 @@ def update():
             else:
                 flash("Experience added")
         
-            if (goodName == username):
+            if (goodName == newUsername):
                 flash("Username is already taken. Please enter a valid username.") #check to see if new username is taken
 
             else:
 
                 try: 
         
-                    dbfire.collection('Users').document(session['user']).update({"userName": username, "Email": email})
-                    dbfire.collection('Users').where('userName', '==', username).set({'experience': experience})
+                    dbfire.collection('Users').document(session['user']).update({"userName": newUsername, "Email": newEmail})
+                    dbfire.collection('Users').where('userName', '==', newUsername).set({'experience': experience})
                     flash("Account details updated")
 
                     return redirect(url_for("profile"))
@@ -604,7 +604,7 @@ def goToSimulation():
                 percentage = []
                 volatility = []
                 links = []
-                #buySell = []
+                buySell = []
                 
                 percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
@@ -623,7 +623,7 @@ def goToSimulation():
                         percentage.append("%.2f" % round(percent, 2))
                         volatility.append("%.2f" % round(Portfolio.volatility,2))
                         links.append(Portfolio.link)
-                       # buySell.append(Portfolio.buySell)
+                        buySell.append(Portfolio.newLink)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
@@ -631,7 +631,7 @@ def goToSimulation():
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
                 currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue,
-                percentage=percentage, links=links)  
+                percentage=percentage, links=links, buySell = buySell)  
             else:
                 return redirect(url_for('.finishSimulation'))
         except KeyError:

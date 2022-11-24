@@ -110,7 +110,8 @@
             let originalValuesList = {{originalValue|safe}};
             let percentageList = {{percentage|safe}};
             let linkList = {{links|safe}};
-            //let volatilityList = {{volatility|safe}};
+            let volatilityList = {{volatility|safe}};
+            let buySellList =  {{buySell|safe}};
             
             let portfolio = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -123,8 +124,9 @@
                 'Cost Basis': originalValuesList[i],
                 'Change': profitList[i],
                 '% of Account' : percentageList[i],
-                'Link to Chart' : linkList[i]
-                //Volatility: volatilityList[i]
+                'Link to Chart' : linkList[i], 
+                'Buy/Sell Options': buySellList[i],
+                Volatility: volatilityList[i]
               })
             }
 
