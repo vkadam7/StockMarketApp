@@ -111,6 +111,7 @@
             let buyList = {{buys|safe}};
             let totalList = {{prices|safe}};
             let datesList = {{dates|safe}};
+            let buySellButtonList = {{buySellButtons|safe}};
             
             let orderlist = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -119,7 +120,8 @@
                 Quantity: quantList[i],
                 'Transaction Type': buyList[i],
                 Total: totalList[i],
-                'Date of Order' : datesList[i]
+                'Date of Order' : datesList[i],
+                'Buy or Sell' : buySellButtonList[i],
               })
             }
 
@@ -134,14 +136,24 @@
               }
               for (let element of data) {
                 let row = table.insertRow();
+                i = 0;
                 for (key in element) {
+                 if (i < 5) {
                   let cell = row.insertCell();
                   let text = document.createTextNode(element[key]);
                   cell.appendChild(text);
+                } else {
+                  var ListCell = row.insertCell();
+                  var ListLink = document.createElement('a');
+                  var LinkLinkText = document.createTextNode('Buy or Sell');
+                  ListLink.setAttribute('href', element[key]);
+                  ListLink.appendChild(ListLinkText);
+                  ListCell.appendChild(ListLink);
                 }
               }
+              i = i + 1;
             }
-
+          }
             let table = document.querySelector("table");
             let data = Object.keys(orderlist[0]);
             generateOrderlist(table, orderlist, data); 

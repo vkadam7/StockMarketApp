@@ -888,9 +888,14 @@ def userlists():
 def orderlists():
     if ('user' in session):
         orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
+        buySellButtons = []
+        for entry in Order.stocksBought(dbfire,session['simName']):
+            Portfolio = portfolio(dbfire,entry,session['user'],session['simName'])
+            if Portfolio.quantity != 0:
+                buySellButtons.append(Portfolio.newLink)
 
         return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
-        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
+        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list(), buySellButtons = buySellButtons)
 
 @app.route("/orderHist/<simName>")
 def orderHist(simName):
