@@ -89,18 +89,19 @@
 
 <body>
 <main> 
-    
-    <h1> Share your thoughts on the StockSim Blog</h1>
+    <div id = "posting">
+    <h1 style="text-align:left"> Share your thoughts on the StockSim Blog</h1>
     <hr>
+    <br> 
 
     <form action = "/postBlog" method = "POST">
-        <div class="form-outline w-75 mb-4">
-        <textarea class="form-control" id="textAreaExample6" rows="7"></textarea>
-        <label class="form-label" for="textAreaExample6">75% width of the parent</label>
+        <div class="form-outline w-50 mb-4">
+        <label class="form-label" for="textAreaExample6">Post on the Blog</label>
+        <textarea maxlength="250" class="form-control" id="textAreaExample6" rows="10"></textarea>    
         </div>
     <button class = "btn btn-block" style = "background-color:rgb(33, 103, 42);color:WHITE;">Post</button>
     </form>
-
+    </div>
 
 </main>
 {% with messages = get_flashed_messages() %}
@@ -118,7 +119,7 @@
 
 
 <br><br><br><br>
-    <footer class="footer mt-auto py-3" id = "foot">
+    <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
         <div class="container">
           <span>Copyright 2022 by StockSim</span>
         </div>
