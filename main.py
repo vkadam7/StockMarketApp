@@ -134,7 +134,7 @@ def postBLog():
             Author = results['userName']
            
             dbfire.collection('Blog').add({"Author": Author,"DatePosted":firestore.SERVER_TIMESTAMP,"Post":post,"Likes":0})
-            flash("Posted.", "pass")
+            flash("Your submission has been posted.")
     return render_template("postBlog.html")
 
 @app.route("/Leaderboard")
