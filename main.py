@@ -361,7 +361,7 @@ def register():
                 user = authen.create_user_with_email_and_password(email, Password)
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""]})
+                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""], "experience": ""})
                 #dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 flash("Account succesfully created, you may now login" , "pass")
@@ -427,26 +427,30 @@ def update():
                 goodName = "Ok"
             
             if (len(experience) > 300):
-                flash("300 character limit") #Adds experience to profile
-            else:
-                flash("Experience added")
+                flash("There is a 300 character limit") #Adds experience to profile
         
             if (goodName == newUsername):
                 flash("Username is already taken. Please enter a valid username.") #check to see if new username is taken
+                
+            dbfire.collection('Users').document('Name', '==', session['user']).update({"userName": newUsername, "Email": newEmail, "experience": experience})
+            
+            flash("Account details updated")
 
-            else:
+            return redirect(url_for("profile"))
 
-                try: 
+           # else:
+
+           #     try: 
+                   # user = authen.update_Current_User()
         
-                    dbfire.collection('Users').document(session['user']).update({"userName": newUsername, "Email": newEmail})
-                    dbfire.collection('Users').where('userName', '==', newUsername).set({'experience': experience})
-                    flash("Account details updated")
+            #        dbfire.collection('Users').document(newUsername).update({"userName": newUsername, "Email": newEmail})
+             #       dbfire.collection('Users').where(newUsername).set({'experience': experience})
+              #      flash("Account details updated")
 
-                    return redirect(url_for("profile"))
+               #     return redirect(url_for("profile"))
 
-                except:
-                    flash("Invalid Registration" , "fail")
-                    return redirect(url_for("update"))
+                #except:
+                 ##  return redirect(url_for("update"))
           
     return render_template('update.html')   
 #Logout

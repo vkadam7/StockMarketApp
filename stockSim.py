@@ -945,10 +945,12 @@ class portfolio:
                 if temp.get('sold') != None:
                     if temp['sold'] == False:
                         amountOfSharesOwned += int(temp['newQuantity'])
+                        return amountOfSharesOwned
             else:
                 if temp.get('sold') != None:
                     if temp['sold'] == False:
-                        amountOfSharesOwned += int(temp['quantity'])             
+                        amountOfSharesOwned += int(temp['quantity'])     
+                        return amountOfSharesOwned        
         avgPriceOfOrders = mean(prices)
         currentValueOfShares = currentPriceOfStock * amountOfSharesOwned
         if avgStockPrices:
