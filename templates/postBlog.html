@@ -97,10 +97,13 @@
     <form action = "/postBlog" method = "POST">
         <div class="form-outline w-50 mb-4">
         <label class="form-label" for="textAreaExample6">Post on the Blog</label>
-        <textarea maxlength="250" class="form-control" id="textAreaExample6" rows="10"></textarea>    
+        <textarea maxlength="250" class="form-control" name = "blogPost" rows="9" style="height:90%;"></textarea>
+        <br>  
+        <div class = "d-flex justify-content-end">
+        <button class = "btn btn-block" style = "background-color:rgb(33, 103, 42);color:WHITE;">Post</button>
         </div>
-    <button class = "btn btn-block" style = "background-color:rgb(33, 103, 42);color:WHITE;">Post</button>
-    </form>
+        </form>
+        </div>
     </div>
 
 </main>
@@ -118,8 +121,8 @@
 </body>
 
 
-<br><br><br><br>
-    <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
+>
+    <footer class="footer mt-auto py-3" id = "foot">
         <div class="container">
           <span>Copyright 2022 by StockSim</span>
         </div>
