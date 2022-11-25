@@ -417,9 +417,9 @@ def update():
             newUsername = results['Unames']
             experience = results["experience"]  
             
-            doc = dbfire.collection('Users').document(newUsername).get()
+            doc = dbfire.collection('Users').document(session['user']).document(newUsername).get()
             if doc.exists:
-                checkName = dbfire.collection('Users').where('userName', '==', newUsername)
+                checkName = dbfire.collection('Users').where('userName', '==', newUsername).get()
                 for docs in grabName.stream(): 
                     grabName = docs.to_dict()
                 goodName = grabName['userName']
@@ -431,26 +431,16 @@ def update():
         
             if (goodName == newUsername):
                 flash("Username is already taken. Please enter a valid username.") #check to see if new username is taken
-                
-            dbfire.collection('Users').document('Name', '==', session['user']).update({"userName": newUsername, "Email": newEmail, "experience": experience})
             
-            flash("Account details updated")
+            try:  
+                dbfire.collection('Users').document('Name', '==', session['user']).update({"userName": newUsername, "Email": newEmail, "experience": experience})
+            
+                flash("Account details updated", "pass")
 
-            return redirect(url_for("profile"))
+                return redirect(url_for("profile"))
+            except:
+                return redirect(url_for("update"))
 
-           # else:
-
-           #     try: 
-                   # user = authen.update_Current_User()
-        
-            #        dbfire.collection('Users').document(newUsername).update({"userName": newUsername, "Email": newEmail})
-             #       dbfire.collection('Users').where(newUsername).set({'experience': experience})
-              #      flash("Account details updated")
-
-               #     return redirect(url_for("profile"))
-
-                #except:
-                 ##  return redirect(url_for("update"))
           
     return render_template('update.html')   
 #Logout
