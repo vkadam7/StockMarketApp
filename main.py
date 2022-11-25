@@ -596,6 +596,22 @@ def orderFormFill():
     session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
     return render_template('orderForm.html', option=session['option'])
 
+@app.route("/sellTaxLot/<orderID>")
+def sellTaxLot(orderID):
+    if 'user' in session:
+        order = dbfire.collection('Orders').document(orderID).get().to_dict()
+        session['orderID'] = orderID
+        session['option'] = 'Sell'
+        session['optionType'] = 1
+        session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
+        if order.get('newQuantity') != None:
+            session['stockQuantity'] = order['newQuantity']
+        else:
+            session['stockQuantity'] = order['quantity']
+        session['currentAmount'] = session['stockQuantity']
+        session['orderPrice'] = "%.2f" % round(float(session['stockQuantity']) * float(session['currentPrice']), 2)
+        return render_template('orderConfirmation.html')
+
 #@app.route("/orderCreate", methods=['POST', 'GET'])
 #def orderCreate():
 #    return render_template('orderConfirmation.html', option=session['option'])

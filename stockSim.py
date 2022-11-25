@@ -954,7 +954,7 @@ class Order:
                 temp = entry.to_dict()
                 date = str(datetime.datetime.fromtimestamp(temp['dayOfPurchase'].timestamp()).strftime("%Y-%m-%d %H:%M:%S"))
                 if temp['buyOrSell'] == 'Buy':
-                    link = str('/sellTaxLot?ticker=' + temp['ticker'])
+                    link = str('/sellTaxLot/' + entry.id)
                 else:
                     link = ""
                 if temp.get('partiallySold') != None and temp['sold'] == False:
