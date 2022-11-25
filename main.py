@@ -70,8 +70,7 @@ def profile():
         #endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
         #startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
         #while(startDateFetch >= endDateFetch):
-        #    startDate = startDateFetch[0]
-        #    endDate = endDateFetch[0]
+        #    endDateFetch_format = 
             
             
         return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard)
@@ -87,7 +86,14 @@ def Leaderboard():
         documentRef.sort(key = itemgetter('score'), reverse=True)
         print("about to print leaderboard")
         print(documentRef)
-        return render_template("Leaderboard.html",documentRef = documentRef) #placeholder
+        
+        cash = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True)
+        for doc in cash.stream():
+            cash = doc.to_dict()
+        return render_template("Leaderboard.html",documentRef = documentRef, cash = cash) #placeholder
+
+        
+
     else:
         redirect(url_for("login"))
 
