@@ -899,6 +899,43 @@ class Order:
             tickers.append(temp['ticker'])
         return [*set(tickers)]
 
+    def sellTaxLot(db, user, sim, orderID):
+        doc = db.collection('Orders').document(orderID).get().to_dict()
+        avgStockPrice = SimulationFactory(db, user).simulation.currentPriceOf(doc['ticker'])
+        if doc.get('newQuantity') == None:
+            count = len(db.collection('Orders').where('simulation', '==', sim).get())
+            orderName = sim + doc['ticker'] + str(count)
+            data = {
+                'simulation': sim,
+                'ticker': doc['ticker'],
+                'dayOfPurchase': datetime.datetime.now(),
+                'buyOrSell': 'Sell',
+                'quantity': doc['quantity'],
+                'avgStockPrice': avgStockPrice,
+                'totalPrice': avgStockPrice * doc['quantity']
+            }
+            db.collection('Orders').document(orderName).set(data)
+            db.collection('Orders').docunent(orderID).update({'sold' : True, 'quantity' : 0})
+            Simulation.updateCash(db, sim, doc['totalPrice'])
+            return 1
+        else:
+            count = len(db.collection('Orders').where('simulation', '==', sim).get())
+            orderName = sim + doc['ticker'] + str(count)
+            data = {
+                'simulation': sim,
+                'ticker': doc['ticker'],
+                'dayOfPurchase': datetime.datetime.now(),
+                'buyOrSell': 'Sell',
+                'quantity': doc['newQuantity'],
+                'avgStockPrice': avgStockPrice,
+                'totalPrice': avgStockPrice * doc['newQuantity']
+            }
+            db.collection('Orders').document(orderName).set(data)
+            db.collection('Orders').docunent(orderID).update({'sold' : True, 'newQuantity' : 0})
+            Simulation.updateCash(db, sim, doc['totalPrice'])
+            return 1
+        return -1
+
     # List of Orders by Muneeb Khan
     def orderList(db, simName):
         quantityOwned = 0
