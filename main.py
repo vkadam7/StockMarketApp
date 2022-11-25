@@ -717,7 +717,8 @@ def stockSearchSuggestions():
             stockNames = []
             for entry in db.collection("StockSearchInfo").get():
                 temp = entry.to_dict()
-                stockNames.append(temp) 
+                stockNames.extend(temp['name'])
+            print(stockNames) 
             return render_template("home.html", stockNames = stockNames)
 
 ## displayStock
@@ -943,7 +944,7 @@ def quizSubmit():
         for scores in yourscore:
             updatescore = scores.id
             yourscore = scores.to_dict()
-        dbfire.collection('Users').document(updatescore).update({'QuizScore': firestore.Increment(score)})
+        dbfire.collection('Users').document(updatescore).update({'QuizScore': str(score*10) + "%"})
         flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
         " You are now ready to invest, please click the start simulation button above to start investing." +
         "Correct answers were: " +
@@ -963,7 +964,7 @@ def quizSubmit():
         for scores in yourscore:
             updatescore = scores.id
             yourscore = scores.to_dict()
-        dbfire.collection('Users').document(updatescore).update({'QuizScore': firestore.Increment(score)})
+        dbfire.collection('Users').document(updatescore).update({'QuizScore': str(score*10) + "%"})
         flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
         " You need to score at least a 7/10 to pass. Please try again."  + 
         "Correct answers were: " +
