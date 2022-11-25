@@ -106,6 +106,8 @@
             let buyList = {{buys|safe}};
             let totalList = {{prices|safe}};
             let datesList = {{dates|safe}};
+            let partiallySoldList = {{partiallySold|safe}};
+            let profitsList = {{profits|safe}};
             let linksList = {{links|safe}};
             
             let orderlist = [];
@@ -116,6 +118,8 @@
                 'Transaction Type': buyList[i],
                 Total: totalList[i],
                 'Date of Order' : datesList[i],
+                'Partially Sold' : partiallySoldList[i],
+                'Profit' : profitsList[i],
                 'Link to Sell' : linksList[i]
               })
             }
@@ -133,7 +137,7 @@
                 let row = table.insertRow();
                 i = 0;
                 for (key in element) {
-                    if (i < 4) {
+                    if (i < 7 || element[key] == "") {
                     let cell = row.insertCell();
                     let text = document.createTextNode(element[key]);
                     cell.appendChild(text);

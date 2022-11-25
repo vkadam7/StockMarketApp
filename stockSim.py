@@ -957,13 +957,17 @@ class Order:
                     link = str('/sellTaxLot?ticker=' + temp['ticker'])
                 else:
                     link = ""
-                if temp.get('partiallySold') != None:
+                if temp.get('partiallySold') != None and temp['sold'] == False:
                     partiallySold = str(temp['newQuantity'])
                 else:
                     partiallySold = ""
-                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],"%.2f" % round(float(temp['totalPrice']),2),date, partiallySold, link])
+                if temp.get('profit') != None:
+                    profit = str(temp['profit'])
+                else:
+                    profit = ""
+                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],"%.2f" % round(float(temp['totalPrice']),2),date, partiallySold, profit, link])
             
-            df = pd.DataFrame(orderslist, columns=['buyOrSell','quantity','ticker','totalPrice', 'dayOfPurchase', 'partiallySold', 'link'])
+            df = pd.DataFrame(orderslist, columns=['buyOrSell','quantity','ticker','totalPrice', 'dayOfPurchase', 'partiallySold', 'profit', 'links'])
             
             return df
 
