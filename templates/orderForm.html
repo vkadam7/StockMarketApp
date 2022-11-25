@@ -62,6 +62,7 @@
               if ({{ session['simulationFlag'] }} == 0 ) { 
                 document.getElementById('goToSim').style.display = "none";
               }
+
             </script>  
           </li>
           {% else %}
@@ -91,6 +92,9 @@
     <div style="margin-left: 50px;">
 
     <br>
+    <div id="overlay">
+            <div class="loader" style="text-align: center;"></div> 
+            </div>
     <form action="orderConfirm" method="post">
         <p>Current Available Cash: ${{session['currentCash'] }} </p>
         <p>Currently Owned Amount of Shares of this Stock: {{session['currentAmount']}}</p>
@@ -115,6 +119,11 @@
           const regexForInteger = /[a-z]+|[A-Z]+|[0-9]+./;
 
           quantity.addEventListener('input', updatePrice);
+          button.addEventListener('click', loadingScreen);
+
+          function loadingScreen() {
+            document.getElementById("overlay").style.display = "block";
+          }
 
           function updatePrice(delta) {
             totalPrice.textContent = "Order Price: $" + (delta.target.value * currentPrice).toFixed(2);

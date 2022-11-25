@@ -90,6 +90,9 @@
     <h3>{{ session['option'] }} Order for {{ session['ticker'] }}</h3>
     <div style="margin-left: 50px;">
 
+    <div id="overlay">
+        <div class="loader" style="text-align: center;"></div> 
+        </div>
     <br>
     <form action="taxLotSellConfirm" method="post">
         <p>Order ID: {{session['orderID']}}</p>
@@ -101,6 +104,13 @@
         <button id='submitButton' class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;" >Create Order</button>
         <br><br>
         </form>
+    <script>
+        const button = document.getElementById('submitButton');
+        button.addEventListener('click', loadingScreen);
+        function loadingScreen() {
+            document.getElementById("overlay").style.display = "block";
+        }
+    </script>
 
     {% with messages = get_flashed_messages() %}
                     {% if messages %}   
