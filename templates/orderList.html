@@ -118,7 +118,7 @@
                 'Transaction Type': buyList[i],
                 Total: totalList[i],
                 'Date of Order' : datesList[i],
-                'Partially Sold' : partiallySoldList[i],
+                'Remaining Shares' : partiallySoldList[i],
                 'Profit' : profitsList[i],
                 'Link to Sell' : linksList[i]
               })
@@ -138,17 +138,27 @@
                 i = 0;
                 for (key in element) {
                     if (i < 7 || element[key] == "") {
-                    let cell = row.insertCell();
-                    let text = document.createTextNode(element[key]);
-                    cell.appendChild(text);
+                      let cell = row.insertCell();
+                      let text = document.createTextNode(element[key]);
+                      cell.appendChild(text);
+                      if (i == 6 && parseFloat(cell.innerHTML) < 0.0) {
+                        temp = cell.innerHTML;
+                        cell.style.color = "red";
+                        cell.innerHTML = "$" + temp;
+                      } else if (i == 6 && parseFloat(cell.innerHTML) >= 0) {
+                        temp = cell.innerHTML;
+                        cell.style.color = "green";
+                        cell.innerHTML = "$" + temp;
+                      } 
                     } else {
-                    var orderListCell = row.insertCell();
-                    var orderListLink = document.createElement('a');
-                    var orderListLinkText = document.createTextNode('Sell This Order');
-                    orderListLink.setAttribute('href', element[key]);
-                    orderListLink.appendChild(orderListLinkText);
-                    orderListCell.appendChild(orderListLink);
+                      var orderListCell = row.insertCell();
+                      var orderListLink = document.createElement('a');
+                      var orderListLinkText = document.createTextNode('Sell This Order');
+                      orderListLink.setAttribute('href', element[key]);
+                      orderListLink.appendChild(orderListLinkText);
+                      orderListCell.appendChild(orderListLink);
                     }
+                    
                     i = i + 1;
                 }
               }

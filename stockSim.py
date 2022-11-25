@@ -914,12 +914,12 @@ class Order:
                 'buyOrSell': 'Sell',
                 'quantity': doc['quantity'],
                 'avgStockPrice': avgStockPrice,
-                'totalPrice': avgStockPrice * doc['quantity'],
-                'profit': avgStockPrice * doc['quantity'] - doc['totalPrice']
+                'totalPrice': avgStockPrice * float(doc['quantity']),
+                'profit': avgStockPrice * float(doc['quantity']) - float(doc['totalPrice'])
             }
             db.collection('Orders').document(orderName).set(data)
-            db.collection('Orders').docunent(orderID).update({'sold' : True, 'quantity' : 0})
-            Simulation.updateCash(db, sim, doc['totalPrice'])
+            db.collection('Orders').document(orderID).update({'sold' : True})
+            Simulation.updateCash(db, sim, float(doc['totalPrice']))
             return 1
         else:
             count = len(db.collection('Orders').where('simulation', '==', sim).get())
@@ -931,11 +931,11 @@ class Order:
                 'buyOrSell': 'Sell',
                 'quantity': doc['newQuantity'],
                 'avgStockPrice': avgStockPrice,
-                'totalPrice': avgStockPrice * doc['newQuantity'],
-                'profit': avgStockPrice * doc['newQuantity'] - doc['totalPrice']
+                'totalPrice': avgStockPrice * float(doc['newQuantity']),
+                'profit': avgStockPrice * float(doc['newQuantity']) - float(doc['avgStockPrice']) * float(doc['newQuantity'])
             }
             db.collection('Orders').document(orderName).set(data)
-            db.collection('Orders').docunent(orderID).update({'sold' : True, 'newQuantity' : 0})
+            db.collection('Orders').document(orderID).update({'sold' : True, 'newQuantity' : 0})
             Simulation.updateCash(db, sim, doc['totalPrice'])
             return 1
         return -1
@@ -953,7 +953,7 @@ class Order:
             for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
                 temp = entry.to_dict()
                 date = str(datetime.datetime.fromtimestamp(temp['dayOfPurchase'].timestamp()).strftime("%Y-%m-%d %H:%M:%S"))
-                if temp['buyOrSell'] == 'Buy':
+                if temp['buyOrSell'] == 'Buy' and temp['sold'] == False:
                     link = str('/sellTaxLot/' + entry.id)
                 else:
                     link = ""
@@ -962,7 +962,7 @@ class Order:
                 else:
                     partiallySold = ""
                 if temp.get('profit') != None:
-                    profit = str(temp['profit'])
+                    profit = "%.2f" % round(temp['profit'],2)
                 else:
                     profit = ""
                 orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],"%.2f" % round(float(temp['totalPrice']),2),date, partiallySold, profit, link])

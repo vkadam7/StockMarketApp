@@ -611,6 +611,14 @@ def sellTaxLot(orderID):
         session['currentAmount'] = session['stockQuantity']
         session['orderPrice'] = "%.2f" % round(float(session['stockQuantity']) * float(session['currentPrice']), 2)
         return render_template('orderConfirmation.html')
+    else: return redirect(url_for('fourOhFour'))
+
+@app.route("/sellTaxLot/taxLotSellConfirm", methods=['POST', 'GET'])
+def taxLotSellConfirm():
+    if 'user' in session:
+        order = Order.sellTaxLot(dbfire, session['user'], session['simName'], session['orderID'])
+        return redirect(url_for('.goToSimulation'))
+    else: return redirect(url_for('fourOhFour'))
 
 #@app.route("/orderCreate", methods=['POST', 'GET'])
 #def orderCreate():
