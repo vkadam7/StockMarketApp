@@ -695,9 +695,9 @@ class SimulationFactory:
     def existenceCheck(db, email):
         array = [entry for entry in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream()]
         if len(array) == 0:
-            return False
+            return False, "None"
         else:
-            return True
+            return True, array[0].id
 
 class User:
     def __init__(self, db, username):
@@ -802,11 +802,11 @@ class Order:
         if self.option == 'Buy':
             if self.doTheyHaveEnoughMoney():
                 count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
-                orderName = self.sim + self.stock['ticker'] + str(count)
+                orderName = self.sim + self.stock + str(count)
                 data = {
                     'sold': False,
                     'simulation': self.sim,
-                    'ticker': self.stock['ticker'],
+                    'ticker': self.stock,
                     'dayOfPurchase': self.dayOfPurchase,
                     'buyOrSell': 'Buy',
                     'quantity': self.quantity,
@@ -820,17 +820,19 @@ class Order:
 
     def sellOrder(self):
         if self.option == 'Sell':
-            if self.doTheyOwnThat() == True:
+            check, averagePrice = self.doTheyOwnThat()
+            if check == True:
                 count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
-                orderName = self.sim + self.stock['ticker'] + str(count)
+                orderName = self.sim + self.stock + str(count)
                 data = {
                     'simulation': self.sim,
-                    'ticker': self.stock['ticker'],
+                    'ticker': self.stock,
                     'dayOfPurchase': self.dayOfPurchase,
                     'buyOrSell': 'Sell',
                     'quantity': self.quantity,
                     'avgStockPrice': self.avgStockPrice,
-                    'totalPrice': self.totalPrice
+                    'totalPrice': self.totalPrice,
+                    'profit': float(self.avgStockPrice)*float(self.quantity) - float(averagePrice)*float(self.quantity)
                 }
                 self.db.collection('Orders').document(orderName).set(data)
                 Simulation.updateCash(self.db, self.sim, self.totalPrice)
@@ -850,7 +852,7 @@ class Order:
         quantityOwned = 0
         ownageFlag = False
         partialFlag = False
-        for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).get():
+        for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).get():
             temp = entry.to_dict()
             if temp.get('newQuantity') != None:
                 quantityOwned += int(temp['newQuantity'])
@@ -858,34 +860,39 @@ class Order:
             else:
                 quantityOwned += int(temp['quantity'])
 
-        print(quantityOwned)
         if quantityOwned >= int(self.quantity):
             ownageFlag = True
         
+        averagePrice = []
         amountToSell = int(self.quantity)
         if ownageFlag:
             while amountToSell > 0:
                 if partialFlag == True:
-                    for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).where('partiallySold','==',True).stream():
+                    for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).where('partiallySold','==',True).stream():
+                        if amountToSell <= 0:
+                            break
                         temp = entry.to_dict()
-                        print("Difference is: " + str(amountToSell) + "-" + str(temp['newQuantity']) + "=" + str(amountToSell - int(temp['newQuantity'])))
-                        if amountToSell - int(temp['newQuantity']) >= 0:
-                            self.db.collection('Orders').document(entry.id).update({'sold' : True, 'newQuantity' : 0})
-                            amountToSell -= int(temp['newQuantity'])
-                        else:
+                        averagePrice.append(float(temp['avgStockPrice']))
+                        if int(temp['newQuantity']) - amountToSell > 0:
                             self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['newQuantity']) - amountToSell)})
                             amountToSell -= abs(int(temp['newQuantity']) - amountToSell)
-                for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock['ticker']).stream():
+                        else:
+                            self.db.collection('Orders').document(entry.id).update({'sold' : True, 'newQuantity' : 0})
+                            amountToSell -= int(temp['newQuantity'])
+                
+                for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).stream():
+                    if amountToSell <= 0:
+                        break
                     temp = entry.to_dict()
-                    print("Difference is: " + str(amountToSell) + "-" + temp['quantity'] + "=" + str(amountToSell - int(temp['quantity'])))
-                    if amountToSell - int(temp['quantity']) >= 0:
-                        self.db.collection('Orders').document(entry.id).update({'sold' : True})
-                        amountToSell -= int(temp['quantity'])
-                    else:
+                    averagePrice.append(float(temp['avgStockPrice']))
+                    if int(temp['quantity']) - amountToSell > 0:
                         self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['quantity']) - amountToSell)})
                         amountToSell -= abs(int(temp['quantity']) - amountToSell)
+                    else:
+                        self.db.collection('Orders').document(entry.id).update({'sold' : True})
+                        amountToSell -= int(temp['quantity'])
 
-            return ownageFlag
+            return ownageFlag, mean(averagePrice)
         
         return ownageFlag
 
@@ -902,6 +909,45 @@ class Order:
             tickers.append(temp['ticker'])
         return [*set(tickers)]
 
+    def sellTaxLot(db, user, sim, orderID):
+        doc = db.collection('Orders').document(orderID).get().to_dict()
+        avgStockPrice = SimulationFactory(db, user).simulation.currentPriceOf(doc['ticker'])
+        if doc.get('newQuantity') == None:
+            count = len(db.collection('Orders').where('simulation', '==', sim).get())
+            orderName = sim + doc['ticker'] + str(count)
+            data = {
+                'simulation': sim,
+                'ticker': doc['ticker'],
+                'dayOfPurchase': datetime.datetime.now(),
+                'buyOrSell': 'Sell',
+                'quantity': doc['quantity'],
+                'avgStockPrice': avgStockPrice,
+                'totalPrice': avgStockPrice * float(doc['quantity']),
+                'profit': avgStockPrice * float(doc['quantity']) - float(doc['totalPrice'])
+            }
+            db.collection('Orders').document(orderName).set(data)
+            db.collection('Orders').document(orderID).update({'sold' : True})
+            Simulation.updateCash(db, sim, float(doc['totalPrice']))
+            return 1
+        else:
+            count = len(db.collection('Orders').where('simulation', '==', sim).get())
+            orderName = sim + doc['ticker'] + str(count)
+            data = {
+                'simulation': sim,
+                'ticker': doc['ticker'],
+                'dayOfPurchase': datetime.datetime.now(),
+                'buyOrSell': 'Sell',
+                'quantity': doc['newQuantity'],
+                'avgStockPrice': avgStockPrice,
+                'totalPrice': avgStockPrice * float(doc['newQuantity']),
+                'profit': avgStockPrice * float(doc['newQuantity']) - float(doc['avgStockPrice']) * float(doc['newQuantity'])
+            }
+            db.collection('Orders').document(orderName).set(data)
+            db.collection('Orders').document(orderID).update({'sold' : True, 'newQuantity' : 0})
+            Simulation.updateCash(db, sim, doc['totalPrice'])
+            return 1
+        return -1
+
     # List of Orders by Muneeb Khan
     def orderList(db, simName):
         quantityOwned = 0
@@ -915,9 +961,23 @@ class Order:
             for entry in db.collection('Orders').where('simulation','==',simName).stream(): # To loop through the users orders
                 temp = entry.to_dict()
                 date = str(datetime.datetime.fromtimestamp(temp['dayOfPurchase'].timestamp()).strftime("%Y-%m-%d %H:%M:%S"))
-                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],"%.2f" % round(float(temp['totalPrice']),2),date])
+                if temp['buyOrSell'] == 'Buy' and temp['sold'] == False:
+                    link = str('/sellTaxLot/' + entry.id)
+                elif temp['buyOrSell'] == 'Buy' and temp['sold'] == True:
+                    link = "Sold"
+                else:
+                    link = ""
+                if temp.get('partiallySold') != None and temp['sold'] == False:
+                    partiallySold = str(temp['newQuantity'])
+                else:
+                    partiallySold = ""
+                if temp.get('profit') != None:
+                    profit = "%.2f" % round(temp['profit'],2)
+                else:
+                    profit = ""
+                orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],"%.2f" % round(float(temp['totalPrice']),2),date, partiallySold, profit, link])
             
-            df = pd.DataFrame(orderslist, columns=['buyOrSell','quantity','ticker','totalPrice', 'dayOfPurchase'])
+            df = pd.DataFrame(orderslist, columns=['buyOrSell','quantity','ticker','totalPrice', 'dayOfPurchase', 'partiallySold', 'profit', 'links'])
             
             return df
 

@@ -172,8 +172,12 @@ def login():
         user = authen.sign_in_with_email_and_password(email,passw)
         session['user'] = email
         session['loginFlagPy'] = 1
-        if SimulationFactory.existenceCheck(dbfire, email):
+        check, session['simName'] = SimulationFactory.existenceCheck(dbfire, email)
+        if check:
             session['simulationFlag'] = 1
+            sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
+            session['portfolioValue'] = "%.2f" % round(sharesValue, 2)
+            session['currentCash'] = "%.2f" % round(currentCash, 2)
         else:
             session['simulationFlag'] = 0
         sessionFlagCheck(session['loginFlagPy'], session['simulationFlag'])
@@ -669,9 +673,33 @@ def orderFormFill():
         session['optionType'] = 0
     else:
         session['optionType'] = 1
-    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
     session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
     return render_template('orderForm.html', option=session['option'])
+
+@app.route("/sellTaxLot/<orderID>")
+def sellTaxLot(orderID):
+    if 'user' in session:
+        order = dbfire.collection('Orders').document(orderID).get().to_dict()
+        session['orderID'] = orderID
+        session['option'] = 'Sell'
+        session['optionType'] = 1
+        session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
+        if order.get('newQuantity') != None:
+            session['stockQuantity'] = order['newQuantity']
+        else:
+            session['stockQuantity'] = order['quantity']
+        session['currentAmount'] = session['stockQuantity']
+        session['orderPrice'] = "%.2f" % round(float(session['stockQuantity']) * float(session['currentPrice']), 2)
+        return render_template('orderConfirmation.html')
+    else: return redirect(url_for('fourOhFour'))
+
+@app.route("/sellTaxLot/taxLotSellConfirm", methods=['POST', 'GET'])
+def taxLotSellConfirm():
+    if 'user' in session:
+        order = Order.sellTaxLot(dbfire, session['user'], session['simName'], session['orderID'])
+        return redirect(url_for('.goToSimulation'))
+    else: return redirect(url_for('fourOhFour'))
 
 #@app.route("/orderCreate", methods=['POST', 'GET'])
 #def orderCreate():
@@ -682,7 +710,7 @@ def orderConfirm():
     if request.form['stockQuantity'].isnumeric():
         session['orderQuantity'] = request.form['stockQuantity']
         session['orderPrice'] = "%.2f" % round(float(session['orderQuantity']) * float(session['currentPrice']), 2)
-        order = Order(dbfire, session['simName'], stock, 
+        order = Order(dbfire, session['simName'], session['ticker'], 
                         session['option'], session['orderQuantity'], session['currentPrice'])
         if session['option'] == 'Buy':
             flag = order.buyOrder()
@@ -916,7 +944,8 @@ def orderlists():
         orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
 
         return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
-        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
+        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list(), partiallySold=orderlist['partiallySold'].to_list(), 
+        profits=orderlist['profit'].to_list(), links=orderlist['links'].to_list())
 
 @app.route("/orderHist/<simName>")
 def orderHist(simName):

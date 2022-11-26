@@ -62,8 +62,10 @@
               if ({{ session['simulationFlag'] }} == 0 ) { 
                 document.getElementById('goToSim').style.display = "none";
               }
+
             </script>  
           </li>
+
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -72,11 +74,19 @@
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
         {% endif %}
-                </ul>
+      </ul>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('currentCashNav').style.display = "none";
+                document.getElementById('portfolioValueNav').style.display = "none";
+              }
+            </script>  
                 <form action="/stockSearch" method="post">
-          <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
-                  <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
+                  <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
       </form>
               </div>        
             </div>
@@ -91,6 +101,9 @@
     <div style="margin-left: 50px;">
 
     <br>
+    <div id="overlay">
+            <div class="loader" style="text-align: center;"></div> 
+            </div>
     <form action="orderConfirm" method="post">
         <p>Current Available Cash: ${{session['currentCash'] }} </p>
         <p>Currently Owned Amount of Shares of this Stock: {{session['currentAmount']}}</p>
@@ -99,7 +112,7 @@
         <label for="quantity">Quantity:</label>
         <input class="quantity" name="stockQuantity" value="{{ request.form['stockQuantity'] }}">
         <br><br>
-        <button id='submitButton' class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Create Order</button>
+        <button id='submitButton' class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;" disabled="true">Create Order</button>
         <br><br>
         <p id="priceNotice" style="color:red;"></p>
         <script>
@@ -112,7 +125,16 @@
           const button = document.getElementById('submitButton');
           const notice = document.getElementById('priceNotice');
 
+          const regexForString = /[a-z]+|[A-Z]+|[^A-Za-z0-9]/;
+          const regexForDecimal = /[0-9]+./;
+          const regex2 = /[0-9]+/;
+
           quantity.addEventListener('input', updatePrice);
+          button.addEventListener('click', loadingScreen);
+
+          function loadingScreen() {
+            document.getElementById("overlay").style.display = "block";
+          }
 
           function updatePrice(delta) {
             totalPrice.textContent = "Order Price: $" + (delta.target.value * currentPrice).toFixed(2);
@@ -135,9 +157,23 @@
                 notice.textContent = "";
               }
             }
-            if (delta.target.value.includes('.')) {
+            //if (delta.target.value.length == 0) {
+            //  button.disabled = true;
+            //}
+            //if (delta.target.value.match(regexForInteger) != null) {
+            //  button.disabled = true;
+            //  notice.textContent = "You must submit a whole number."
+            //}
+            if (delta.target.value.match(regexForString) != null) {
               button.disabled = true;
-              notice.textContent = "You must submit a whole number."
+              notice.textContent = "Please enter a valid quantity.";
+            } //else if (delta.target.value.match(regexForDecimal) != null) {
+            //  button.disabled = true;
+            //  notice.textContent = "Please enter a whole number.";
+            //} 
+            if (+(delta.target.value) < 0 || delta.target.value.includes('.') != false) {
+              button.disabled = true;
+              notice.textContent = "Please enter a whole number.";
             }
           }
         </script>
