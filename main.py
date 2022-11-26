@@ -3,6 +3,7 @@ from asyncio.windows_events import NULL
 #from crypt import methods
 #from re import T
 from datetime import datetime
+from datetime import date
 import math
 from operator import itemgetter, mod
 import re
@@ -67,13 +68,15 @@ def profile():
             cash = doc.to_dict()
         for doc in leaderboard.stream():
             leaderboard = doc.to_dict()
-        #endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
-        #startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
-        #while(startDateFetch >= endDateFetch):
-        #    endDateFetch_format = 
+        endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate').get()
+        startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate').get()
+        
+        while(startDateFetch >= endDateFetch):
+            delta = endDateFetch - startDateFetch
+            return delta.days
             
             
-        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard)
+        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard, delta = delta)
     else:
 
         redirect(url_for("login"))
