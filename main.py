@@ -100,18 +100,9 @@ def followList():
         for entry in dbfire.collection('Users').where('Email','==',session['user']).stream():
             temp = entry.to_dict()
             followersList.extend(temp['FollowerNames'])
-        print(followersList)
-
-
-        FollowerNames = []
-        for followers in followersList:
-            names = dbfire.collection('Users').where('userName','==',followers).get()
-            for name in names:
-                names = name.to_dict()
-                FollowerNames.append(names)
-        print(FollowerNames)    
-        
-        return render_template('followers.html',followersList = followersList, FollowerNames = FollowerNames)
+        splitNames = [item.split(',') for item in followersList]
+        print(splitNames)
+        return render_template('followers.html',splitNames = splitNames)
     else:
         redirect(url_for("login"))
 
@@ -465,8 +456,15 @@ def logout():
 def hello(name=None):
     session['loginFlagPy'] = 0
     session['simulationFlag'] = 0
+
+    if request.method == 'GET':
+        stockNames = []
+        for entry in dbfire.collection("StockSearchInfo").get():
+            temp = entry.to_dict()
+            stockNames.append(temp['name'])
+        print(stockNames) 
     
-    return render_template("home.html")
+    return render_template("home.html",stockNames = stockNames)
 
 ## Route for Home page - Muneeb Khan
 @app.route("/home")
@@ -477,7 +475,14 @@ def home():
         for x in person.get():
             person = x.to_dict()
 
-        return render_template("home.html", person = person)
+        if request.method == 'GET':
+            stockNames = []
+            for entry in dbfire.collection("StockSearchInfo").get():
+                temp = entry.to_dict()
+                stockNames.append(temp['name'])
+            print(stockNames) 
+
+        return render_template("home.html", person = person, stockNames = stockNames)
     else:
         return render_template('home.html')
 
@@ -760,9 +765,10 @@ def stockSearchSuggestions():
     if ('user' in session):
         if request.method == 'GET':
             stockNames = []
-            for entry in db.collection("Stocks").document("ticker").get():
+            for entry in dbfire.collection("StockSearchInfo").get():
                 temp = entry.to_dict()
-                stockNames.append(temp) 
+                stockNames.append(temp['name'])
+            print(stockNames) 
             return render_template("home.html", stockNames = stockNames)
 
 ## displayStock
@@ -933,6 +939,11 @@ def userlists():
 def orderlists():
     if ('user' in session):
         orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
+        buySellButtons = []
+        for entry in Order.stocksBought(dbfire,session['simName']):
+            Portfolio = portfolio(dbfire,entry,session['user'],session['simName'])
+            if Portfolio.quantity != 0:
+                buySellButtons.append(Portfolio.newLink)
 
         return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
         tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list(), partiallySold=orderlist['partiallySold'].to_list(), 
@@ -980,6 +991,11 @@ def quizSubmit():
 
     score = quiz.scoreCalc()
     if score >= 7:
+        yourscore = dbfire.collection('Users').where('Email', '==', session['user']).get()
+        for scores in yourscore:
+            updatescore = scores.id
+            yourscore = scores.to_dict()
+        dbfire.collection('Users').document(updatescore).update({'QuizScore': str(score*10) + "%"})
         flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
         " You are now ready to invest, please click the start simulation button above to start investing." +
         "Correct answers were: " +
@@ -995,6 +1011,11 @@ def quizSubmit():
         "10 A ")
         return redirect(url_for('information', person = session['user']))
     else:
+        yourscore = dbfire.collection('Users').where('Email', '==', session['user']).get()
+        for scores in yourscore:
+            updatescore = scores.id
+            yourscore = scores.to_dict()
+        dbfire.collection('Users').document(updatescore).update({'QuizScore': str(score*10) + "%"})
         flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
         " You need to score at least a 7/10 to pass. Please try again."  + 
         "Correct answers were: " +
