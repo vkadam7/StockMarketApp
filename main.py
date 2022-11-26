@@ -430,7 +430,7 @@ def update():
             newUsername = results['Unames']
             experience = results["experience"]  
             
-            doc = dbfire.collection('Users').document(session['user']).document(newUsername).get()
+            doc = dbfire.collection('Users').where('Email', '==', session['user'])
             if doc.exists:
                 checkName = dbfire.collection('Users').where('userName', '==', newUsername).get()
                 for docs in grabName.stream(): 

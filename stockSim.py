@@ -1005,12 +1005,12 @@ class portfolio:
                 if temp.get('sold') != None:
                     if temp['sold'] == False:
                         amountOfSharesOwned += int(temp['newQuantity'])
-                        return amountOfSharesOwned
+                        
             else:
                 if temp.get('sold') != None:
                     if temp['sold'] == False:
                         amountOfSharesOwned += int(temp['quantity'])     
-                        return amountOfSharesOwned        
+                                
         avgPriceOfOrders = mean(prices)
         currentValueOfShares = currentPriceOfStock * amountOfSharesOwned
         if avgStockPrices:
@@ -1018,29 +1018,6 @@ class portfolio:
         else:
             return currentValueOfShares - avgPriceOfOrders, 0, amountOfSharesOwned
             
-    #Displays amount of shares owned (To also be implemented later)
-    #def weight(self):
-    #    quantity = 0
-    #    prices = []
-    #    for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
-    #        temp = entry.to_dict()
-    #        if temp.get('newQuantity') != None:
-    #            quantity += int(temp['newQuantity'])
-    #        else:
-    #            quantity += int(temp['quantity'])
-    #        prices.append(float(temp['avgStockPrice']))
-    #    if prices:
-    #        return quantity, round(mean(prices),2) 
-    #    else:
-    #        return quantity, round(mean(prices),2)
-        
-    #def returnValue(self):
-    #    for entry in Order.retrieveOwned(self.firebase, self.sim, self.stock):
-    #        temp = entry.to_dict()
-    #        prices.append(float(temp['avgStockPrice']))
-    #    if prices:
-    #        return round(mean(prices),2)
-    #    return 0
 
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
     def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
