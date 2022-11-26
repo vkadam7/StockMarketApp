@@ -125,7 +125,9 @@
           const button = document.getElementById('submitButton');
           const notice = document.getElementById('priceNotice');
 
-          const regexForInteger = /[a-z]+|[A-Z]+|[0-9]+./;
+          const regexForString = /[a-z]+|[A-Z]+|[^A-Za-z0-9]/;
+          const regexForDecimal = /[0-9]+./;
+          const regex2 = /[0-9]+/;
 
           quantity.addEventListener('input', updatePrice);
           button.addEventListener('click', loadingScreen);
@@ -155,12 +157,23 @@
                 notice.textContent = "";
               }
             }
-            if (delta.target.value.length == 0) {
+            //if (delta.target.value.length == 0) {
+            //  button.disabled = true;
+            //}
+            //if (delta.target.value.match(regexForInteger) != null) {
+            //  button.disabled = true;
+            //  notice.textContent = "You must submit a whole number."
+            //}
+            if (delta.target.value.match(regexForString) != null) {
               button.disabled = true;
-            }
-            if (delta.target.value.match(regexForInteger) != null) {
+              notice.textContent = "Please enter a valid quantity.";
+            } //else if (delta.target.value.match(regexForDecimal) != null) {
+            //  button.disabled = true;
+            //  notice.textContent = "Please enter a whole number.";
+            //} 
+            if (+(delta.target.value) < 0 || delta.target.value.includes('.') != false) {
               button.disabled = true;
-              notice.textContent = "You must submit a whole number."
+              notice.textContent = "Please enter a whole number.";
             }
           }
         </script>

@@ -829,7 +829,7 @@ class Order:
                     'quantity': self.quantity,
                     'avgStockPrice': self.avgStockPrice,
                     'totalPrice': self.totalPrice,
-                    'profit': float(self.avgStockPrice)*float(self.quantity) - averagePrice
+                    'profit': float(self.avgStockPrice)*float(self.quantity) - float(averagePrice)*float(self.quantity)
                 }
                 self.db.collection('Orders').document(orderName).set(data)
                 Simulation.updateCash(self.db, self.sim, self.totalPrice)
@@ -866,23 +866,28 @@ class Order:
             while amountToSell > 0:
                 if partialFlag == True:
                     for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).where('partiallySold','==',True).stream():
+                        if amountToSell <= 0:
+                            break
                         temp = entry.to_dict()
                         averagePrice.append(float(temp['avgStockPrice']))
-                        if amountToSell - int(temp['newQuantity']) >= 0:
-                            self.db.collection('Orders').document(entry.id).update({'sold' : True, 'newQuantity' : 0})
-                            amountToSell -= int(temp['newQuantity'])
-                        else:
+                        if int(temp['newQuantity']) - amountToSell > 0:
                             self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['newQuantity']) - amountToSell)})
                             amountToSell -= abs(int(temp['newQuantity']) - amountToSell)
+                        else:
+                            self.db.collection('Orders').document(entry.id).update({'sold' : True, 'newQuantity' : 0})
+                            amountToSell -= int(temp['newQuantity'])
+                
                 for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).stream():
+                    if amountToSell <= 0:
+                        break
                     temp = entry.to_dict()
                     averagePrice.append(float(temp['avgStockPrice']))
-                    if amountToSell - int(temp['quantity']) >= 0:
-                        self.db.collection('Orders').document(entry.id).update({'sold' : True})
-                        amountToSell -= int(temp['quantity'])
-                    else:
+                    if int(temp['quantity']) - amountToSell > 0:
                         self.db.collection('Orders').document(entry.id).update({'partiallySold' : True, 'newQuantity' : abs(int(temp['quantity']) - amountToSell)})
                         amountToSell -= abs(int(temp['quantity']) - amountToSell)
+                    else:
+                        self.db.collection('Orders').document(entry.id).update({'sold' : True})
+                        amountToSell -= int(temp['quantity'])
 
             return ownageFlag, mean(averagePrice)
         
