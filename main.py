@@ -787,19 +787,14 @@ def displayStock():
     global stock
     if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
         stockData = SimulationFactory(dbfire, session['user']).simulation.retrieveStock(ticker)
+        BasisData = dbfire.collection('Stocks').document(session['ticker']).get().to_dict()
         existenceFlag = True
         for entry in stockData:
             temp = entry.to_dict()
             if temp.get('unavailable') != None:
                 existenceFlag = False
         if existenceFlag:
-            if timespan == 'hourly' or timespan == 'daily' or timespan == 'weekly' or timespan == 'monthly':
-                if timespan == 'hourly':
-                    mod = 6
-                elif timespan == 'daily':
-                    mod = 40
-                elif timespan == 'weekly':
-                    mod = 40*7
+            if timespan == 'hourly':
                 for entry in stockData:
                     stock = entry.to_dict()
                 if stock != -1:
@@ -808,20 +803,43 @@ def displayStock():
                     avgPrice = []
                     for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
                         avgPrice.append(stock['prices'][i])
+                        if i % 6 == 1:
+                            prices.append(mean(avgPrice))
+                            dates.append(stock['dates'][i-1])
+                    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+            elif timespan == 'daily' or timespan == 'weekly' or timespan == 'monthly':
+                if timespan == 'daily':
+                    mod = 40
+                elif timespan == 'weekly':
+                    mod = 40*7
+                    BasisMod = 7
+                for entry in stockData:
+                    stock = entry.to_dict()
+                if stock != -1:
+                    dates = []
+                    prices = []
+                    avgPrice = []
+                    startingIndex = BasisData['daily']['dates'].index(stock['dates'][0][0:10])
+                    for i in range(startingIndex-365, startingIndex):
+                        if timespan == 'monthly':
+                            BasisMod = 30
+                        if timespan == 'daily':
+                            prices.append(float(BasisData['daily']['opens'][i]))
+                            dates.append(BasisData['daily']['dates'][i])
+                        else:
+                            if i % BasisMod == 1:
+                                prices.append(float(BasisData['daily']['opens'][i]))
+                                dates.append(BasisData['daily']['dates'][i])
+                    for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
+                        avgPrice.append(stock['prices'][i])
                         if timespan == 'monthly':
                             mod = 40*7*int(stock['dates'][i][5:7])
-                        #if timespan == 'hourly' and int(stock['dates'][i][11:13]) == 9:
-                        #    mod = 3
                         if i % mod == 1:
-                            prices.append(mean(avgPrice))
-                            if timespan != 'hourly':
-                                dates.append(stock['dates'][i][0:10])
-                            else:
-                                dates.append(stock['dates'][i-1])
+                            prices.append(round(mean(avgPrice), 2))
+                            dates.append(stock['dates'][i][0:10])
                             avgPrice = []
-                        #    if int(stock['dates'][i][11:13]) == 9:
-                        #        mod = 6
-                    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+                    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
                     return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
             elif timespan == '1minute' or timespan == '5minute':
                 for entry in stockData:
@@ -831,20 +849,20 @@ def displayStock():
                     dates = []
                     prices = []
                     for i in range(1, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
-                        if timespan == '5minute':
-                            tempInterp = np.interp(range(0,3),[0, 2],[stock['prices'][i-1], stock['prices'][i]])
-                            for element in tempInterp:
-                                element += (np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]]))/100
-                                prices.append(element)
-                            # 15 = index of minute
-                            tempDate1 = list(stock['dates'][i])
-                            for j in range(1,3):
-                                tempDate2 = tempDate1
-                                tempDate2[15] = str((j*5)%10)
-                                if i % 6 != 0:
-                                    tempDate2 = tempDate2[11:19]
-                                dates.append("".join(tempDate2))
-                        elif timespan == '1minute':
+                        #if timespan == '5minute':
+                        #    tempInterp = np.interp(range(0,3),[0, 2],[stock['prices'][i-1], stock['prices'][i]])
+                        #    for element in tempInterp:
+                        #        element += (np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]]))/50
+                        #        prices.append(element)
+                        #    # 15 = index of minute
+                        #    tempDate1 = list(stock['dates'][i])
+                        #    for j in range(1,3):
+                        #        tempDate2 = tempDate1
+                        #        tempDate2[15] = str((j*5)%10)
+                        #        if i % 6 != 0:
+                        #            tempDate2 = tempDate2[11:19]
+                        #        dates.append("".join(tempDate2))
+                        if timespan == '1minute':
                             tempInterp = np.interp(range(0,11),[0, 10],[stock['prices'][i-1], stock['prices'][i]])
                             for element in tempInterp:
                                 element += (np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]]))/50
@@ -856,7 +874,7 @@ def displayStock():
                                 if i % 30 != 0:
                                     tempDate2 = tempDate2[11:19]
                                 dates.append("".join(tempDate2))
-                    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+                    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
                     return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
             else:
                 for entry in stockData:
@@ -868,7 +886,7 @@ def displayStock():
                     for i in range(0, SimulationFactory(dbfire, session['user']).simulation.whatTimeIsItRightNow()):
                         dates.append(stock['dates'][i])
                         prices.append(stock['prices'][i])
-                    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+                    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
                     return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
         else:
             return redirect(url_for('fourOhFour'))
@@ -885,7 +903,7 @@ def changeStockView():
     if request.method == 'POST':
         #return displayStock(stock['ticker'],request.form['startDate'],request.form['endDate'],request.form['timespan'])
         
-        return redirect(url_for('.displayStock', ticker=stock['ticker'], timespan=request.form['timespan']))
+        return redirect(url_for('.displayStock', ticker=session['ticker'], timespan=request.form['timespan']))
     return -1
 
 @app.route('/stockList', methods=['POST','GET'])
@@ -913,7 +931,7 @@ def stockSimFormFunction():
 @app.route("/stockAvailability",methods=['POST'])
 def stockAvailability():
     if request.method == 'POST':
-        return redirect(url_for('stockDisplay.html',ticker=stock['ticker'],startDate="2021-09-08",endDate="2022-09-19",timespan="daily"))
+        return redirect(url_for('stockDisplay.html',ticker=session['ticker'],startDate="2021-09-08",endDate="2022-09-19",timespan="daily"))
 
     return -1    
 
