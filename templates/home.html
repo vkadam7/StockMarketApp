@@ -79,11 +79,11 @@
         {% endif %}
                 </ul>
                 <form action="/stockSearch" method="post">
-          <input class = "stockSearchBar" type="search" list = "/_stockSearchSuggestions" name="searchTerm" placeholder="Find a stock..."
+          <input class = "stockSearchBar" type="search" list = "stockNames" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
-                  <datalist id = "/_stockSearchSuggestions">
-                    {% for stocks in stockNames%}
-                    <option value = "{{stocks}}">{{stocks}}</option>
+                  <datalist id = "stockNames">
+                    {% for stockname in stockNames%}
+                    <option value = "{{stockname}}" />
                     {% endfor %}
                   </datalist>
                   <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);">Display Stock</button>

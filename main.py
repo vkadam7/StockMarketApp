@@ -444,8 +444,15 @@ def logout():
 def hello(name=None):
     session['loginFlagPy'] = 0
     session['simulationFlag'] = 0
+
+    if request.method == 'GET':
+        stockNames = []
+        for entry in dbfire.collection("StockSearchInfo").get():
+            temp = entry.to_dict()
+            stockNames.append(temp['name'])
+        print(stockNames) 
     
-    return render_template("home.html")
+    return render_template("home.html",stockNames = stockNames)
 
 ## Route for Home page - Muneeb Khan
 @app.route("/home")
@@ -456,7 +463,14 @@ def home():
         for x in person.get():
             person = x.to_dict()
 
-        return render_template("home.html", person = person)
+        if request.method == 'GET':
+            stockNames = []
+            for entry in dbfire.collection("StockSearchInfo").get():
+                temp = entry.to_dict()
+                stockNames.append(temp['name'])
+            print(stockNames) 
+
+        return render_template("home.html", person = person, stockNames = stockNames)
     else:
         return render_template('home.html')
 
@@ -715,9 +729,9 @@ def stockSearchSuggestions():
     if ('user' in session):
         if request.method == 'GET':
             stockNames = []
-            for entry in db.collection("StockSearchInfo").get():
+            for entry in dbfire.collection("StockSearchInfo").get():
                 temp = entry.to_dict()
-                stockNames.extend(temp['name'])
+                stockNames.append(temp['name'])
             print(stockNames) 
             return render_template("home.html", stockNames = stockNames)
 
