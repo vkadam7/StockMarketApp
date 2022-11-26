@@ -692,9 +692,9 @@ class SimulationFactory:
     def existenceCheck(db, email):
         array = [entry for entry in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream()]
         if len(array) == 0:
-            return False
+            return False, "None"
         else:
-            return True
+            return True, array[0].id
 
 class User:
     def __init__(self, db, username):
@@ -955,6 +955,8 @@ class Order:
                 date = str(datetime.datetime.fromtimestamp(temp['dayOfPurchase'].timestamp()).strftime("%Y-%m-%d %H:%M:%S"))
                 if temp['buyOrSell'] == 'Buy' and temp['sold'] == False:
                     link = str('/sellTaxLot/' + entry.id)
+                elif temp['buyOrSell'] == 'Buy' and temp['sold'] == True:
+                    link = "Sold"
                 else:
                     link = ""
                 if temp.get('partiallySold') != None and temp['sold'] == False:

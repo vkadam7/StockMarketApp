@@ -112,8 +112,12 @@ def login():
         user = authen.sign_in_with_email_and_password(email,passw)
         session['user'] = email
         session['loginFlagPy'] = 1
-        if SimulationFactory.existenceCheck(dbfire, email):
+        check, session['simName'] = SimulationFactory.existenceCheck(dbfire, email)
+        if check:
             session['simulationFlag'] = 1
+            sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
+            session['portfolioValue'] = "%.2f" % round(sharesValue, 2)
+            session['currentCash'] = "%.2f" % round(currentCash, 2)
         else:
             session['simulationFlag'] = 0
         sessionFlagCheck(session['loginFlagPy'], session['simulationFlag'])
