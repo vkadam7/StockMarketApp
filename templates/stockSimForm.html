@@ -128,9 +128,7 @@
                 <button id='simButton' disabled='true' class = "btn btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Start Simulation!</button>
               </div>
               <br>
-              <br>
               <p id="cashNotice" style="color: red;"></p>
-              <br>
               <p id="dateNotice" style="color: red;"></p>
             </form>
             <script>
@@ -141,10 +139,15 @@
               const cashNotice = document.getElementById('cashNotice');
               const dateNotice = document.getElementById('dateNotice');
 
+              var dateFlag = false;
+              var moneyFlag = false;
+
               const regexForString = /[a-z]+|[A-Z]+/;
               const regexForDecimal = /[0-9]+./;
               const regex2 = /[0-9]+/;
 
+              startDate.addEventListener('input', dateCheck);
+              endDate.addEventListener('input', dateCheck);
               money.addEventListener('input', moneyCheck);
               simButton.addEventListener('click', loadingScreen);
 
@@ -153,21 +156,70 @@
               }
               function moneyCheck(check) {
                 if (money.value.length == 0) {
-                  simButton.disabled = true;
+                  moneyFlag = false;
                   cashNotice.textContent = "";
                 }
                 if (money.value.match(regexForString) != null) {
-                  simButton.disabled = true;
+                  moneyFlag = false;
                   cashNotice.textContent = "Please enter a valid quantity.";
                 } else if (money.value.match(regexForDecimal) != null) {
-                  simButton.disabled = true;
+                  moneyFlag = false;
                   cashNotice.textContent = "Please enter a whole number.";
                 } 
                 if (+(money.value) > 0 && money.value.includes('.') == false) {
-                  simButton.disabled = false;
+                  moneyFlag = true;
                   cashNotice.textContent = "";
                 }
+                if (moneyFlag === true && dateFlag === true) {
+                  dateNotice.textContent = "";
+                  cashNotice.textContent = "";
+                  simButton.disabled = false;
+                } else {
+                  simButton.disabled = true;
+                }
+
               }
+              function dateCheck(check) {
+                startYear = +(startDate.value.slice(0, 4));
+                startMonth = +(startDate.value.slice(5, 7));
+                startDay = +(startDate.value.slice(8, 10));
+                endYear = +(endDate.value.slice(0, 4));
+                endMonth = +(endDate.value.slice(5, 7));
+                endDay = +(endDate.value.slice(8, 10));
+                if (endYear < startYear) {
+                  dateFlag = false;
+                  dateNotice.textContent = "Please enter a new end date that comes after the start date.";
+                } else if (endYear == startYear) {
+                  if (endMonth < startMonth) {
+                    dateFlag = false;
+                    dateNotice.textContent = "Please enter a new end date that comes after the start date.";
+
+                  } else if (endMonth == startMonth) {
+                    if (endDay <= startDay) {
+                      dateFlag = false;
+                      dateNotice.textContent = "Please enter a new end date that comes after the start date.";
+                    } else {
+                      dateFlag = true;
+                      dateNotice.textContent = "";
+                    }
+                  } else {
+                    dateFlag = true;
+                    dateNotice.textContent = "";
+                  }
+                } else {
+                  dateFlag = true;
+                  dateNotice.textContent = "";
+                }
+                if (moneyFlag === true && dateFlag === true) {
+                  dateNotice.textContent = "";
+                  cashNotice.textContent = "";
+                  simButton.disabled = false;
+                } else {
+                  simButton.disabled = true;
+                }
+
+              }
+              
             </script>
 
             {% with messages = get_flashed_messages() %}
