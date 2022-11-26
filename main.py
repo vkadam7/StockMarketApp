@@ -8,6 +8,7 @@ from operator import itemgetter, mod
 import re
 from statistics import mean
 from datetime import timedelta
+import datetime
 #from django.shortcuts import render
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
@@ -115,12 +116,16 @@ def Blog():
             showBlog = dbfire.collection('Blog').where('Author', '==', x).get()
             for docus in showBlog:
                 showBlog = docus.to_dict()
+                #post.append(showBlog['Post'])
+                showBlog['DatePosted'] = str(datetime.datetime.fromtimestamp(showBlog['DatePosted'].timestamp()).strftime("%Y-%m-%d"))
                 blog.append(showBlog)
-                
+        
         print("Here comes personal B")
+        blog.sort(key = itemgetter('DatePosted'), reverse=True)
         print(blog)   
         return render_template("Blog.html", blog = blog)
 
+#@app.route("/postDelete")
 
 @app.route("/postBlog", methods = ["POST","GET"])
 def postBLog():
