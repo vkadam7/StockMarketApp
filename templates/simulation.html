@@ -122,8 +122,8 @@
             let originalValuesList = {{originalValue|safe}};
             let percentageList = {{percentage|safe}};
             let linkList = {{links|safe}};
-            let volatilityList = {{volatility|safe}};
             let buySellList =  {{buySell|safe}};
+            <!--let volatilityList = {{volatility|safe}};-->
             
             let portfolio = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -137,7 +137,7 @@
                 'Change': profitList[i],
                 '% of Account' : percentageList[i],
                 'Link to Chart' : linkList[i], 
-                'Buy/Sell Options': buySellList[i],
+                'Buy/Sell Options': buySellList[i]
                 <!--Volatility: volatilityList[i]-->
               })
             }
@@ -199,10 +199,10 @@
                       orderListCell.appendChild(buySellLink);
                     }
                     i = i + 1;
+                  }
+                }
               }
             }
-          }
-        }
 
             let table = document.querySelector("table");
             let data = Object.keys(portfolio[0]);
