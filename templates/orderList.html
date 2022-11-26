@@ -73,6 +73,7 @@
               }
             </script>  
           </li>
+
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -80,13 +81,22 @@
           <li class = "nav-item">
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
+
         {% endif %}
-                </ul>
+      </ul>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('currentCashNav').style.display = "none";
+                document.getElementById('portfolioValueNav').style.display = "none";
+              }
+            </script>  
                 <form action="/stockSearch" method="post">
-                    <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
-                            value="{{ request.form['searchTerm'] }}">
-                            <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
-                </form>
+          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+                  value="{{ request.form['searchTerm'] }}">
+                  <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
+      </form>
               </div>        
             </div>
           </nav>
@@ -111,7 +121,9 @@
             let buyList = {{buys|safe}};
             let totalList = {{prices|safe}};
             let datesList = {{dates|safe}};
-            let buySellButtonList = {{buySellButtons|safe}};
+            let partiallySoldList = {{partiallySold|safe}};
+            let profitsList = {{profits|safe}};
+            let linksList = {{links|safe}};
             
             let orderlist = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -121,7 +133,9 @@
                 'Transaction Type': buyList[i],
                 Total: totalList[i],
                 'Date of Order' : datesList[i],
-                'Buy or Sell' : buySellButtonList[i],
+                'Remaining Shares' : partiallySoldList[i],
+                'Profit' : profitsList[i],
+                'Link to Sell' : linksList[i]
               })
             }
 
@@ -138,17 +152,29 @@
                 let row = table.insertRow();
                 i = 0;
                 for (key in element) {
-                 if (i < 5) {
-                  let cell = row.insertCell();
-                  let text = document.createTextNode(element[key]);
-                  cell.appendChild(text);
-                } else {
-                  var ListCell = row.insertCell();
-                  var ListLink = document.createElement('a');
-                  var LinkLinkText = document.createTextNode('Buy or Sell');
-                  ListLink.setAttribute('href', element[key]);
-                  ListLink.appendChild(ListLinkText);
-                  ListCell.appendChild(ListLink);
+                    if (i < 7 || element[key] == "" || element[key] == "Sold") {
+                      let cell = row.insertCell();
+                      let text = document.createTextNode(element[key]);
+                      cell.appendChild(text);
+                      if (i == 6 && parseFloat(cell.innerHTML) < 0.0) {
+                        temp = cell.innerHTML;
+                        cell.style.color = "red";
+                        cell.innerHTML = "$" + temp;
+                      } else if (i == 6 && parseFloat(cell.innerHTML) >= 0) {
+                        temp = cell.innerHTML;
+                        cell.style.color = "green";
+                        cell.innerHTML = "$" + temp;
+                      } 
+                    } else {
+                      var orderListCell = row.insertCell();
+                      var orderListLink = document.createElement('a');
+                      var orderListLinkText = document.createTextNode('Sell This Order');
+                      orderListLink.setAttribute('href', element[key]);
+                      orderListLink.appendChild(orderListLinkText);
+                      orderListCell.appendChild(orderListLink);
+                    }
+                    
+                    i = i + 1;
                 }
               }
               i = i + 1;

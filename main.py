@@ -109,11 +109,23 @@ def followList():
 @app.route("/followingList")
 def followingList():
     if 'user' in session:
-        followingList = []
-        for entry in dbfire.collection('Users').where('Name', '==', session['user']).document('FollowingNames').get():
-            following = entry.to_dict()
-            followingList.append(following['FollowingNames'])
-        return render_template('followingList.html', followingList = followingList)
+        #followingList = []
+        #for entry in dbfire.collection('Users').where('Name', '==', session['user']).stream():
+        #    following = entry.to_dict()
+        #    followingList.extend(following['FollowingNames'])
+            
+        #followingListNames = []
+        
+        #return render_template('followingList.html', followingList = followingList)
+        
+        followingList= []
+        
+        for name in dbfire.collection('Users').where('Name', '==', session['user']).stream():
+            temp = name.to_dict()
+            followingList.extend(name['FollowingNames'])
+        names = [item.split(',') for item in followingList]
+        print(names)
+        return render_template('followingList.html', names = names)
     
 #Route for the Order list - Muneeb Khan
 #@app.route("/orderList")
@@ -142,8 +154,12 @@ def login():
         user = authen.sign_in_with_email_and_password(email,passw)
         session['user'] = email
         session['loginFlagPy'] = 1
-        if SimulationFactory.existenceCheck(dbfire, email):
+        check, session['simName'] = SimulationFactory.existenceCheck(dbfire, email)
+        if check:
             session['simulationFlag'] = 1
+            sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
+            session['portfolioValue'] = "%.2f" % round(sharesValue, 2)
+            session['currentCash'] = "%.2f" % round(currentCash, 2)
         else:
             session['simulationFlag'] = 0
         sessionFlagCheck(session['loginFlagPy'], session['simulationFlag'])
@@ -340,7 +356,7 @@ def register():
                 user = authen.create_user_with_email_and_password(email, Password)
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""]})
+                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""], "experience": ""})
                 #dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 flash("Account succesfully created, you may now login" , "pass")
@@ -386,44 +402,40 @@ def PasswordRecovery():
           
     return render_template("PasswordRecovery.html")   
 
+#Author: Viraj Kadam
 @app.route('/update', methods = ["POST", "GET"])
 def update():
     if 'user' in session:
-        if request.method == 'POST':
+        if request.method == "POST":
             results = request.form
-            email = results['email']
-            username = results['Unames']
-            experience = results['experience']
+            newEmail = results['email']
+            newUsername = results['Unames']
+            experience = results["experience"]  
             
-            doc = dbfire.collection('Users').document(username).get()
+            doc = dbfire.collection('Users').where('Email', '==', session['user'])
             if doc.exists:
-                checkName = dbfire.collection('Users').where('userName', '==', username)
+                checkName = dbfire.collection('Users').where('userName', '==', newUsername).get()
                 for docs in grabName.stream(): 
                     grabName = docs.to_dict()
                 goodName = grabName['userName']
             else:
                 goodName = "Ok"
             
+            if (len(experience) > 300):
+                flash("There is a 300 character limit") #Adds experience to profile
+        
+            if (goodName == newUsername):
+                flash("Username is already taken. Please enter a valid username.") #check to see if new username is taken
             
-        if (len(experience) < 300):
-           flash("300 character limit")
-        
-        elif (goodName == username):
-            flash("Username is already taken. Please enter a valid username.") #check to see if username is taken
-
-        else:
-
-            try: 
-        
-                dbfire.collection('Users').document(session['user']).update({"userName": username, "Email": email})
-                dbfire.collection('Users').where('userName', '==', username).set({'experience': experience})
-                flash("Account details updated")
+            try:  
+                dbfire.collection('Users').document('Name', '==', session['user']).update({"userName": newUsername, "Email": newEmail, "experience": experience})
+            
+                flash("Account details updated", "pass")
 
                 return redirect(url_for("profile"))
-
             except:
-                flash("Invalid Registration" , "fail")
                 return redirect(url_for("update"))
+
           
     return render_template('update.html')   
 #Logout
@@ -595,7 +607,7 @@ def goToSimulation():
                 percentage = []
                 volatility = []
                 links = []
-                #buySell = []
+                buySell = []
                 
                 percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
@@ -614,7 +626,7 @@ def goToSimulation():
                         percentage.append("%.2f" % round(percent, 2))
                         volatility.append("%.2f" % round(Portfolio.volatility,2))
                         links.append(Portfolio.link)
-                       # buySell.append(Portfolio.buySell)
+                        buySell.append(Portfolio.newLink)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
@@ -622,7 +634,7 @@ def goToSimulation():
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
                 currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue,
-                percentage=percentage, links=links)  
+                percentage=percentage, links=links, buySell = buySell)  
             else:
                 return redirect(url_for('.finishSimulation'))
         except KeyError:
@@ -657,9 +669,33 @@ def orderFormFill():
         session['optionType'] = 0
     else:
         session['optionType'] = 1
-    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
     session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
     return render_template('orderForm.html', option=session['option'])
+
+@app.route("/sellTaxLot/<orderID>")
+def sellTaxLot(orderID):
+    if 'user' in session:
+        order = dbfire.collection('Orders').document(orderID).get().to_dict()
+        session['orderID'] = orderID
+        session['option'] = 'Sell'
+        session['optionType'] = 1
+        session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
+        if order.get('newQuantity') != None:
+            session['stockQuantity'] = order['newQuantity']
+        else:
+            session['stockQuantity'] = order['quantity']
+        session['currentAmount'] = session['stockQuantity']
+        session['orderPrice'] = "%.2f" % round(float(session['stockQuantity']) * float(session['currentPrice']), 2)
+        return render_template('orderConfirmation.html')
+    else: return redirect(url_for('fourOhFour'))
+
+@app.route("/sellTaxLot/taxLotSellConfirm", methods=['POST', 'GET'])
+def taxLotSellConfirm():
+    if 'user' in session:
+        order = Order.sellTaxLot(dbfire, session['user'], session['simName'], session['orderID'])
+        return redirect(url_for('.goToSimulation'))
+    else: return redirect(url_for('fourOhFour'))
 
 #@app.route("/orderCreate", methods=['POST', 'GET'])
 #def orderCreate():
@@ -670,7 +706,7 @@ def orderConfirm():
     if request.form['stockQuantity'].isnumeric():
         session['orderQuantity'] = request.form['stockQuantity']
         session['orderPrice'] = "%.2f" % round(float(session['orderQuantity']) * float(session['currentPrice']), 2)
-        order = Order(dbfire, session['simName'], stock, 
+        order = Order(dbfire, session['simName'], session['ticker'], 
                         session['option'], session['orderQuantity'], session['currentPrice'])
         if session['option'] == 'Buy':
             flag = order.buyOrder()
@@ -910,7 +946,8 @@ def orderlists():
                 buySellButtons.append(Portfolio.newLink)
 
         return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
-        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list(), buySellButtons = buySellButtons)
+        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list(), partiallySold=orderlist['partiallySold'].to_list(), 
+        profits=orderlist['profit'].to_list(), links=orderlist['links'].to_list())
 
 @app.route("/orderHist/<simName>")
 def orderHist(simName):

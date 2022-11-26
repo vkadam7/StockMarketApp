@@ -104,6 +104,18 @@ questions = [
         'd' : 'DIS'
     },
     'correct' : 'd'
+},
+
+{
+    #Question 11
+    'text': 'How long is the stock market opened till?',
+    'answers': {
+        'a': '10AM-5PM',
+        'b': '9AM-5PM',
+        'c': '12PM-10PM',
+        'd': '24/7'
+    }, 
+    'correct': 'b'
 }]
 
 ids = []

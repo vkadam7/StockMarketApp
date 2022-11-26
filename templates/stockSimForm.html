@@ -70,6 +70,7 @@
               }
             </script>  
           </li>
+
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -78,18 +79,26 @@
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
         {% endif %}
-                </ul>
-                      <form action="/stockSearch" method="post">
-                <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
-                        value="{{ request.form['searchTerm'] }}">
-                        <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
-            </form>
+      </ul>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('currentCashNav').style.display = "none";
+                document.getElementById('portfolioValueNav').style.display = "none";
+              }
+            </script>  
+                <form action="/stockSearch" method="post">
+          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+                  value="{{ request.form['searchTerm'] }}">
+                  <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
+      </form>
               </div>        
             </div>
           </nav>
     </header>
 
-<br><br><br><br><br><br>
+<br>
 
     <body>
         <div class = "centering">
@@ -97,31 +106,127 @@
             <h4>Just need to enter some details to get the simulation started!</h4>
             <hr>
         </div>
-        
+        <div id="overlay">
+            <div class="loader" style="text-align: center;"></div> 
+            </div>
+            <br>
             <div class="container">
-            <div class="row justify-content-center" style = "margin-left: 40%;margin-right: 20%;">
+            <div class="row justify-content-center" >
             <form action="/startSimulation" method="post">
               <div class = "form-row align-items-center" style = "box-sizing: 0;">
                 <div class = "form-group col-md-5">
                   <label for="dateInput">Starting Date of Simulation:</label>
-                  <input type="date" class = "form-control"  name="simStartDate" value="{{ request.form['simStartDate'] }}" placeholder="yyyy-mm-dd">
+                  <input id='startDate' type="date" class = "form-control"  name="simStartDate" value="{{ request.form['simStartDate'] }}" placeholder="yyyy-mm-dd">
                 </div>
                 <br>
                 <div class = "form-group col-md-5">
                   <label for="dateInput">Ending Date of Simulation:</label>
-                  <input type="date" class = "form-control" name="simEndDate" value="{{ request.form['simEndDate'] }}" placeholder="yyyy-mm-dd">
+                  <input id='endDate' type="date" class = "form-control" name="simEndDate" value="{{ request.form['simEndDate'] }}" placeholder="yyyy-mm-dd">
                 </div>
               </div>
               <br>
               <div class = "form-row align-items-center" style = "box-sizing: 0;">
-                <div class = "form-group col-md-8">
+                <div class = "form-group col-md-6">
                   <label for="Money">Simulation Starting Cash:</label>
-                  <input type="Money" name="initialCash" value="{{ request.form['initialCash'] }}" placeholder="Enter an amount...">
+                  <input id='money' type="Money" name="initialCash" value="{{ request.form['initialCash'] }}" placeholder="Enter an amount...">
                 </div>
                 <br>
-                <button class = "btn btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Start Simulation!</button>
+                <button id='simButton' disabled='true' class = "btn btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Start Simulation!</button>
               </div>
+              <br>
+              <p id="cashNotice" style="color: red;"></p>
+              <p id="dateNotice" style="color: red;"></p>
             </form>
+            <script>
+              const startDate = document.getElementById('startDate');
+              const endDate = document.getElementById('endDate');
+              const money = document.getElementById('money');
+              const simButton = document.getElementById('simButton');
+              const cashNotice = document.getElementById('cashNotice');
+              const dateNotice = document.getElementById('dateNotice');
+
+              var dateFlag = false;
+              var moneyFlag = false;
+
+              const regexForString = /[a-z]+|[A-Z]+/;
+              const regexForDecimal = /[0-9]+./;
+              const regex2 = /[0-9]+/;
+
+              startDate.addEventListener('input', dateCheck);
+              endDate.addEventListener('input', dateCheck);
+              money.addEventListener('input', moneyCheck);
+              simButton.addEventListener('click', loadingScreen);
+
+              function loadingScreen() {
+                document.getElementById("overlay").style.display = "block";
+              }
+              function moneyCheck(check) {
+                if (money.value.length == 0) {
+                  moneyFlag = false;
+                  cashNotice.textContent = "";
+                }
+                if (money.value.match(regexForString) != null) {
+                  moneyFlag = false;
+                  cashNotice.textContent = "Please enter a valid quantity.";
+                } else if (money.value.match(regexForDecimal) != null) {
+                  moneyFlag = false;
+                  cashNotice.textContent = "Please enter a whole number.";
+                } 
+                if (+(money.value) > 0 && money.value.includes('.') == false) {
+                  moneyFlag = true;
+                  cashNotice.textContent = "";
+                }
+                if (moneyFlag === true && dateFlag === true) {
+                  dateNotice.textContent = "";
+                  cashNotice.textContent = "";
+                  simButton.disabled = false;
+                } else {
+                  simButton.disabled = true;
+                }
+
+              }
+              function dateCheck(check) {
+                startYear = +(startDate.value.slice(0, 4));
+                startMonth = +(startDate.value.slice(5, 7));
+                startDay = +(startDate.value.slice(8, 10));
+                endYear = +(endDate.value.slice(0, 4));
+                endMonth = +(endDate.value.slice(5, 7));
+                endDay = +(endDate.value.slice(8, 10));
+                if (endYear < startYear) {
+                  dateFlag = false;
+                  dateNotice.textContent = "Please enter a new end date that comes after the start date.";
+                } else if (endYear == startYear) {
+                  if (endMonth < startMonth) {
+                    dateFlag = false;
+                    dateNotice.textContent = "Please enter a new end date that comes after the start date.";
+
+                  } else if (endMonth == startMonth) {
+                    if (endDay <= startDay) {
+                      dateFlag = false;
+                      dateNotice.textContent = "Please enter a new end date that comes after the start date.";
+                    } else {
+                      dateFlag = true;
+                      dateNotice.textContent = "";
+                    }
+                  } else {
+                    dateFlag = true;
+                    dateNotice.textContent = "";
+                  }
+                } else {
+                  dateFlag = true;
+                  dateNotice.textContent = "";
+                }
+                if (moneyFlag === true && dateFlag === true) {
+                  dateNotice.textContent = "";
+                  cashNotice.textContent = "";
+                  simButton.disabled = false;
+                } else {
+                  simButton.disabled = true;
+                }
+
+              }
+              
+            </script>
 
             {% with messages = get_flashed_messages() %}
                     {% if messages %}   
