@@ -510,10 +510,10 @@ class Simulation:
         data = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
         for entry in data:
             fin = entry.to_dict()
-        highestIndex = Simulation.maxIndex(self.db, self.simName)
-        if highestIndex > self.whatTimeIsItRightNow():
-            return fin['prices'][self.whatTimeIsItRightNow()]
-        return fin['prices'][len(fin['prices'])-1]
+            highestIndex = Simulation.maxIndex(self.db, self.simName)
+            if highestIndex > self.whatTimeIsItRightNow():
+                return fin['prices'][self.whatTimeIsItRightNow()]
+            return fin['prices'][len(fin['prices'])-1]
 
     def retrieveStock(self, ticker):
         stock = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
@@ -632,6 +632,7 @@ class Simulation:
         dates = []
         scores = []
         links = []
+        #button = []
         i = 1
         for entry in db.collection('Simulations').where('user','==',user).where('ongoing','==',False).stream():
             temp = entry.to_dict()
@@ -641,6 +642,8 @@ class Simulation:
             scores.append("%.2f" % round(float(temp['score']), 2))
             link = str('/orderHist/'+entry.id)
             links.append(link)
+            #buySell = str('/orderForm/' + entry.id)
+            #button.append(buySell)
             i+=1
         return sims, dates, scores, links
 
@@ -987,6 +990,7 @@ class portfolio:
         self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
         self.profit, self.avgSharePrice, self.quantity = self.getVariables()
         self.volatility = 0
+        self.newLink = str('/orderConfirm?ticker= ' + stock+ '&timespan=hourly')
 
     def getVariables(self):
         currentPriceOfStock = SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock)
@@ -1001,10 +1005,12 @@ class portfolio:
                 if temp.get('sold') != None:
                     if temp['sold'] == False:
                         amountOfSharesOwned += int(temp['newQuantity'])
+                        return amountOfSharesOwned
             else:
                 if temp.get('sold') != None:
                     if temp['sold'] == False:
-                        amountOfSharesOwned += int(temp['quantity'])             
+                        amountOfSharesOwned += int(temp['quantity'])     
+                        return amountOfSharesOwned        
         avgPriceOfOrders = mean(prices)
         currentValueOfShares = currentPriceOfStock * amountOfSharesOwned
         if avgStockPrices:

@@ -7,6 +7,7 @@ import math
 from operator import itemgetter, mod
 import re
 from statistics import mean
+from datetime import timedelta
 #from django.shortcuts import render
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
@@ -57,17 +58,23 @@ def profile():
         cash = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True) #For simulation status section
         #daysRemaining = (dbfire.collection('Simulations').collection('simName').collection('endDate')) - (dbfire.collection('Simulations').collection('simName').collection('startDate'))
         #Author: Miqdad Hafiz
+        
+        leaderboard = dbfire.collection('Leaderboard').where('email', '==', session['user'])
         for doc in results.stream(): 
             results = doc.to_dict()
         #Author: Viraj Kadam    
         for doc in cash.stream():
             cash = doc.to_dict()
-        
+        for doc in leaderboard.stream():
+            leaderboard = doc.to_dict()
         #endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate')
-        ##startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
+        #startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate')
         #while(startDateFetch >= endDateFetch):
+        #    startDate = startDateFetch[0]
+        #    endDate = endDateFetch[0]
             
-        return render_template("profile.html", results = results, cash = cash)
+            
+        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard)
     else:
 
         redirect(url_for("login"))
@@ -84,15 +91,59 @@ def Leaderboard():
     else:
         redirect(url_for("login"))
 
-@app.route("/followList")
-def followList():
-    if 'user' in session:
-        followersB = dbfire.collection('UserFollowers').get()
-        documentRef = list(doc.to_dict() for doc in followersB)
-        documentRef.sort(key=itemgetter('names'))
-        print(documentRef)
-        return render_template('followers')
 
+# Follow list function updated by Viraj and Muneeb
+@app.route("/followers")
+def followList():
+    if ('user' in session):
+        followersList = []
+        for entry in dbfire.collection('Users').where('Email','==',session['user']).stream():
+            temp = entry.to_dict()
+            followersList.extend(temp['FollowerNames'])
+        print(followersList)
+
+
+        FollowerNames = []
+        for followers in followersList:
+            names = dbfire.collection('Users').where('userName','==',followers).get()
+            for name in names:
+                names = name.to_dict()
+                FollowerNames.append(names)
+        print(FollowerNames)    
+        
+        return render_template('followers.html',followersList = followersList, FollowerNames = FollowerNames)
+    else:
+        redirect(url_for("login"))
+
+@app.route("/followingList")
+def followingList():
+    if 'user' in session:
+        #followingList = []
+        #for entry in dbfire.collection('Users').where('Name', '==', session['user']).stream():
+        #    following = entry.to_dict()
+        #    followingList.extend(following['FollowingNames'])
+            
+        #followingListNames = []
+        
+        #return render_template('followingList.html', followingList = followingList)
+        
+        followingList= []
+        
+        for name in dbfire.collection('Users').where('Name', '==', session['user']).stream():
+            temp = name.to_dict()
+            followingList.extend(name['FollowingNames'])
+        names = [item.split(',') for item in followingList]
+        print(names)
+        return render_template('followingList.html', names = names)
+    
+#Route for the Order list - Muneeb Khan
+#@app.route("/orderList")
+#def orderlists():
+#    if ('user' in session):
+#        orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
+
+#        return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
+#        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
 
 # Login
 #  This function allows the user to log into the app with correct credentials
@@ -202,13 +253,13 @@ def follow():
         # First add 1 to followers number of user searched
         UserSearched = session['userResults']
         userNamed = UserSearched['userName']
-        print(userNamed)
+        print(userNamed + " userNamed")
         
-        #userChange = dbfire.collection('Users').update({'Followers':firestore.Increment(1)}).where('userName', '==', userNamed)
+        
         userChange = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for doc in userChange:
             key = doc.id
-        print(key)
+        print(key + " key1")
         userChanged = dbfire.collection('Users').document(key).update({'Followers':firestore.Increment(1)})
 
         # Second add 1 to following of the user (YOU)
@@ -216,18 +267,19 @@ def follow():
         for docus in myself:
             key2 = docus.id
             myself = docus.to_dict()
-        print(key2)
+        print(key2 + " key2")
         myself2 = dbfire.collection('Users').document(key2).update({'Following': firestore.Increment(1)})
+        myself2 = dbfire.collection('Users').document(key2).update({'FollowingNames': firestore.ArrayUnion([userNamed])})
         
 
         #Last add name to searched user follower array
         updateFollowArray = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for docu in updateFollowArray:
             key3 = docu.id
-        print(key3)
+        print(key3 + " key3")
         uName =  myself['userName']
         print("HERE COMES LAST PART")
-        print(uName)
+        print(uName + " uName")
         updateFollowArray2 = dbfire.collection('Users').document(key3).update({'FollowerNames': firestore.ArrayUnion([uName])})
         flash("You have followed " + userNamed)
         return redirect(url_for("social"))
@@ -239,25 +291,26 @@ def unfollow():
     if 'user' in session:
         UserSearched = session['userResults']
         userNamed = UserSearched['userName']
-        print(userNamed)
+        print(userNamed + " userNamed")
         
         userChange = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for doc in userChange:
             key = doc.id
-        print(key)
+        print(key + " key")
         userchanged = dbfire.collection('Users').document(key).update({'Followers': firestore.Increment(-1)})
 
         myself = dbfire.collection('Users').where('Email', '==', session['user']).get()
         for doc1 in myself:
             key1 = doc1.id
         myself = doc1.to_dict()
-        print(key1)
+        print(key1 + " key1")
         me = dbfire.collection('Users').document(key1).update({'Following': firestore.Increment(-1)})
+        myself2 = dbfire.collection('Users').document(key1).update({'FollowingNames': firestore.ArrayRemove([userNamed])})
         
         followArray = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for f in followArray:
             new = f.id
-        print(new)
+        print(new + " new")
         Names = myself['userName']
         newArray = dbfire.collection('Users').document(new).update({'FollowerNames': firestore.ArrayRemove([Names])})
         
@@ -312,7 +365,7 @@ def register():
                 user = authen.create_user_with_email_and_password(email, Password)
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""]})
+                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""], "experience": ""})
                 #dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 flash("Account succesfully created, you may now login" , "pass")
@@ -358,34 +411,42 @@ def PasswordRecovery():
           
     return render_template("PasswordRecovery.html")   
 
-@app.route('/update', methods = ['POST', 'GEt'])
+#Author: Viraj Kadam
+@app.route('/update', methods = ["POST", "GET"])
 def update():
     if 'user' in session:
-        if request.method == 'POST':
-            results = dbfire.collection('Users').where('Email', '==', session['user'])
-            for doc in results.stream(): 
-                results = doc.to_dict()
+        if request.method == "POST":
+            results = request.form
+            newEmail = results['email']
+            newUsername = results['Unames']
+            experience = results["experience"]  
             
-            new = request.form
-            username = new['userName']
-            #experience = new['experience']
-            description = new['description']
-            doc = dbfire.collection('Users').document('userName').get()
-            for docs in doc:
-                if docs.to_dict() ['userName'] != username:
-                    db.collection('Users').document(username).update({'userName': username})                    
+            doc = dbfire.collection('Users').document(session['user']).document(newUsername).get()
+            if doc.exists:
+                checkName = dbfire.collection('Users').where('userName', '==', newUsername).get()
+                for docs in grabName.stream(): 
+                    grabName = docs.to_dict()
+                goodName = grabName['userName']
             else:
-                uniqueName = "usernameoktouse"
-                
-            if (len(description) < 200):
-                flash("Your description should be at least 200 characters")
-            else:
-                dbfire.collection('Users').set(description)
-                        
-            return render_template("update.html", results = results)
-    else:
-        return redirect('profile.html')
+                goodName = "Ok"
+            
+            if (len(experience) > 300):
+                flash("There is a 300 character limit") #Adds experience to profile
+        
+            if (goodName == newUsername):
+                flash("Username is already taken. Please enter a valid username.") #check to see if new username is taken
+            
+            try:  
+                dbfire.collection('Users').document('Name', '==', session['user']).update({"userName": newUsername, "Email": newEmail, "experience": experience})
+            
+                flash("Account details updated", "pass")
 
+                return redirect(url_for("profile"))
+            except:
+                return redirect(url_for("update"))
+
+          
+    return render_template('update.html')   
 #Logout
 # After user logs out session is ended and user is taken to login page
 # Author: Miqdad 
@@ -541,6 +602,7 @@ def goToSimulation():
                 percentage = []
                 volatility = []
                 links = []
+                buySell = []
                 
                 percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
@@ -559,6 +621,7 @@ def goToSimulation():
                         percentage.append("%.2f" % round(percent, 2))
                         volatility.append("%.2f" % round(Portfolio.volatility,2))
                         links.append(Portfolio.link)
+                        buySell.append(Portfolio.newLink)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
@@ -566,7 +629,7 @@ def goToSimulation():
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
                 currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue,
-                percentage=percentage, links=links)  
+                percentage=percentage, links=links, buySell = buySell)  
             else:
                 return redirect(url_for('.finishSimulation'))
         except KeyError:
@@ -588,6 +651,11 @@ def simlists():
         sims, dates, scores, links = Simulation.listSims(dbfire, session['user'])             
         return render_template('simulationHistory.html', person = session['user'],sims = sims, 
         dates = dates, scores = scores, links=links)
+
+#@app.route("/buySell/<simName>")
+#def buySell(simName):
+#    if 'user' in session:
+#        return redirect(url_for('.ordeForm'))
 
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
@@ -687,16 +755,15 @@ def stockSearch():
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
 
-@app.route('/_stockSearchSuggestions', methods=['GET'])
+@app.route('/_stockSearchSuggestions', methods=['POST','GET'])
 def stockSearchSuggestions():
     if ('user' in session):
         if request.method == 'GET':
-            tickers = []
-            for entry in db.collection("Stocks").document("tickers").stream():
+            stockNames = []
+            for entry in db.collection("Stocks").document("ticker").get():
                 temp = entry.to_dict()
-                tickers.append(temp)
-                
-            return render_template("home.html", tickers = tickers)
+                stockNames.append(temp) 
+            return render_template("home.html", stockNames = stockNames)
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
@@ -876,6 +943,8 @@ def orderHist(simName):
     if ('user' in session):
         return redirect(url_for('.orderHistory', simName=simName))
 
+
+
 @app.route("/orderHistory")
 def orderHistory():
     simName = request.args['simName']
@@ -894,6 +963,7 @@ def fourOhFour():
 #    if 'user' in session:
 
 # Submission check route for Quiz by Ian Mcnulty
+# Updates by Muneeb Khan
 @app.route('/quizSubmit', methods = ['GET', 'POST'])
 def quizSubmit():
     quiz = Quiz(dbfire,'Quiz1',session['user'])
@@ -909,13 +979,35 @@ def quizSubmit():
             quiz.answerQuestion(ids[i], 'f')
 
     score = quiz.scoreCalc()
-    if score > 7:
+    if score >= 7:
         flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
-        " You are now ready to invest, please click the start simulation button above to start investing.")
+        " You are now ready to invest, please click the start simulation button above to start investing." +
+        "Correct answers were: " +
+        "1 B " + 
+        "2 A " +
+        "3 B " +
+        "4 A " +
+        "5 C " +
+        "6 C " +
+        "7 A " +
+        "8 C " +
+        "9 B " +
+        "10 A ")
         return redirect(url_for('information', person = session['user']))
     else:
         flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
-        " You need to score at least a 7/10 to pass.")
+        " You need to score at least a 7/10 to pass. Please try again."  + 
+        "Correct answers were: " +
+        "1 B " + 
+        "2 A " +
+        "3 B " +
+        "4 A " +
+        "5 C " +
+        "6 C " +
+        "7 A " +
+        "8 C " +
+        "9 B " +
+        "10 A ")
         return redirect(url_for('information', person = session['user']))
 
 
@@ -964,30 +1056,6 @@ def quizpage():
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
 
-#Author: Viraj Kadam   
-#Updates user profile  
-#class User(Flaskform):
-    #picture =  
-#    description = StringField('Description')
-#    experience = StringField('Experience')
-#    submit = SubmitField("Submit")   
-    
-#@app.route('/update/<int:id>', methods = ['GET', 'POST'])
-#def update():
-#   updateinfo = User.query.get(id)
-#   if request.method == 'POST':
-#        update.description = request.form('Description')
-#        update.experience = request.form('Experience')
-#        try:
-#            db.session.commit()
-#            flash("User profile updates")
-#            return render_template('profile.html')
-#        except:
-#            flash("Error, unable to update your profile")
-
-#@app.route('/')
-#def method_name():
-#    pass
     
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,3 +1,8 @@
+
+<!--Updated by Muneeb, Miqdad, and Viraj-->
+<!--CSS Updated by Miqdad and integrated by Muneeb-->
+<!--This page is just for testing the Order list function - Muneeb Khan-->
+
 <!doctype html>
 <html lang="en" class="h-100">
   <head>
@@ -10,7 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
     </head>
     <header>
-    
+
       <a class="navbar-brand" href="home" style = "color: black; padding: 10px;">
         StockSim: Learn How to Trade
       </a>
@@ -63,7 +68,6 @@
               }
             </script>  
           </li>
-
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -72,74 +76,87 @@
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
         {% endif %}
-      </ul>
-                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
-                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
-            <script type="text/javascript">
-              if ({{ session['simulationFlag'] }} == 0 ) { 
-                document.getElementById('currentCashNav').style.display = "none";
-                document.getElementById('portfolioValueNav').style.display = "none";
-              }
-            </script>  
+                </ul>
                 <form action="/stockSearch" method="post">
-          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
-                  value="{{ request.form['searchTerm'] }}">
-                  <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
-      </form>
-
-
+                    <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+                            value="{{ request.form['searchTerm'] }}">
+                            <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
+                </form>
               </div>        
             </div>
           </nav>
     </header>
-<br><br><br><br><br><br>
+
+<body>  
+        <br><br><br>
+        
+        <h3>People You Follow</h3>
+        <div class = "followinglist">
+          <div class="row justify-content-center">
+          <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
+
+            <thead class = "bg-light">
+              <tr><th>Name: </th></tr>
+            </thead>
+            {%for user in names%}
+            <tbody>
+              <tr>
+                <td> <h3> {{user[0]}}</h3></td>
+              </tr>
+            </tbody>
+            {%endfor%}
+
+           </table>
+
+          <script type="text/javascript">
+           <!-- let followingList = {{followingList|safe}};
+
+            let list = [];
+            
+            for (let i = 0; i < followingList.length; i++) {
+              list.push({
+                Name: followingList[i]
+              })
+            }
+
+            function generateFollowinglist(table, data, keys) {
+              let thead = table.createTHead();
+              let row = thead.insertRow();
+              for (let key of keys) {
+                let th = document.createElement("th");
+                let text = document.createTextNode(key);
+                th.appendChild(text);
+                row.appendChild(th);
+              }
+              for (let element of data) {
+                let row = table.insertRow();
+                for (key in element) {
+                  let cell = row.insertCell();
+                  let text = document.createTextNode(element[key]);
+                  cell.appendChild(text);
+                }
+              }
+            }
+
+            let table = document.querySelector("table");
+            let data = Object.keys(list[0]);
+            generateOrderlist(table, list, data); -->
 
 
-
-<body>
-    
-<h1>StockSim Leaderboard</h1>    
-
-
-
-
-<table class = "table table-bordered table-hover align-middle mb-0 bg-white justify-content-center" id = "tableL">
-  <thead class = "bg-light justify-content-center">
-  <tr>
-    <th> Rank </th>
-    <th> Username </th>
-    <th> Score </th>
-  </tr>
-  </thead>
-  {% for user in documentRef%}
-  <tbody>
-    <tr>
-      <td class = "counterIncrement"></td>
-      <td>
-        <p class = "fw-noraml mb-1"> {{user['username']}}</p>
-      </td>
-      <td>
-        <p class = "fw-normal mb-1"> {{user['score']}}</p>
-      </td>
-    </tr>
-  </tbody>
-  {% endfor %}
-</table>
-<script>
-  var tableHTML = window.localStorage["sharedTable"];
-  var table = document.createElement('table');
-  table.innerHTML = tableHTML;
-</script>
-<br>
-</body>
-
-<footer class="footer mt-auto py-3" id = "foot">
-  <div class="container">
-    <span>Copyright 2022 by StockSim</span>
-  </div>
-</footer>
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+            </script>
+          </div>
+          <br><br>
+          <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
+        <div class="container">
+          <span>Copyright 2022 by StockSim</span>
+        </div>
+      </footer>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-<script src="/static/jsStyle/bootstrap.bundle.min.js"></script>
+    <script src="/static/jsStyle/bootstrap.bundle.min.js"></script>
+
+</body>
+
+
 </html>
