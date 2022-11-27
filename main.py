@@ -462,9 +462,10 @@ def hello(name=None):
         for entry in dbfire.collection("StockSearchInfo").get():
             temp = entry.to_dict()
             stockNames.append(temp['name'])
+        session['stockNames'] = stockNames
         print(stockNames) 
     
-    return render_template("home.html",stockNames = stockNames)
+    return render_template("home.html",stockNames = session['stockNames'])
 
 ## Route for Home page - Muneeb Khan
 @app.route("/home")
@@ -482,7 +483,7 @@ def home():
                 stockNames.append(temp['name'])
             print(stockNames) 
 
-        return render_template("home.html", person = person, stockNames = stockNames)
+        return render_template("home.html", person = person, stockNames = session['stockNames'])
     else:
         return render_template('home.html')
 
