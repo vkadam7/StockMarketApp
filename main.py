@@ -457,13 +457,12 @@ def hello(name=None):
     session['loginFlagPy'] = 0
     session['simulationFlag'] = 0
 
-    if request.method == 'GET':
-        stockNames = []
-        for entry in dbfire.collection("StockSearchInfo").get():
-            temp = entry.to_dict()
-            stockNames.append(temp['name'])
-        session['stockNames'] = stockNames
-        print(stockNames) 
+    stockNames = []
+    for entry in dbfire.collection("StockSearchInfo").get():
+        temp = entry.to_dict()
+        stockNames.append(temp['name'])
+    session['stockNames'] = stockNames
+    print(stockNames) 
     
     return render_template("home.html",stockNames = session['stockNames'])
 
@@ -476,12 +475,12 @@ def home():
         for x in person.get():
             person = x.to_dict()
 
-        if request.method == 'GET':
-            stockNames = []
-            for entry in dbfire.collection("StockSearchInfo").get():
-                temp = entry.to_dict()
-                stockNames.append(temp['name'])
-            print(stockNames) 
+        stockNames = []
+        for entry in dbfire.collection("StockSearchInfo").get():
+            temp = entry.to_dict()
+            stockNames.append(temp['name'])
+        session['stockNames'] = stockNames
+        print(stockNames) 
 
         return render_template("home.html", person = person, stockNames = session['stockNames'])
     else:
