@@ -113,6 +113,11 @@
           <div class = "mt-3 inputs">
             <i class = "fa fa-search"></i>
             <input name = "searchUser" id = "searchUser" type = "text" class = "form-control" placeholder="Search for a user...">
+            <datalist id = "users">
+              {%for userNames in users%}
+                <option value = {"userNames"}></option>
+              {%endfor%}
+
           </div>
           <br>
           <button type = "submit" class = "btn btn-primary btn-lg btn-block" style = "background-color:rgb(33, 103, 42)">Search</button>

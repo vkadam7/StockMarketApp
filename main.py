@@ -68,15 +68,15 @@ def profile():
             cash = doc.to_dict()
         for doc in leaderboard.stream():
             leaderboard = doc.to_dict()
-        endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate').get()
-        startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate').get()
+       #endDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('endDate').get()
+       # startDateFetch = dbfire.collection('Simulations').where('user', '==', session['user']).where('ongoing', '==', True).document('startDate').get()
         
-        while(startDateFetch >= endDateFetch):
-            delta = endDateFetch - startDateFetch
-            return delta.days
+       # while(startDateFetch >= endDateFetch):
+       #     delta = endDateFetch - startDateFetch
+       #     return delta.days
             
             
-        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard, delta = delta)
+        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard)
     else:
 
         redirect(url_for("login"))
@@ -135,6 +135,8 @@ def followingList():
         names = [item.split(',') for item in followingList]
         print(names)
         return render_template('followingList.html', names = names)
+    else:
+        return redirect(url_for('profile'))
     
 #Route for the Order list - Muneeb Khan
 #@app.route("/orderList")
@@ -317,6 +319,19 @@ def unfollow():
         flash("You have unfollowed " + userNamed)
         return redirect(url_for("social"))
 
+@app.route('/userSearchSuggestion', methods = ['POST', 'GET'])
+def userSearchSuggestions():
+    if 'user' in session:
+        if request.method == 'GET':
+            userNames = []
+            for users in dbfire.collection('Users').get():
+                temp = users.to_dict()
+                userNames.append(temp([users]))
+            print(userNames)
+            
+        return render_template('social.html', userNames = userNames)
+        
+        
         
 #Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
@@ -1037,7 +1052,8 @@ def quizSubmit():
         "7 A " +
         "8 C " +
         "9 B " +
-        "10 A ")
+        "10 A "
+        )
         return redirect(url_for('information', person = session['user']))
 
 
@@ -1059,6 +1075,7 @@ def quizpage():
         answers8 = [answers[7]]
         answers9 = [answers[8]]
         answers10 = [answers[9]]
+        answers11 = [answers[10]]
 
 
         if (request.method == 'POST'):
@@ -1080,7 +1097,7 @@ def quizpage():
 
         return render_template('quiz.html',quiz = quiz, questions = questions, answers = answers,
         answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
-        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10)
+        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10, answers11 = answers11)
                    
     else:
         flash("Sorry you must be logged in to take the quiz.")
