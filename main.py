@@ -780,7 +780,6 @@ def stockSearchSuggestions():
 @app.route('/displayStock')
 def displayStock():
     startDate = request.args['startDate']
-    print(startDate)
     ticker = request.args['ticker']
     timespan = request.args['timespan']
     session['ticker'] = ticker
@@ -795,13 +794,14 @@ def displayStock():
             temp = entry.to_dict()
             if temp.get('unavailable') != None:
                 existenceFlag = False
-        session['currentDate'] = temp['dates'][final][0:10]
-        print(session['currentDate'])
         if existenceFlag:
             if timespan == 'hourly':
                 for entry in stockData:
                     stock = entry.to_dict()
                 if stock != -1:
+                    session['currentYear'] = str(stock['dates'][final][0:4])
+                    session['currentMonth'] = str(stock['dates'][final][5:7])
+                    session['currentDay'] = str(stock['dates'][final][8:10])
                     dates = []
                     prices = []
                     avgPrice = []
@@ -820,6 +820,9 @@ def displayStock():
                 for entry in stockData:
                     stock = entry.to_dict()
                 if stock != -1:
+                    session['currentYear'] = str(stock['dates'][final][0:4])
+                    session['currentMonth'] = str(stock['dates'][final][5:7])
+                    session['currentDay'] = str(stock['dates'][final][8:10])
                     dates = []
                     prices = []
                     avgPrice = []
@@ -876,6 +879,9 @@ def displayStock():
                 for entry in stockData:
                     stock = entry.to_dict()
                 if stock != -1:
+                    session['currentYear'] = str(stock['dates'][final][0:4])
+                    session['currentMonth'] = str(stock['dates'][final][5:7])
+                    session['currentDay'] = str(stock['dates'][final][8:10])
                     dates = []
                     prices = []
                     for i in range(1, final):
@@ -909,6 +915,9 @@ def displayStock():
                 for entry in stockData:
                     stock = entry.to_dict()
                 if stock != -1:
+                    session['currentYear'] = str(stock['dates'][final][0:4])
+                    session['currentMonth'] = str(stock['dates'][final][5:7])
+                    session['currentDay'] = str(stock['dates'][final][8:10])                    
                     dates = []
                     prices = []
                     for i in range(0, final):

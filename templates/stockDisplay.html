@@ -170,9 +170,48 @@
             </div>
             <br>
             
-                <button type="submit" class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Show Ranges</button>
-            
+                <button id="changeView" type="submit" class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Show Ranges</button>
+              <p id="dateNotice" style="color: red;"></p>
         </form>
+        <script>
+          const button = document.getElementById('changeView');
+          const dateInput = document.getElementById('startDate');
+          let endYear = +({{session['currentYear']}});
+          let endMonth = +({{session['currentMonth']}});
+          let endDay = +({{session['currentDay']}});
+
+          dateInput.addEventListener('input', dateCheck2);
+
+          function dateCheck2(check) {
+            startYear = +(dateInput.value.slice(0, 4));
+            startMonth = +(dateInput.value.slice(5, 7));
+            startDay = +(dateInput.value.slice(8, 10));
+            if (endYear < startYear) {
+              button.disabled = true;
+              dateNotice.textContent = "Please enter a new end date that comes after the start date.";
+            } else if (endYear == startYear) {
+              if (endMonth < startMonth) {
+                button.disabled = true;
+                dateNotice.textContent = "Please enter a new end date that comes after the start date.";
+              } else if (endMonth == startMonth) {
+                if (endDay <= startDay) {
+                  button.disabled = true;
+                  dateNotice.textContent = "Please enter a new end date that comes after the start date.";
+                } else {
+                  button.disabled = false;
+                  dateNotice.textContent = "";
+                }
+              } else {
+                button.disabled = false;
+                dateNotice.textContent = "";
+              }
+            } else {
+              button.disabled = false;
+              dateNotice.textContent = "";
+            }
+
+          }
+        </script>
         <br>
 
         <form action="/orderForm" method="post" style = "padding-left: 30px;">
