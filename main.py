@@ -412,29 +412,32 @@ def update():
             newUsername = results['Unames']
             experience = results["experience"]  
             
-            doc = dbfire.collection('Users').where('Email', '==', session['user'])
-            if doc.exists:
-                checkName = dbfire.collection('Users').where('userName', '==', newUsername).get()
-                for docs in grabName.stream(): 
-                    grabName = docs.to_dict()
-                goodName = grabName['userName']
-            else:
-                goodName = "Ok"
+            checkName = dbfire.collection('Users').where('Email','==',session['user']).where('userName', '==', session['user']).get()
+            for docs in checkName:
+                updatesInfo = docs.id
+                checkName = docs.to_dict()
+
+            goodName = newUsername
             
             if (len(experience) > 300):
+                print("There is a 300 character limit")
                 flash("There is a 300 character limit") #Adds experience to profile
         
-            if (goodName == newUsername):
+            elif (goodName == session['user']):
+                print("Username is already taken. Please enter a valid username.")
                 flash("Username is already taken. Please enter a valid username.") #check to see if new username is taken
             
-            try:  
-                dbfire.collection('Users').document('Name', '==', session['user']).update({"userName": newUsername, "Email": newEmail, "experience": experience})
-            
-                flash("Account details updated", "pass")
+            else:
 
-                return redirect(url_for("profile"))
-            except:
-                return redirect(url_for("update"))
+                try:  
+                    dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "Email": newEmail, "experience": experience})
+                    print("Account details updated")
+                    flash("Account details updated", "pass")
+
+                    return redirect(url_for("profile"))
+                except:
+                    print("update failed")
+                    return redirect(url_for("update"))
 
           
     return render_template('update.html')   
@@ -972,7 +975,7 @@ def fourOhFour():
 #def portfolioGraph():
 #    if 'user' in session:
 
-## Route for About us page - Muneeb Khan
+## Route for Quiz selection page - Muneeb Khan
 @app.route("/quizselection")
 def quizselection():
     if('user' in session): 
@@ -983,7 +986,8 @@ def quizselection():
 
         return render_template("quizselection.html", person = person, stockNames = session['stockNames'])
     else:
-        return render_template('quizselection.html')
+        flash("Sorry you must be logged in to take the quiz.")
+        return redirect(url_for("login"))
 
 # Submission check route for Quiz by Ian Mcnulty
 # Updates by Muneeb Khan
