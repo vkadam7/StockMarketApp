@@ -972,6 +972,19 @@ def fourOhFour():
 #def portfolioGraph():
 #    if 'user' in session:
 
+## Route for About us page - Muneeb Khan
+@app.route("/quizselection")
+def quizselection():
+    if('user' in session): 
+        person = dbfire.collection('Users').where('Email', '==', session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
+
+        for x in person.get():
+            person = x.to_dict()
+
+        return render_template("quizselection.html", person = person, stockNames = session['stockNames'])
+    else:
+        return render_template('quizselection.html')
+
 # Submission check route for Quiz by Ian Mcnulty
 # Updates by Muneeb Khan
 @app.route('/quizSubmit', methods = ['GET', 'POST'])
