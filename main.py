@@ -13,7 +13,7 @@ from flask import Flask, abort, flash, session, render_template, request, redire
 import pyrebase
 import firebase_admin
 
-from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, portfolio
+from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, portfolio, DAYS_IN_MONTH
 from followers import FollowUnfollow, UserInfo
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -582,9 +582,7 @@ def goToSimulation():
             sim = SimulationFactory(dbfire, session['user']).simulation
             session['initialCash'] = sim.initialCash
             session['simName'] = sim.simName
-            print('prior to ongoingCheck')
             if Simulation.ongoingCheck(dbfire, session['simName'], session['user']):
-                print('inside if loop')
                 sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
                 sharesValue = float(sharesValue)
                 currentCash = float(currentCash)
@@ -798,6 +796,7 @@ def displayStock():
             if temp.get('unavailable') != None:
                 existenceFlag = False
         session['currentDate'] = temp['dates'][final][0:10]
+        print(session['currentDate'])
         if existenceFlag:
             if timespan == 'hourly':
                 for entry in stockData:
@@ -826,7 +825,32 @@ def displayStock():
                     avgPrice = []
                     b = BasisData['daily']['dates'].index(stock['dates'][0][0:10])
                     if startDate != '':
-                        a = BasisData['daily']['dates'].index(startDate)
+                        tempArr = np.array(BasisData['daily']['dates'])
+                        startLoc = np.where(tempArr == startDate)   
+                        if startLoc[0].size == 0:
+                            tempDate = startDate
+                            month = int(tempDate[5:7])
+                            day = int(tempDate[8:10])
+                            year = int(tempDate[0:4])
+                            while startLoc[0].size == 0:
+                                day += 1
+                                if day >= DAYS_IN_MONTH[month]:
+                                    month += 1
+                                    if month >= 12:
+                                        month = 1
+                                        year += 1
+                                    day = 1
+                                if month < 10:
+                                    strMonth = "0" + str(month)       
+                                else: 
+                                    strMonth = str(month)
+                                if day < 10:
+                                    strDay = "0" + str(day)       
+                                else: 
+                                    strDay = str(day)
+                                strYear = str(year)
+                                startLoc = np.where(tempArr == (strYear + "-" + strMonth + "-" + strDay))
+                        a = startLoc[0][0]
                     else:
                         a = b - 30
                     for i in range(a, b):
