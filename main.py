@@ -151,7 +151,10 @@ def userPosts():
             user = doc.to_dict()
         author = user['userName']
 
-        userPost = dbfire.collection('Blog').where
+        userPost = dbfire.collection('Blog').where('Author','==',author)
+        for docs in userPost.stream():
+            userPost = docs.to_dict()
+    return render_template("userPosts.html", userPost = userPost)
 
 @app.route("/Leaderboard")
 def Leaderboard():
