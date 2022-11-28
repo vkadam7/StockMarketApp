@@ -126,6 +126,21 @@ def Blog():
         print(blog)   
         return render_template("Blog.html", blog = blog)
 
+@app.route("/userPosts", methods = ["POST","GET"])
+def userPosts():
+    if('user' in session):
+        user = dbfire.collection('Users').where('Email', '==', session['user'])
+        for doc in user.stream():
+            user = doc.to_dict()
+        author = user['userName']
+
+        posts = []
+        userPost = dbfire.collection('Blog').where('Author','==',author)
+        for docs in userPost.stream():
+            userPost = docs.to_dict()
+        print(userPost)
+        return render_template("userPosts.html",userPost = userPost)
+
 #@app.route("/postDelete")
 
 @app.route("/postBlog", methods = ["POST","GET"])
@@ -143,18 +158,7 @@ def postBLog():
             flash("Your submission has been posted.")
     return render_template("postBlog.html")
 
-@app.route("/userPosts", methods = ["POST","GET"])
-def userPosts():
-    if('user' in session):
-        user = dbfire.collection('Users').where('Email', '==', session['user'])
-        for doc in user.stream():
-            user = doc.to_dict()
-        author = user['userName']
 
-        userPost = dbfire.collection('Blog').where('Author','==',author)
-        for docs in userPost.stream():
-            userPost = docs.to_dict()
-    return render_template("userPosts.html", userPost = userPost)
 
 @app.route("/Leaderboard")
 def Leaderboard():

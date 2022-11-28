@@ -101,7 +101,7 @@
       </h4>
     </div>
     <div>
-      {% for user in blog %}
+    {% for users in userPost %}
       <div>
         <div class="d-flex p-3 border-bottom">
           
@@ -109,17 +109,15 @@
             <div>
               
                 <h6 class="text-body" style = "text-align: left;">
-                  {{user['Author']}}
+                  {{users['Author']}}
                   <span class="small text-muted font-weight-normal"> • </span>
-                  <span class="small text-muted font-weight-normal">{{user['DatePosted']}}</span>
+                  <span class="small text-muted font-weight-normal">{{users['DatePosted']}}</span>
                   <span><i class="fas fa-angle-down float-end"></i></span>
                 </h6>
               
               <p style="line-height: 1.2;">
-                {{user['Post']}}
+                {{users['Post']}}
               </p>
-              
-              
             </div>
           </div>
         </div>
