@@ -16,14 +16,13 @@
       </a>
         <nav class="navbar navbar-expand-md navbar-dark" id = "navBar">
           <img src = "/static/stockLogo.png" alt = "stock symbol" width = "45" height = "45" class="d-inline-block align-top">
-            <div class="container-fluid">
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
               <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav me-auto mb-2 mb-md-0">
                   <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="home">Home</a>
+                    <a class="nav-link" aria-current="page" href="home">Home</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="aboutus">About Us</a>
@@ -31,19 +30,19 @@
                   <li class="nav-item">
                     <a class="nav-link" href="information">Information</a>
                   </li>
-                  {% if session['user'] %}
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
-          </li>
-        </li class = "nav-item">
-            <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
-         </li>
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
-          </li>
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
-          </li>
+        {% if session['user'] %}
+        <li class="nav-item">
+          <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
+        </li>
+      </li class = "nav-item">
+          <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
+       </li>
+        <li class="nav-item">
+          <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
+        </li>
+        <li class="nav-item">
+          <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
+        </li>
           <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
             <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
               <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Start a simulation!</button>
@@ -64,7 +63,6 @@
               }
             </script>  
           </li>
-
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -85,13 +83,7 @@
                 <form action="/stockSearch" method="post">
           <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
-                  <datalist id = "_stockSearchSuggestions">
-                  {% for stocks in stockNames%}
-                    <option>{{stockNames}}</option>
-                  {% endfor %}
-                  </datalist>
                   <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
-
       </form>
               </div>        
             </div>

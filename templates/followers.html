@@ -12,12 +12,11 @@
     </head>
     <header>
 
-        <nav class="navbar navbar-expand-md navbar-dark fixed-top" id = "navBar">
-            <div class="container-fluid">
-              <a class="navbar-brand" href="home">
-                <img src = "/static/stockLogo.png" alt = "stock symbol" width = "35" height = "35" class="d-inline-block align-top">
-                StockSim: Learn How to Trade
-              </a>
+      <a class="navbar-brand" href="home" style = "color: black; padding: 10px;">
+        StockSim: Learn How to Trade
+      </a>
+        <nav class="navbar navbar-expand-md navbar-dark" id = "navBar">
+          <img src = "/static/stockLogo.png" alt = "stock symbol" width = "45" height = "45" class="d-inline-block align-top">
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
@@ -37,7 +36,7 @@
           <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
         </li>
       </li class = "nav-item">
-          <a class = "nav-link active" method = "POST" href = "social"> Your Network</a>
+          <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
        </li>
         <li class="nav-item">
           <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
@@ -65,7 +64,6 @@
               }
             </script>  
           </li>
-
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -74,7 +72,7 @@
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
         {% endif %}
-      </ul>
+                </ul>
                 <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
                 <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
             <script type="text/javascript">
@@ -88,7 +86,6 @@
                   value="{{ request.form['searchTerm'] }}">
                   <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
       </form>
-
               </div>        
             </div>
           </nav>
