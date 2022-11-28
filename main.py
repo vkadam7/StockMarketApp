@@ -140,6 +140,7 @@ def userPosts():
             userPost = docs.to_dict()
             if(userPost['Author'] == author):
                 userPost['DatePosted'] = str(datetime.datetime.fromtimestamp(userPost['DatePosted'].timestamp()).strftime("%Y-%m-%d"))
+                userPost['DocID'] = docs.id
                 posts.append(userPost)
         posts.sort(key = itemgetter('DatePosted'), reverse=True)
         print(posts)
