@@ -138,6 +138,8 @@ def userPosts():
         userPost = dbfire.collection('Blog').where('Author','==',author)
         for docs in userPost.stream():
             userPost = docs.to_dict()
+            userPost['DatePosted'] = str(datetime.datetime.fromtimestamp(showBlog['DatePosted'].timestamp()).strftime("%Y-%m-%d"))
+            posts.append(userPost)
         print(userPost)
         return render_template("userPosts.html",userPost = userPost)
 
