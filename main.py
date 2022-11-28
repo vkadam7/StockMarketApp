@@ -99,6 +99,7 @@ def profile():
 
         redirect(url_for("login"))
 
+
 @app.route("/Blog", methods = ["POST","GET"])
 def Blog():
     if('user' in session):
@@ -141,6 +142,16 @@ def postBLog():
             dbfire.collection('Blog').add({"Author": Author,"DatePosted":firestore.SERVER_TIMESTAMP,"Post":post,"Likes":0})
             flash("Your submission has been posted.")
     return render_template("postBlog.html")
+
+@app.route("/userPosts", methods = ["POST","GET"])
+def userPosts():
+    if('user' in session):
+        user = dbfire.collection('Users').where('Email', '==', session['user'])
+        for doc in user.stream():
+            user = doc.to_dict()
+        author = user['userName']
+
+        userPost = dbfire.collection('Blog').where
 
 @app.route("/Leaderboard")
 def Leaderboard():
