@@ -403,6 +403,7 @@ def PasswordRecovery():
     return render_template("PasswordRecovery.html")   
 
 #Author: Viraj Kadam
+#Updated by Viraj and Muneeb
 @app.route('/update', methods = ["POST", "GET"])
 def update():
     if 'user' in session:
@@ -412,7 +413,7 @@ def update():
             newUsername = results['Unames']
             experience = results["experience"]  
             
-            checkName = dbfire.collection('Users').where('Email','==',session['user']).where('userName', '==', session['user']).get()
+            checkName = dbfire.collection('Users').where('Email','==',session['user']).get()
             for docs in checkName:
                 updatesInfo = docs.id
                 checkName = docs.to_dict()
@@ -428,16 +429,13 @@ def update():
                 flash("Username is already taken. Please enter a valid username.") #check to see if new username is taken
             
             else:
+                dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "Email": newEmail, "experience": experience})
+                print("Account details updated")
+                flash("Account details updated", "pass")
 
-                try:  
-                    dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "Email": newEmail, "experience": experience})
-                    print("Account details updated")
-                    flash("Account details updated", "pass")
-
-                    return redirect(url_for("profile"))
-                except:
-                    print("update failed")
-                    return redirect(url_for("update"))
+                return redirect(url_for("profile"))
+        else:
+                return render_template('update.html')
 
           
     return render_template('update.html')   
