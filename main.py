@@ -326,12 +326,10 @@ def userSearchSuggestions():
             userNames = []
             for users in dbfire.collection('Users').get():
                 temp = users.to_dict()
-                userNames.append(temp([users]))
+                userNames.append(temp(['userName']))
             print(userNames)
             
         return render_template('social.html', userNames = userNames)
-        
-        
         
 #Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
@@ -696,6 +694,29 @@ def orderFormFill():
     session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
     session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
     return render_template('orderForm.html', option=session['option'])
+
+
+@app.route("/buyOrder/<orderID>")
+def buyRoute(orderID):
+    if 'user' in session:
+        session['option'] = 'Buy'
+        session['orderId'] = orderID
+        session['optionType'] = 1
+        session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
+        order = dbfire.collection('Orders').document(orderID).get().to_dict()
+        if order.get()
+        
+        
+        session['currentAmount'] = session['stockQuantity']
+        session['orderPrice'] = "%.2f" % round(float(session['stockQuantity']) * float(session['currentPrice']), 2)
+        return render_template('orderConfirmation.html')
+
+@app.route('/stockSell/<orderID>')
+def stockSell(orderID):
+    if 'user' in session:
+        session['option'] = 'Sell'
+        session['orderID'] = orderID
+        
 
 @app.route("/sellTaxLot/<orderID>")
 def sellTaxLot(orderID):

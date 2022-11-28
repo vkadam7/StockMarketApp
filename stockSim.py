@@ -964,7 +964,7 @@ class Order:
                 if temp['buyOrSell'] == 'Buy' and temp['sold'] == False:
                     link = str('/sellTaxLot/' + entry.id)
                 elif temp['buyOrSell'] == 'Buy' and temp['sold'] == True:
-                    link = "Sold"
+                    link = str('/buyOrder/' + entry.id)
                 else:
                     link = ""
                 if temp.get('partiallySold') != None and temp['sold'] == False:
@@ -990,7 +990,8 @@ class portfolio:
         self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
         self.profit, self.avgSharePrice, self.quantity = self.getVariables()
         self.volatility = 0
-        self.newLink = str('/orderConfirm?ticker =' + stock + '&timespan=hourly')
+        
+        #self.sellLink = Order.orderList(self.sim)
 
     def getVariables(self):
         currentPriceOfStock = SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock)
@@ -1140,21 +1141,6 @@ class portfolio:
                 fig[i].set_color(color[i])
             
             plt.show
-           
-           
-    #def animate():
-        
-    #Display all information
-    def displayInfo(self, close):
-        print(self.percentChange)
-        print(self.returns)
-        print(self.funds_remaining)
-
-        print(self.get_profit)
-        if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
-            print("Gains: +" + self.GainorLoss) 
-        elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
-            return
 
 ## Class for setting up quiz - Muneeb Khan
 ## Updated by Ian Mcnulty
