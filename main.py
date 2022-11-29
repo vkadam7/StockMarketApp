@@ -146,7 +146,9 @@ def userPosts():
         print(posts)
         return render_template("userPosts.html",posts = posts)
 
-#@app.route("/postDelete")
+@app.route("/postDelete/<id>", methods = ["POST"])
+def postDelete(id):
+    print(id)
 
 @app.route("/postBlog", methods = ["POST","GET"])
 def postBLog():
