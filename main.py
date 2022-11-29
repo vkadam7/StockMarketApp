@@ -50,7 +50,6 @@ def sessionFlagCheck(loginFlag, simFlag):
     print("simulationFlag is: " + str(simFlag))
 
 #Author: Miqdad Hafiz
-#
 @app.route("/profile")
 def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
@@ -99,7 +98,7 @@ def profile():
 
         redirect(url_for("login"))
 
-
+#Author: Miqdad Hafiz
 @app.route("/Blog", methods = ["POST","GET"])
 def Blog():
     if('user' in session):
@@ -126,6 +125,7 @@ def Blog():
         print(blog)   
         return render_template("Blog.html", blog = blog)
 
+#Author: Miqdad Hafiz
 @app.route("/userPosts", methods = ["POST","GET"])
 def userPosts():
     if('user' in session):
@@ -146,6 +146,8 @@ def userPosts():
         print(posts)
         return render_template("userPosts.html",posts = posts)
 
+
+#Author: Miqdad Hafiz
 @app.route("/postDelete/<id>", methods = ["GET"])
 def postDelete(id):
     if('user' in session):
@@ -154,7 +156,7 @@ def postDelete(id):
         dbfire.collection('Blog').document(id).delete()
         return redirect(url_for("userPosts"))
 
-
+#Author: Miqdad Hafiz
 @app.route("/postBlog", methods = ["POST","GET"])
 def postBlog():
     if('user' in session):
@@ -171,7 +173,7 @@ def postBlog():
     return render_template("postBlog.html")
 
 
-
+#Author: Miqdad Hafiz
 @app.route("/Leaderboard")
 def Leaderboard():
     if('user' in session):
