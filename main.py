@@ -157,6 +157,16 @@ def postDelete(id):
         return redirect(url_for("userPosts"))
 
 #Author: Miqdad Hafiz
+@app.route("/editPost/<id>",methods = ["POST","GET"])
+def editPost(id):
+    edit = dbfire.collection('Blog').document(id).get()
+    edit = edit.to_dict()
+    edit['DocID'] = id
+    return render_template("editingPost.html", edit = edit)
+
+
+
+#Author: Miqdad Hafiz
 @app.route("/postBlog", methods = ["POST","GET"])
 def postBlog():
     if('user' in session):
