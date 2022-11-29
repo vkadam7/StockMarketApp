@@ -9,6 +9,7 @@
     <link rel = "stylesheet" href = "/static/stylesheets/newStyle.css">
     <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
     </head>
     <header>
 
@@ -89,8 +90,13 @@
               }
             </script>  
                 <form action="/stockSearch" method="post">
-          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" list = "stockNames" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
+                  <datalist id = "stockNames">
+                  {% for stockname in stockNames%}
+                      <option value = "{{stockname}}" />
+                  {% endfor %}
+                   </datalist>
                   <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
       </form>
               </div>        
@@ -102,6 +108,19 @@
 <br><br><br><br><br><br>
 
 <body>
+
+  {% with messages = get_flashed_messages() %}
+                    {% if messages %}   
+                        {% for message in messages %}
+                        <script>
+                        swal( '{{ message }}', {
+                        button: "Close",
+                        });
+                        </script>
+                        {% endfor %} 
+                    {% endif %} 
+  {% endwith %}
+
   <section class = "vh-100">
     <div class = "container h-100 mb-5" style = "padding-bottom: 3rem;">
        <div class = "row d-flex align-items-center justify-content-center h-100">
@@ -110,20 +129,20 @@
            </div>
            <div class = "col-md-7 col-lg-5 col-xl-5 offset-x;-1">
              <div class="shadow-lg p-3 mb-5 bg-white rounded">
-               <form method = "POST">
+               <form action = "/update" method = "POST">
                    <div class = "form-outline mb-4">
                      <label class = "form-label" for = "name">Update your username</label>
-                     <input type = "text" id = "Unames" name = "Unames" class = "form-control form-control-lg"/>
+                     <input type = "text" id = "Unames" name = "Unames" class = "form-control form-control-lg" placeholder="Enter a new username"/>
                    </div>
 
                    <div class = "form-outline mb-4">
                      <label class = "form-label" for = "name">Update your email</label>
-                     <input type = "text" id = "email" name = "email" class = "form-control form-control-lg" />
+                     <input type = "text" id = "email" name = "email" class = "form-control form-control-lg" placeholder="Enter a new email ex. john123@sample.com"/>
                    </div>
 
                    <div class = "form-outline mb-4">
                     <label class = "form-label" for = "experience">Update your experience</label>
-                    <input type = "text" id = "experience" name = "experience" class = "form-control form-control-lg" />
+                    <input type = "text" id = "experience" name = "experience" class = "form-control form-control-lg" placeholder="Enter your experience (300 characters max)"/>
                    </div>
                    <button type = "submit" class = "btn btn-primary btn-lg btn-block" style = "background-color:rgb(33, 103, 42)">Update</button>
                </form>

@@ -74,7 +74,7 @@ def profile():
         #    endDate = endDateFetch[0]
             
             
-        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard)
+        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard, stockNames = session['stockNames'])
     else:
 
         redirect(url_for("login"))
@@ -87,7 +87,7 @@ def Leaderboard():
         documentRef.sort(key = itemgetter('score'), reverse=True)
         print("about to print leaderboard")
         print(documentRef)
-        return render_template("Leaderboard.html",documentRef = documentRef) #placeholder
+        return render_template("Leaderboard.html",documentRef = documentRef, stockNames = session['stockNames']) #placeholder
     else:
         redirect(url_for("login"))
 
@@ -102,7 +102,7 @@ def followList():
             followersList.extend(temp['FollowerNames'])
         splitNames = [item.split(',') for item in followersList]
         print(splitNames)
-        return render_template('followers.html',splitNames = splitNames)
+        return render_template('followers.html',splitNames = splitNames, stockNames = session['stockNames'])
     else:
         redirect(url_for("login"))
 
@@ -125,7 +125,7 @@ def followingList():
             followingList.extend(name['FollowingNames'])
         names = [item.split(',') for item in followingList]
         print(names)
-        return render_template('followingList.html', names = names)
+        return render_template('followingList.html', names = names, stockNames = session['stockNames'])
     
 #Route for the Order list - Muneeb Khan
 #@app.route("/orderList")
@@ -172,7 +172,7 @@ def login():
         #    return redirect(url_for("login"))
     else:
         print("Landing on page")
-        return render_template('login.html')
+        return render_template('login.html', stockNames = session['stockNames'])
 
 
 #Author: Miqdad Hafiz
@@ -228,12 +228,12 @@ def social():
                 print(userResult)
                 print("HERE COMES THE SESSION VARIABLE")
                 print(session['userResults'])
-                return render_template("userDisplay.html",  userResult = userResult, matching = matching, alreadyFollows = alreadyFollows)
+                return render_template("userDisplay.html",  userResult = userResult, matching = matching, alreadyFollows = alreadyFollows, stockNames = session['stockNames'])
             else:
                 print("Can't find user.")
                 flash("User not found.")
-                return render_template("social.html")
-        return render_template("social.html")
+                return render_template("social.html", stockNames = session['stockNames'])
+        return render_template("social.html", stockNames = session['stockNames'])
 
 
 
@@ -356,7 +356,7 @@ def register():
                 user = authen.create_user_with_email_and_password(email, Password)
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""], "experience": ""})
+                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""], "experience": "", "QuizScore:" : "0%"})
                 #dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
                 flash("Account Created, you will now be redirected to verify your account" , "pass")
                 flash("Account succesfully created, you may now login" , "pass")
@@ -403,6 +403,7 @@ def PasswordRecovery():
     return render_template("PasswordRecovery.html")   
 
 #Author: Viraj Kadam
+#Updated by Viraj and Muneeb
 @app.route('/update', methods = ["POST", "GET"])
 def update():
     if 'user' in session:
@@ -412,29 +413,31 @@ def update():
             newUsername = results['Unames']
             experience = results["experience"]  
             
-            doc = dbfire.collection('Users').where('Email', '==', session['user'])
-            if doc.exists:
-                checkName = dbfire.collection('Users').where('userName', '==', newUsername).get()
-                for docs in grabName.stream(): 
-                    grabName = docs.to_dict()
-                goodName = grabName['userName']
-            else:
-                goodName = "Ok"
+            checkName = dbfire.collection('Users').where('Email','==',session['user']).get()
+            for docs in checkName:
+                updatesInfo = docs.id
+                checkName = docs.to_dict()
+
+            goodName = newUsername
             
             if (len(experience) > 300):
+                print("There is a 300 character limit")
                 flash("There is a 300 character limit") #Adds experience to profile
+                return render_template('update.html')
         
-            if (goodName == newUsername):
+            elif (goodName == session['user']):
+                print("Username is already taken. Please enter a valid username.")
                 flash("Username is already taken. Please enter a valid username.") #check to see if new username is taken
+                return render_template('update.html')
             
-            try:  
-                dbfire.collection('Users').document('Name', '==', session['user']).update({"userName": newUsername, "Email": newEmail, "experience": experience})
-            
+            else:
+                dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "Email": newEmail, "experience": experience})
+                print("Account details updated")
                 flash("Account details updated", "pass")
 
                 return redirect(url_for("profile"))
-            except:
-                return redirect(url_for("update"))
+        else:
+            return render_template('update.html')
 
           
     return render_template('update.html')   
@@ -457,14 +460,14 @@ def hello(name=None):
     session['loginFlagPy'] = 0
     session['simulationFlag'] = 0
 
-    if request.method == 'GET':
-        stockNames = []
-        for entry in dbfire.collection("StockSearchInfo").get():
-            temp = entry.to_dict()
-            stockNames.append(temp['name'])
-        print(stockNames) 
+    stockNames = []
+    for entry in dbfire.collection("StockSearchInfo").get():
+        temp = entry.to_dict()
+        stockNames.append(temp['name'])
+    session['stockNames'] = stockNames
+    print(stockNames) 
     
-    return render_template("home.html",stockNames = stockNames)
+    return render_template("home.html",stockNames = session['stockNames'])
 
 ## Route for Home page - Muneeb Khan
 @app.route("/home")
@@ -475,14 +478,7 @@ def home():
         for x in person.get():
             person = x.to_dict()
 
-        if request.method == 'GET':
-            stockNames = []
-            for entry in dbfire.collection("StockSearchInfo").get():
-                temp = entry.to_dict()
-                stockNames.append(temp['name'])
-            print(stockNames) 
-
-        return render_template("home.html", person = person, stockNames = stockNames)
+        return render_template("home.html", person = person, stockNames = session['stockNames'])
     else:
         return render_template('home.html')
 
@@ -495,7 +491,7 @@ def aboutus():
         for x in person.get():
             person = x.to_dict()
 
-        return render_template("aboutus.html", person = person)
+        return render_template("aboutus.html", person = person, stockNames = session['stockNames'])
     else:
         return render_template('aboutus.html')
 
@@ -508,9 +504,9 @@ def information():
         for x in person.get():
             person = x.to_dict()
 
-        return render_template("information.html", person = person)
+        return render_template("information.html", person = person, stockNames = session['stockNames'])
     else:
-        return render_template("information.html")
+        return render_template("information.html", stockNames = session['stockNames'])
     
 @app.route("/StockDefinitions")
 def StockDefinitions():
@@ -520,9 +516,9 @@ def StockDefinitions():
         for x in person.get():
             person = x.to_dict()
 
-        return render_template("StockDefinitions.html", person = person)
+        return render_template("StockDefinitions.html", person = person, stockNames = session['stockNames'])
     else:
-        return render_template("StockDefinitions.html")
+        return render_template("StockDefinitions.html", stockNames = session['stockNames'])
 
 # Route for Graph pictures page - Muneeb Khan
 @app.route("/graphPictures")
@@ -533,9 +529,9 @@ def graphPictures():
         for x in person.get():
             person = x.to_dict()
 
-        return render_template("graphPictures.html", person = person)
+        return render_template("graphPictures.html", person = person, stockNames = session['stockNames'])
     else:
-        return render_template("graphPictures.html")
+        return render_template("graphPictures.html", stockNames = session['stockNames'])
 
 @app.route("/simulationSuggestion", methods=['POST', 'GET'])
 def simSuggest():
@@ -574,7 +570,7 @@ def startSimulation():
             return redirect(url_for('fourOhFour'))
         except IndexError:
             print("Index Error occured: " + str(IndexError))
-            return render_template('stockSimForm.html', person=session['user'])
+            return render_template('stockSimForm.html', person=session['user'], stockNames = session['stockNames'])
     else:
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
@@ -653,7 +649,7 @@ def simlists():
     if ('user' in session):
         sims, dates, scores, links = Simulation.listSims(dbfire, session['user'])             
         return render_template('simulationHistory.html', person = session['user'],sims = sims, 
-        dates = dates, scores = scores, links=links)
+        dates = dates, scores = scores, links=links, stockNames = session['stockNames'])
 
 #@app.route("/buySell/<simName>")
 #def buySell(simName):
@@ -669,7 +665,7 @@ def orderFormFill():
         session['optionType'] = 1
     session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
     session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
-    return render_template('orderForm.html', option=session['option'])
+    return render_template('orderForm.html', option=session['option'], stockNames = session['stockNames'])
 
 @app.route("/sellTaxLot/<orderID>")
 def sellTaxLot(orderID):
@@ -758,16 +754,22 @@ def stockSearch():
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
 
+
+# Function for Stock search suggestions list by Muneeb Khan
 @app.route('/_stockSearchSuggestions', methods=['POST','GET'])
 def stockSearchSuggestions():
     if ('user' in session):
+        # Will get the users input
         if request.method == 'GET':
             stockNames = []
+            # This will loop through the stock names from firebase - Muneeb Khan
             for entry in dbfire.collection("StockSearchInfo").get():
                 temp = entry.to_dict()
                 stockNames.append(temp['name'])
+
+            session['stockNames'] = stockNames # This will store the names in session list (Updated from Ian Mcnulty)
             print(stockNames) 
-            return render_template("home.html", stockNames = stockNames)
+            return render_template("home.html", stockNames = session['stockNames'])
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
@@ -880,7 +882,11 @@ def displayStock():
                             prices.append(round(mean(avgPrice), 2))
                             dates.append(stock['dates'][i][0:10])
                             avgPrice = []
-                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+                        #    if int(stock['dates'][i][11:13]) == 9:
+                        #        mod = 6
+                    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'])
+
             elif timespan == '1minute' or timespan == '5minute':
                 for entry in stockData:
                     stock = entry.to_dict()
@@ -916,7 +922,8 @@ def displayStock():
                                 if i % 30 != 0:
                                     tempDate2 = tempDate2[11:19]
                                 dates.append("".join(tempDate2))
-                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+                    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'])
             else:
                 for entry in stockData:
                     stock = entry.to_dict()
@@ -929,7 +936,8 @@ def displayStock():
                     for i in range(0, final):
                         dates.append(stock['dates'][i])
                         prices.append(stock['prices'][i])
-                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+                    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'])
         else:
             return redirect(url_for('fourOhFour'))
     else:
@@ -953,7 +961,7 @@ def stockListing():
         sim = SimulationFactory(dbfire, session['user']).simulation
         session['simName'] = sim.simName
         tickers, prices, links, names = Simulation.getAvailableStockList(dbfire, session['simName'], session['user'])
-        return render_template('stockList.html', person=session['user'], tickers=tickers, currentPrices=prices, links=links, names=names)
+        return render_template('stockList.html', person=session['user'], tickers=tickers, currentPrices=prices, links=links, names=names, stockNames = session['stockNames'])
     else:
         return redirect(url_for('stockSimFormFunction'))
 
@@ -965,7 +973,7 @@ def stockListing():
 @app.route("/stockSimForm", methods=['POST', 'GET'])
 def stockSimFormFunction():
     if 'user' in session:
-        return render_template('stockSimForm.html', person=session['user'])
+        return render_template('stockSimForm.html', person=session['user'], stockNames = session['stockNames'])
     else:
         return redirect(url_for('fourOhFour'))
 
@@ -1000,7 +1008,7 @@ def orderlists():
 
         return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
         tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list(), partiallySold=orderlist['partiallySold'].to_list(), 
-        profits=orderlist['profit'].to_list(), links=orderlist['links'].to_list())
+        profits=orderlist['profit'].to_list(), links=orderlist['links'].to_list(), stockNames = session['stockNames'])
 
 @app.route("/orderHist/<simName>")
 def orderHist(simName):
@@ -1013,16 +1021,30 @@ def orderHistory():
     orderlist = Order.orderList(dbfire, simName) # This will have the username show on webpage when logged in - Muneeb Khan
 
     return render_template('orderHistory.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
-    tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())       
+    tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list(), stockNames = session['stockNames'])       
 
 ## 
 @app.route('/404Error')
 def fourOhFour():
-    return render_template('404Error.html',person = session['user'])
+    return render_template('404Error.html',person = session['user'], stockNames = session['stockNames'])
     
 #@app.route('/startSimulation')
 #def portfolioGraph():
 #    if 'user' in session:
+
+## Route for Quiz selection page - Muneeb Khan
+@app.route("/quizselection")
+def quizselection():
+    if('user' in session): 
+        person = dbfire.collection('Users').where('Email', '==', session['user']) # This will have the username show on webpage when logged in - Muneeb Khan
+
+        for x in person.get():
+            person = x.to_dict()
+
+        return render_template("quizselection.html", person = person, stockNames = session['stockNames'])
+    else:
+        flash("Sorry you must be logged in to take the quiz.")
+        return redirect(url_for("login"))
 
 # Submission check route for Quiz by Ian Mcnulty
 # Updates by Muneeb Khan
@@ -1042,11 +1064,12 @@ def quizSubmit():
 
     score = quiz.scoreCalc()
     if score >= 7:
+        ## This will store the users quiz score on Firebase - Muneeb Khan
         yourscore = dbfire.collection('Users').where('Email', '==', session['user']).get()
         for scores in yourscore:
             updatescore = scores.id
             yourscore = scores.to_dict()
-        dbfire.collection('Users').document(updatescore).update({'QuizScore': str(score*10) + "%"})
+        dbfire.collection('Users').document(updatescore).update({'QuizScore': str(score*10) + "%"}) # Convert users score to percentage - Muneeb Khan
         flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
         " You are now ready to invest, please click the start simulation button above to start investing." +
         "Correct answers were: " +
@@ -1062,11 +1085,12 @@ def quizSubmit():
         "10 A ")
         return redirect(url_for('information', person = session['user']))
     else:
+        ## This will store the users quiz score on Firebase - Muneeb Khan
         yourscore = dbfire.collection('Users').where('Email', '==', session['user']).get()
         for scores in yourscore:
             updatescore = scores.id
             yourscore = scores.to_dict()
-        dbfire.collection('Users').document(updatescore).update({'QuizScore': str(score*10) + "%"})
+        dbfire.collection('Users').document(updatescore).update({'QuizScore': str(score*10) + "%"}) # Convert users score to percentage - Muneeb Khan
         flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
         " You need to score at least a 7/10 to pass. Please try again."  + 
         "Correct answers were: " +
@@ -1122,7 +1146,7 @@ def quizpage():
 
         return render_template('quiz.html',quiz = quiz, questions = questions, answers = answers,
         answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
-        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10)
+        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10, stockNames = session['stockNames'])
                    
     else:
         flash("Sorry you must be logged in to take the quiz.")
