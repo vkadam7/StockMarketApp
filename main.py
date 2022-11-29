@@ -165,7 +165,13 @@ def editPost(id):
     return render_template("editingPost.html", edit = edit)
 
 
-
+@app.route("/editingPost/<id>" methods = ["POST","GET"])
+def editingPost(id):
+    if('user' in session):
+        if(request.method == "POST"):
+            result = request.form
+            editedPost = result["editingthePost"]
+        return redirect(url_for('userPosts'))
 #Author: Miqdad Hafiz
 @app.route("/postBlog", methods = ["POST","GET"])
 def postBlog():
