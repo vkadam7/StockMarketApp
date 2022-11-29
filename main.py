@@ -351,21 +351,22 @@ def register():
 
         else:
 
-            try: 
-                authen.send_email_verification(user['idToken'])
-                user = authen.create_user_with_email_and_password(email, Password)
+            # try: 
+            
+            user = authen.create_user_with_email_and_password(email, Password)
+            authen.send_email_verification(user['idToken'])
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-                dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""], "experience": "", "QuizScore:" : "0%"})
+            dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""], "experience": "", "QuizScore" : "0%"})
                 #dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
-                flash("Account Created, you will now be redirected to verify your account" , "pass")
-                flash("Account succesfully created, you may now login" , "pass")
+            flash("Account Created, you will now be redirected to verify your account" , "pass")
+            flash("Account succesfully created, you may now login" , "pass")
 
-                return redirect(url_for("login"))
+            return redirect(url_for("login"))
 
-            except:
-                flash("Invalid Registration" , "fail")
-                return redirect(url_for("register"))
+            # except:
+            #     flash("Invalid Registration" , "fail")
+            #     return redirect(url_for("register"))
           
     return render_template('register.html')   
 
