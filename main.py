@@ -146,12 +146,16 @@ def userPosts():
         print(posts)
         return render_template("userPosts.html",posts = posts)
 
-@app.route("/postDelete/<id>", methods = ["POST"])
+@app.route("/postDelete/<id>", methods = ["GET"])
 def postDelete(id):
-    print(id)
+    if('user' in session):
+        print("Testing delete")
+        print(id)
+        return redirect(url_for("postBlog"))
+
 
 @app.route("/postBlog", methods = ["POST","GET"])
-def postBLog():
+def postBlog():
     if('user' in session):
         if(request.method == "POST"):
             result = request.form
