@@ -151,7 +151,8 @@ def postDelete(id):
     if('user' in session):
         print("Testing delete")
         print(id)
-        return redirect(url_for("postBlog"))
+        dbfire.collection('Blog').document(id).delete()
+        return redirect(url_for("userPosts"))
 
 
 @app.route("/postBlog", methods = ["POST","GET"])
