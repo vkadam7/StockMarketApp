@@ -319,17 +319,18 @@ def unfollow():
         flash("You have unfollowed " + userNamed)
         return redirect(url_for("social"))
 
-@app.route('/userSearchSuggestion', methods = ['POST', 'GET'])
+@app.route('/_userSearchSuggestion', methods = ['POST', 'GET'])
 def userSearchSuggestions():
     if 'user' in session:
         if request.method == 'GET':
             userNames = []
-            for users in dbfire.collection('Users').get():
-                temp = users.to_dict()
+            for search in dbfire.collection('Users').get():
+                temp = search.to_dict()
                 userNames.append(temp(['userName']))
+            session['userNames'] = userNames
             print(userNames)
             
-        return render_template('social.html', userNames = userNames)
+        return render_template('social.html', userNames = session['userNames'])
         
 #Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
@@ -634,6 +635,7 @@ def goToSimulation():
                 percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
                     Portfolio = portfolio(dbfire, entry, session['user'], session['simName'])
+                    order = Order.sellTaxLot(dbfire, session['user'], session['simName'], session['orderID'])
                     if Portfolio.quantity != 0:
                         currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
                         tickers.append(entry)
@@ -648,7 +650,7 @@ def goToSimulation():
                         percentage.append("%.2f" % round(percent, 2))
                         volatility.append("%.2f" % round(Portfolio.volatility,2))
                         links.append(Portfolio.link)
-                        buySell.append(Portfolio.newLink)
+                        buySell.append(Portfolio.buySell)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
@@ -704,8 +706,9 @@ def buyRoute(orderID):
         session['optionType'] = 1
         session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
         order = dbfire.collection('Orders').document(orderID).get().to_dict()
-        if order.get()
-        
+        if order.get('Quantity') == None:
+                session['stockQuantity'] = order['']
+
         
         session['currentAmount'] = session['stockQuantity']
         session['orderPrice'] = "%.2f" % round(float(session['stockQuantity']) * float(session['currentPrice']), 2)
