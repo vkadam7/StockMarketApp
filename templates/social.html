@@ -109,13 +109,14 @@
         <div class="d-flex justify-content-between align-items-center">
           <span class = "font-weight-bold"> Search for a user</span>
           </div>
-          <form method= "POST">
+          <form method= "GET">
           <div class = "mt-3 inputs">
             <i class = "fa fa-search"></i>
-            <input name = "searchUser" id = "searchUser" type = "text" class = "form-control" placeholder="Search for a user...">
-            <datalist id = "users">
-              {%for userNames in users%}
-                <option value = {"userNames"}></option>
+            <input name = "searchUser" id = "searchUser" type = "search" class = "form-control" list = "userNames" value = "{{request.form['searchTerm']}}"
+             placeholder="Search for a user...">
+            <datalist id = "userNames">
+              {%for users in userNames%}
+                <option value = {"users"}/>
               {%endfor%}
 
           </div>
