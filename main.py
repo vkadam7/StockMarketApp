@@ -423,10 +423,12 @@ def update():
             if (len(experience) > 300):
                 print("There is a 300 character limit")
                 flash("There is a 300 character limit") #Adds experience to profile
+                return render_template('update.html')
         
             elif (goodName == session['user']):
                 print("Username is already taken. Please enter a valid username.")
                 flash("Username is already taken. Please enter a valid username.") #check to see if new username is taken
+                return render_template('update.html')
             
             else:
                 dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "Email": newEmail, "experience": experience})
@@ -435,7 +437,7 @@ def update():
 
                 return redirect(url_for("profile"))
         else:
-                return render_template('update.html')
+            return render_template('update.html')
 
           
     return render_template('update.html')   
