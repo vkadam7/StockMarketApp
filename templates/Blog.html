@@ -30,8 +30,13 @@
                   <li class="nav-item">
                     <a class="nav-link" href="aboutus">About Us</a>
                   </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="information">Information</a>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Information Pages</a>
+                    <ul class = "dropdown-menu">
+                      <li><a class ="dropdown-item" href="information">Information</a></li>
+                      <li><a class ="dropdown-item" href="graphPictures">Graph Pictures</a></li>
+                      <li><a class ="dropdown-item" href="StockDefinitions">Stock Definitions</a></li>
+                    </ul>
                   </li>
                   {% if session['user'] %}
           <li class="nav-item">
@@ -99,7 +104,7 @@
 <div class="panel">
   <div class="panel-body">
     <form action = "/postBlog" method = "POST">
-    <textarea class="form-control w-100" name = "blogPost" rows="2" placeholder="Share your thoughts"></textarea>
+    <textarea class="form-control w-100" name = "blogPost" rows="3" placeholder="Share your thoughts"></textarea>
     <br>
     <div class="mar-top clearfix">
       <button class="btn btn-sm btn-primary pull-right" style = "background-color:rgb(33, 103, 42);color:WHITE;" type="submit"><i class="fa fa-pencil fa-fw"></i> Post</button>
