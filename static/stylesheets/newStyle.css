@@ -23,7 +23,7 @@ body {
 }
 
 h1{
-  text-align: center;
+  text-align:center;
   font-size: large;
 }
 
@@ -425,4 +425,9 @@ table{
 }
 .h-100 {
   height: 100%!important;
+}
+
+#posting{
+  padding: 10px;
+  margin:10px;
 }

@@ -2,12 +2,13 @@ from asyncio.windows_events import NULL
 #from crypt import methods
 #from crypt import methods
 #from re import T
-from datetime import datetime
+from datetime import datetime,date
 import math
 from operator import itemgetter, mod
 import re
 from statistics import mean
 from datetime import timedelta
+import datetime
 #from django.shortcuts import render
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
@@ -49,7 +50,6 @@ def sessionFlagCheck(loginFlag, simFlag):
     print("simulationFlag is: " + str(simFlag))
 
 #Author: Miqdad Hafiz
-#
 @app.route("/profile")
 def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
@@ -73,12 +73,130 @@ def profile():
         #    startDate = startDateFetch[0]
         #    endDate = endDateFetch[0]
             
+
+        followingArray = []
+        userF = dbfire.collection('Users').where('Email', '==', session['user'])
+        for docs in userF.stream():
+            userF = docs.to_dict()
+            followingArray.extend(userF['FollowingNames'])
+        #print("Printing miqdads following list ")
+        #print(followingArray)
+
+
+        #print("Here comes the leaderboard hopefully")
+        personalLB1 = []
+        for x in followingArray:
+            personalLB = dbfire.collection('Leaderboard').where('username', '==', x).get()
+            for docus in personalLB:
+                personalLB = docus.to_dict()
+                personalLB1.append(personalLB)
+                
+        #print("Here comes personal B")
+        #print(personalLB1)    
             
-        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard, stockNames = session['stockNames'])
+        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard, stockNames = session['stockNames'],personalLB1 = personalLB1)
+
     else:
 
         redirect(url_for("login"))
 
+#Author: Miqdad Hafiz
+@app.route("/Blog", methods = ["POST","GET"])
+def Blog():
+    if('user' in session):
+        followingArray = []
+        userF = dbfire.collection('Users').where('Email', '==', session['user'])
+        for docs in userF.stream():
+            userF = docs.to_dict()
+            followingArray.extend(userF['FollowingNames'])
+        print("Printing user's following list ")
+        print(followingArray)
+
+        print("Here comes the BLOG.")
+        blog = []
+        for x in followingArray:
+            showBlog = dbfire.collection('Blog').where('Author', '==', x).get()
+            for docus in showBlog:
+                showBlog = docus.to_dict()
+                #post.append(showBlog['Post'])
+                showBlog['DatePosted'] = str(datetime.datetime.fromtimestamp(showBlog['DatePosted'].timestamp()).strftime("%Y-%m-%d"))
+                blog.append(showBlog)
+        
+        print("Here comes personal B")
+        blog.sort(key = itemgetter('DatePosted'), reverse=True)
+        print(blog)   
+        return render_template("Blog.html", blog = blog)
+
+#Author: Miqdad Hafiz
+@app.route("/userPosts", methods = ["POST","GET"])
+def userPosts():
+    if('user' in session):
+        user = dbfire.collection('Users').where('Email', '==', session['user'])
+        for doc in user.stream():
+            user = doc.to_dict()
+        author = user['userName']
+
+        posts = []
+        userPost = dbfire.collection('Blog').stream()
+        for docs in userPost:
+            userPost = docs.to_dict()
+            if(userPost['Author'] == author):
+                userPost['DatePosted'] = str(datetime.datetime.fromtimestamp(userPost['DatePosted'].timestamp()).strftime("%Y-%m-%d"))
+                userPost['DocID'] = docs.id
+                posts.append(userPost)
+        posts.sort(key = itemgetter('DatePosted'), reverse=True)
+        print(posts)
+        return render_template("userPosts.html",posts = posts)
+
+
+#Author: Miqdad Hafiz
+@app.route("/postDelete/<id>", methods = ["GET"])
+def postDelete(id):
+    if('user' in session):
+        print("Testing delete")
+        print(id)
+        dbfire.collection('Blog').document(id).delete()
+        flash("Your post has been deleted.")
+        return redirect(url_for("userPosts"))
+
+#Author: Miqdad Hafiz
+@app.route("/editPost/<id>",methods = ["POST","GET"])
+def editPost(id):
+    edit = dbfire.collection('Blog').document(id).get()
+    edit = edit.to_dict()
+    edit['DocID'] = id
+    return render_template("editingPost.html", edit = edit)
+
+
+@app.route("/editingPost/<id>", methods = ["POST","GET"])
+def editingPost(id):
+    if('user' in session):
+        if(request.method == "POST"):
+            result = request.form
+            editedPost = result["editingthePost"]
+            
+            
+            dbfire.collection('Blog').document(id).update({'Post': editedPost})
+            flash("Post has been updated.")
+        return redirect(url_for('userPosts'))
+#Author: Miqdad Hafiz
+@app.route("/postBlog", methods = ["POST","GET"])
+def postBlog():
+    if('user' in session):
+        if(request.method == "POST"):
+            result = request.form
+            post = result["blogPost"]
+            results = dbfire.collection('Users').where('Email', '==', session['user'])
+            for docs in results.stream():
+                results = docs.to_dict()
+            Author = results['userName']
+           
+            dbfire.collection('Blog').add({"Author": Author,"DatePosted":firestore.SERVER_TIMESTAMP,"Post":post,"Likes":0})
+            flash("Your submission has been posted.")
+    return render_template("postBlog.html")
+
+
+#Author: Miqdad Hafiz
 @app.route("/Leaderboard")
 def Leaderboard():
     if('user' in session):
@@ -1153,6 +1271,5 @@ def quizpage():
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
 
-    
 if __name__ == '__main__':
     app.run(debug=True)
