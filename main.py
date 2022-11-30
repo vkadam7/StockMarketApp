@@ -281,7 +281,7 @@ def login():
         else:
             session['simulationFlag'] = 0
         sessionFlagCheck(session['loginFlagPy'], session['simulationFlag'])
-        flash("Log in succesful.", "pass")
+        flash("Login successful!", "pass")
         print("Login successful.")
         return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         #except:
@@ -455,14 +455,14 @@ def register():
         
         # If else conditions to check the password requirements - Muneeb Khan
         if (len(Password) < 6 or len(Password) > 20 or digits == 0 or specials == 0):
-            flash("Invalid Password! must contain the following requirements: ")
+            flash("Invalid Password! Must contain the following requirements: ")
             flash("6 characters minimum")
             flash("20 characters maximum")
             flash("at least 1 digit")
             flash("at least 1 special character ('!','@','#', or '$'")
         
         elif (Password != confirmPass): # If password and cofirm password don't match
-            flash("You're password do not match. Please enter the same password for both fields.")
+            flash("Your password submissions do not match. Please enter the same password for both fields.")
         
         elif (uniqueName == UseN):
             flash("Username is already taken. Please enter a valid username.") #check to see if username is taken
@@ -477,8 +477,8 @@ def register():
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
             dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""], "experience": "", "QuizScore" : "0%"})
                 #dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
-            flash("Account Created, you will now be redirected to verify your account" , "pass")
-            flash("Account succesfully created, you may now login" , "pass")
+            flash("Account created, you will now be redirected to verify your account!" , "pass")
+            flash("Account succesfully created, you may now login!" , "pass")
 
             return redirect(url_for("login"))
 
@@ -513,10 +513,10 @@ def PasswordRecovery():
         email = result["email"]
         try:
             user = authen.send_password_reset_email(email) # Will send the notification to the provided email - Muneeb Khan
-            flash("Password reset notification was sent to your email", "pass")
+            flash("Password reset notification was sent to your email.", "pass")
             return redirect(url_for("login"))
         except:
-            flash("Email not found" , "fail")
+            flash("Email not found, please enter a valid email." , "fail")
             return redirect(url_for("PasswordRecovery"))
           
     return render_template("PasswordRecovery.html")   
@@ -540,8 +540,8 @@ def update():
             goodName = newUsername
             
             if (len(experience) > 300):
-                print("There is a 300 character limit")
-                flash("There is a 300 character limit") #Adds experience to profile
+                print("There is a 300 character limit.")
+                flash("There is a 300 character limit.") #Adds experience to profile
                 return render_template('update.html')
         
             elif (goodName == session['user']):
@@ -568,7 +568,7 @@ def logout():
     session.pop('user')
     session['loginFlagPy'] = 0
     session['simulationFlag'] = 0
-    flash('logout succesful','pass')
+    flash('Logout successful!','pass')
     return redirect(url_for("login"))
 
 #Home
