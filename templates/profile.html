@@ -38,22 +38,19 @@
                       <li><a class ="dropdown-item" href="StockDefinitions">Stock Definitions</a></li>
                     </ul>
                   </li>
-                  {% if session['user'] %}
-          <li class="nav-item">
-            <a class = "nav-link active" method = "POST" href = "profile">Profile</a> 
-          </li>
-        </li class = "nav-item">
-            <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
-         </li>
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
-          </li>
-          </li class = "nav-item">
-            <a class = "nav-link" method = "POST" href = "update">Update</a>
-          </li>
-          <li class="nav-item">
-            <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
-          </li>
+        {% if session['user'] %}
+        <li class="nav-item">
+          <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
+        </li>
+      </li class = "nav-item">
+          <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
+       </li>
+        <li class="nav-item">
+          <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
+        </li>
+        <li class="nav-item">
+          <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
+        </li>
           <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
             <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
               <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Start a simulation!</button>
@@ -66,7 +63,7 @@
           </li>
           <li>
             <form id="nav-link" action="/simulation" method="post"> 
-              <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="goToSim">Go to Current Sim!</button>
+              <button class = "btn btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="goToSim">Go to Current Sim!</button>
             </form>
             <script type="text/javascript">
               if ({{ session['simulationFlag'] }} == 0 ) { 
@@ -74,7 +71,6 @@
               }
             </script>  
           </li>
-
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -83,7 +79,7 @@
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
         {% endif %}
-      </ul>
+                </ul>
                 <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
                 <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
             <script type="text/javascript">
@@ -93,7 +89,7 @@
               }
             </script>  
                 <form action="/stockSearch" method="post">
-          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" list = "stockNames" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
                   <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
       </form>
@@ -103,7 +99,7 @@
     </header>
 
 
-<br><br><br><br><br><br>
+<br>
 
 <body>
 
@@ -170,7 +166,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Name</h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary">
+                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
                     {{results['Name']}}  
                   </div>  
                 </div>
@@ -179,7 +175,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Email</h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary">
+                  <div class = "col-sm-9 text-secondary" style = "text-align: left;">
                     {{results['Email']}} 
                   </div> 
                 </div> 
@@ -188,11 +184,22 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Username</h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary">
+                  <div class = "col-sm-9 text-secondary" style = "text-align: left;">
                     {{results['userName']}} 
                   </div> 
-
-                  <a href = "update" class = "btn btn-secondary btn-sm">Update</a>
+                </div> 
+                <hr>
+                <div class = "row">
+                  <div class = "col-sm-3">
+                    <h6 class = "mb-0">My Experience</h6>  
+                  </div>
+                  <div class = "col-sm-9 text-secondary" style = "text-align: left;">
+                    {{results['experience']}} 
+                  </div> 
+                  <div class = "col-sm 9 text-secondary" style = "text-align: center;">
+                    <br>
+                  <a href = "update" class = "btn btn-secondary btn-sm" style="width: 25%;">Update</a>
+                  </div>
                 </div>
                 
 
@@ -204,8 +211,8 @@
                   <div class="card mb-3">
                     <div class="card-body">
                       <div class = "row">
-                  <div class = "col-sm-3">
-                    <h6 class = "mb-0">Simulation Info</h6>  
+                  <div class = "col-sm-3" style = "text-align: center;">
+                    <h5 class = "mb-0">Simulation Info</h5>  
                   </div>  
                 </div>
                 <hr>
@@ -213,7 +220,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Start Date</h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary">
+                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
                     {{cash['startDate']}}  
                   </div> 
                 </div> 
@@ -222,7 +229,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">End Date </h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary">
+                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
                     {{ cash['endDate'] }} 
                   </div> 
                 </div>
@@ -233,7 +240,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Score </h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary">
+                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
                     {{ leaderboard['score'] }} 
                   </div> 
                 </div>
@@ -244,6 +251,8 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Days Remaining </h6>  
                   </div>
+                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
+                    {{daysRemaining}} 
                   <div class = "col-sm-9 text-secondary">
                     {{delta}} 
                   </div> 
@@ -254,7 +263,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Current holding </h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary">
+                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
                     {{ cash['currentCash'] }} 
                   </div> 
                 </div>
@@ -262,9 +271,19 @@
                 <hr>
                 <div class = "row">
                   <div class = "col-sm-3">
-                    <h6 class = "mb-0">Quiz Score</h6>  
+                    <h6 class = "mb-0">Quiz 1 Score</h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary">
+                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
+                    {{ results['QuizScore'] }} 
+                  </div> 
+                </div>
+                </hr>
+                <hr>
+                <div class = "row">
+                  <div class = "col-sm-3">
+                    <h6 class = "mb-0">Quiz 2 Score</h6>  
+                  </div>
+                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
                     {{ results['QuizScore'] }} 
                   </div> 
                 </div>
@@ -286,7 +305,9 @@
       <div class = "col-md-6">
           <div class = "card mb-4 mb-md-0" style = "border-radius: .5rem;">
             <div class = "card-body">
-            <a class "nav-link"  href= "/simulationHistory">Simulation History</a>
+            <h5>To see you orders from past simulations, please click the button below</h5>
+            <br>
+            <a class = "btn-block btn-lg btn-warning" style = "color:black;"  href= "/simulationHistory">Simulation History</a>
             </div>
           </div>
         </div>

@@ -57,6 +57,11 @@
                 <form action="/stockSearch" method="post">
                   <input type="search" name="searchTerm" placeholder="Find a stock..."
                           value="{{ request.form['searchTerm'] }}">
+                          <datalist id = "stockNames">
+                            {% for stockname in stockNames%}
+                                <option value = "{{stockname}}" />
+                            {% endfor %}
+                          </datalist>
                           <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
                         </form>
               </div>        
@@ -64,7 +69,7 @@
           </nav>
     </header>
 
-<br><br><br><br><br><br>
+<br>
 
 <body>
     <section>

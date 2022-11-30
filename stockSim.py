@@ -994,7 +994,6 @@ class portfolio:
         self.volatility = 0
         self.buyForm = str('/buyOrder')
         self.sellForm = str('/stockSell')
-        #self.sellForm = str('/sellForm')
 
     def getVariables(self):
         currentPriceOfStock = SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock)

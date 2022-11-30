@@ -89,8 +89,13 @@
               }
             </script>  
                 <form action="/stockSearch" method="post">
-          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" list = "stockNames" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
+                  <datalist id = "stockNames">
+                  {% for stockname in stockNames%}
+                      <option value = "{{stockname}}" />
+                  {% endfor %}
+                   </datalist>
                   <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
       </form>
             </div>        
@@ -183,7 +188,7 @@
                     orderListCell.appendChild(orderListLink);
 
                   }
-                  i = i + 1;
+                  
                 }
                 for (key in element){
                   if (i < 7 || element[key] == "Buy"){
@@ -208,7 +213,7 @@
                     buyListLink.appendChild(buyListLinkText);
                     buyListCell.appendChild(buyListLink);
                   }
-                  i = i + 1;
+                
 
 
                 }
@@ -236,11 +241,12 @@
                   sellListLink.appendChild(sellListLinkText);
                   sellListCell.appendChild(sellListLink);
                 }
+                
+
                 i = i + 1;
-
-
           
               }
+            
             }
           }
         }
