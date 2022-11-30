@@ -96,60 +96,27 @@
         <br><br><br>
         
         <h3>People You Follow</h3>
-        <div class = "followinglist">
-          <div class="row justify-content-center">
+        <div class = "container-fluid w-50" id = "centers">
+          <div class="justify-content-center mt-5">
+            <div class = "card">
+              <div class = "d-flex justify-content-between align-items-center">
           <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
 
             <thead class = "bg-light">
-              <tr><th>Name: </th></tr>
+              <tr><th>Name:</th></tr>
             </thead>
             {%for user in names%}
             <tbody>
               <tr>
-                <td> <h3> {{user[0]}}</h3></td>
+                <td>{{user[0]}}</td>
               </tr>
             </tbody>
-            {%endfor%}
-
+            {% endfor %}
            </table>
-
-          <script type="text/javascript">
-           <!-- let followingList = {{followingList|safe}};
-
-            let list = [];
-            
-            for (let i = 0; i < followingList.length; i++) {
-              list.push({
-                Name: followingList[i]
-              })
-            }
-
-            function generateFollowinglist(table, data, keys) {
-              let thead = table.createTHead();
-              let row = thead.insertRow();
-              for (let key of keys) {
-                let th = document.createElement("th");
-                let text = document.createTextNode(key);
-                th.appendChild(text);
-                row.appendChild(th);
-              }
-              for (let element of data) {
-                let row = table.insertRow();
-                for (key in element) {
-                  let cell = row.insertCell();
-                  let text = document.createTextNode(element[key]);
-                  cell.appendChild(text);
-                }
-              }
-            }
-
-            let table = document.querySelector("table");
-            let data = Object.keys(list[0]);
-            generateOrderlist(table, list, data); -->
-
-
-            </script>
           </div>
+        </div>
+      </div>
+    </div>
           <br><br>
           <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
         <div class="container">

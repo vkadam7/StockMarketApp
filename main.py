@@ -117,24 +117,15 @@ def followList():
 
 @app.route("/followingList")
 def followingList():
-    if 'user' in session:
-        #followingList = []
-        #for entry in dbfire.collection('Users').where('Name', '==', session['user']).stream():
-        #    following = entry.to_dict()
-        #    followingList.extend(following['FollowingNames'])
-            
-        #followingListNames = []
-        
-        #return render_template('followingList.html', followingList = followingList)
-        
+    if 'user' in session: 
         followingList= []
         
         for name in dbfire.collection('Users').where('Name', '==', session['user']).stream():
             temp = name.to_dict()
-            followingList.extend(name['FollowingNames'])
+            followingList.extend(temp['FollowingNames'])
         names = [item.split(',') for item in followingList]
         print(names)
-        return render_template('followingList.html', names = names)
+        return render_template('followingList.html', names = names )
     else:
         return redirect(url_for('profile'))
     
@@ -630,12 +621,12 @@ def goToSimulation():
                 percentage = []
                 volatility = []
                 links = []
-                buySell = []
+                buySellLink = []
                 
                 percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
                     Portfolio = portfolio(dbfire, entry, session['user'], session['simName'])
-                    order = Order.sellTaxLot(dbfire, session['user'], session['simName'], session['orderID'])
+                    #order = Order.sellTaxLot(dbfire, session['user'], session['simName'], session['orderID'])
                     if Portfolio.quantity != 0:
                         currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
                         tickers.append(entry)
@@ -650,7 +641,7 @@ def goToSimulation():
                         percentage.append("%.2f" % round(percent, 2))
                         volatility.append("%.2f" % round(Portfolio.volatility,2))
                         links.append(Portfolio.link)
-                        buySell.append(Portfolio.buySell)
+                        buySellLink.append(Portfolio.buySellForm)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
@@ -658,7 +649,7 @@ def goToSimulation():
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
                 currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue,
-                percentage=percentage, links=links, buySell = buySell)  
+                percentage=percentage, links=links, buySellLink = buySellLink)  
             else:
                 return redirect(url_for('.finishSimulation'))
         except KeyError:
@@ -698,27 +689,44 @@ def orderFormFill():
     return render_template('orderForm.html', option=session['option'])
 
 
-@app.route("/buyOrder/<orderID>")
+@app.route("/buyOrder/")
 def buyRoute(orderID):
     if 'user' in session:
         session['option'] = 'Buy'
         session['orderId'] = orderID
-        session['optionType'] = 1
+        session['optionType'] = 0
         session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
-        order = dbfire.collection('Orders').document(orderID).get().to_dict()
-        if order.get('Quantity') == None:
-                session['stockQuantity'] = order['']
-
-        
         session['currentAmount'] = session['stockQuantity']
         session['orderPrice'] = "%.2f" % round(float(session['stockQuantity']) * float(session['currentPrice']), 2)
-        return render_template('orderConfirmation.html')
+        order = Order(dbfire, session['simName'], session['ticker'], 
+                        session['option'], session['orderQuantity'], session['currentPrice'])
+        if session['optionType'] == 0:
+            flag = order.buyOrder()
+        else:
+            return
+        return render_template('orderForm.html', option = session['option'])
 
-@app.route('/stockSell/<orderID>')
-def stockSell(orderID):
+@app.route('/stockSell')
+def stockSellRoute(orderID):
     if 'user' in session:
         session['option'] = 'Sell'
         session['orderID'] = orderID
+        session['optionType'] = 1
+        session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
+        session['orderPrice'] = "%.2f" % round(float(session['stockQuantity']) * float(session['currentPrice']), 2)
+        session['currentAmount'] = session['stockQuantity']
+        order = Order(dbfire, session['simName'], session['ticker'], 
+                        session['option'], session['orderQuantity'], session['currentPrice'])
+        return render_template('orderForm.html', option = session['option'])
+    
+#@app.route('buySellRoute')
+#def buySellRoute():
+#    if 'user' in session:
+#        if session['option'] == 'Buy':
+             
+    
+        
+        
         
 
 @app.route("/sellTaxLot/<orderID>")
@@ -990,8 +998,6 @@ def orderlists():
         buySellButtons = []
         for entry in Order.stocksBought(dbfire,session['simName']):
             Portfolio = portfolio(dbfire,entry,session['user'],session['simName'])
-            if Portfolio.quantity != 0:
-                buySellButtons.append(Portfolio.newLink)
 
         return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
         tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list(), partiallySold=orderlist['partiallySold'].to_list(), 
