@@ -990,7 +990,7 @@ class portfolio:
         self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
         self.profit, self.avgSharePrice, self.quantity = self.getVariables()
         self.volatility = 0
-        self.newLink = str('/orderConfirm?ticker= ' + stock+ '&timespan=hourly')
+        self.newLink = str('/orderConfirm?ticker =' + stock + '&timespan=hourly')
 
     def getVariables(self):
         currentPriceOfStock = SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock)

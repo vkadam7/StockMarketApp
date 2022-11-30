@@ -26,8 +26,13 @@
                 <li class="nav-item">
                   <a class="nav-link" href="aboutus">About Us</a>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="information">Information</a>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Information Pages</a>
+                  <ul class = "dropdown-menu">
+                    <li><a class ="dropdown-item" href="information">Information</a></li>
+                    <li><a class ="dropdown-item" href="graphPictures">Graph Pictures</a></li>
+                    <li><a class ="dropdown-item" href="StockDefinitions">Stock Definitions</a></li>
+                  </ul>
                 </li>
       {% if session['user'] %}
       <li class="nav-item">
@@ -81,8 +86,13 @@
               }
             </script>  
                 <form action="/stockSearch" method="post">
-          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" list = "stockNames" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
+                  <datalist id = "stockNames">
+                  {% for stockname in stockNames%}
+                      <option value = "{{stockname}}" />
+                  {% endfor %}
+                   </datalist>
                   <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
       </form>
             </div>        
