@@ -10,6 +10,7 @@
     <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
     </head>
     <header>
       <a class="navbar-brand" href="home" style = "color: black; padding: 10px;">
@@ -126,6 +127,44 @@
   </div>
 </div>
 
+<div class="container bootdey">
+<div class="col-md-12 bootstrap snippets">
+<div class="panel">
+  <div class="panel-body">
+    <textarea class="form-control" rows="2" placeholder="What are you thinking?"></textarea>
+    <div class="mar-top clearfix">
+      <button class="btn btn-sm btn-primary pull-right" type="submit"><i class="fa fa-pencil fa-fw"></i> Share</button>
+    </div>
+  </div>
+</div>
+<div class="panel">
+    <div class="panel-body">
+    <!-- Newsfeed Content -->
+    <!--===================================================-->
+    <div class="media-block">
+      
+      <div class="media-body">
+        <div class="mar-btm">
+          <a href="#" class="btn-link text-semibold media-heading box-inline">Lisa D.</a>
+          <p class="text-muted text-sm"><i class="fa fa-mobile fa-lg"></i> - From Mobile - 11 min ago</p>
+        </div>
+        <p>consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.</p>
+        <div class="pad-ver">
+          <div class="btn-group">
+            <a class="btn btn-sm btn-default btn-hover-success" href="#"><i class="fa fa-thumbs-up"></i></a>
+            <a class="btn btn-sm btn-default btn-hover-danger" href="#"><i class="fa fa-thumbs-down"></i></a>
+          </div>
+          
+        </div>
+        <hr>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+</div>
+</div>
 
 </main>
 {% with messages = get_flashed_messages() %}
