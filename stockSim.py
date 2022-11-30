@@ -992,8 +992,8 @@ class portfolio:
         self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
         self.profit, self.avgSharePrice, self.quantity = self.getVariables()
         self.volatility = 0
-        self.buyForm = str('/buyOrder')
-        self.sellForm = str('/stockSell')
+        self.buyForm = str('/buyOrder?ticker='+stock)
+        self.sellForm = str('/stockSell?ticker='+stock)
         #self.sellForm = str('/sellForm')
 
     def getVariables(self):

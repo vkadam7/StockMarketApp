@@ -681,7 +681,9 @@ def simlists():
 
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
-    session['option'] = request.form['option']
+    option = request.form.get('option', None)
+    if option != None:
+        session['option'] = request.form['option']
     if session['option'] == 'Buy':
         session['optionType'] = 0
     else:
@@ -694,20 +696,20 @@ def orderFormFill():
 @app.route("/buyOrder")
 def buyRoute():
     if 'user' in session:
+        session['ticker'] = request.args['ticker']
         session['option'] = 'Buy'
         session['optionType'] = 0
-        order = Order(dbfire, session['simName'], session['ticker'], 
-                        session['option'], session['orderQuantity'], session['currentPrice'])
-        return render_template('orderForm.html', option = session['option'])
+        session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
+        return redirect(url_for('.orderFormFill'))
 
 @app.route("/stockSell")
 def stockSellRoute():
     if 'user' in session:
+        session['ticker'] = request.args['ticker']
         session['option'] = 'Sell'
         session['optionType'] = 1
-        order = Order(dbfire, session['simName'], session['ticker'], 
-                        session['option'], session['orderQuantity'], session['currentPrice'])
-        return render_template('orderForm.html', option = session['option'])   
+        session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
+        return redirect(url_for('.orderFormFill'))
     
 @app.route("/sellTaxLot/<orderID>")
 def sellTaxLot(orderID):
