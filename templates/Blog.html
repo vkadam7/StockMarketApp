@@ -141,24 +141,25 @@
     <div class="panel-body">
     <!-- Newsfeed Content -->
     <!--===================================================-->
+    {% for user in blog %}
     <div class="media-block">
       
       <div class="media-body">
         <div class="mar-btm">
-          <a href="#" class="btn-link text-semibold media-heading box-inline">Lisa D.</a>
-          <p class="text-muted text-sm"><i class="fa fa-mobile fa-lg"></i> - From Mobile - 11 min ago</p>
+          <h4 style = "text-align: left;"> {{user['Author']}} </h4>
+          <p class="text-muted text-sm"> 11 min ago</p>
         </div>
         <p>consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.</p>
         <div class="pad-ver">
           <div class="btn-group">
             <a class="btn btn-sm btn-default btn-hover-success" href="#"><i class="fa fa-thumbs-up"></i></a>
-            <a class="btn btn-sm btn-default btn-hover-danger" href="#"><i class="fa fa-thumbs-down"></i></a>
           </div>
           
         </div>
         <hr>
         </div>
       </div>
+      {% endfor %}
     </div>
     
   </div>
