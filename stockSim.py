@@ -9,24 +9,9 @@ import numpy as np
 import pandas as pd
 import firebase_admin
 from firebase_admin import firestore
-from google.cloud.firestore import ArrayUnion
 import datetime
 
 import math
-
-
-
-
-
-#import matplotlib as plt
-#import matplotlib.animation as animation
-#import matplotlib.pyplot as plt
-#from matplotlib import style
-#import math
-#import mpld3
-#from mpld3 import plugins
-
-
 
 DAYS_IN_MONTH = {
     1 : 31,
@@ -43,10 +28,16 @@ DAYS_IN_MONTH = {
     12 : 31
 }
 
+## Class: StockData
+#   Description: Class used to manage data obtained from the Stocks collection in the database
+#
+#   Dependencies: firebase_admin, numpy
+#
+#   Authors: Ian McNulty, Muneeb Khan  
 class StockData:
-    ## StockData __init__
+    ## StockData.__init__
     #   Description: Initiates a StockData object with Database and 
-    #   requested stock, for display
+    #   requested stock
     #
     #   Inputs: db - Database object, connected to Firestore
     #           req - Key for requested stock
@@ -188,10 +179,9 @@ class StockData:
                                     self.volumes[i]])
             return dataMatrix
         except IndexError:
-            #print("One of the selected dates are unavailable")
             return -1
 
-    ## checkDate
+    ## StockData.checkDate
     #   Description: Checks the given date to see if it is the end of the selected
     #   timespan, for example, if the current day is the 31st, then it is the end 
     #   of the month or if today is the 7th and the next day in the data is more 
@@ -223,9 +213,9 @@ class StockData:
         else:
             return False
             
-    ## stockJSON
+    ## StockData.stockJSON - DEPRECATED
     #   Description: Returns a dictionary of values to be used with the stockView
-    #   HTML template
+    #   HTML template 
     #
     #   Author: Ian McNulty
     def stockJSON(self):
@@ -244,7 +234,7 @@ class StockData:
         }
         return stock
 
-    ## StockData retrieve
+    ## StockData.retrieve
     #   Description: Retrieves data from Firestore database according
     #   to requested stock ID.
     #
@@ -409,7 +399,13 @@ class StockData:
         except KeyError:
             return 'This data entry does not exist'
 
-    # Stock availability by Muneeb Khan
+    ## StockData.stockList
+    #   Description: Gets a list of available stock tickers from the Stocks collection
+    #   in the database
+    #
+    #   Inputs: db - Link to the Firestore Database
+    # 
+    #   Author: Muneeb Khan
     def stockList(db):
 
         tickers = []
@@ -419,12 +415,19 @@ class StockData:
 
         return tickers
 
-    ## stockSearch
+    ## StockData.stockSearch
     #   Description: Checks to see if that stock exists in the database yet,
-    #   according to the ID (ticker)
+    #   according to the ticker and simulation ID, returns a boolean value representing
+    #   whether the search term was found or not and the ticker of the stock found
     #
     #   Inputs: db - Link to the database
-    #   ticker - stock ticker to be searched for in database
+    #   searchTerm - String to be searched for in the database
+    #   simName - ID of the simulation to be matched
+    #
+    #   Returns: True, if found
+    #            Stock ticker String, if found
+    #            False, if not found
+    #            -1, if not found
     #
     #   Author: Ian McNulty
     def stockSearch(db, searchTerm, simName):
@@ -462,8 +465,25 @@ class StockData:
                     return True, ticker.upper()
 
         return False, -1
-        
+
+## Class: Simulation
+#   Description: Class used to manage Simulation entries and data from the Firestore database
+#
+#   Dependencies: firebase_admin, numpy, StockData, Order, portfolio, SimulationFactory
+#
+#   Authors: Ian McNulty, Muneeb Khan  
 class Simulation:
+    ## Simulation.__init__
+    #   Description: Initiates a Simulation object with inputs, not to be used to retrieve ongoing
+    #   simulations
+    #
+    #   Inputs: db - Database object, connected to Firestore
+    #           req - String, user to relate with this Simulation
+    #           startDate - String, starting date of the Simulation
+    #           endDate - String, ending date of the Simulation
+    #           initialCash - Integer, starting amount of cash usable in this Simulation
+    #
+    #   Author: Ian McNulty
     def __init__(self, db, user, startDate, endDate, initialCash):
         self.db = db
         self.user = user
