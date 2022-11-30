@@ -58,6 +58,7 @@
               }
             </script>  
           </li>
+
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -65,13 +66,22 @@
           <li class = "nav-item">
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
+          
         {% endif %}
-                </ul>
+      </ul>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('currentCashNav').style.display = "none";
+                document.getElementById('portfolioValueNav').style.display = "none";
+              }
+            </script>  
                 <form action="/stockSearch" method="post">
-                    <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
-                            value="{{ request.form['searchTerm'] }}">
-                            <button class = "btn btn-block" style = "background-color: rgb(68, 115, 233);color:rgb(255, 255, 255);">Display Stock</button>
-                </form>
+          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+                  value="{{ request.form['searchTerm'] }}">
+                  <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
+      </form>
               </div>        
             </div>
           </nav>
@@ -81,18 +91,20 @@
 
     <body>
         <div class = "centering">
-            <h1>Quiz:</h1>
-            <h4>Ready to test your knowledge?</h4>
+            <h1>Quiz selection</h1>
             <hr>
         </div>
           <div class = "card w-75" style= "padding-top: 10px; padding-bottom: 10px;">
             <div class="container">
               <form action = "/quizSelection" method ="POST">
-                <h2>Choose a quiz below</h2>
-                        <a href = quiz>Quiz 1</a> <p>Your last score on this quiz was "insert quiz 1 score here"</p>
-                        <br>
-                        <a href = quiz2>Quiz 2</a> <p>Your last score on this quiz was "insert quiz 2 score here"</p>
-                        <br>
+                <h2>Please select a Quiz to begin</h2>
+                  <br>
+                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "quiz">Quiz 1</a></h5> 
+                    <br><h5>Your last score on this quiz was {{person['QuizScore']}}</h5>
+                    <br><br>
+                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "quiz2">Quiz 2</a></h5> 
+                    <br><h5>Your last score on this quiz was {{person['QuizScore']}}</h5>
+                    <br>
               </form>
             </div>
             </div>

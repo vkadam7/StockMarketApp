@@ -32,8 +32,13 @@
                   <li class="nav-item">
                     <a class="nav-link" href="aboutus">About Us</a>
                   </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="information">Information</a>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Information Pages</a>
+                    <ul class = "dropdown-menu">
+                      <li><a class ="dropdown-item" href="information">Information</a></li>
+                      <li><a class ="dropdown-item" href="graphPictures">Graph Pictures</a></li>
+                      <li><a class ="dropdown-item" href="StockDefinitions">Stock Definitions</a></li>
+                    </ul>
                   </li>
         {% if session['user'] %}
         <li class="nav-item">
@@ -80,6 +85,11 @@
                 <form action="/stockSearch" method="post">
                     <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
                             value="{{ request.form['searchTerm'] }}">
+                            <datalist id = "stockNames">
+                            {% for stockname in stockNames%}
+                                  <option value = "{{stockname}}" />
+                            {% endfor %}
+                            </datalist>
                             <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
                 </form>
               </div>        
@@ -96,11 +106,20 @@
           <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
 
             <thead class = "bg-light">
+              <tr><th>Name: </th></tr>
+            </thead>
+            {%for user in names%}
+            <tbody>
+              <tr>
+                <td> <h3> {{user[0]}}</h3></td>
+              </tr>
+            </tbody>
+            {%endfor%}
 
            </table>
 
           <script type="text/javascript">
-            let followingList = {{followingList|safe}};
+           <!-- let followingList = {{followingList|safe}};
 
             let list = [];
             
@@ -131,7 +150,9 @@
 
             let table = document.querySelector("table");
             let data = Object.keys(list[0]);
-            generateOrderlist(table, list, data); 
+            generateOrderlist(table, list, data); -->
+
+
             </script>
           </div>
           <br><br>

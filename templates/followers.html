@@ -29,8 +29,13 @@
                   <li class="nav-item">
                     <a class="nav-link" href="aboutus">About Us</a>
                   </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="information">Information</a>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Information Pages</a>
+                    <ul class = "dropdown-menu">
+                      <li><a class ="dropdown-item" href="information">Information</a></li>
+                      <li><a class ="dropdown-item" href="graphPictures">Graph Pictures</a></li>
+                      <li><a class ="dropdown-item" href="StockDefinitions">Stock Definitions</a></li>
+                    </ul>
                   </li>
         {% if session['user'] %}
         <li class="nav-item">
@@ -65,6 +70,7 @@
               }
             </script>  
           </li>
+
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -73,22 +79,34 @@
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
         {% endif %}
-                </ul>
-                <form action="/stockSearch" method="post" id = "dropStock">
-                  <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+      </ul>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('currentCashNav').style.display = "none";
+                document.getElementById('portfolioValueNav').style.display = "none";
+              }
+            </script>  
+                <form action="/stockSearch" method="post">
+          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" list = "stockNames" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
-                  <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Display Stock</button>
-                </form>
+                  <datalist id = "stockNames">
+                  {% for stockname in stockNames%}
+                      <option value = "{{stockname}}" />
+                  {% endfor %}
+                   </datalist>
+                  <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
+      </form>
+
               </div>        
             </div>
           </nav>
     </header>
 
-<br><br><br><br><br><br>
+<br>
 
 <body>
-    
-
   <div class = "container-fluid w-50" id = "centers">
     <div class = "justify-content-center mt-5">
       <div class = "card">
@@ -97,78 +115,22 @@
           <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
             
             <thead class = "bg-light">
-
+              <tr><th>Names: </th></tr>
+            </thead>
+            {% for user in splitNames%}
+            <tbody>
+            <tr>
+            <td><h3>{{user[0]}}</h3></td>  
+            </tr>  
+            </tbody>
+            {% endfor %}
            </table>
-           <script type = "text/javascript">
-            let followlist = {{followersList|safe}};
-            let followers = [];
-            for (let i = 0; i < followlist.length; i++){
-                followers.push({
-                    'Names': followlist[i]
-                })
-            }
-
-            function generateFollowTable(table, data, key){
-                let thead = table.createTHead();
-                let row = thead.insertRow();
-                for (let key of keys){
-                    let th = document.createElement();
-                    let text = document.createTextNode();
-                    th.appendChild(text);
-                    row.appendChild(th);
-                }
-
-                for (let element of data){
-                    let row = table.insertRow();
-                    for (key in element){
-                        let cell = row.insertCell();
-                        let text = document.createTextNode(element[key]);
-                        cell.appendChild(text);
-                    }
-                }
-            }
-
-            let table = document.querySelector("table");
-            let data = Object.keys(followers[0]);
-            generateFollowTable(table, followers, data);
-            </script>
 
 
       </div>
     </div>
   </div>
-
-
-  </section>  
- <!--  {% with alerts = get_flashed_messages() %}
-        {% for print in alerts %}
-            {% if print in get_flashed_messages(category_filter = ['pass']) %} 
-            <div class="alert-pass" role="alert">
-                {{ print }}
-            </div>
-            {% elif print in get_flashed_messages(category_filter = ['fail']) %}
-            <div class="alert-fail" role="alert">
-                {{ print }}
-            </div>
-            {% endif %}
-         {% endfor %}
-        {% endwith %}  Keep this an alternative - Muneeb Khan
-    <br>
-    </h1> -->
-    
-    {% with messages = get_flashed_messages() %}
-                    {% if messages %}   
-                        {% for message in messages %}
-                        <div class ="alert alert-warning alert-dismissible fade show" style = "text-align: center"; role="alert">
-                            {{ message }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                              <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        {% endfor %} 
-                    {% endif %} 
-    {% endwith %}
-
+</div>
     <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
         <div class="container">
           <span>Copyright 2022 by StockSim</span>

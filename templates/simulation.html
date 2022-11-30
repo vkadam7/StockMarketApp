@@ -29,8 +29,13 @@
                 <li class="nav-item">
                   <a class="nav-link" href="aboutus">About Us</a>
                 </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="information">Information</a>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Information Pages</a>
+                  <ul class = "dropdown-menu">
+                    <li><a class ="dropdown-item" href="information">Information</a></li>
+                    <li><a class ="dropdown-item" href="graphPictures">Graph Pictures</a></li>
+                    <li><a class ="dropdown-item" href="StockDefinitions">Stock Definitions</a></li>
+                  </ul>
                 </li>
       {% if session['user'] %}
       <li class="nav-item">
@@ -65,6 +70,7 @@
             }
           </script>  
         </li>
+
         {% else %}
         <li class="nav-item">
           <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -73,14 +79,25 @@
           <a class = "nav-link" method = "POST" href = "register">Register</a>
         </li>
       {% endif %}
-              </ul>
-              <form action="/stockSearch" method="post">
-                  <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
-                          value="{{ request.form['searchTerm'] }}">
-                          <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
-              </form>
-
-
+    </ul>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('currentCashNav').style.display = "none";
+                document.getElementById('portfolioValueNav').style.display = "none";
+              }
+            </script>  
+                <form action="/stockSearch" method="post">
+          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" list = "stockNames" name="searchTerm" placeholder="Find a stock..."
+                  value="{{ request.form['searchTerm'] }}">
+                  <datalist id = "stockNames">
+                  {% for stockname in stockNames%}
+                      <option value = "{{stockname}}" />
+                  {% endfor %}
+                   </datalist>
+                  <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
+      </form>
             </div>        
           </div>
         </nav>
@@ -110,7 +127,8 @@
             let originalValuesList = {{originalValue|safe}};
             let percentageList = {{percentage|safe}};
             let linkList = {{links|safe}};
-            //let volatilityList = {{volatility|safe}};
+            let buySellList =  {{buySell|safe}};
+            <!--let volatilityList = {{volatility|safe}};-->
             
             let portfolio = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -123,8 +141,9 @@
                 'Cost Basis': originalValuesList[i],
                 'Change': profitList[i],
                 '% of Account' : percentageList[i],
-                'Link to Chart' : linkList[i]
-                //Volatility: volatilityList[i]
+                'Link to Chart' : linkList[i], 
+                'Buy/Sell Options': buySellList[i]
+                <!--Volatility: volatilityList[i]-->
               })
             }
 
@@ -185,6 +204,8 @@
                       orderListCell.appendChild(buySellLink);
                     }
                     i = i + 1;
+                  }
+                }
               }
             }
 

@@ -32,8 +32,13 @@
                   <li class="nav-item">
                     <a class="nav-link" href="aboutus">About Us</a>
                   </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="information">Information</a>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Information Pages</a>
+                    <ul class = "dropdown-menu">
+                      <li><a class ="dropdown-item" href="information">Information</a></li>
+                      <li><a class ="dropdown-item" href="graphPictures">Graph Pictures</a></li>
+                      <li><a class ="dropdown-item" href="StockDefinitions">Stock Definitions</a></li>
+                    </ul>
                   </li>
         {% if session['user'] %}
         <li class="nav-item">
@@ -68,6 +73,7 @@
               }
             </script>  
           </li>
+
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -75,13 +81,27 @@
           <li class = "nav-item">
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
+
         {% endif %}
-                </ul>
+      </ul>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('currentCashNav').style.display = "none";
+                document.getElementById('portfolioValueNav').style.display = "none";
+              }
+            </script>  
                 <form action="/stockSearch" method="post">
-                    <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
-                            value="{{ request.form['searchTerm'] }}">
-                            <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
-                </form>
+          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" list = "stockNames" name="searchTerm" placeholder="Find a stock..."
+                  value="{{ request.form['searchTerm'] }}">
+                  <datalist id = "stockNames">
+                  {% for stockname in stockNames%}
+                      <option value = "{{stockname}}" />
+                  {% endfor %}
+                   </datalist>
+                  <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
+      </form>
               </div>        
             </div>
           </nav>
@@ -106,6 +126,9 @@
             let buyList = {{buys|safe}};
             let totalList = {{prices|safe}};
             let datesList = {{dates|safe}};
+            let partiallySoldList = {{partiallySold|safe}};
+            let profitsList = {{profits|safe}};
+            let linksList = {{links|safe}};
             
             let orderlist = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -114,7 +137,10 @@
                 Quantity: quantList[i],
                 'Transaction Type': buyList[i],
                 Total: totalList[i],
-                'Date of Order' : datesList[i]
+                'Date of Order' : datesList[i],
+                'Remaining Shares' : partiallySoldList[i],
+                'Profit' : profitsList[i],
+                'Link to Sell' : linksList[i]
               })
             }
 
@@ -129,14 +155,36 @@
               }
               for (let element of data) {
                 let row = table.insertRow();
+                i = 0;
                 for (key in element) {
-                  let cell = row.insertCell();
-                  let text = document.createTextNode(element[key]);
-                  cell.appendChild(text);
+                    if (i < 7 || element[key] == "" || element[key] == "Sold") {
+                      let cell = row.insertCell();
+                      let text = document.createTextNode(element[key]);
+                      cell.appendChild(text);
+                      if (i == 6 && parseFloat(cell.innerHTML) < 0.0) {
+                        temp = cell.innerHTML;
+                        cell.style.color = "red";
+                        cell.innerHTML = "$" + temp;
+                      } else if (i == 6 && parseFloat(cell.innerHTML) >= 0) {
+                        temp = cell.innerHTML;
+                        cell.style.color = "green";
+                        cell.innerHTML = "$" + temp;
+                      } 
+                    } else {
+                      var orderListCell = row.insertCell();
+                      var orderListLink = document.createElement('a');
+                      var orderListLinkText = document.createTextNode('Sell This Order');
+                      orderListLink.setAttribute('href', element[key]);
+                      orderListLink.appendChild(orderListLinkText);
+                      orderListCell.appendChild(orderListLink);
+                    }
+                    
+                    i = i + 1;
                 }
               }
+              i = i + 1;
             }
-
+          
             let table = document.querySelector("table");
             let data = Object.keys(orderlist[0]);
             generateOrderlist(table, orderlist, data); 

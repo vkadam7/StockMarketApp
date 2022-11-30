@@ -28,8 +28,13 @@
                   <li class="nav-item">
                     <a class="nav-link" href="aboutus">About Us</a>
                   </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="information">Information</a>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Information Pages</a>
+                    <ul class = "dropdown-menu">
+                      <li><a class ="dropdown-item" href="information">Information</a></li>
+                      <li><a class ="dropdown-item" href="graphPictures">Graph Pictures</a></li>
+                      <li><a class ="dropdown-item" href="StockDefinitions">Stock Definitions</a></li>
+                    </ul>
                   </li>
         {% if session['user'] %}
         <li class="nav-item">
@@ -64,6 +69,7 @@
               }
             </script>  
           </li>
+
           {% else %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "login">Login</a> 
@@ -71,12 +77,26 @@
           <li class = "nav-item">
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
+
         {% endif %}
-                </ul>
+      </ul>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
+            <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('currentCashNav').style.display = "none";
+                document.getElementById('portfolioValueNav').style.display = "none";
+              }
+            </script>  
                 <form action="/stockSearch" method="post">
-          <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" list = "stockNames" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
-                  <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
+                  <datalist id = "stockNames">
+                  {% for stockname in stockNames%}
+                      <option value = "{{stockname}}" />
+                  {% endfor %}
+                   </datalist>
+                  <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
       </form>
               </div>        
             </div>
@@ -134,12 +154,15 @@
         <form action="/changeView" method="post" style = "padding-left: 30px;">
             <div class = "row justify-content-center">
             <div class = "form-row align-items-center">
+              <div class = "form-group col-md-5">
+                  <label for="dateInput">New Start Date:</label>
+                  <input id='startDate' type="date" class = "form-control"  name="startDate" value="{{ request.form['startDate'] }}" placeholder="yyyy-mm-dd">
+                </div>
                 <div class = "form-group col-md-6">
                     <label for = "timespan">Timespan:</label>
                     <select class = "form-control" name="timespan" value="{{ request.form['timespan'] }}">
                         <option value="hourly">Hourly prices</option>
                         <option value="1minute">1 Minute</option>
-                        <option value="5minute">5 Minutes</option>
                         <option value="10minute">10 Minutes</option>
                         <option value="daily">Daily prices</option>
                         <option value="weekly">Weekly prices</option>
@@ -157,9 +180,48 @@
             </div>
             <br>
             
-                <button type="submit" class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Show Ranges</button>
-            
+                <button id="changeView" type="submit" class="btn btn btn-lg btn-block" style = "background-color:rgb(33, 103, 42);color: white;">Show Ranges</button>
+              <p id="dateNotice" style="color: red;"></p>
         </form>
+        <script>
+          const button = document.getElementById('changeView');
+          const dateInput = document.getElementById('startDate');
+          let endYear = +({{session['currentYear']}});
+          let endMonth = +({{session['currentMonth']}});
+          let endDay = +({{session['currentDay']}});
+
+          dateInput.addEventListener('input', dateCheck2);
+
+          function dateCheck2(check) {
+            startYear = +(dateInput.value.slice(0, 4));
+            startMonth = +(dateInput.value.slice(5, 7));
+            startDay = +(dateInput.value.slice(8, 10));
+            if (endYear < startYear) {
+              button.disabled = true;
+              dateNotice.textContent = "Please enter a new end date that comes after the start date.";
+            } else if (endYear == startYear) {
+              if (endMonth < startMonth) {
+                button.disabled = true;
+                dateNotice.textContent = "Please enter a new end date that comes after the start date.";
+              } else if (endMonth == startMonth) {
+                if (endDay <= startDay) {
+                  button.disabled = true;
+                  dateNotice.textContent = "Please enter a new end date that comes after the start date.";
+                } else {
+                  button.disabled = false;
+                  dateNotice.textContent = "";
+                }
+              } else {
+                button.disabled = false;
+                dateNotice.textContent = "";
+              }
+            } else {
+              button.disabled = false;
+              dateNotice.textContent = "";
+            }
+
+          }
+        </script>
         <br>
 
         <form action="/orderForm" method="post" style = "padding-left: 30px;">
