@@ -621,7 +621,8 @@ def goToSimulation():
                 percentage = []
                 volatility = []
                 links = []
-                buySellLink = []
+                buyLink = []
+                sellLink = []
                 
                 percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
@@ -641,7 +642,8 @@ def goToSimulation():
                         percentage.append("%.2f" % round(percent, 2))
                         volatility.append("%.2f" % round(Portfolio.volatility,2))
                         links.append(Portfolio.link)
-                        buySellLink.append(Portfolio.buySellForm)
+                        buyLink.append(Portfolio.buyForm)
+                        sellLink.append(Portfolio.sellForm)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
@@ -649,7 +651,7 @@ def goToSimulation():
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
                 currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue,
-                percentage=percentage, links=links, buySellLink = buySellLink)  
+                percentage=percentage, links=links, buyLink = buyLink, sellLink = sellLink)  
             else:
                 return redirect(url_for('.finishSimulation'))
         except KeyError:
@@ -689,46 +691,24 @@ def orderFormFill():
     return render_template('orderForm.html', option=session['option'])
 
 
-@app.route("/buyOrder/")
-def buyRoute(orderID):
+@app.route("/buyOrder")
+def buyRoute():
     if 'user' in session:
         session['option'] = 'Buy'
-        session['orderId'] = orderID
         session['optionType'] = 0
-        session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
-        session['currentAmount'] = session['stockQuantity']
-        session['orderPrice'] = "%.2f" % round(float(session['stockQuantity']) * float(session['currentPrice']), 2)
         order = Order(dbfire, session['simName'], session['ticker'], 
                         session['option'], session['orderQuantity'], session['currentPrice'])
-        if session['optionType'] == 0:
-            flag = order.buyOrder()
-        else:
-            return
         return render_template('orderForm.html', option = session['option'])
 
-@app.route('/stockSell')
-def stockSellRoute(orderID):
+@app.route("/stockSell")
+def stockSellRoute():
     if 'user' in session:
         session['option'] = 'Sell'
-        session['orderID'] = orderID
         session['optionType'] = 1
-        session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
-        session['orderPrice'] = "%.2f" % round(float(session['stockQuantity']) * float(session['currentPrice']), 2)
-        session['currentAmount'] = session['stockQuantity']
         order = Order(dbfire, session['simName'], session['ticker'], 
                         session['option'], session['orderQuantity'], session['currentPrice'])
-        return render_template('orderForm.html', option = session['option'])
+        return render_template('orderForm.html', option = session['option'])   
     
-#@app.route('buySellRoute')
-#def buySellRoute():
-#    if 'user' in session:
-#        if session['option'] == 'Buy':
-             
-    
-        
-        
-        
-
 @app.route("/sellTaxLot/<orderID>")
 def sellTaxLot(orderID):
     if 'user' in session:

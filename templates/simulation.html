@@ -122,7 +122,8 @@
             let originalValuesList = {{originalValue|safe}};
             let percentageList = {{percentage|safe}};
             let linkList = {{links|safe}};
-            let buySellList =  {{buySell|safe}};
+            let buyList =  {{buyLink|safe}};
+            let sellList = {{sellLink|safe}};
             <!--let volatilityList = {{volatility|safe}};-->
             
             let portfolio = [];
@@ -137,7 +138,8 @@
                 'Change': profitList[i],
                 '% of Account' : percentageList[i],
                 'Link to Chart' : linkList[i], 
-                'Buy/Sell Options': buySellList[i]
+                'Buy Option': buyList[i], 
+                'Sell Option': sellList[i]
                 <!--Volatility: volatilityList[i]-->
               })
             }
@@ -179,30 +181,69 @@
                     orderListLink.setAttribute('href', element[key]);
                     orderListLink.appendChild(orderListLinkText);
                     orderListCell.appendChild(orderListLink);
+
                   }
                   i = i + 1;
                 }
-                for (let element of data) {
-                  let row = table.insertRow();
-                  i = 0;
-                  for (key in element) {
-                    if (i < 8) {
-                      let cell = row.insertCell();
-                      let text = document.createTextNode(element[key]);
-                      cell.appendChild(text);
-                    } else {
-                      var buySellCell = row.insertCell();
-                      var buySellLink = document.createElement('a');
-                      var buySellLinkText = document.createTextNode('Buy or Sell');
-                      orderListLink.setAttribute('href', element[key]);
-                      orderListLink.appendChild(buySellLinkText);
-                      orderListCell.appendChild(buySellLink);
-                    }
-                    i = i + 1;
+                for (key in element){
+                  if (i < 7 || element[key] == "Buy"){
+                    let cell = row.insertCell();
+                    let text = document.createTextNode(element[key]);
+                    cell.appendChild(text);
+                    if (i == 6 && parseFloat(cell.innerHTML) < 0.0) {
+                      temp = cell.innerHTML;
+                      cell.style.color = "red";
+                      cell.innerHTML = "$" + temp;
+                    } 
+                   else if (i == 6 && parseFloat(cell.innerHTML) >= 0) {
+                    temp = cell.innerHTML;
+                    cell.style.color = "green";
+                    cell.innerHTML = "$" + temp;
+                  } 
+                  else{
+                    var buyListCell = row.insertCell();
+                    var buyListLink = document.createElement('a');
+                    var buyListLinkText = document.createTextNode('Buy');
+                    buyListLink.setAttribute('href', element[key])
+                    buyListLink.appendChild(buyListLinkText);
+                    buyListCell.appendChild(buyListLink);
                   }
+                  i = i + 1;
+
+
                 }
               }
+              for (key in element){
+                if (i < 7 || element[key] == "Sell"){
+                  let cell = row.insertCell();
+                  let text = document.createTextNode(element[key]);
+                  cell.appendChild(text);
+                  if (i == 6 && parseFloat(cell.innerHTML) < 0.0) {
+                    temp = cell.innerHTML;
+                    cell.style.color = "red";
+                    cell.innerHTML = "$" + temp;
+                  } 
+                 else if (i == 6 && parseFloat(cell.innerHTML) >= 0) {
+                  temp = cell.innerHTML;
+                  cell.style.color = "green";
+                  cell.innerHTML = "$" + temp;
+                } 
+                else{
+                  var sellListCell = row.insertCell();
+                  var sellListLink = document.createElement('a');
+                  var sellListLinkText = document.createTextNode('Sell');
+                  sellListLink.setAttribute('href', element[key])
+                  sellListLink.appendChild(sellListLinkText);
+                  sellListCell.appendChild(sellListLink);
+                }
+                i = i + 1;
+
+
+          
+              }
             }
+          }
+        }
 
             let table = document.querySelector("table");
             let data = Object.keys(portfolio[0]);
