@@ -164,13 +164,13 @@
               </div>
             </div>
             <div class="col-md-8">
-              <div class="card mb-3">
+              <div class="card mb-3" style="text-align: left;">
                 <div class = "card-body">
                 <div class = "row">
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Name</h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
+                  <div class = "col-sm-9 text-secondary">
                     {{results['Name']}}  
                   </div>  
                 </div>
@@ -179,7 +179,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Email</h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary" style = "text-align: left;">
+                  <div class = "col-sm-9 text-secondary">
                     {{results['Email']}} 
                   </div> 
                 </div> 
@@ -188,7 +188,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Username</h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary" style = "text-align: left;">
+                  <div class = "col-sm-9 text-secondary">
                     {{results['userName']}} 
                   </div> 
                 </div> 
@@ -197,12 +197,12 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">My Experience</h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary" style = "text-align: left;">
+                  <div class = "col-sm-9 text-secondary">
                     {{results['experience']}} 
                   </div> 
-                  <div class = "col-sm 9 text-secondary" style = "text-align: center;">
-                    <br>
-                  <a href = "update" class = "btn btn-secondary btn-sm" style="width: 25%;">Update</a>
+                  <div class = "col-sm-12 text-secondary">
+                  <hr>
+                  <a href = "update" class = "btn btn-secondary btn-btn-block" style="width: 30%;">Update</a>
                   </div>
                 </div>
                 
@@ -210,12 +210,12 @@
                 </div>
               </div>
 
-              <div class="row gutters-sm">
+              <div class="row gutters-sm" style="text-align: left;">
                 <div class="col-md-8 mb-3">
                   <div class="card mb-3">
                     <div class="card-body">
                       <div class = "row">
-                  <div class = "col-sm-3" style = "text-align: center;">
+                  <div class = "col-sm-12">
                     <h5 class = "mb-0">Simulation Info</h5>  
                   </div>  
                 </div>
@@ -224,7 +224,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Start Date</h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
+                  <div class = "col-sm-9 text-secondary">
                     {{cash['startDate']}}  
                   </div> 
                 </div> 
@@ -233,7 +233,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">End Date </h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
+                  <div class = "col-sm-9 text-secondary">
                     {{ cash['endDate'] }} 
                   </div> 
                 </div>
@@ -244,7 +244,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Score </h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
+                  <div class = "col-sm-9 text-secondary">
                     {{ leaderboard['score'] }} 
                   </div> 
                 </div>
@@ -255,7 +255,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Days Remaining </h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
+                  <div class = "col-sm-9 text-secondary">
                     {{daysRemaining}} 
                   </div> 
                 </div>
@@ -265,7 +265,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Current holding </h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
+                  <div class = "col-sm-9 text-secondary">
                     {{ cash['currentCash'] }} 
                   </div> 
                 </div>
@@ -275,7 +275,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Quiz 1 Score</h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
+                  <div class = "col-sm-9 text-secondary">
                     {{ results['QuizScore'] }} 
                   </div> 
                 </div>
@@ -285,7 +285,7 @@
                   <div class = "col-sm-3">
                     <h6 class = "mb-0">Quiz 2 Score</h6>  
                   </div>
-                  <div class = "col-sm-9 text-secondary" style="text-align: left;">
+                  <div class = "col-sm-9 text-secondary">
                     {{ results['QuizScore'] }} 
                   </div> 
                 </div>
