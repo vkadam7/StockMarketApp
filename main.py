@@ -443,17 +443,19 @@ def register():
             flash("20 characters maximum")
             flash("at least 1 digit")
             flash("at least 1 special character ('!','@','#', or '$'")
-        
+            return render_template("register.html")
+
         elif (Password != confirmPass): # If password and cofirm password don't match
             flash("You're password do not match. Please enter the same password for both fields.")
+            return render_template('register.html')   
         
         elif (uniqueName == UseN):
             flash("Username is already taken. Please enter a valid username.") #check to see if username is taken
-
+            return render_template('register.html')   
         else:
 
             # try: 
-            
+
             user = authen.create_user_with_email_and_password(email, Password)
             authen.send_email_verification(user['idToken'])
 
@@ -462,7 +464,6 @@ def register():
                 #dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
             flash("Account Created, you will now be redirected to verify your account" , "pass")
             flash("Account succesfully created, you may now login" , "pass")
-
             return redirect(url_for("login"))
 
             # except:
@@ -500,7 +501,7 @@ def PasswordRecovery():
             return redirect(url_for("login"))
         except:
             flash("Email not found" , "fail")
-            return redirect(url_for("PasswordRecovery"))
+            return render_template("PasswordRecovery.html")   
           
     return render_template("PasswordRecovery.html")   
 
@@ -608,7 +609,7 @@ def information():
 
         return render_template("information.html", person = person, stockNames = session['stockNames'])
     else:
-        return render_template("information.html", stockNames = session['stockNames'])
+        return render_template("information.html")
     
 @app.route("/StockDefinitions")
 def StockDefinitions():
