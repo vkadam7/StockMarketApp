@@ -240,26 +240,26 @@ def login():
         result = request.form
         email = result["email"]
         passw = result["password"]
-        #try:
-        user = authen.sign_in_with_email_and_password(email,passw)
-        session['user'] = email
-        session['loginFlagPy'] = 1
-        check, session['simName'] = SimulationFactory.existenceCheck(dbfire, email)
-        if check:
-            session['simulationFlag'] = 1
-            sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
-            session['portfolioValue'] = "%.2f" % round(sharesValue, 2)
-            session['currentCash'] = "%.2f" % round(currentCash, 2)
-        else:
-            session['simulationFlag'] = 0
-        sessionFlagCheck(session['loginFlagPy'], session['simulationFlag'])
-        flash("Login successful!", "pass")
-        print("Login successful.")
-        return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
-        #except:
-        #    flash("Failed to log in", "fail")
-        #    print("login failed.")
-        #    return redirect(url_for("login"))
+        try:
+            user = authen.sign_in_with_email_and_password(email,passw)
+            session['user'] = email
+            session['loginFlagPy'] = 1
+            check, session['simName'] = SimulationFactory.existenceCheck(dbfire, email)
+            if check:
+                session['simulationFlag'] = 1
+                sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
+                session['portfolioValue'] = "%.2f" % round(sharesValue, 2)
+                session['currentCash'] = "%.2f" % round(currentCash, 2)
+            else:
+                session['simulationFlag'] = 0
+            sessionFlagCheck(session['loginFlagPy'], session['simulationFlag'])
+            flash("Login successful!", "pass")
+            print("Login successful.")
+            return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
+        except:
+            flash("Failed to log in, incorrect email or password", "fail")
+            print("login failed, incorrect email or password.")
+            return render_template("login.html")
     else:
         print("Landing on page")
         return render_template('login.html', stockNames = session['stockNames'])
