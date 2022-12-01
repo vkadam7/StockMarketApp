@@ -239,6 +239,9 @@ class StockData:
     #   to requested stock ID.
     #
     #   Inputs: id - Database key for requested stock.
+    #           ticker - String, ID for stock entry
+    #           startDate - String, entry for starting date of viewing period
+    #           endDate - String, entry for ending date of viewing period
     #
     #   Author: Ian McNulty
     def retrieve(db, ticker, simName="", startDate="", endDate=""):
@@ -432,6 +435,7 @@ class StockData:
     #   Author: Ian McNulty
     def stockSearch(db, searchTerm, simName):
 
+        # Search for exact match
         stocksDB = db.collection('IntradayStockData').where('simulation','==',simName)
         for entry in stocksDB.stream():
             temp = entry.to_dict()
@@ -441,6 +445,7 @@ class StockData:
                 else:
                     return True, searchTerm.upper()
 
+        # Search for string match to ticker
         for entry in stocksDB.stream():
             temp = entry.to_dict()
             ticker = temp['ticker'].lower()
@@ -451,6 +456,7 @@ class StockData:
                 else:
                     return True, ticker.upper()
 
+        # Search for string match to company name
         for entry in stocksDB.stream():
             temp = entry.to_dict()
             ticker = temp['ticker'].lower()
@@ -471,7 +477,7 @@ class StockData:
 #
 #   Dependencies: firebase_admin, numpy, StockData, Order, portfolio, SimulationFactory
 #
-#   Authors: Ian McNulty, Muneeb Khan  
+#   Authors: Ian McNulty
 class Simulation:
     ## Simulation.__init__
     #   Description: Initiates a Simulation object with inputs, not to be used to retrieve ongoing
@@ -492,9 +498,16 @@ class Simulation:
         self.initialCash = initialCash
         self.stocks = []
 
+    ## Simulation.createSim
+    #   Description: Creates an entry in the Simulations collection of the Firestore database with
+    #   the input values from __init__
+    #
+    #   Author: Ian McNulty
     def createSim(self):
-        count = len(self.db.collection('Simulations').get())
+        # Starting timestamp for Simulation
         self.startTimestamp = datetime.datetime.now()
+
+        # Dictionary for creation of the Firestore entry
         data = {
             'ongoing': True,
             'user': self.user,
@@ -506,19 +519,28 @@ class Simulation:
             'startTimestamp': self.startTimestamp,
         }
         updateTime, tempRef = self.db.collection('Simulations').add(data)
+
+        # Simulation ID for use in later functions, if necessary
         self.simName = tempRef.id
+
+        # Creation of Intraday Stock Data for the Simulation
         self.addStocksToSim()
 
+    ## Simulation.whatTimeIsItRightNow
+    #   Description: Finds the correct index in the stock data by calculating the time elapsed since 
+    #   starting timestamp of the Simulation creation
+    #
+    #   Author: Ian McNulty
     def whatTimeIsItRightNow(self):
         currentTime = datetime.datetime.now()
         difference = currentTime - self.startTimestamp
         index = -1
         total = difference.total_seconds()
-        days = round(total//86400)
+        days = round(total//86400) # Days
         total -= days*86400
-        hours = round(total//3600)
+        hours = round(total//3600) # Hours
         total -= hours*3600
-        tenMin = round(total//600)
+        tenMin = round(total//600) # Remaining minutes grouped in 10s
         for i in range(0,days):
             index += 40
         for i in range(0,hours):
@@ -526,6 +548,24 @@ class Simulation:
         index += tenMin
         return index
 
+    ## Simulation.addStocksToSim
+    #   Description: Creates entries in the IntradayStockData collection for use in the Simulation by 
+    #   using StockData.retrieve to sequentially create them
+    #
+    #   Author: Ian McNulty
+    def addStocksToSim(self):
+        tickerList = StockData.stockList(self.db)
+        for ticker in tickerList:
+            tempData = StockData.retrieve(self.db, ticker, self.simName, self.startDate, self.endDate)
+            self.stocks.append(tempData)
+            self.db.collection('IntradayStockData').add(tempData)
+
+    ## Simulation.currentPriceOf
+    #   Description: Retrieves current price of requested stock according to whatTimeIsItRightNow result
+    #
+    #   Input: ticker - String, ID for requested stock entry
+    #
+    #   Author: Ian McNulty
     def currentPriceOf(self, ticker):
         data = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
         for entry in data:
@@ -535,17 +575,22 @@ class Simulation:
                 return fin['prices'][self.whatTimeIsItRightNow()]
             return fin['prices'][len(fin['prices'])-1]
 
+    ## Simulation.retrieveStock
+    #   Description: Retrieves database entry matching Simulation ID and ticker ID
+    #
+    #   Input: ticker - String, ID for requested stock entry
+    #
+    #   Author: Ian McNulty
     def retrieveStock(self, ticker):
         stock = self.db.collection('IntradayStockData').where('simulation','==',self.simName).where('ticker','==',ticker).get()
         return stock
 
-    def addStocksToSim(self):
-        tickerList = StockData.stockList(self.db)
-        for ticker in tickerList:
-            tempData = StockData.retrieve(self.db, ticker, self.simName, self.startDate, self.endDate)
-            self.stocks.append(tempData)
-            self.db.collection('IntradayStockData').add(tempData)
-
+    ## Simulation.amountOwned
+    #   Description: Retrieves currently owned amount of shares of a searched stock
+    #
+    #   Input: ticker - String, ID for requested stock entry
+    #
+    #   Author: Ian McNulty
     def amountOwned(self, ticker):
         quantityOwned = 0
         for entry in Order.retrieve(self.db, self.simName, ticker):
@@ -560,6 +605,13 @@ class Simulation:
                         quantityOwned += int(temp['quantity'])   
         return quantityOwned
 
+    ## Simulation.finishSimulation
+    #   Description:
+    #
+    #   Inputs: db - Firestore object, link to Firestore database
+    #           simName - String, ID of the simulation data entry to be finished
+    #
+    #   Author: Ian McNulty
     def finishSimulation(db, simName):
         data = db.collection('Simulations').document(simName).get().to_dict()
 
@@ -567,15 +619,18 @@ class Simulation:
         currentPrices = []
         totalValue = 0
         
+        # Retrieve current values of owned shares
         for entry in Order.stocksBought(db, simName):
             Portfolio = portfolio(db, entry, data['user'], simName)
             if Portfolio.quantity != 0:
                 quantities.append(Portfolio.quantity)
                 currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
         
+        # Summation of portfolio value
         for i in range(len(quantities)):
             totalValue += quantities[i] * currentPrices[i]
 
+        # Score calculation
         percentChange = ((float(data['currentCash']) + totalValue) - float(data['initialCash'])) / float(data['initialCash'])
         scores = percentChange * 100
         scoreRounded = round(scores)
@@ -585,16 +640,30 @@ class Simulation:
                 emails = docs.to_dict()
         grabUserName = emails['userName']
 
+        # Leaderboard data entry calculation
         db.collection('Leaderboard').add({"email":grabDataEmail, "score":scoreRounded, "username":grabUserName})
 
+        # Delete newly useless entries in the IntradayStockData entries associated with finished Sim
         for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
             temp = entry.id
             db.collection('IntradayStockData').document(temp).delete()
 
+        # Add score to Simulation entry and mark it as finished
         data['score'] = percentChange * 100
         data['ongoing'] = False
         db.collection('Simulations').document(simName).update(data)
 
+    ## Simulation.checkDates
+    #   Description: Compares the input dates to confirm that the start date comes
+    #   before the end date
+    #
+    #   Inputs: startDate - String, starting date to be checked
+    #           endDate - String, ending date to be checked
+    #
+    #   Return: True, if dates are a valid input
+    #           False, if dates are an invalid input
+    #   
+    #   Author: Ian McNulty
     def checkDates(startDate, endDate):
         if int(startDate[0:4]) >= int(endDate[0:4]):
             if int(startDate[5:7]) > int(endDate[5:7]):
@@ -604,12 +673,21 @@ class Simulation:
                     return False
         return True
 
-    def retrieveOngoing(db, email):
-        for query in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream():
+    ## Simulation.retrieveOngoing
+    #   Description: Retrieves the currently ongoing simulation given an ID
+    #
+    #   Inputs: db - Firestore object, link to Firestore database
+    #           user - String, ID of the user to be searched for in the Simulation collection
+    #
+    #   Return: tempSim - Dictionary, dict object in the form of the Simulation data entry
+    #
+    #   Author: Ian McNulty
+    def retrieveOngoing(db, user):
+        for query in db.collection('Simulations').where('ongoing','==',True).where('user','==',user).stream():
             id = query.id
             entry = query.to_dict()
 
-        tempSim = Simulation(db, email, entry['startDate'], entry['endDate'], entry['initialCash'])
+        tempSim = Simulation(db, user, entry['startDate'], entry['endDate'], entry['initialCash'])
         tempSim.simName = id
         tempSim.startTimestamp = datetime.datetime.fromtimestamp(entry['startTimestamp'].timestamp())
         tempSim.currentCash = round(float(entry['currentCash']), 2)
@@ -621,32 +699,85 @@ class Simulation:
 
         return tempSim
     
-    def updateCash(db, sim, delta):
-        data = db.collection('Simulations').document(sim).get().to_dict()
+    ## Simulation.updateCash
+    #   Description: Updates the currently available amount of cash in the simulation by
+    #   adding the amount of change to it
+    #
+    #   Inputs: db - Firestore object, link to Firestore database
+    #           simName - String, ID of the simulation data entry to be finished
+    #           delta - Float, amount to update the currently available cash by
+    #
+    #   Author: Ian McNulty
+    def updateCash(db, simName, delta):
+        data = db.collection('Simulations').document(simName).get().to_dict()
         currentCash = data['currentCash']
         newCurrentCash = float(currentCash) + float(delta)
-        db.collection('Simulations').document(sim).update({'currentCash' : newCurrentCash})
+        db.collection('Simulations').document(simName).update({'currentCash' : newCurrentCash})
 
-    def retrieveCurrentCash(db, sim):
-        data = db.collection('Simulations').document(sim).get().to_dict()
+    ## Simulation.retrieveCurrentCash - DEPRECATED
+    #   Description: Retrieves the available amount of cash to the user in the simulation
+    #
+    #   Inputs: db - Firestore object, link to Firestore database
+    #           simName - String, ID of the simulation data entry to be finished
+    #
+    #   Return: data['currentCash'] - Float, currently available amount of cash to the user
+    #
+    #   Author: Ian McNulty
+    def retrieveCurrentCash(db, simName):
+        data = db.collection('Simulations').document(simName).get().to_dict()
         return data['currentCash']
 
-    def maxIndex(db, sim):
+    ## Simulation.maxIndex
+    #   Description: Calculates the highest index found in the IntradayStockData collection for
+    #   the simulation's associated stocks; to be used with time limit checking for simulation
+    #
+    #   Inputs: db - Firestore object, link to Firestore database
+    #           simName - String, ID of the simulation data entry to be finished
+    #
+    #   Return: highestIndex - Integer, highest index found in the IntradayStockData for the sim
+    #
+    #   Author: Ian McNulty
+    def maxIndex(db, simName):
         highestIndex = 0
-        for entry in db.collection('IntradayStockData').where('simulation','==',sim).stream():
+        for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
             temp = entry.to_dict()
             if temp.get('unavailable') == None:
                 if len(temp['prices']) > highestIndex:
                     highestIndex = len(temp['prices'])
         return highestIndex
 
-    def ongoingCheck(db, sim, email):
-        index = SimulationFactory(db, email).simulation.whatTimeIsItRightNow()        
-        highestIndex = Simulation.maxIndex(db,sim)
+    ## Simulation.ongoingCheck
+    #   Description: Checks to see if there is a currently ongoing simulation associated with the 
+    #   user
+    #
+    #   Inputs: db - Firestore object, link to Firestore database
+    #           simName - String, ID of the simulation data entry to be finished
+    #           user - String, ID of the user to be checked
+    #
+    #   Return: True, if ongoing simulation found
+    #           False, if ongoing simulation not found
+    #
+    #   Author: Ian McNulty
+    def ongoingCheck(db, simName, user):
+        index = SimulationFactory(db, user).simulation.whatTimeIsItRightNow()        
+        highestIndex = Simulation.maxIndex(db,simName)
         if index > highestIndex:
             return False
         return True
 
+    ## Simulation.listSims
+    #   Description: Retrieves the IDs, starting dates, scores, and links to order history of 
+    #   all finished sims for the user
+    #
+    #   Inputs: db - Firestore object, link to Firestore database
+    #           user - String, ID of the user to be checked
+    #
+    #   Return: sims - String array, IDs of the listed simulations
+    #           dates - String array, starting dates of the listed simulations
+    #           scores - Float array, scores of the listed simulations
+    #           links - String array, redirects to order history of the listed simulations
+    #
+    #   Author: Ian McNulty
     def listSims(db, user):
         sims = []
         dates = []
@@ -667,6 +798,16 @@ class Simulation:
             i+=1
         return sims, dates, scores, links
 
+    ## Simulation.completedCheck - DEPRECATED
+    #   Description: Checks if the user has completed simulations
+    #
+    #   Inputs: db - Firestore object, link to Firestore database
+    #           user - String, ID of the user to be checked
+    #
+    #   Return: True, if completed simulation found
+    #           False, if completed simulation not found
+    #
+    #   Author: Ian McNulty
     def completedCheck(db, user):
         count = 0
         for query in db.collection('Simulations').where('ongoing','==',False).where('user','==',user).stream():
@@ -675,6 +816,18 @@ class Simulation:
             return True
         return False
 
+    ## Simulation.getPortfolioValue
+    #   Description: Calculates the current portfolio value and gives it to the user along with
+    #   the current cash amount available to the user
+    #
+    #   Inputs: db - Firestore object, link to Firestore database
+    #           simName - String, ID of the simulation data entry to be finished
+    #
+    #   Return: totalValue - Float, total value of the portfolio, in USD
+    #           data['currentCash'] - Float, currently available amount of cash to the user
+    #               in this simulation
+    #
+    #   Author: Ian McNulty
     def getPortfolioValue(db, simName):
         quantities = []
         currentPrices = []
@@ -692,8 +845,22 @@ class Simulation:
 
         return totalValue, data['currentCash']
 
-    def getAvailableStockList(db, simName, email):
-        index = SimulationFactory(db, email).simulation.whatTimeIsItRightNow()        
+    ## Simulation.getAvailableStockList
+    #   Description: Retrieves the tickers, prices, redirect links, and names of the companies
+    #   currently available to the user in their simulation
+    #
+    #   Inputs: db - Firestore object, link to Firestore database
+    #           simName - String, ID of the simulation data entry to be finished
+    #           user - String, ID of the user associated with the Simulation
+    #
+    #   Return: tickers - String array, tickers of the available stocks in the sim
+    #           prices - Float array, current prices of the available stocks in the sim
+    #           links - String array, redirects to display of available stocks in the sim
+    #           names - String array, company names of available stocks in the sim
+    #
+    #   Author: Ian McNulty
+    def getAvailableStockList(db, simName, user):
+        index = SimulationFactory(db, user).simulation.whatTimeIsItRightNow()        
         tickers = []
         prices = []
         links = []
