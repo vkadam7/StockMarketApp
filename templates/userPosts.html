@@ -1,4 +1,4 @@
-<!--CSS Updated by Miqdad and integrated by Muneeb-->
+<!-- page for user posts created by Miqdad-->
 <!doctype html>
 <html lang="en" class="h-100">
   <head>
@@ -9,6 +9,8 @@
     <link rel = "stylesheet" href = "/static/stylesheets/newStyle.css">
     <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     </head>
     <header>
 
@@ -28,27 +30,25 @@
                   <li class="nav-item">
                     <a class="nav-link" href="aboutus">About Us</a>
                   </li>
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Information Pages</a>
-                    <ul class = "dropdown-menu">
-                      <li><a class ="dropdown-item" href="information">Information</a></li>
-                      <li><a class ="dropdown-item" href="graphPictures">Graph Pictures</a></li>
-                      <li><a class ="dropdown-item" href="StockDefinitions">Stock Definitions</a></li>
-                    </ul>
+                  <li class="nav-item">
+                    <a class="nav-link" href="information">Information</a>
                   </li>
-        {% if session['user'] %}
-        <li class="nav-item">
-          <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
-        </li>
-      </li class = "nav-item">
-          <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
-       </li>
-        <li class="nav-item">
-          <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
-        </li>
-        <li class="nav-item">
-          <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
-        </li>
+                  {% if session['user'] %}
+          <li class="nav-item">
+            <a class = "nav-link active" method = "POST" href = "profile">Profile</a> 
+          </li>
+        </li class = "nav-item">
+            <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
+         </li>
+          <li class="nav-item">
+            <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
+          </li>
+          </li class = "nav-item">
+            <a class = "nav-link" method = "POST" href = "update">Update</a>
+          </li>
+          <li class="nav-item">
+            <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
+          </li>
           <li class="nav-item" id="stockSimButton"> <!--Old list name was StockSimStartButton-->
             <form id="nav-link" action="/stockSimForm" method="post"> <!--Old form name was stockSimStart-->
               <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="stockSimButton">Start a simulation!</button>
@@ -61,7 +61,7 @@
           </li>
           <li>
             <form id="nav-link" action="/simulation" method="post"> 
-              <button class = "btn btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="goToSim">Go to Current Sim!</button>
+              <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="goToSim">Go to Current Sim!</button>
             </form>
             <script type="text/javascript">
               if ({{ session['simulationFlag'] }} == 0 ) { 
@@ -78,55 +78,82 @@
           </li>
         {% endif %}
                 </ul>
-                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
-                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
-            <script type="text/javascript">
-              if ({{ session['simulationFlag'] }} == 0 ) { 
-                document.getElementById('currentCashNav').style.display = "none";
-                document.getElementById('portfolioValueNav').style.display = "none";
-              }
-            </script>  
                 <form action="/stockSearch" method="post">
-          <input style="border-radius: 8px; margin-top: 5px;"  class= "stockSearchBar" type="search" list = "stockNames" name="searchTerm" placeholder="Find a stock..."
-                  value="{{ request.form['searchTerm'] }}">
-                  <datalist id = "stockNames">
-                  {% for stockname in stockNames%}
-                      <option value = "{{stockname}}" />
-                  {% endfor %}
-                   </datalist>
-                  <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
-      </form>
+                    <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+                            value="{{ request.form['searchTerm'] }}">
+                            <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
+                </form>
               </div>        
             </div>
           </nav>
     </header>
 
+
+<br><br><br><br><br><br>
+
 <body>
+<main>
 
-  <br><br><br><br><br>
-
-        <div class="row justify-content-center">
-
-          <table class = "table w-50 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
-
-            <h2 style="text-align: center;">Your Followers</h2>
-
-            <thead class = "bg-light">
-              <tr><th><h3>Names: </h3></th></tr>
-            </thead>
-
-            {% for user in splitNames%}
-            <tbody>
-            <tr>
-            <td><h4>{{user[0]}}</h4></td>  
-            </tr>  
-            </tbody>
-            {% endfor %}
-            
-           </table>
-
+  <div class="card" style="width: 75rem">
+  <div class="border border-left border-right px-0">
+    <div class="p-3 border-bottom">
+      <h4 class="d-flex align-items-center mb-0">
+        Your Posts 
+      </h4>
+    </div>
+    <div>
+    {% for users in posts %}
+      <div>
+        <div class="d-flex p-3 border-bottom">
+          
+          <div class="d-flex w-100 ps-3">
+            <div>
+              
+                <h6 class="text-body" style = "text-align: left;">
+                  {{users['Author']}}
+                  <span class="small text-muted font-weight-normal"> • </span>
+                  <span class="small text-muted font-weight-normal">{{users['DatePosted']}}</span>
+                  <div class="btn-group">
+                  <button class="btn btn-secondary btn-sm dropdown-toggle float-end justify-content-end" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  </button>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="/editPost/{{users['DocID']}}">Edit</a></li>
+                    <li><a class="dropdown-item" href="/postDelete/{{users['DocID']}}">Delete</a></li>
+                  </ul>
+                  </div>
+                </h6>
+              
+              <p style="line-height: 1.2;">
+                {{users['Post']}}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
 
+
+
+
+</main>
+{% with messages = get_flashed_messages() %}
+                    {% if messages %}   
+                        {% for message in messages %}
+                        <script>
+                        swal( '{{ message }}', {
+                        button: "Close",
+                        });
+                        </script>
+                        {% endfor %} 
+                    {% endif %} 
+    {% endwith %}
+</body>
+
+
+<br><br><br><br>
     <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
         <div class="container">
           <span>Copyright 2022 by StockSim</span>
@@ -136,5 +163,5 @@
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script src="/static/jsStyle/bootstrap.bundle.min.js"></script>
-    </body>      
+          
 </html>
