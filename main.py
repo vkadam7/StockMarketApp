@@ -172,7 +172,8 @@ def postBlog():
            
             dbfire.collection('Blog').add({"Author": Author,"DatePosted":firestore.SERVER_TIMESTAMP,"Post":post,"Likes":0})
             flash("Your submission has been posted.")
-    return render_template("postBlog.html", stockNames = session['stockNames'])
+
+    return redirect(url_for("userPosts"))
 
 
 #Author: Miqdad Hafiz
