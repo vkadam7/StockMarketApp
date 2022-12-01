@@ -793,8 +793,6 @@ class Simulation:
             scores.append("%.2f" % round(float(temp['score']), 2))
             link = str('/orderHist/'+entry.id)
             links.append(link)
-            #buySell = str('/orderForm/' + entry.id)
-            #button.append(buySell)
             i+=1
         return sims, dates, scores, links
 
@@ -929,16 +927,17 @@ class User:
         data = self.db.collection("Users").document(self.username)
         data.update({ 'Experience' : experience })
 
-    def addFriend(db, user1, user2):
-        data = {
-            'user1': user1,
-            'user2': user2
-        }
-        db.collection("Users").add(data)
+    #No longer part of follower feature
+    #def addFriend(db, user1, user2):
+    #    data = {
+    #        'user1': user1,
+    #        'user2': user2
+    #    }
+    #    db.collection("Users").add(data)
 
-    def removeFriend(db, user1, user2):
-        for entry in db.collection('Users').where('user1','==',user1).where('user2','==',user2).stream():
-            db.collection('Users').document(entry.id).delete()
+    #def removeFriend(db, user1, user2):
+    #    for entry in db.collection('Users').where('user1','==',user1).where('user2','==',user2).stream():
+    #        db.collection('Users').document(entry.id).delete()
 
     def listFriends(db, user):
         friends = []
@@ -1095,6 +1094,9 @@ class Order:
             temp = entry.to_dict()
             tickers.append(temp['ticker'])
         return [*set(tickers)]
+    
+    #def buyRoute(db, user, sim):
+        
 
     def sellTaxLot(db, user, sim, orderID):
         doc = db.collection('Orders').document(orderID).get().to_dict()
@@ -1151,7 +1153,7 @@ class Order:
                 if temp['buyOrSell'] == 'Buy' and temp['sold'] == False:
                     link = str('/sellTaxLot/' + entry.id)
                 elif temp['buyOrSell'] == 'Buy' and temp['sold'] == True:
-                    link = "Sold"
+                    link = str('/buyOrder/' + entry.id)
                 else:
                     link = ""
                 if temp.get('partiallySold') != None and temp['sold'] == False:
@@ -1177,7 +1179,9 @@ class portfolio:
         self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
         self.profit, self.avgSharePrice, self.quantity = self.getVariables()
         self.volatility = 0
-        self.newLink = str('/orderConfirm?ticker =' + stock + '&timespan=hourly')
+        self.buyForm = str('/buyOrder?ticker='+stock)
+        self.sellForm = str('/stockSell?ticker='+stock)
+        #self.sellForm = str('/sellForm')
 
     def getVariables(self):
         currentPriceOfStock = SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock)
@@ -1327,21 +1331,6 @@ class portfolio:
                 fig[i].set_color(color[i])
             
             plt.show
-           
-           
-    #def animate():
-        
-    #Display all information
-    def displayInfo(self, close):
-        print(self.percentChange)
-        print(self.returns)
-        print(self.funds_remaining)
-
-        print(self.get_profit)
-        if (self.GainorLoss > self.db.collection('IntradayStockData').document('').document('closes').get()):
-            print("Gains: +" + self.GainorLoss) 
-        elif (self.GainorLoss < self.db.collection('Stocks').document('daily').document('closes').get()):
-            return
 
 ## Class for setting up quiz - Muneeb Khan
 ## Updated by Ian Mcnulty

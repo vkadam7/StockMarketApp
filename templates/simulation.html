@@ -127,8 +127,8 @@
             let originalValuesList = {{originalValue|safe}};
             let percentageList = {{percentage|safe}};
             let linkList = {{links|safe}};
-            let buySellList =  {{buySell|safe}};
-            <!--let volatilityList = {{volatility|safe}};-->
+            let buyList =  {{buyLink|safe}};
+            let sellList = {{sellLink|safe}};
             
             let portfolio = [];
             for (let i = 0; i < tickersList.length; i++) {
@@ -142,9 +142,9 @@
                 'Change': profitList[i],
                 '% of Account' : percentageList[i],
                 'Link to Chart' : linkList[i], 
-                'Buy/Sell Options': buySellList[i]
-                <!--Volatility: volatilityList[i]-->
-              })
+                'Buy Option': buyList[i], 
+                'Sell Option': sellList[i]
+             })
             }
 
             function generatePortfolio(table, data, keys) {
@@ -177,38 +177,34 @@
                       temp = cell.innerHTML;
                       cell.innerHTML = temp + "%";
                     }
-                  } else {
+                  } else if (i == 8) {
                     var orderListCell = row.insertCell();
                     var orderListLink = document.createElement('a');
                     var orderListLinkText = document.createTextNode('Stock Display');
                     orderListLink.setAttribute('href', element[key]);
                     orderListLink.appendChild(orderListLinkText);
                     orderListCell.appendChild(orderListLink);
+                  } else if (i == 9) {
+                    var buyListCell = row.insertCell();
+                    var buyListLink = document.createElement('a');
+                    var buyListLinkText = document.createTextNode('Buy');
+                    buyListLink.setAttribute('href', element[key])
+                    buyListLink.appendChild(buyListLinkText);
+                    buyListCell.appendChild(buyListLink);
+                  } else {
+                    var sellListCell = row.insertCell();
+                    var sellListLink = document.createElement('a');
+                    var sellListLinkText = document.createTextNode('Sell');
+                    sellListLink.setAttribute('href', element[key])
+                    sellListLink.appendChild(sellListLinkText);
+                    sellListCell.appendChild(sellListLink);
                   }
                   i = i + 1;
                 }
-                for (let element of data) {
-                  let row = table.insertRow();
-                  i = 0;
-                  for (key in element) {
-                    if (i < 8) {
-                      let cell = row.insertCell();
-                      let text = document.createTextNode(element[key]);
-                      cell.appendChild(text);
-                    } else {
-                      var buySellCell = row.insertCell();
-                      var buySellLink = document.createElement('a');
-                      var buySellLinkText = document.createTextNode('Buy or Sell');
-                      orderListLink.setAttribute('href', element[key]);
-                      orderListLink.appendChild(buySellLinkText);
-                      orderListCell.appendChild(buySellLink);
-                    }
-                    i = i + 1;
-                  }
-                }
-              }
-            }
 
+              }
+
+            }
             let table = document.querySelector("table");
             let data = Object.keys(portfolio[0]);
             generatePortfolio(table, portfolio, data); 
