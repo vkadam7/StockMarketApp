@@ -74,7 +74,7 @@ def profile():
         #    endDate = endDateFetch[0]
             
             
-        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard)
+        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard, stockNames = session['stockNames'])
     else:
 
         redirect(url_for("login"))
@@ -104,7 +104,7 @@ def Blog():
         print("Here comes personal B")
         blog.sort(key = itemgetter('DatePosted'), reverse=True)
         print(blog)   
-        return render_template("Blog.html", blog = blog)
+        return render_template("Blog.html", blog = blog, stockNames = session['stockNames'])
 
 #Author: Miqdad Hafiz
 @app.route("/userPosts", methods = ["POST","GET"])
@@ -125,7 +125,7 @@ def userPosts():
                 posts.append(userPost)
         posts.sort(key = itemgetter('DatePosted'), reverse=True)
         print(posts)
-        return render_template("userPosts.html",posts = posts)
+        return render_template("userPosts.html",posts = posts, stockNames = session['stockNames'])
 
 
 #Author: Miqdad Hafiz
@@ -144,7 +144,7 @@ def editPost(id):
     edit = dbfire.collection('Blog').document(id).get()
     edit = edit.to_dict()
     edit['DocID'] = id
-    return render_template("editingPost.html", edit = edit)
+    return render_template("editingPost.html", edit = edit, stockNames = session['stockNames'])
 
 
 @app.route("/editingPost/<id>", methods = ["POST","GET"])
@@ -172,7 +172,7 @@ def postBlog():
            
             dbfire.collection('Blog').add({"Author": Author,"DatePosted":firestore.SERVER_TIMESTAMP,"Post":post,"Likes":0})
             flash("Your submission has been posted.")
-    return render_template("postBlog.html")
+    return render_template("postBlog.html", stockNames = session['stockNames'])
 
 
 #Author: Miqdad Hafiz
@@ -184,7 +184,7 @@ def Leaderboard():
         documentRef.sort(key = itemgetter('score'), reverse=True)
         print("about to print leaderboard")
         print(documentRef)
-        return render_template("Leaderboard.html",documentRef = documentRef) #placeholder
+        return render_template("Leaderboard.html",documentRef = documentRef, stockNames = session['stockNames']) #placeholder
     else:
         redirect(url_for("login"))
 
@@ -212,7 +212,7 @@ def followingList():
             followingList.extend(temp['FollowingNames'])
         names = [item.split(',') for item in followingList]
         print(names)
-        return render_template('followingList.html', names = names)
+        return render_template('followingList.html', names = names, stockNames = session['stockNames'])
     else:
         redirect(url_for("profile"))
     
@@ -734,7 +734,7 @@ def goToSimulation():
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
                 currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue,
-                percentage=percentage, links=links, buyLink = buyLink, sellLink = sellLink)  
+                percentage=percentage, links=links, buyLink = buyLink, sellLink = sellLink, stockNames = session['stockNames'])  
             else:
                 return redirect(url_for('.finishSimulation'))
         except KeyError:
