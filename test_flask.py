@@ -139,8 +139,24 @@ def test_passwordRecoveryFail(client):
     assert testpasswordRecovery.status_code == 200 # Keep user on Password recovery page code 200
 
 def test_passwordRecoveryNoEmail(client):
-    testpasswordRecovery = client.post("/PasswordRecovery")
-    assert testpasswordRecovery.status_code == 400 # Throw a bad request error code 400 for empty email field
+    testpasswordRecovery = client.post("/PasswordRecovery", data = {"email" : ""})
+    assert testpasswordRecovery.status_code == 200 # Keep user on Password recovery page code 200
+
+
+#Profile update tests
+def test_editProfilesuccess(client): 
+
+    testprofileEdit = client.post("/update", data = {"email" : "muneebfkhan93@gmail.com",
+    "Unames" : "MuneebEdit",
+    "experience" : "Update Experience"})
+    assert testprofileEdit.status_code == 302
+
+def test_editProfilefail_toomanycharacters(client):
+
+    testprofileEdit = client.post("/update", data = {"email" : "muneebfkhan93@gmail.com",
+    "Unames" : "MuneebEdit",
+    "experience" : "This experience is too long"})
+    assert testprofileEdit.status_code == 200
 
 #Logout test case - Muneeb Khan
 def test_logout(client):
