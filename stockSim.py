@@ -875,6 +875,13 @@ class Simulation:
                     names.append(str(temp['name']))
         return tickers, prices, links, names
 
+## Class: SimulationFactory
+#   Description: Class used to create Simulation objects by retrieving the currently ongoing 
+#   simulation associated with the user
+#
+#   Dependencies: Simulation
+#
+#   Authors: Ian McNulty
 class SimulationFactory:
     def __init__(self, db, email):
         self.simulation = Simulation.retrieveOngoing(db, email)
