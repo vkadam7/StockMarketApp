@@ -1252,8 +1252,6 @@ def quizpage():
         answers8 = [answers[7]]
         answers9 = [answers[8]]
         answers10 = [answers[9]]
-        answers11 = [answers[10]]
-
 
         if (request.method == 'POST'):
             
