@@ -14,7 +14,7 @@ from flask import Flask, abort, flash, session, render_template, request, redire
 import pyrebase
 import firebase_admin
 
-from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, portfolio, DAYS_IN_MONTH
+from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, Portfolio, DAYS_IN_MONTH
 from followers import FollowUnfollow, UserInfo
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -728,24 +728,24 @@ def goToSimulation():
                 
                 percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
-                    Portfolio = portfolio(dbfire, entry, session['user'], session['simName'])
+                    portfolio = Portfolio(dbfire, entry, session['user'], session['simName'])
                     #order = Order.sellTaxLot(dbfire, session['user'], session['simName'], session['orderID'])
-                    if Portfolio.quantity != 0:
+                    if portfolio.quantity != 0:
                         currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
                         tickers.append(entry)
-                        quantities.append(Portfolio.quantity)
-                        sharesPrices.append("$%.2f" % round(Portfolio.avgSharePrice,2))
+                        quantities.append(portfolio.quantity)
+                        sharesPrices.append("$%.2f" % round(portfolio.avgSharePrice,2))
                         currentPrices.append("$%.2f" % round(currentPrice, 2))
-                        totalValue.append("$%.2f" % round(Portfolio.quantity*currentPrice, 2))
-                        originalValue.append("$%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
-                        profits.append("%.2f" % round((Portfolio.quantity*currentPrice) - (Portfolio.avgSharePrice*Portfolio.quantity), 2))
-                        percent = Portfolio.quantity*currentPrice / (currentCash+sharesValue) * 100
+                        totalValue.append("$%.2f" % round(portfolio.quantity*currentPrice, 2))
+                        originalValue.append("$%.2f" % round(portfolio.avgSharePrice*portfolio.quantity, 2))
+                        profits.append("%.2f" % round((portfolio.quantity*currentPrice) - (portfolio.avgSharePrice*portfolio.quantity), 2))
+                        percent = portfolio.quantity*currentPrice / (currentCash+sharesValue) * 100
                         percentageTotal += percent
                         percentage.append("%.2f" % round(percent, 2))
-                        volatility.append("%.2f" % round(Portfolio.volatility,2))
-                        links.append(Portfolio.link)
-                        buyLink.append(Portfolio.buyForm)
-                        sellLink.append(Portfolio.sellForm)
+                        volatility.append("%.2f" % round(portfolio.volatility,2))
+                        links.append(portfolio.link)
+                        buyLink.append(portfolio.buyForm)
+                        sellLink.append(portfolio.sellForm)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
@@ -1152,7 +1152,7 @@ def orderlists():
         orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
         buySellButtons = []
         for entry in Order.stocksBought(dbfire,session['simName']):
-            Portfolio = portfolio(dbfire,entry,session['user'],session['simName'])
+            portfolio = Portfolio(dbfire,entry,session['user'],session['simName'])
 
         return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
         tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list(), partiallySold=orderlist['partiallySold'].to_list(), 
@@ -1177,7 +1177,7 @@ def fourOhFour():
     return render_template('404Error.html',person = session['user'], stockNames = session['stockNames'])
     
 #@app.route('/startSimulation')
-#def portfolioGraph():
+#def PortfolioGraph():
 #    if 'user' in session:
 
 ## Route for Quiz selection page - Muneeb Khan
@@ -1275,7 +1275,6 @@ def quizpage():
         answers8 = [answers[7]]
         answers9 = [answers[8]]
         answers10 = [answers[9]]
-        #answers11 = [answers[10]]
 
         if (request.method == 'POST'):
             
