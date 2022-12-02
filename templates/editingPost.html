@@ -30,20 +30,32 @@
                   <li class="nav-item">
                     <a class="nav-link" href="aboutus">About Us</a>
                   </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="information">Information</a>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Information Pages</a>
+                    <ul class = "dropdown-menu">
+                      <li><a class ="dropdown-item" href="information">Information</a></li>
+                      <li><a class ="dropdown-item" href="graphPictures">Graph Pictures</a></li>
+                      <li><a class ="dropdown-item" href="StockDefinitions">Stock Definitions</a></li>
+                    </ul>
                   </li>
                   {% if session['user'] %}
           <li class="nav-item">
-            <a class = "nav-link active" method = "POST" href = "profile">Profile</a> 
+            <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
           </li>
-        </li class = "nav-item">
+        <li class = "nav-item">
             <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
+         </li>
+         <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">StockFeed</a>
+          <ul class = "dropdown-menu">
+            <li><a class ="dropdown-item" href="Blog">StockFeed</a></li>
+            <li><a class ="dropdown-item" href="userPosts">Your Posts</a></li>
+          </ul>
          </li>
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
           </li>
-          </li class = "nav-item">
+          <li class = "nav-item">
             <a class = "nav-link" method = "POST" href = "update">Update</a>
           </li>
           <li class="nav-item">
@@ -98,13 +110,12 @@
 <body>
 <main>
 
-    <div class="card w-75">
-    <div class="card-header">Original Post</div>
+    <div class="card w-75 ml-5">
+    <div class="card-header ml-5">Original Post</div>
     <div class="card-body">{{edit['Post']}}</div>
-    
     </div>
 
-    
+    <div class = "container w-75">
     <div id = "posting">
     <h1 style="text-align:left"> Edit your post</h1>
     <hr>
@@ -116,12 +127,14 @@
         <textarea class="form-control" rows="5" name = "editingthePost" id="comment"></textarea>
         </div>
         <br>  
-        <div class = "d-flex justify-content-end">
+        <div class = "d-flex">
         <button class = "btn btn-block" style = "background-color:rgb(33, 103, 42);color:WHITE;">Post</button>
         </div>
         </form>
         </div>
     </div>
+    
+    
 
 
 
