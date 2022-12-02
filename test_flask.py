@@ -104,12 +104,12 @@ def test_register_invalidemail(client):
 
 def test_register_missingemail(client):
 
-    testregisteruser = client.post("/register", data = {
+    testregisteruser = client.post("/register", data = { "email" : "",
     "password" : "ABCDEF3#",
     "confirmPassw" : "ABCDEF3#",
     "Unames" : "Samples",
     "username" : "Samples"})
-    assert testregisteruser.status_code == 400 # Returns bad request code 400 for missing email
+    assert testregisteruser.status_code == 200 # Keeps user on register page code 200
 
 def test_register_invalidusername(client):
 
@@ -124,14 +124,16 @@ def test_register_missingusername(client):
 
     testregisteruser = client.post("/register", data = {"email" : "sample1234@gmail.com",
     "password" : "ABCDEF3#",
-    "confirmPassw" : "ABCDEF3#"})
-    assert testregisteruser.status_code == 400 # Returns bad request code 400 for missing username
+    "confirmPassw" : "ABCDEF3#",
+    "Unames" : "",
+    "username" : "Samples"})
+    assert testregisteruser.status_code == 200 # Keeps user on register page code 200
 
 #Test cases for Password recovery - Muneeb Khan
 #Succesful Password recovery test
 def test_passwordRecoverySuccess(client):
-    testpasswordRecovery = client.post("/PasswordRecovery", data = {"email" : "muneebfkhan93@gmail.com"})
-    assert testpasswordRecovery.status_code == 302 # Redirect user to login code 302
+    testpasswordRecovery = client.post("/PasswordRecovery", data = {"email" : "Unittest1234@gmail.com"})
+    assert testpasswordRecovery.status_code == 302 # Redirect user to login page code 302
 
 #Unsuccesful Password recovery tests
 def test_passwordRecoveryFail(client):
@@ -143,20 +145,30 @@ def test_passwordRecoveryNoEmail(client):
     assert testpasswordRecovery.status_code == 200 # Keep user on Password recovery page code 200
 
 
-#Profile update tests
+#Profile update tests - Muneeb Khan
 def test_editProfilesuccess(client): 
 
-    testprofileEdit = client.post("/update", data = {"email" : "muneebfkhan93@gmail.com",
-    "Unames" : "MuneebEdit",
+    testprofileEdit = client.post("/update", data = {"Unames" : "MuneebEdit",
     "experience" : "Update Experience"})
-    assert testprofileEdit.status_code == 302
+    assert testprofileEdit.status_code == 302 # Redirect user to profile page code 302
+
+def test_editProfilefail_usernameinuse(client):
+
+    testprofileEdit = client.post("/update", data = {"Unames" : "UnitTesting",
+    "experience" : "Update Experience"})
+    assert testprofileEdit.status_code == 200 # Keep user on update page code 200
+
+def test_editProfilefail_nousername(client):
+
+    testprofileEdit = client.post("/update", data = {"Unames" : "",
+    "experience" : "Update Experience"})
+    assert testprofileEdit.status_code == 200 # Keep user on update page code 200
 
 def test_editProfilefail_toomanycharacters(client):
 
-    testprofileEdit = client.post("/update", data = {"email" : "muneebfkhan93@gmail.com",
-    "Unames" : "MuneebEdit",
+    testprofileEdit = client.post("/update", data = {"Unames" : "MuneebEdit",
     "experience" : "This experience is too long"})
-    assert testprofileEdit.status_code == 200
+    assert testprofileEdit.status_code == 200 # Keep user on update page code 200
 
 #Logout test case - Muneeb Khan
 def test_logout(client):
