@@ -55,8 +55,14 @@ def test_BuyOrder():
     currentPrice = "%.2f" % round(SimulationFactory(dbfire, testEmail).simulation.currentPriceOf(testTicker), 2)
     assert float(currentPrice) > 5
     assert float(currentPrice) < 15
+    portfolioValue, currentCash = Simulation.getPortfolioValue(dbfire,sim.simName)
+    assert portfolioValue == 0
+    assert currentCash == 100
     order = Order(dbfire, sim.simName, testTicker, 'Buy', 5, currentPrice)
     order.buyOrder()
+    portfolioValue, currentCash = Simulation.getPortfolioValue(dbfire,sim.simName)
+    assert portfolioValue == 5*float(currentPrice)
+    assert currentCash == 100 - 5*float(currentPrice)
     for entry in dbfire.collection('Orders').where('simulation', '==', sim.simName).where('ticker','==',testTicker).where('buyOrSell','==','Buy').stream():
         buyOrder = entry.to_dict()
     assert buyOrder['sold'] == False
@@ -88,6 +94,9 @@ def test_SellOrder():
     assert buyOrder1['sold'] == False
     assert buyOrder1['partiallySold'] == True
     assert buyOrder1['newQuantity'] == 4
+    portfolioValue, currentCash = Simulation.getPortfolioValue(dbfire,sim.simName)
+    assert portfolioValue == 4*float(currentPrice)
+    assert currentCash == 100 - 4*float(currentPrice)
     dbfire.collection('Orders').document(sellOrder1ID).delete()
     order = Order(dbfire, sim.simName, testTicker, 'Sell', 4, currentPrice)
     order.sellOrder()
@@ -106,8 +115,46 @@ def test_SellOrder():
     assert buyOrder2['sold'] == True
     assert buyOrder2['partiallySold'] == True
     assert buyOrder2['newQuantity'] == 0
+    portfolioValue, currentCash = Simulation.getPortfolioValue(dbfire,sim.simName)
+    assert portfolioValue == 0
+    assert currentCash == 100
     for entry in dbfire.collection('Orders').where('simulation','==',sim.simName).stream():
         dbfire.collection('Orders').document(entry.id).delete()
+
+def test_SellTaxLot():
+    testEmail = "gi5631@wayne.edu"
+    testTicker = 'F'
+    dbfire = firestore.client() #firestore database
+    sim = SimulationFactory(dbfire, testEmail)
+    sim = sim.simulation
+    currentPrice = "%.2f" % round(SimulationFactory(dbfire, testEmail).simulation.currentPriceOf(testTicker), 2)
+    assert float(currentPrice) > 5
+    assert float(currentPrice) < 15
+    portfolioValue, currentCash = Simulation.getPortfolioValue(dbfire,sim.simName)
+    assert portfolioValue == 0
+    assert currentCash == 100
+    order = Order(dbfire, sim.simName, testTicker, 'Buy', 5, currentPrice)
+    order.buyOrder()
+    for entry in dbfire.collection('Orders').where('simulation', '==', sim.simName).where('ticker','==',testTicker).where('buyOrSell','==','Buy').stream():
+        buyOrder1 = entry
+    buyID = buyOrder1.id
+    portfolioValue, currentCash = Simulation.getPortfolioValue(dbfire,sim.simName)
+    assert portfolioValue == 5*float(currentPrice)
+    assert currentCash == 100 - 5*float(currentPrice)
+    order = Order(dbfire, sim.simName, testTicker, 'Sell', 5, currentPrice)
+    Order.sellTaxLot(dbfire, testEmail, sim.simName, buyID)
+    for entry in dbfire.collection('Orders').where('simulation', '==', sim.simName).where('ticker','==',testTicker).where('buyOrSell','==','Sell').stream():
+        sellOrder1 = entry
+    sellOrder1 = sellOrder1.to_dict()
+    for entry in dbfire.collection('Orders').where('simulation', '==', sim.simName).where('ticker','==',testTicker).where('buyOrSell','==','Buy').stream():
+        buyOrder1 = entry
+    buyOrder1 = buyOrder1.to_dict()
+    assert sellOrder1['quantity'] == 5
+    assert sellOrder1['avgStockPrice'] == currentPrice
+    assert buyOrder1['sold'] == True
+    portfolioValue, currentCash = Simulation.getPortfolioValue(dbfire,sim.simName)
+    assert portfolioValue == 0
+    assert currentCash == 100
 
 def test_StockSimFinish():
     testEmail = "gi5631@wayne.edu"
