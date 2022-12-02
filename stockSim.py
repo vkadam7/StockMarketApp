@@ -1318,23 +1318,38 @@ class Order:
 #
 #   Authors: Viraj Kadam, Ian McNulty, Muneeb Khan
 class Portfolio:
-    def __init__(self, db, stock, user, simulation):
+    ## Portfolio.__init__
+    #   Description: Initiates an entry of the portfolio table for the front end and 
+    #   creates all necessary data for viewing
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           stock - String, ID of the associated stock
+    #           user - String, ID of the associated user
+    #           simName - String, ID for the current simulation
+    #
+    #   Author: Ian McNulty, Viraj Kadam
+    def __init__(self, db, stock, user, simName):
         self.firebase = db
         self.stock = stock
         self.user = user
-        self.sim = simulation 
+        self.simName = simName 
         self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
         self.profit, self.avgSharePrice, self.quantity = self.getVariables()
         self.volatility = 0
         self.buyForm = str('/buyOrder?ticker='+stock)
         self.sellForm = str('/stockSell?ticker='+stock)
 
+    ## Portfolio.getVariables
+    #   Description: Obtains the values for profit of the shares owned, average 
+    #   share price of the owned shares, and the quantity of the owned shares
+    #
+    #   Author: Ian McNulty
     def getVariables(self):
         currentPriceOfStock = SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock)
         prices = []
         avgStockPrices = []
         amountOfSharesOwned = 0
-        for entry in Order.retrieve(self.firebase, self.sim, self.stock):
+        for entry in Order.retrieve(self.firebase, self.simName, self.stock):
             temp = entry.to_dict()
             avgStockPrices.append(float(temp['avgStockPrice']))
             prices.append(float(temp['totalPrice']))
@@ -1353,7 +1368,7 @@ class Portfolio:
         else:
             return currentValueOfShares - avgPriceOfOrders, 0, amountOfSharesOwned
             
-
+    ## Portfolio.GainorLoss - DEPRECATED
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
     def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
           #tempData = self.db.collection('Simulations').document(self.sim).document('Orders').get()
@@ -1364,8 +1379,6 @@ class Portfolio:
         currentCash = self.db.collection('Simulations').document(self.sim).document('currentCash').get()
         currentPrice = Simulation.currentPriceOf
         day = datetime()
-        
-        
         stocksOwned = self.db.collection('Orders').document(self.sim).document('ticker')
 
         if quanity > 0:    
@@ -1388,7 +1401,8 @@ class Portfolio:
                  netGainorLoss = (currentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
                  return netGainorLoss
               
-     #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
+    ## Portfolio.funds_remaining - DEPRECATED
+    #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
     def funds_remaining(self, initialAmount, finalAmount):
         finalAmount = 0
         fundsUsed = 0
@@ -1420,14 +1434,15 @@ class Portfolio:
                  fundsUsed = data['currentCash'] - data['initialCash']
                  fundsRemainiing = fundsUsed
                  return fundsRemainiing
-       
         
+    ## Portfolio.returns - DEPRECATED
     #Edited returns feature
     def returns(self, quantity, avgStockPrice, AdjustClose):
         returns = self.db.collection('Stocks').document('daily').document('closes').get()
         daily_returns = returns.pct_change()
         print(daily_returns)
-       
+
+    ## Portfolio.volatitlity - DEPRECATED  
     #New volatility function (Viraj Kadam)   
     def volatitlity(self):
        currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
@@ -1443,6 +1458,7 @@ class Portfolio:
            
        return volatility
            
+    ## Portfolio.percentChange - DEPRECATED
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
     def percentChange(db,simName):
@@ -1459,6 +1475,7 @@ class Portfolio:
         print(str(finalAmount) + " %")
         return (str(finalAmount) + " %")   
         
+    ## Portfolio.user_graph - DEPRECATED
     #Author: Viraj Kadam    
     #Graph of user stocks   (Need buy and sell info)
     def user_graph(self, db, startDate, endDate):
@@ -1469,14 +1486,14 @@ class Portfolio:
             temp = entry.to_dict()
             xlabel = prices
             ylabel = dates
-            fig = plt.figure()
-            plt.xlabel('Date')
-            plt.ylabel('Price')
-            fig = plt.plot(prices[i], dates[i])
-            for i in range(db.collection('Simulations').collections('simName').collection('startDate'), db.collection('Simulations').collections('simName').collection('endDate')):
-                fig[i].set_color(color[i])
+            ##fig = plt.figure()
+            ##plt.xlabel('Date')
+            ##plt.ylabel('Price')
+            ##fig = plt.plot(prices[i], dates[i])
+            ##for i in range(db.collection('Simulations').collections('simName').collection('startDate'), db.collection('Simulations').collections('simName').collection('endDate')):
+            ##    fig[i].set_color(color[i])
             
-            plt.show
+            ##plt.show
 
 ## Class: Quiz
 #   Description: Class used to handle questions and answers for quizzes taken by the user
@@ -1485,6 +1502,14 @@ class Portfolio:
 #
 #   Authors: Muneeb Khan, Ian McNulty
 class Quiz:
+    ## Quiz.__init__
+    #   Description: Creates a Quiz object with data retrieved from the Firestore database
+    #
+    #   Inputs: db - Firestore object, link to the Firestore database
+    #           quizID - String, ID of the requested quiz
+    #           user - String, ID of the associated user taking the quiz
+    #
+    #   Author: Muneeb Khan, Ian McNulty
     def __init__(self,db,quizID,user):
         self.db = db
         self.questions = self.retrieveQuestions(quizID)
@@ -1492,7 +1517,12 @@ class Quiz:
         self.user = user
         self.correct = []
     
-    # To store all the questions and answers for the Quiz
+    ## Quiz.retrieveQuestions
+    #   Description: To store all the questions and answers for the Quiz
+    #
+    #   Inputs: quizID - String, ID of the requested quiz
+    #
+    #   Author: Muneeb Khan, Ian McNulty
     def retrieveQuestions(self, quizid):
         quiz = self.db.collection('Quiz').document(quizid).get().to_dict()
 
@@ -1504,7 +1534,13 @@ class Quiz:
         self.questions = pd.DataFrame(questions, columns=['id','text','answers','correct'])
         return pd.DataFrame(questions, columns=['id','text','answers','correct'])
 
-    # Check if Users answer is correct
+    ## Quiz.answerQuestion
+    #   Description: Check if Users answer is correct
+    #
+    #   Inputs: questionid - String, ID of the requested question
+    #           answer - Character, answer from the user for this question
+    #
+    #   Author: Muneeb Khan, Ian McNulty
     def answerQuestion(self, questionid, answer):
         question = self.questions.loc[self.questions['id'].isin([questionid])]
         index = self.questions[self.questions['id'] == questionid].index[0]
@@ -1512,12 +1548,20 @@ class Quiz:
         if answer == correct[0]:
             self.correct.append(True)
 
+    ## Quiz.scoreCalc
+    #   Description: Calculates the score of the quiz after finishing
+    #
+    #   Author: Muneeb Khan, Ian McNulty
     def scoreCalc(self):
         count = len(self.correct)
 
         self.score = round(count, 2)
         return round(count, 2)
 
+    ## Quiz.submitScore
+    #   Description: Submits the score as an entry into the database
+    #
+    #   Author: Muneeb Khan, Ian McNulty
     def submitScore(self):
         data = {
             'user': self.user,
@@ -1526,7 +1570,15 @@ class Quiz:
         }
         self.db.collection('QuizScores').add(data)
 
-    def retrieveScore(db, user, qid):
-        for entry in db.collection('QuizScores').where('user','==',user).where('qid','==',qid).stream():
+    ## Quiz.retrieveScore
+    #   Description: Retrieves the score entry associated with the user for the requested quiz
+    #
+    #   Inputs: db - Firestore object, link to the Firestore database
+    #           quizID - String, ID of the requested quiz
+    #           user - String, ID of the associated user taking the quiz
+    #
+    #   Author: Muneeb Khan, Ian McNulty
+    def retrieveScore(db, quizID, user):
+        for entry in db.collection('QuizScores').where('user','==',user).where('qid','==',quizID).stream():
             temp = entry.to_dict()
             return temp['score']
