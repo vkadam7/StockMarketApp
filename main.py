@@ -1354,9 +1354,9 @@ def quiz2():
         return redirect(url_for("login"))
 
 @app.route("/quiz3", methods = ["POST", "GET"])
-def quiz4():
+def quiz3():
     if ('user' in session):
-        quizID = 'Quiz3'
+        quizID = 'Quiz4'
         quiz = Quiz(dbfire,quizID,session['user'])
         questions = quiz.questions['text']
         answers = quiz.questions['answers']
@@ -1402,7 +1402,7 @@ def quiz4():
 @app.route("/quiz4", methods = ["POST", "GET"])
 def quiz4():
     if ('user' in session):
-        quizID = 'Quiz3'
+        quizID = 'Quiz4'
         quiz = Quiz(dbfire,quizID,session['user'])
         questions = quiz.questions['text']
         answers = quiz.questions['answers']
