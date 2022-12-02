@@ -40,8 +40,15 @@
                   <li class="nav-item">
                     <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
                   </li>
-                  </li class = "nav-item">
+                  <li class = "nav-item">
                     <a class = "nav-link" method = "POST" href = "social">Your Network</a> 
+                  </li>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">StockFeed</a>
+                    <ul class = "dropdown-menu">
+                      <li><a class ="dropdown-item" href="Blog">StockFeed</a></li>
+                      <li><a class ="dropdown-item" href="userPosts">Your Posts</a></li>
+                    </ul>
                   </li>
                   <li class="nav-item">
                     <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
@@ -132,12 +139,12 @@
                             <form method = "POST" >
                                 <div class = "form-outline mb-4">
                                   <label class = "form-label" for = "email">Email Address</label>
-                                  <input type = "email" id = "email" name = "email" class = "form-control form-control-lg" placeholder="ex: john123@sample.com" required />
+                                  <input type = "email" id = "email" name = "email" class = "form-control form-control-lg" placeholder="ex: john123@sample.com"/>
                                 </div>
 
                                 <div class = "form-outline mb-4">
                                     <label class = "form-label" for = "password">Password</label>
-                                    <input type = "password" id = "password" name = "password" class = "form-control form-control-lg" placeholder="Must be 6 characters minimum" required />
+                                    <input type = "password" id = "password" name = "password" class = "form-control form-control-lg" placeholder="Must be 6 characters minimum"/>
                                 </div>
 
                                 <div class = "d-flex justify-content-around align-items-center mb-4">
