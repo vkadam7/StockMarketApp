@@ -706,7 +706,7 @@ class Simulation:
     #   adding the amount of change to it
     #
     #   Inputs: db - Firestore object, link to Firestore database
-    #           simName - String, ID of the simulation data entry to be finished
+    #           simName - String, ID of the simulation data entry
     #           delta - Float, amount to update the currently available cash by
     #
     #   Author: Ian McNulty
@@ -720,7 +720,7 @@ class Simulation:
     #   Description: Retrieves the available amount of cash to the user in the simulation
     #
     #   Inputs: db - Firestore object, link to Firestore database
-    #           simName - String, ID of the simulation data entry to be finished
+    #           simName - String, ID of the simulation data entry
     #
     #   Return: data['currentCash'] - Float, currently available amount of cash to the user
     #
@@ -734,7 +734,7 @@ class Simulation:
     #   the simulation's associated stocks; to be used with time limit checking for simulation
     #
     #   Inputs: db - Firestore object, link to Firestore database
-    #           simName - String, ID of the simulation data entry to be finished
+    #           simName - String, ID of the simulation data entry
     #
     #   Return: highestIndex - Integer, highest index found in the IntradayStockData for the sim
     #
@@ -753,7 +753,7 @@ class Simulation:
     #   user
     #
     #   Inputs: db - Firestore object, link to Firestore database
-    #           simName - String, ID of the simulation data entry to be finished
+    #           simName - String, ID of the simulation data entry
     #           user - String, ID of the user to be checked
     #
     #   Return: True, if ongoing simulation found
@@ -1051,9 +1051,21 @@ class User:
 #
 #   Authors: Ian McNulty, Muneeb Khan
 class Order:
-    def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
+    ## Order.__init__
+    #   Description: Creates an object of Order type to be able to add it to the Orders collection in
+    #   the Firestore database
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           simName - String, ID of the associated simulation
+    #           stock - String, ID of the associated stock
+    #           buyOrSell - String, type of order to be created
+    #           quantity - Integer, amount of shares to be bought or sold
+    #           stockPrice - Float, price of the stock at time of purchase
+    #
+    #   Author: Ian McNulty
+    def __init__(self, db, simName, stock, buyOrSell, quantity, stockPrice):
         self.db = db
-        self.sim = simulation
+        self.simName = simName
         self.stock = stock
         self.dayOfPurchase = datetime.datetime.now()
         self.option = buyOrSell
@@ -1061,14 +1073,18 @@ class Order:
         self.avgStockPrice = stockPrice
         self.totalPrice = float(quantity)*float(stockPrice)
 
+    ## Order.buyOrder
+    #   Description: Creates a buy order if the user has enough money
+    #
+    #   Author: Ian McNulty
     def buyOrder(self):
         if self.option == 'Buy':
             if self.doTheyHaveEnoughMoney():
-                count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
-                orderName = self.sim + self.stock + str(count)
+                count = len(self.db.collection('Orders').where('simulation', '==', self.simName).get())
+                orderName = self.simName + self.stock + str(count)
                 data = {
                     'sold': False,
-                    'simulation': self.sim,
+                    'simulation': self.simName,
                     'ticker': self.stock,
                     'dayOfPurchase': self.dayOfPurchase,
                     'buyOrSell': 'Buy',
@@ -1077,18 +1093,22 @@ class Order:
                     'totalPrice': self.totalPrice
                 }
                 self.db.collection('Orders').document(orderName).set(data)
-                Simulation.updateCash(self.db, self.sim, float(self.totalPrice) * -1)
+                Simulation.updateCash(self.db, self.simName, float(self.totalPrice) * -1)
                 return 1
             else: return -1
 
+    ## Order.sellOrder
+    #   Description: Creates a sell order if the user has enough shares
+    #
+    #   Author: Ian McNulty
     def sellOrder(self):
         if self.option == 'Sell':
             check, averagePrice = self.doTheyOwnThat()
             if check == True:
-                count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
-                orderName = self.sim + self.stock + str(count)
+                count = len(self.db.collection('Orders').where('simulation', '==', self.simName).get())
+                orderName = self.simName + self.stock + str(count)
                 data = {
-                    'simulation': self.sim,
+                    'simulation': self.simName,
                     'ticker': self.stock,
                     'dayOfPurchase': self.dayOfPurchase,
                     'buyOrSell': 'Sell',
@@ -1098,24 +1118,33 @@ class Order:
                     'profit': float(self.avgStockPrice)*float(self.quantity) - float(averagePrice)*float(self.quantity)
                 }
                 self.db.collection('Orders').document(orderName).set(data)
-                Simulation.updateCash(self.db, self.sim, self.totalPrice)
+                Simulation.updateCash(self.db, self.simName, self.totalPrice)
                 return 1
             else: return -1
 
+    ## Order.doTheyHaveEnoughMoney
+    #   Description: Checks if the user has enough money to buy the requested amount of shares
+    #
+    #   Author: Ian McNulty
     def doTheyHaveEnoughMoney(self):
         enoughFlag = False
 
-        currentCash = int(self.db.collection('Simulations').document(self.sim).get().to_dict()['currentCash'])
+        currentCash = int(self.db.collection('Simulations').document(self.simName).get().to_dict()['currentCash'])
         if currentCash >= self.totalPrice:
             enoughFlag = True
 
         return enoughFlag
 
+    ## Order.doTheyOwnThat
+    #   Description: Checks if the user owns the shares they are trying to sell
+    #
+    #   Author: Ian McNulty
     def doTheyOwnThat(self):
         quantityOwned = 0
         ownageFlag = False
         partialFlag = False
-        for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).get():
+        # Retrieve buy orders
+        for entry in self.db.collection('Orders').where('simulation','==',self.simName).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).get():
             temp = entry.to_dict()
             if temp.get('newQuantity') != None:
                 quantityOwned += int(temp['newQuantity'])
@@ -1130,8 +1159,9 @@ class Order:
         amountToSell = int(self.quantity)
         if ownageFlag:
             while amountToSell > 0:
+                # Partial order sales go first
                 if partialFlag == True:
-                    for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).where('partiallySold','==',True).stream():
+                    for entry in self.db.collection('Orders').where('simulation','==',self.simName).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).where('partiallySold','==',True).stream():
                         if amountToSell <= 0:
                             break
                         temp = entry.to_dict()
@@ -1143,7 +1173,8 @@ class Order:
                             self.db.collection('Orders').document(entry.id).update({'sold' : True, 'newQuantity' : 0})
                             amountToSell -= int(temp['newQuantity'])
                 
-                for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).stream():
+                # Whole order sales go second
+                for entry in self.db.collection('Orders').where('simulation','==',self.simName).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).stream():
                     if amountToSell <= 0:
                         break
                     temp = entry.to_dict()
@@ -1159,27 +1190,59 @@ class Order:
         
         return ownageFlag
 
-    def retrieve(db, sim, ticker):
-        return db.collection('Orders').where('simulation','==',sim).where('ticker','==',ticker).stream()
+    ## Order.retrieve
+    #   Description: Retrieves all orders associated with the simulation and ticker
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           simName - String, ID of the simulation data entry
+    #           ticker - String, ID of the stock to be affected
+    #
+    #   Author: Ian McNulty
+    def retrieve(db, simName, ticker):
+        return db.collection('Orders').where('simulation','==',simName).where('ticker','==',ticker).stream()
 
-    def retrieveOwned(db, sim, ticker):
-        return db.collection('Orders').where('simulation','==',sim).where('ticker','==',ticker).where('sold','==',False).stream()
+    ## Order.retrieveOwned
+    #   Description: Retrieves all unsold buy orders associated with the simulation and ticker
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           simName - String, ID of the simulation data entry
+    #           ticker - String, ID of the stock to be affected
+    #
+    #   Author: Ian McNulty
+    def retrieveOwned(db, simName, ticker):
+        return db.collection('Orders').where('simulation','==',simName).where('ticker','==',ticker).where('sold','==',False).stream()
 
-    def stocksBought(db, sim):
+    ## Order.stocksBought
+    #   Description: Retrieve list of stocks bought in the associated simulation
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           simName - String, ID of the simulation data entry
+    #
+    #   Author: Ian McNulty
+    def stocksBought(db, simName):
         tickers = []
-        for entry in db.collection('Orders').where('simulation','==',sim).stream():
+        for entry in db.collection('Orders').where('simulation','==',simName).stream():
             temp = entry.to_dict()
             tickers.append(temp['ticker'])
         return [*set(tickers)]
 
-    def sellTaxLot(db, user, sim, orderID):
+    ## Order.sellTaxLot
+    #   Description: Sells all remaining shares of a specific order
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           simName - String, ID of the simulation data entry
+    #           ticker - String, ID of the stock to be affected
+    #           orderID - String, ID of the order to be sold
+    #
+    #   Author: Ian McNulty
+    def sellTaxLot(db, user, simName, orderID):
         doc = db.collection('Orders').document(orderID).get().to_dict()
         avgStockPrice = SimulationFactory(db, user).simulation.currentPriceOf(doc['ticker'])
         if doc.get('newQuantity') == None:
-            count = len(db.collection('Orders').where('simulation', '==', sim).get())
-            orderName = sim + doc['ticker'] + str(count)
+            count = len(db.collection('Orders').where('simulation', '==', simName).get())
+            orderName = simName + doc['ticker'] + str(count)
             data = {
-                'simulation': sim,
+                'simulation': simName,
                 'ticker': doc['ticker'],
                 'dayOfPurchase': datetime.datetime.now(),
                 'buyOrSell': 'Sell',
@@ -1190,13 +1253,13 @@ class Order:
             }
             db.collection('Orders').document(orderName).set(data)
             db.collection('Orders').document(orderID).update({'sold' : True})
-            Simulation.updateCash(db, sim, float(doc['totalPrice']))
+            Simulation.updateCash(db, simName, float(doc['totalPrice']))
             return 1
         else:
-            count = len(db.collection('Orders').where('simulation', '==', sim).get())
-            orderName = sim + doc['ticker'] + str(count)
+            count = len(db.collection('Orders').where('simulation', '==', simName).get())
+            orderName = simName + doc['ticker'] + str(count)
             data = {
-                'simulation': sim,
+                'simulation': simName,
                 'ticker': doc['ticker'],
                 'dayOfPurchase': datetime.datetime.now(),
                 'buyOrSell': 'Sell',
@@ -1207,13 +1270,17 @@ class Order:
             }
             db.collection('Orders').document(orderName).set(data)
             db.collection('Orders').document(orderID).update({'sold' : True, 'newQuantity' : 0})
-            Simulation.updateCash(db, sim, doc['totalPrice'])
+            Simulation.updateCash(db, simName, doc['totalPrice'])
             return 1
-        return -1
 
-    # List of Orders by Muneeb Khan
+    ## Order.orderList
+    #   Description: Lists the order values for viewing on the front end
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           simName - String, ID for the current simulation
+    #
+    #   Author: Ian McNulty, Muneeb Khan
     def orderList(db, simName):
-        quantityOwned = 0
         ownageFlag = True
 
         # The order list function will loop through the orders in firebase and store each one
@@ -1261,7 +1328,6 @@ class Portfolio:
         self.volatility = 0
         self.buyForm = str('/buyOrder?ticker='+stock)
         self.sellForm = str('/stockSell?ticker='+stock)
-        #self.sellForm = str('/sellForm')
 
     def getVariables(self):
         currentPriceOfStock = SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock)
