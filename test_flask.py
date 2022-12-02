@@ -45,6 +45,7 @@ def test_information_page(client):
     assert testget.status_code == 200
 
 
+
 # Test cases for registration and validations for email, password, and username - Muneeb Khan
 # Successful registration test
 def test_register_success(client):
@@ -163,6 +164,8 @@ def test_logout(client):
     testlogout = client.get("/logout")
     assert testlogout.status_code == 302 # Redirect user to login page code 302
     
+#Login test case- Viraj Kadam
+    
 def test_login_successful(client):
     testuser = client.post("/login", data = {'email': "virajk063@gmail.com", "password": "ABCDEF2@"})
     assert testuser.status_code == 302
@@ -174,6 +177,8 @@ def test_login_failure_invalidEmail(client):
 def test_login_failure_invalidPassword(client):
     testuser = client.post("/login", data = {"email": "virajk063@gmail.com", "password": "ABCDEF2@"})
     assert testuser.status_code == 200
+
+
 
 
 
