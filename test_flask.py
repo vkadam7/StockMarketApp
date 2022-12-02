@@ -125,6 +125,22 @@ def test_passwordRecoveryFail(client):
 def test_passwordRecoveryNoEmail(client):
     testpasswordRecovery = client.post("/PasswordRecovery")
     assert testpasswordRecovery.status_code == 400 # Throw a bad request error code 400 for empty email field
+    
+def test_login_successful(client):
+    testuser = client.post("/login", data = {'email': "virajk063@gmail.com", "password": "ABCDEF2@"})
+    assert testuser.status_code == 302
+
+def test_login_failure_invalidEmail(client):
+    testuser = client.post("/login", data = {"email": "virajk063@gmail.com", "password": "ABCDEF2@"})
+    assert testuser.status_code == 200
+    
+def test_login_failure_invalidPassword(client):
+    testuser = client.post("/login", data = {"email": "virajk063@gmail.com", "password": "ABCDEF2@"})
+    assert testuser.status_code == 200
+
+
+
+    
 
 if __name__ == '__main__':
     pytest.main()
