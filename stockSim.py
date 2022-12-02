@@ -475,7 +475,7 @@ class StockData:
 ## Class: Simulation
 #   Description: Class used to manage Simulation entries and data from the Firestore database
 #
-#   Dependencies: firebase_admin, numpy, StockData, Order, portfolio, SimulationFactory
+#   Dependencies: firebase_admin, numpy, StockData, Order, Portfolio, SimulationFactory
 #
 #   Authors: Ian McNulty
 class Simulation:
@@ -606,7 +606,9 @@ class Simulation:
         return quantityOwned
 
     ## Simulation.finishSimulation
-    #   Description:
+    #   Description: Calculates score based on final valuation of Portfolio combined with
+    #   current amount of cash available to the user, it then marks the simulation as 
+    #   finished and stores the score
     #
     #   Inputs: db - Firestore object, link to Firestore database
     #           simName - String, ID of the simulation data entry to be finished
@@ -621,12 +623,12 @@ class Simulation:
         
         # Retrieve current values of owned shares
         for entry in Order.stocksBought(db, simName):
-            Portfolio = portfolio(db, entry, data['user'], simName)
-            if Portfolio.quantity != 0:
-                quantities.append(Portfolio.quantity)
+            portfolio = Portfolio(db, entry, data['user'], simName)
+            if portfolio.quantity != 0:
+                quantities.append(portfolio.quantity)
                 currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
         
-        # Summation of portfolio value
+        # Summation of Portfolio value
         for i in range(len(quantities)):
             totalValue += quantities[i] * currentPrices[i]
 
@@ -815,13 +817,13 @@ class Simulation:
         return False
 
     ## Simulation.getPortfolioValue
-    #   Description: Calculates the current portfolio value and gives it to the user along with
+    #   Description: Calculates the current Portfolio value and gives it to the user along with
     #   the current cash amount available to the user
     #
     #   Inputs: db - Firestore object, link to Firestore database
     #           simName - String, ID of the simulation data entry to be finished
     #
-    #   Return: totalValue - Float, total value of the portfolio, in USD
+    #   Return: totalValue - Float, total value of the Portfolio, in USD
     #           data['currentCash'] - Float, currently available amount of cash to the user
     #               in this simulation
     #
@@ -833,9 +835,9 @@ class Simulation:
         data = db.collection('Simulations').document(simName).get().to_dict()
         
         for entry in Order.stocksBought(db, simName):
-            Portfolio = portfolio(db, entry, data['user'], simName)
-            if Portfolio.quantity != 0:
-                quantities.append(Portfolio.quantity)
+            portfolio = Portfolio(db, entry, data['user'], simName)
+            if portfolio.quantity != 0:
+                quantities.append(portfolio.quantity)
                 currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
         
         for i in range(len(quantities)):
@@ -911,13 +913,20 @@ class SimulationFactory:
 ## Class: User
 #   Description: Class used to handle and change User data within the application
 #
-#   Dependencies: firebase_admin, numpy, StockData, Order, portfolio, SimulationFactory
+#   Dependencies: firebase_admin, numpy, StockData, Order, Portfolio, SimulationFactory
 #
 #   Authors: Ian McNulty, Muneeb Khan
 class User:
-    def __init__(self, db, username):
+    ## User.__init__
+    #   Description: Creates an object of User type with the given inputs
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           user - String, ID of the user to be created
+    #
+    #   Author: Ian McNulty
+    def __init__(self, db, user):
         self.db = db
-        self.username = username
+        self.user = user
         self.userDataDocument = self.retrieve()
         if self.userDataDocument != 'This data entry does not exist':
             self.email = self.userDataDocument['Email']
@@ -928,12 +937,27 @@ class User:
         else:
             print("This user does not exist")
 
+    ## User.retrieve
+    #   Description: Retrieves the user from the Firestore database
+    # 
+    #   Return: 'This data entry does not exist', if the user is not found
+    #           self.db.collection('Users').document(self.user).get(), if the user is found
+    #
+    #   Author: Ian McNulty
     def retrieve(self):
         try:
-            return self.db.collection('Users').document(self.username).get()
+            return self.db.collection('Users').document(self.user).get()
         except:
             return 'This data entry does not exist'
 
+    ## User.updateProfile
+    #   Description: Updates the profile entry in the database with the given parameters
+    # 
+    #   Inputs: description - String, new description of the user
+    #           picture - Photo (JPG, PNG, etc), new profile photo for the user
+    #           experience - String, new experience description of the user
+    #
+    #   Author: Ian McNulty
     def updateProfile(self, description="", picture="", experience=""):
         if description == "":
             description = self.description
@@ -945,25 +969,49 @@ class User:
         self.updatePicture(picture)
         self.updateExperience(experience)
 
+    ## User.updateDescription
+    #   Description: Updates the description field in the User entry
+    # 
+    #   Inputs: description - String, new description of the user
+    #
+    #   Author: Ian McNulty
     def updateDescription(self, description):
-        data = self.db.collection("Users").document(self.username)
+        data = self.db.collection("Users").document(self.user)
         data.update({ 'Description' : description })
 
+    ## User.updatePicture
+    #   Description: Updates the profile photo field in the User entry
+    # 
+    #   Inputs: picture - Photo (JPG, PNG, etc), new profile photo for the user
+    #
+    #   Author: Ian McNulty
     def updatePicture(self, picture):
-        data = self.db.collection("Users").document(self.username)
+        data = self.db.collection("Users").document(self.user)
         data.update({ 'Picture' : picture })
 
+    ## User.updateExperience
+    #   Description: Updates the experence field in the User entry
+    # 
+    #   Inputs: experience - String, new experience description of the user
+    #
+    #   Author: Ian McNulty
     def updateExperience(self, experience):
-        data = self.db.collection("Users").document(self.username)
+        data = self.db.collection("Users").document(self.user)
         data.update({ 'Experience' : experience })
 
-    def listFriends(db, user):
-        friends = []
-        for entry in db.collection('Users').where('user1','==',user).stream():
-            temp = entry.to_dict()
-            friends.append(temp['user2'])
-        return friends
-
+    ## User.registerUser
+    #   Description: Registers a user data entry with the given inputs
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           username - String, username of the user
+    #           email - String, email of the user
+    #           name - String, name of the user
+    #           userID - String, ID of the user
+    #           description - String, new description of the user
+    #           picture - Photo (JPG, PNG, etc), new profile photo for the user
+    #           experience - String, new experience description of the user
+    #
+    #   Author: Ian McNulty
     def registerUser(db, username, email, name, userID, description="", picture="", experience=""):
         data = {
             'Email' : email,
@@ -976,7 +1024,12 @@ class User:
         }
         db.collection('Users').document(username).set(data)
 
-    # User list by Muneeb Khan
+    ## User.userList
+    #   Description: Lists the user values for viewing on the front end
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #
+    #   Author: Ian McNulty, Muneeb Khan
     def userList(db):
 
         # The usernames list function will loop through the usernames in firebase and store each one
@@ -991,6 +1044,12 @@ class User:
         print(df)
         return df                 
 
+## Class: Order
+#   Description: Class used to handle and change Order data from the application
+#
+#   Dependencies: firebase_admin, numpy, Simulation, SimulationFactory
+#
+#   Authors: Ian McNulty, Muneeb Khan
 class Order:
     def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
         self.db = db
@@ -1112,9 +1171,6 @@ class Order:
             temp = entry.to_dict()
             tickers.append(temp['ticker'])
         return [*set(tickers)]
-    
-    #def buyRoute(db, user, sim):
-        
 
     def sellTaxLot(db, user, sim, orderID):
         doc = db.collection('Orders').document(orderID).get().to_dict()
@@ -1188,7 +1244,13 @@ class Order:
             
             return df
 
-class portfolio:
+## Class: Portfolio
+#   Description: Class used to handle and concatenate relevant ownership data for the user in the front end
+#
+#   Dependencies: firebase_admin, numpy, StockData, Order, Portfolio, SimulationFactory
+#
+#   Authors: Viraj Kadam, Ian McNulty, Muneeb Khan
+class Portfolio:
     def __init__(self, db, stock, user, simulation):
         self.firebase = db
         self.stock = stock
@@ -1350,8 +1412,12 @@ class portfolio:
             
             plt.show
 
-## Class for setting up quiz - Muneeb Khan
-## Updated by Ian Mcnulty
+## Class: Quiz
+#   Description: Class used to handle questions and answers for quizzes taken by the user
+#
+#   Dependencies: firebase_admin, pandas
+#
+#   Authors: Muneeb Khan, Ian McNulty
 class Quiz:
     def __init__(self,db,quizID,user):
         self.db = db
