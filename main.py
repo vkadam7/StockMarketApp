@@ -514,26 +514,40 @@ def update():
             results = request.form
             #newEmail = results['email']
             newUsername = results['Unames']
-            experience = results["experience"]  
-            
+            experience = results["experience"]
+            goodName = newUsername
+
+            # For loop to check if User is already using the username
             checkName = dbfire.collection('Users').where('Email','==',session['user']).get()
             for docs in checkName:
                 updatesInfo = docs.id
                 checkName = docs.to_dict()
-                oldName = checkName['userName']
 
-            goodName = newUsername
+            # For loop to check all documents on Firebase if the username is already in use by any other user
+            checkNames = dbfire.collection('Users').document(newUsername).get()
+            if checkNames.exists:
+                grabExistingName = dbfire.collection('Users').where('userName', '==', newUsername)
+                for docs in grabExistingName.stream(): 
+                    grabExistingName = docs.to_dict()
+                ExistingName = grabExistingName['userName']
             
+            # If the name isnt taken
+            else:
+                ExistingName = "ok"
+
+            # Check if user entered too many characters for experience
             if (len(experience) > 300):
                 print("There is a 300 character limit")
                 flash("There is a 300 character limit") #Adds experience to profile
                 return render_template('update.html')
         
-            elif (goodName == oldName):
-                print("Username is already taken. Please enter a valid username.")
-                flash("Username is already taken. Please enter a valid username.") #check to see if new username is taken
+            # Check if the new username matches an existing name on firebase
+            elif (goodName == ExistingName):
+                print("Sorry the username is already taken by another user. Please try a different username.")
+                flash("Sorry the username is already taken by another user. Please try a different username.") #check to see if new username is taken
                 return render_template('update.html')
             
+            # Update the username and experience based on user input
             else:
                 dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "experience": experience})
                 #dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "Email": newEmail, "experience": experience})
