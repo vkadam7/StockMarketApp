@@ -1352,5 +1352,97 @@ def quiz2():
     else:
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
+
+@app.route("/quiz3", methods = ["POST", "GET"])
+def quiz4():
+    if ('user' in session):
+        quizID = 'Quiz3'
+        quiz = Quiz(dbfire,quizID,session['user'])
+        questions = quiz.questions['text']
+        answers = quiz.questions['answers']
+        answers1 = [answers[0]]
+        answers2 = [answers[1]]
+        answers3 = [answers[2]]
+        answers4 = [answers[3]]
+        answers5 = [answers[4]]
+        answers6 = [answers[5]]
+        answers7 = [answers[6]]
+        answers8 = [answers[7]]
+        answers9 = [answers[8]]
+        answers10 = [answers[9]]
+        answers11 = [answers[10]]
+
+
+        if (request.method == 'POST'):
+            
+            choiceA = request.args['a']
+            choiceB = request.args['b']
+            choiceC = request.args['c']
+            choiceD = request.args['d']
+            submitButton = request.args['submitButton']
+
+            if request.method == choiceA:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceA)
+            elif request.method == choiceB:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceB)
+            elif request.method == choiceC:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceC)
+            elif request.method == submitButton:
+                return Quiz.submitScore(dbfire)
+            
+
+        return render_template('quiz2.html',quiz = quiz, questions = questions, answers = answers,
+        answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
+        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10, answers11 = answers11)
+                   
+    else:
+        flash("Sorry you must be logged in to take the quiz.")
+        return redirect(url_for("login"))
+    
+@app.route("/quiz4", methods = ["POST", "GET"])
+def quiz4():
+    if ('user' in session):
+        quizID = 'Quiz3'
+        quiz = Quiz(dbfire,quizID,session['user'])
+        questions = quiz.questions['text']
+        answers = quiz.questions['answers']
+        answers1 = [answers[0]]
+        answers2 = [answers[1]]
+        answers3 = [answers[2]]
+        answers4 = [answers[3]]
+        answers5 = [answers[4]]
+        answers6 = [answers[5]]
+        answers7 = [answers[6]]
+        answers8 = [answers[7]]
+        answers9 = [answers[8]]
+        answers10 = [answers[9]]
+        answers11 = [answers[10]]
+
+
+        if (request.method == 'POST'):
+            
+            choiceA = request.args['a']
+            choiceB = request.args['b']
+            choiceC = request.args['c']
+            choiceD = request.args['d']
+            submitButton = request.args['submitButton']
+
+            if request.method == choiceA:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceA)
+            elif request.method == choiceB:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceB)
+            elif request.method == choiceC:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceC)
+            elif request.method == submitButton:
+                return Quiz.submitScore(dbfire)
+            
+
+        return render_template('quiz2.html',quiz = quiz, questions = questions, answers = answers,
+        answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
+        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10, answers11 = answers11)
+                   
+    else:
+        flash("Sorry you must be logged in to take the quiz.")
+        return redirect(url_for("login"))
 if __name__ == '__main__':
     app.run(debug=True)
