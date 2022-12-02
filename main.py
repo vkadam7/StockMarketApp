@@ -189,7 +189,7 @@ def Leaderboard():
         redirect(url_for("login"))
 
 
-# Follow list function updated by Viraj and Muneeb
+# Followers and Following lists functions updated by Viraj and Muneeb
 @app.route("/followers")
 def followList():
     if ('user' in session):
@@ -239,26 +239,26 @@ def login():
         result = request.form
         email = result["email"]
         passw = result["password"]
-        #try:
-        user = authen.sign_in_with_email_and_password(email,passw)
-        session['user'] = email
-        session['loginFlagPy'] = 1
-        check, session['simName'] = SimulationFactory.existenceCheck(dbfire, email)
-        if check:
-            session['simulationFlag'] = 1
-            sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
-            session['portfolioValue'] = "%.2f" % round(sharesValue, 2)
-            session['currentCash'] = "%.2f" % round(currentCash, 2)
-        else:
-            session['simulationFlag'] = 0
-        sessionFlagCheck(session['loginFlagPy'], session['simulationFlag'])
-        flash("Log in succesful.", "pass")
-        print("Login successful.")
-        return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
-        #except:
-        #    flash("Failed to log in", "fail")
-        #    print("login failed.")
-        #    return redirect(url_for("login"))
+        try:
+            user = authen.sign_in_with_email_and_password(email,passw)
+            session['user'] = email
+            session['loginFlagPy'] = 1
+            check, session['simName'] = SimulationFactory.existenceCheck(dbfire, email)
+            if check:
+                session['simulationFlag'] = 1
+                sharesValue, currentCash = Simulation.getPortfolioValue(dbfire, session['simName'])
+                session['portfolioValue'] = "%.2f" % round(sharesValue, 2)
+                session['currentCash'] = "%.2f" % round(currentCash, 2)
+            else:
+                session['simulationFlag'] = 0
+            sessionFlagCheck(session['loginFlagPy'], session['simulationFlag'])
+            flash("Log in succesful.", "pass")
+            print("Login successful.")
+            return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
+        except:
+            flash("Failed to log in, either your email or password were incorrect, please try again", "fail")
+            print("login failed.")
+            return render_template('login.html', stockNames = session['stockNames'])
     else:
         print("Landing on page")
         return render_template('login.html', stockNames = session['stockNames'])
@@ -520,6 +520,7 @@ def update():
             for docs in checkName:
                 updatesInfo = docs.id
                 checkName = docs.to_dict()
+                oldName = checkName['userName']
 
             goodName = newUsername
             
@@ -528,7 +529,7 @@ def update():
                 flash("There is a 300 character limit") #Adds experience to profile
                 return render_template('update.html')
         
-            elif (goodName == session['user']):
+            elif (goodName == oldName):
                 print("Username is already taken. Please enter a valid username.")
                 flash("Username is already taken. Please enter a valid username.") #check to see if new username is taken
                 return render_template('update.html')
@@ -610,7 +611,8 @@ def information():
         return render_template("information.html", person = person, stockNames = session['stockNames'])
     else:
         return render_template("information.html")
-    
+
+## Route for Definitions Page - Muneeb Khan    
 @app.route("/StockDefinitions")
 def StockDefinitions():
     if('user' in session):
@@ -750,6 +752,8 @@ def finishSimulation():
     Simulation.finishSimulation(dbfire, session['simName'])
     return redirect(url_for("profile")) 
 
+# Simulation History route by Muneeb Khan
+# Updated by Ian Mcnulty
 @app.route("/simulationHistory")
 def simlists():
     if ('user' in session):
@@ -1105,6 +1109,7 @@ def stockSimFormFunction():
     else:
         return redirect(url_for('fourOhFour'))
 
+# Stock availability list route by Muneeb Khan
 @app.route("/stockAvailability",methods=['POST'])
 def stockAvailability():
     if request.method == 'POST':
@@ -1173,7 +1178,7 @@ def quizselection():
         return redirect(url_for("login"))
 
 # Submission check route for Quiz by Ian Mcnulty
-# Updates by Muneeb Khan
+# Updates by Muneeb and Ian
 @app.route('/quizSubmit', methods = ['GET', 'POST'])
 def quizSubmit():
     quiz = Quiz(dbfire,'Quiz1',session['user'])
@@ -1235,6 +1240,7 @@ def quizSubmit():
 
 
 # Quiz page route by Muneeb Khan
+# Updated by Muneeb & Viraj
 @app.route('/quiz', methods =['GET','POST'])
 def quizpage():
     if ('user' in session):
@@ -1252,8 +1258,7 @@ def quizpage():
         answers8 = [answers[7]]
         answers9 = [answers[8]]
         answers10 = [answers[9]]
-        answers11 = [answers[10]]
-
+        #answers11 = [answers[10]]
 
         if (request.method == 'POST'):
             
