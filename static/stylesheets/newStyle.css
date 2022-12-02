@@ -431,3 +431,6 @@ table{
   padding: 10px;
   margin:10px;
 }
+.row{
+  --bs-gutter-x: 0rem!important;
+}
