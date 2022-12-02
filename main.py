@@ -74,7 +74,7 @@ def profile():
         #    endDate = endDateFetch[0]
             
             
-        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard)
+        return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard, stockNames = session['stockNames'])
     else:
 
         redirect(url_for("login"))
@@ -104,7 +104,7 @@ def Blog():
         print("Here comes personal B")
         blog.sort(key = itemgetter('DatePosted'), reverse=True)
         print(blog)   
-        return render_template("Blog.html", blog = blog)
+        return render_template("Blog.html", blog = blog, stockNames = session['stockNames'])
 
 #Author: Miqdad Hafiz
 @app.route("/userPosts", methods = ["POST","GET"])
@@ -125,7 +125,7 @@ def userPosts():
                 posts.append(userPost)
         posts.sort(key = itemgetter('DatePosted'), reverse=True)
         print(posts)
-        return render_template("userPosts.html",posts = posts)
+        return render_template("userPosts.html",posts = posts, stockNames = session['stockNames'])
 
 
 #Author: Miqdad Hafiz
@@ -144,7 +144,7 @@ def editPost(id):
     edit = dbfire.collection('Blog').document(id).get()
     edit = edit.to_dict()
     edit['DocID'] = id
-    return render_template("editingPost.html", edit = edit)
+    return render_template("editingPost.html", edit = edit, stockNames = session['stockNames'])
 
 
 @app.route("/editingPost/<id>", methods = ["POST","GET"])
@@ -172,7 +172,8 @@ def postBlog():
            
             dbfire.collection('Blog').add({"Author": Author,"DatePosted":firestore.SERVER_TIMESTAMP,"Post":post,"Likes":0})
             flash("Your submission has been posted.")
-    return render_template("postBlog.html")
+
+    return redirect(url_for("userPosts"))
 
 
 #Author: Miqdad Hafiz
@@ -184,7 +185,7 @@ def Leaderboard():
         documentRef.sort(key = itemgetter('score'), reverse=True)
         print("about to print leaderboard")
         print(documentRef)
-        return render_template("Leaderboard.html",documentRef = documentRef) #placeholder
+        return render_template("Leaderboard.html",documentRef = documentRef, stockNames = session['stockNames']) #placeholder
     else:
         redirect(url_for("login"))
 
@@ -212,7 +213,7 @@ def followingList():
             followingList.extend(temp['FollowingNames'])
         names = [item.split(',') for item in followingList]
         print(names)
-        return render_template('followingList.html', names = names)
+        return render_template('followingList.html', names = names, stockNames = session['stockNames'])
     else:
         redirect(url_for("profile"))
     
@@ -252,13 +253,14 @@ def login():
             else:
                 session['simulationFlag'] = 0
             sessionFlagCheck(session['loginFlagPy'], session['simulationFlag'])
-            flash("Log in succesful.", "pass")
+            flash("Login succesful!.", "pass")
             print("Login successful.")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
             flash("Failed to log in, either your email or password were incorrect, please try again", "fail")
             print("login failed.")
             return render_template('login.html', stockNames = session['stockNames'])
+            
     else:
         print("Landing on page")
         return render_template('login.html', stockNames = session['stockNames'])
@@ -438,7 +440,7 @@ def register():
         
         # If else conditions to check the password requirements - Muneeb Khan
         if (len(Password) < 6 or len(Password) > 20 or digits == 0 or specials == 0):
-            flash("Invalid Password! must contain the following requirements: ")
+            flash("Invalid Password! Must contain the following requirements: ")
             flash("6 characters minimum")
             flash("20 characters maximum")
             flash("at least 1 digit")
@@ -446,7 +448,7 @@ def register():
             return render_template("register.html")
 
         elif (Password != confirmPass): # If password and cofirm password don't match
-            flash("You're password do not match. Please enter the same password for both fields.")
+            flash("Your password submissions do not match. Please enter the same password for both fields.")
             return render_template('register.html')   
         
         elif (uniqueName == UseN):
@@ -462,8 +464,8 @@ def register():
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
             dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""], "experience": "", "QuizScore" : "0%"})
                 #dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
-            flash("Account Created, you will now be redirected to verify your account" , "pass")
-            flash("Account succesfully created, you may now login" , "pass")
+            flash("Account created, you will now be redirected to verify your account!" , "pass")
+            flash("Account succesfully created, you may now login!" , "pass")
             return redirect(url_for("login"))
 
             # except:
@@ -497,10 +499,10 @@ def PasswordRecovery():
         email = result["email"]
         try:
             user = authen.send_password_reset_email(email) # Will send the notification to the provided email - Muneeb Khan
-            flash("Password reset notification was sent to your email", "pass")
+            flash("Password reset notification was sent to your email.", "pass")
             return redirect(url_for("login"))
         except:
-            flash("Email not found" , "fail")
+            flash("Email not found, please enter a valid email." , "fail")
             return render_template("PasswordRecovery.html")   
           
     return render_template("PasswordRecovery.html")   
@@ -537,8 +539,8 @@ def update():
 
             # Check if user entered too many characters for experience
             if (len(experience) > 300):
-                print("There is a 300 character limit")
-                flash("There is a 300 character limit") #Adds experience to profile
+                print("There is a 300 character limit.")
+                flash("There is a 300 character limit.") #Adds experience to profile
                 return render_template('update.html')
         
             # Check if the new username matches an existing name on firebase
@@ -568,7 +570,7 @@ def logout():
     session.pop('user')
     session['loginFlagPy'] = 0
     session['simulationFlag'] = 0
-    flash('logout succesful','pass')
+    flash('Logout successful!','pass')
     return redirect(url_for("login"))
 
 #Home
@@ -751,7 +753,7 @@ def goToSimulation():
                 return render_template('simulation.html', person=session['user'], tickers=tickers, 
                 quantities=quantities, profits=profits, sharesPrices=sharesPrices,
                 currentPrices=currentPrices, totalValue=totalValue, originalValue=originalValue,
-                percentage=percentage, links=links, buyLink = buyLink, sellLink = sellLink)  
+                percentage=percentage, links=links, buyLink = buyLink, sellLink = sellLink, stockNames = session['stockNames'])  
             else:
                 return redirect(url_for('.finishSimulation'))
         except KeyError:

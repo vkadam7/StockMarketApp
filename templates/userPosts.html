@@ -30,16 +30,28 @@
                   <li class="nav-item">
                     <a class="nav-link" href="aboutus">About Us</a>
                   </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="information">Information</a>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Information Pages</a>
+                    <ul class = "dropdown-menu">
+                      <li><a class ="dropdown-item" href="information">Information</a></li>
+                      <li><a class ="dropdown-item" href="graphPictures">Graph Pictures</a></li>
+                      <li><a class ="dropdown-item" href="StockDefinitions">Stock Definitions</a></li>
+                    </ul>
                   </li>
                   {% if session['user'] %}
           <li class="nav-item">
-            <a class = "nav-link active" method = "POST" href = "profile">Profile</a> 
+            <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
           </li>
         </li class = "nav-item">
             <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
          </li>
+         <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">StockFeed</a>
+          <ul class = "dropdown-menu">
+            <li><a class ="dropdown-item" href="Blog">StockFeed</a></li>
+            <li><a class ="dropdown-item" href="userPosts">Your Posts</a></li>
+          </ul>
+        </li>
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
           </li>
@@ -79,8 +91,13 @@
         {% endif %}
                 </ul>
                 <form action="/stockSearch" method="post">
-                    <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+                    <input class = "stockSearchBar" type="search" name="searchTerm" list = "stockNames" placeholder="Find a stock..."
                             value="{{ request.form['searchTerm'] }}">
+                            <datalist id = "stockNames">
+                            {% for stockname in stockNames%}
+                              <option value = "{{stockname}}" />
+                            {% endfor %}
+                            </datalist>
                             <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;padding-right: 10px; margin-right: 5px;" id="stockSearchButton">Display Stock</button>
                 </form>
               </div>        
@@ -101,38 +118,42 @@
         Your Posts 
       </h4>
     </div>
-    <div>
-    {% for users in posts %}
-      <div>
-        <div class="d-flex p-3 border-bottom">
-          
-          <div class="d-flex w-100 ps-3">
-            <div>
-              
-                <h6 class="text-body" style = "text-align: left;">
-                  {{users['Author']}}
-                  <span class="small text-muted font-weight-normal"> • </span>
-                  <span class="small text-muted font-weight-normal">{{users['DatePosted']}}</span>
-                  <div class="btn-group">
-                  <button class="btn btn-secondary btn-sm dropdown-toggle float-end justify-content-end" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  </button>
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="/editPost/{{users['DocID']}}">Edit</a></li>
-                    <li><a class="dropdown-item" href="/postDelete/{{users['DocID']}}">Delete</a></li>
-                  </ul>
-                  </div>
-                </h6>
-              
-              <p style="line-height: 1.2;">
-                {{users['Post']}}
-              </p>
+    
+
+<div class="container mt-4 mb-5">
+    <div class="d-flex justify-content-center row">
+        <div class="col-md-8">
+            <div class="feed p-2">
+                <!-- 
+                  <div class="d-flex flex-row justify-content-between align-items-center p-2 bg-white border">
+                    <div class="feed-text px-2">
+                        <h6 class="text-black-50 mt-2">What's on your mind</h6>
+                    </div>
+                 -->   
+                </div>
+
+                {% for users in posts %}
+                <div class="bg-white border mt-2">
+                    <div>
+                        <div class="d-flex flex-row justify-content-between align-items-center p-2 border-bottom">
+                            
+                                <div class="d-flex flex-column flex-wrap ml-2"><span class="font-weight-bold">{{users['Author']}}</span><span class="text-black-50 time">{{users['DatePosted']}}</span></div>
+
+                                <div class="btn-group">
+                                <button class="fa fa-ellipsis-v text-black-50" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
+                                <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/editPost/{{users['DocID']}}">Edit</a></li>
+                                <li><a class="dropdown-item" href="/postDelete/{{users['DocID']}}">Delete</a></li>
+                                </ul>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="p-2 px-3"><span>{{users['Post']}}</span></div>
+                </div>
+                {% endfor %}
             </div>
-          </div>
         </div>
-      </div>
     </div>
-    {% endfor %}
-  </div>
 </div>
 
 

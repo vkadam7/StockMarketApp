@@ -10,6 +10,7 @@
     <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
     </head>
     <header>
       <a class="navbar-brand" href="home" style = "color: black; padding: 10px;">
@@ -24,21 +25,33 @@
               <div class="collapse navbar-collapse" id="navbarCollapse">
                 <ul class="navbar-nav me-auto mb-2 mb-md-0">
                   <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="home">Home</a>
+                    <a class="nav-link" aria-current="page" href="home">Home</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link" href="aboutus">About Us</a>
                   </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="information">Information</a>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Information Pages</a>
+                    <ul class = "dropdown-menu">
+                      <li><a class ="dropdown-item" href="information">Information</a></li>
+                      <li><a class ="dropdown-item" href="graphPictures">Graph Pictures</a></li>
+                      <li><a class ="dropdown-item" href="StockDefinitions">Stock Definitions</a></li>
+                    </ul>
                   </li>
                   {% if session['user'] %}
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "profile">Profile</a> 
           </li>
-        </li class = "nav-item">
+        <li class = "nav-item">
             <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
          </li>
+         <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">StockFeed</a>
+          <ul class = "dropdown-menu">
+            <li><a class ="dropdown-item" href="Blog">StockFeed</a></li>
+            <li><a class ="dropdown-item" href="userPosts">Your Posts</a></li>
+          </ul>
+        </li>
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
           </li>
@@ -75,8 +88,13 @@
         {% endif %}
                 </ul>
                 <form action="/stockSearch" method="post">
-          <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+          <input class = "stockSearchBar" type="search" list = "stockNames" name="searchTerm" placeholder="Find a stock..."
                   value="{{ request.form['searchTerm'] }}">
+                  <datalist id = "stockNames">
+                  {% for stockname in stockNames%}
+                    <option value = "{{stockname}}" />
+                  {% endfor %}
+                  </datalist>
                   <button class = "btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
       </form>
               </div>        
@@ -90,40 +108,51 @@
 <body>
 <main>
 
-  <div class="card" style="width: 75rem">
-  <div class="border border-left border-right px-0">
-    <div class="p-3 border-bottom">
-      <h4 class="d-flex align-items-center mb-0">
-        StockBlog <i class="far fa-xs fa-star ms-auto text-primary"></i>
-      </h4>
+  <h2 style = "text-align: center;"> StockFeed</h2>
+  <hr>
+<div class = "container" style = "width: 80%;">
+<div class="container bootdey">
+<div class="col-md-12 bootstrap snippets">
+<div class="panel">
+  <div class="panel-body">
+    <form action = "/postBlog" method = "POST">
+    <textarea class="form-control w-100" name = "blogPost" rows="3" placeholder="Share your thoughts"></textarea>
+    <br>
+    <div class="mar-top clearfix">
+      <button class="btn btn-sm btn-primary pull-right" style = "background-color:rgb(33, 103, 42);color:WHITE;" type="submit"><i class="fa fa-pencil fa-fw"></i> Post</button>
     </div>
-    <div>
-      {% for user in blog %}
-      <div>
-        <div class="d-flex p-3 border-bottom">
-          
-          <div class="d-flex w-100 ps-3">
-            <div>
-              
-                <h6 class="text-body" style = "text-align: left;">
-                  {{user['Author']}}
-                  <span class="small text-muted font-weight-normal"> • </span>
-                  <span class="small text-muted font-weight-normal">{{user['DatePosted']}}</span>
-                  <span><i class="fas fa-angle-down float-end"></i></span>
-                </h6>
-              
-              <p style="line-height: 1.2;">
-                {{user['Post']}}
-              </p>
-              
-              
-            </div>
+    </form>
+  </div>
+</div>
+<br>
+<div class="panel">
+    <div class="panel-body">
+    <!-- Newsfeed Content -->
+    <!--===================================================-->
+    {% for user in blog %}
+    <div class="media-block">
+      
+      <div class="media-body">
+        <div class="mar-btm">
+          <h4 style = "text-align: left;"> {{user['Author']}} </h4>
+          <p class="text-muted text-sm"> {{user['DatePosted']}}</p>
+        </div>
+        <p>{{user['Post']}}</p>
+        <div class="pad-ver">
+          <div class="btn-group">
+            <a class="btn btn-sm btn-default btn-hover-success" href="#"><i class="fa fa-thumbs-up"></i></a>
           </div>
+          
+        </div>
+        <hr>
         </div>
       </div>
+      {% endfor %}
     </div>
-    {% endfor %}
+    
   </div>
+</div>
+</div>
 </div>
 
 

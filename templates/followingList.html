@@ -47,6 +47,13 @@
       </li class = "nav-item">
           <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
        </li>
+       <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">StockFeed</a>
+        <ul class = "dropdown-menu">
+          <li><a class ="dropdown-item" href="Blog">StockFeed</a></li>
+          <li><a class ="dropdown-item" href="userPosts">Your Posts</a></li>
+        </ul>
+      </li>
         <li class="nav-item">
           <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
         </li>
@@ -91,7 +98,7 @@
               }
             </script>  
                 <form action="/stockSearch" method="post">
-                    <input class = "stockSearchBar" type="search" name="searchTerm" placeholder="Find a stock..."
+                    <input class = "stockSearchBar" type="search" list = "stockNames" name="searchTerm" placeholder="Find a stock..."
                             value="{{ request.form['searchTerm'] }}">
                             <datalist id = "stockNames">
                             {% for stockname in stockNames%}
