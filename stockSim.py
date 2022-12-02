@@ -881,16 +881,39 @@ class Simulation:
 #
 #   Authors: Ian McNulty
 class SimulationFactory:
-    def __init__(self, db, email):
-        self.simulation = Simulation.retrieveOngoing(db, email)
+    ## SimulationFactory.__init__
+    #   Description: Retrieves the ongoing simulation data with only a user ID as a key
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           user - String, ID of the user to be searched for
+    #
+    #   Author: Ian McNulty
+    def __init__(self, db, user):
+        self.simulation = Simulation.retrieveOngoing(db, user)
 
-    def existenceCheck(db, email):
-        array = [entry for entry in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream()]
+    ## SimulationFactory.existenceCheck
+    #   Description: Checks whether there is an ongoing simulation for the given user
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           user - String, ID of the user to be searched for
+    #
+    #   Return: True, if ongoing simulation exists
+    #           False, if ongoing simulation does not exist
+    #
+    #   Author: Ian McNulty
+    def existenceCheck(db, user):
+        array = [entry for entry in db.collection('Simulations').where('ongoing','==',user).where('user','==',email).stream()]
         if len(array) == 0:
             return False, "None"
         else:
             return True, array[0].id
 
+## Class: User
+#   Description: Class used to handle and change User data within the application
+#
+#   Dependencies: firebase_admin, numpy, StockData, Order, portfolio, SimulationFactory
+#
+#   Authors: Ian McNulty, Muneeb Khan
 class User:
     def __init__(self, db, username):
         self.db = db
@@ -933,18 +956,6 @@ class User:
     def updateExperience(self, experience):
         data = self.db.collection("Users").document(self.username)
         data.update({ 'Experience' : experience })
-
-    #No longer part of follower feature
-    #def addFriend(db, user1, user2):
-    #    data = {
-    #        'user1': user1,
-    #        'user2': user2
-    #    }
-    #    db.collection("Users").add(data)
-
-    #def removeFriend(db, user1, user2):
-    #    for entry in db.collection('Users').where('user1','==',user1).where('user2','==',user2).stream():
-    #        db.collection('Users').document(entry.id).delete()
 
     def listFriends(db, user):
         friends = []
