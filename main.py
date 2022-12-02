@@ -164,8 +164,13 @@ def postDelete(id):
 def editPost(id):
     edit = dbfire.collection('Blog').document(id).get()
     edit = edit.to_dict()
-    edit['DocID'] = id
-    return render_template("editingPost.html", edit = edit)
+    try:
+        edit['DocID'] = id
+        return render_template("editingPost.html", edit = edit)
+    except:
+        return redirect(url_for(id))
+    
+    #return redirect(url_for('editingPost', id = edit))
 
 
 @app.route("/editingPost/<id>", methods = ["POST","GET"])
@@ -176,9 +181,13 @@ def editingPost(id):
             editedPost = result["editingthePost"]
             
             
-            dbfire.collection('Blog').document(id).update({'Post': editedPost})
+            dbfire.collection('Blog').document(id).update({'Post': editedPost,'DatePosted':firestore.SERVER_TIMESTAMP})
             flash("Post has been updated.")
-        return redirect(url_for('userPosts'))
+            return redirect(url_for('userPosts'))
+        else:
+            return redirect(url_for('userPosts'))
+
+
 #Author: Miqdad Hafiz
 @app.route("/postBlog", methods = ["POST","GET"])
 def postBlog():
