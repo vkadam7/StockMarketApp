@@ -304,12 +304,12 @@ def social():
             grabUser = dbfire.collection('Users').where('userName', '==', searchKey).get()
             found = True
             size = len(grabUser)
-            print(size, "try block 1")
+            
             if(size == 0):
                 grabUser = dbfire.collection('Users').where('Name', '==', searchKey).get()
                 found = True
                 size = len(grabUser)
-                print(size, "try block 2")
+                
                 if(size == 0):
                     found = False
 
@@ -330,6 +330,7 @@ def social():
                 else:
                     matching = False
                 
+                print("print matching", matching)
                 #check if user already follows
                 myselfs = dbfire.collection('Users').where('Email', '==', userEmail)
                 for doc in myselfs.stream():
@@ -337,15 +338,16 @@ def social():
                 myUsername = myselfs['userName']
 
                 for key in userResult['FollowerNames']:
+                    print(key)
+                    print(myUsername)
                     if(key == myUsername):
                         alreadyFollows = True
+                        break
                     else:
                         alreadyFollows = False
-                     
-                print("HERE COMES THE USERNAME!")
-                print(userResult)
-                print("HERE COMES THE SESSION VARIABLE")
-                print(session['userResults'])
+                    
+                print("print already follows", alreadyFollows)
+                
                 return render_template("userDisplay.html",  userResult = userResult, matching = matching, alreadyFollows = alreadyFollows, stockNames = session['stockNames'])
             else:
                 print("Can't find user.")

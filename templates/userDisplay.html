@@ -116,12 +116,12 @@
                                 <div class = "flex-grow-1 ms-3">
                                     
                                     <h5 class = "mb-1"> {{userResult['Name']}}</h5>
-                                    <div class = "d-flex justify-content-start rounded-3 p-2 mb-2" style="background-color: #efefef; margin-left: 5px;">
-                                        <div>
+                                    <div class = "d-flex justify-content-center rounded-3 p-2 mb-2" style="background-color: #efefef; margin-left: 5px;">
+                                        <div class = "px-3">
                                             <p class = "small text-muted mb-1">Followers  </p>
                                             <p class = "mb-0">{{userResult['Followers']}}  </p>
                                         </div>
-                                        <div>
+                                        <div class = "px-3">
                                             <p class = "small text-muted mb-1">Following</p>
                                             <p class = "mb-0">{{userResult['Following']}}</p>
                                         </div>
@@ -129,22 +129,19 @@
                                             <p class = "small text-muted mb-1">User Name</p>
                                             <p class = "mb-0">{{userResult['userName']}}</p>
                                         </div>
-                                        <div class = "px-3">
-                                            <p class = "small text-muted mb-1">Email</p>
-                                            <p class = "mb-0">{{userResult['Email']}}</p>
-                                        </div>
+                                        
                                     
                                     </div>
-                                    {% if matching %}
+                                    {% if matching == True %}
                                     <div class = "d-flex justify-content-end">
                                     <a href="/social">
                                     <button class = "btn btn-primary" input type = "submit" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Close</button>
                                     </a>  
                                     </div>
-                                    {% elif alreadyFollows %}
+                                    {% elif alreadyFollows == True %}
                                     <form action = "/unfollow" method = "POST">
                                     <div class = "d-flex justify-content-end">
-                                        <button class = "btn btn-primary" input type = "submit" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Unfollow</button> 
+                                        <button class = "btn btn-primary" input type = "submit" name = "option" value = "Unfollow" style = "background-color:rgb(33, 103, 42)">Unfollow</button> 
                                     </div>
                                     </form>
                                     {% else %}
