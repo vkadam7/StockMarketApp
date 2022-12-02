@@ -190,7 +190,7 @@ def Leaderboard():
         redirect(url_for("login"))
 
 
-# Follow list function updated by Viraj and Muneeb
+# Followers and Following lists functions updated by Viraj and Muneeb
 @app.route("/followers")
 def followList():
     if ('user' in session):
@@ -253,13 +253,14 @@ def login():
             else:
                 session['simulationFlag'] = 0
             sessionFlagCheck(session['loginFlagPy'], session['simulationFlag'])
-            flash("Login successful!", "pass")
+            flash("Login succesful!.", "pass")
             print("Login successful.")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
-            flash("Failed to log in, incorrect email or password", "fail")
-            print("login failed, incorrect email or password.")
-            return render_template("login.html")
+            flash("Failed to log in, either your email or password were incorrect, please try again", "fail")
+            print("login failed.")
+            return render_template('login.html', stockNames = session['stockNames'])
+            
     else:
         print("Landing on page")
         return render_template('login.html', stockNames = session['stockNames'])
@@ -513,29 +514,45 @@ def update():
     if 'user' in session:
         if request.method == "POST":
             results = request.form
-            newEmail = results['email']
+            #newEmail = results['email']
             newUsername = results['Unames']
-            experience = results["experience"]  
-            
+            experience = results["experience"]
+            goodName = newUsername
+
+            # For loop to check if User is already using the username
             checkName = dbfire.collection('Users').where('Email','==',session['user']).get()
             for docs in checkName:
                 updatesInfo = docs.id
                 checkName = docs.to_dict()
 
-            goodName = newUsername
+            # For loop to check all documents on Firebase if the username is already in use by any other user
+            checkNames = dbfire.collection('Users').document(newUsername).get()
+            if checkNames.exists:
+                grabExistingName = dbfire.collection('Users').where('userName', '==', newUsername)
+                for docs in grabExistingName.stream(): 
+                    grabExistingName = docs.to_dict()
+                ExistingName = grabExistingName['userName']
             
+            # If the name isnt taken
+            else:
+                ExistingName = "ok"
+
+            # Check if user entered too many characters for experience
             if (len(experience) > 300):
                 print("There is a 300 character limit.")
                 flash("There is a 300 character limit.") #Adds experience to profile
                 return render_template('update.html')
         
-            elif (goodName == session['user']):
-                print("Username is already taken. Please enter a valid username.")
-                flash("Username is already taken. Please enter a valid username.") #check to see if new username is taken
+            # Check if the new username matches an existing name on firebase
+            elif (goodName == ExistingName):
+                print("Sorry the username is already taken by another user. Please try a different username.")
+                flash("Sorry the username is already taken by another user. Please try a different username.") #check to see if new username is taken
                 return render_template('update.html')
             
+            # Update the username and experience based on user input
             else:
-                dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "Email": newEmail, "experience": experience})
+                dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "experience": experience})
+                #dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "Email": newEmail, "experience": experience})
                 print("Account details updated")
                 flash("Account details updated", "pass")
 
@@ -611,7 +628,8 @@ def information():
         return render_template("information.html", person = person, stockNames = session['stockNames'])
     else:
         return render_template("information.html")
-    
+
+## Route for Definitions Page - Muneeb Khan    
 @app.route("/StockDefinitions")
 def StockDefinitions():
     if('user' in session):
@@ -751,6 +769,8 @@ def finishSimulation():
     Simulation.finishSimulation(dbfire, session['simName'])
     return redirect(url_for("profile")) 
 
+# Simulation History route by Muneeb Khan
+# Updated by Ian Mcnulty
 @app.route("/simulationHistory")
 def simlists():
     if ('user' in session):
@@ -1106,6 +1126,7 @@ def stockSimFormFunction():
     else:
         return redirect(url_for('fourOhFour'))
 
+# Stock availability list route by Muneeb Khan
 @app.route("/stockAvailability",methods=['POST'])
 def stockAvailability():
     if request.method == 'POST':
@@ -1174,7 +1195,7 @@ def quizselection():
         return redirect(url_for("login"))
 
 # Submission check route for Quiz by Ian Mcnulty
-# Updates by Muneeb Khan
+# Updates by Muneeb and Ian
 @app.route('/quizSubmit', methods = ['GET', 'POST'])
 def quizSubmit():
     quiz = Quiz(dbfire,'Quiz1',session['user'])
@@ -1236,6 +1257,7 @@ def quizSubmit():
 
 
 # Quiz page route by Muneeb Khan
+# Updated by Muneeb & Viraj
 @app.route('/quiz', methods =['GET','POST'])
 def quizpage():
     if ('user' in session):
@@ -1253,8 +1275,7 @@ def quizpage():
         answers8 = [answers[7]]
         answers9 = [answers[8]]
         answers10 = [answers[9]]
-        answers11 = [answers[10]]
-
+        #answers11 = [answers[10]]
 
         if (request.method == 'POST'):
             
