@@ -743,6 +743,10 @@ def goToSimulation():
     else:
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
+    
+#@app.route("/portfolioGraph")
+#def portfolioGraph():
+    
         
 @app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
