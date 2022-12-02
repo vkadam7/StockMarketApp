@@ -104,12 +104,12 @@ def test_register_invalidemail(client):
 
 def test_register_missingemail(client):
 
-    testregisteruser = client.post("/register", data = {
+    testregisteruser = client.post("/register", data = { "email" : "",
     "password" : "ABCDEF3#",
     "confirmPassw" : "ABCDEF3#",
     "Unames" : "Samples",
     "username" : "Samples"})
-    assert testregisteruser.status_code == 400 # Returns bad request code 400 for missing email
+    assert testregisteruser.status_code == 200 # Keeps user on register page code 200
 
 def test_register_invalidusername(client):
 
@@ -124,8 +124,10 @@ def test_register_missingusername(client):
 
     testregisteruser = client.post("/register", data = {"email" : "sample1234@gmail.com",
     "password" : "ABCDEF3#",
-    "confirmPassw" : "ABCDEF3#"})
-    assert testregisteruser.status_code == 400 # Returns bad request code 400 for missing username
+    "confirmPassw" : "ABCDEF3#",
+    "Unames" : "",
+    "username" : "Samples"})
+    assert testregisteruser.status_code == 200 # Keeps user on register page code 200
 
 #Test cases for Password recovery - Muneeb Khan
 #Succesful Password recovery test
