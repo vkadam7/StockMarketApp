@@ -512,7 +512,7 @@ def update():
     if 'user' in session:
         if request.method == "POST":
             results = request.form
-            newEmail = results['email']
+            #newEmail = results['email']
             newUsername = results['Unames']
             experience = results["experience"]  
             
@@ -535,7 +535,8 @@ def update():
                 return render_template('update.html')
             
             else:
-                dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "Email": newEmail, "experience": experience})
+                dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "experience": experience})
+                #dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "Email": newEmail, "experience": experience})
                 print("Account details updated")
                 flash("Account details updated", "pass")
 
