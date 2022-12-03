@@ -653,7 +653,7 @@ def StockDefinitions():
 
         return render_template("StockDefinitions.html", person = person, stockNames = session['stockNames'])
     else:
-        return render_template("StockDefinitions.html", stockNames = session['stockNames'])
+        return render_template("StockDefinitions.html")
 
 # Route for Graph pictures page - Muneeb Khan
 @app.route("/graphPictures")
@@ -666,7 +666,7 @@ def graphPictures():
 
         return render_template("graphPictures.html", person = person, stockNames = session['stockNames'])
     else:
-        return render_template("graphPictures.html", stockNames = session['stockNames'])
+        return render_template("graphPictures.html")
 
 @app.route("/simulationSuggestion", methods=['POST', 'GET'])
 def simSuggest():

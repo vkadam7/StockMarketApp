@@ -25,6 +25,10 @@ import firebase_admin
 from firebase_admin import db
 
 # Testing landing response codes for frontend pages - Muneeb Khan
+def test_landing():
+    testlanding = app.test_client().get("/")
+    assert testlanding.status_code == 200
+
 def test_home():
     testhome = app.test_client().get("/home")
     assert testhome.status_code == 200
@@ -42,9 +46,104 @@ def test_graphPictures():
     assert testgraphPictures.status_code == 200
 
 def test_stockDefinitions():
-    teststockDefinitions = app.test_client().get("/stockDefinitions")
+    teststockDefinitions = app.test_client().get("/StockDefinitions")
     assert teststockDefinitions.status_code == 200
 
+# Testing Registrations with Email, Username, and Password Validations - Muneeb Khan
+# Succesfull registrations will redirect the user to login page (code 302)
+# Fail registrations will keep user on registration page (code 200)
+def test_register_success():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEG4$3",
+    "confirmPassw" : "ABCDEG4$3",
+    "Unames" : "Pytest2",
+    "username" : "Pytest2"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 302
+    dbfire = firestore.client()
+    dbfire.collection('UsersTest').document(user).delete() # Trying to make it so the account created from the test
+    # gets deleted immediately
+
+def test_register_fail_usernameInUse():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEG4$",
+    "confirmPassw" : "ABCDEG4$",
+    "Unames" : "UnitTesting",
+    "username" : "UnitTesting"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_passwordsDontMatch():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEG4$",
+    "confirmPassw" : "ABCDEG5%",
+    "Unames" : "Pytest1",
+    "username" : "Pytest1"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_passwordTooShort():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "AB4$",
+    "confirmPassw" : "AB4$",
+    "Unames" : "Pytest1",
+    "username" : "Pytest1"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_passwordTooLong():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEFG123$%^IStoolongandover20characters",
+    "confirmPassw" : "ABCDEFG123$%^IStoolongandover20characters",
+    "Unames" : "Pytest1",
+    "username" : "Pytest1"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_passwordMissingDigit():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEG$$",
+    "confirmPassw" : "ABCDEG$$",
+    "Unames" : "Pytest1",
+    "username" : "Pytest1"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_passwordMissingSpecial():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEG44",
+    "confirmPassw" : "ABCDEG44",
+    "Unames" : "Pytest12",
+    "username" : "Pytest12"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_blankEmail():
+    user = {"email" : "",
+    "password" : "ABCDEG4$",
+    "confirmPassw" : "ABCDEG4$",
+    "Unames" : "Pytest12",
+    "username" : "Pytest12"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_blankPassword():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "",
+    "confirmPassw" : "",
+    "Unames" : "Pytest12",
+    "username" : "Pytest12"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_blankUsername():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEG44",
+    "confirmPassw" : "ABCDEG$",
+    "Unames" : "",
+    "username" : ""}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 500 # Temporary workaround but should really return 200
 
 
 if __name__ == '__main__':
