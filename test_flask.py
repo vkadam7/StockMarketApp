@@ -179,11 +179,14 @@ def test_logout(client):
 #Login test case- Viraj Kadam
     
 def test_login_successful(client):
-    testuser = client.post("/login", data = {'email': "virajk063@gmail.com", "password": "ABCDEF2@"})
+    testuser = client.post("/login", data = {'email': 
+        "virajk063@gmail.com", 
+        "password": "ABCDEF2@"})
     assert testuser.status_code == 302
 
 def test_login_failure_invalidEmail(client):
-    testuser = client.post("/login", data = {"email": "virajk063@gmail.com", "password": "ABCDEF2@"})
+    testuser = client.post("/login", data = {"email": "virajk063@gmail.com", 
+    "password": "ABCDEF2@"})
     assert testuser.status_code == 200
     
 def test_login_failure_invalidPassword(client):
@@ -196,6 +199,9 @@ def test_stockSearch_successful(client):
 
 #Author: Viraj Kadam
 #Test cases for follow and unfollow functions
+
+def test_UserSearch(client):
+    testUser = client.post("/social", data = {"userName": "viraj1"})
 def test_Follow_successful(client):
     testUser = client.post9("/follow", data = {"userName": "viraj1"})
     assert testUser.status_code == 200
