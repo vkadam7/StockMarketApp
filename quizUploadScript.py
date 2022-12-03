@@ -130,3 +130,33 @@ quiz = {
 # Name of quiz entry
 quizName = 'Quiz2'
 db.collection('Quiz').document(quizName).set(quiz)
+
+
+questions2 = [{
+    #Question 1
+    'text': 'What does a portfolio contain?',
+    'answers': {
+        'a': 'Your holdings',
+        'b': 'Stock Buy Options',
+        'c': 'Profits/Losses',
+        'd': 'All of the above',
+        },
+    
+    'correct': 'd'
+}
+              
+{
+    #Question 2
+    'text':, 
+    'answers': {
+        'a': 
+        'b':
+        'c':
+        'd':
+    }
+}
+              
+              
+              
+              ]
+
