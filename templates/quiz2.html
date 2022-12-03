@@ -242,7 +242,18 @@
                         <input type = "radio" id = "e" name = "choices9" value = "c">E. {{answer['e']}}
                       <br>
                       {% endfor %}
+                      <br><br>
+
+                      <h5 class = "question" id = "question" value = "question">11. {{questions[10]}}</h5>
+                      {% for answer in answers11%}
+                        <input type = "radio" id = "a" name = "choices0" value = "a">A. {{answer['a']}}
+                        <br>
+                        <input type = "radio" id = "b" name = "choices0" value = "b">B. {{answer['b']}}
+                        <br>
+                        <input type = "radio" id = "c" name = "choices0" value = "c">C. {{answer['c']}}
                       <br>
+                      {% endfor %}
+                      <br><br>
 
                 <button type = "submit" id = "submitButton" value = "{{request.form['submitButton']}}">Submit {{submitButton}}
               </form>
