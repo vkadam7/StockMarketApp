@@ -14,7 +14,7 @@ from flask import Flask, abort, flash, session, render_template, request, redire
 import pyrebase
 import firebase_admin
 
-from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, portfolio, DAYS_IN_MONTH
+from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, Portfolio, DAYS_IN_MONTH
 from followers import FollowUnfollow, UserInfo
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -143,10 +143,14 @@ def postDelete(id):
 def editPost(id):
     edit = dbfire.collection('Blog').document(id).get()
     edit = edit.to_dict()
-    edit['DocID'] = id
-    return render_template("editingPost.html", edit = edit, stockNames = session['stockNames'])
+    try:
+        edit['DocID'] = id
+        return render_template("editingPost.html", edit = edit)
+    except:
+        return redirect(url_for(id))
 
 
+#Author: Miqdad Hafiz
 @app.route("/editingPost/<id>", methods = ["POST","GET"])
 def editingPost(id):
     if('user' in session):
@@ -155,9 +159,13 @@ def editingPost(id):
             editedPost = result["editingthePost"]
             
             
-            dbfire.collection('Blog').document(id).update({'Post': editedPost})
+            dbfire.collection('Blog').document(id).update({'Post': editedPost,'DatePosted':firestore.SERVER_TIMESTAMP})
             flash("Post has been updated.")
-        return redirect(url_for('userPosts'))
+            return redirect(url_for('userPosts'))
+        else:
+            return redirect(url_for('userPosts'))
+
+
 #Author: Miqdad Hafiz
 @app.route("/postBlog", methods = ["POST","GET"])
 def postBlog():
@@ -277,12 +285,12 @@ def social():
             grabUser = dbfire.collection('Users').where('userName', '==', searchKey).get()
             found = True
             size = len(grabUser)
-            print(size, "try block 1")
+            
             if(size == 0):
                 grabUser = dbfire.collection('Users').where('Name', '==', searchKey).get()
                 found = True
                 size = len(grabUser)
-                print(size, "try block 2")
+                
                 if(size == 0):
                     found = False
 
@@ -303,6 +311,7 @@ def social():
                 else:
                     matching = False
                 
+                print("print matching", matching)
                 #check if user already follows
                 myselfs = dbfire.collection('Users').where('Email', '==', userEmail)
                 for doc in myselfs.stream():
@@ -310,15 +319,16 @@ def social():
                 myUsername = myselfs['userName']
 
                 for key in userResult['FollowerNames']:
+                    print(key)
+                    print(myUsername)
                     if(key == myUsername):
                         alreadyFollows = True
+                        break
                     else:
                         alreadyFollows = False
-                     
-                print("HERE COMES THE USERNAME!")
-                print(userResult)
-                print("HERE COMES THE SESSION VARIABLE")
-                print(session['userResults'])
+                    
+                print("print already follows", alreadyFollows)
+                
                 return render_template("userDisplay.html",  userResult = userResult, matching = matching, alreadyFollows = alreadyFollows, stockNames = session['stockNames'])
             else:
                 print("Can't find user.")
@@ -367,7 +377,7 @@ def follow():
         return redirect(url_for("social"))
             
 
-
+#Author: Miqdad Hafiz and Viraj 
 @app.route("/unfollow", methods = ['POST', 'GET'])
 def unfollow():
     if 'user' in session:
@@ -412,7 +422,7 @@ def userSearchSuggestions():
             
         return render_template('social.html', userNames = session['userName'])
         
-#Author: Viraj Kadam
+#Author: Viraj Kadam, Miqdad helped
 @app.route('/register', methods = ["POST", "GET"])
 def register():
     if request.method == "POST":
@@ -741,24 +751,24 @@ def goToSimulation():
                 
                 percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
-                    Portfolio = portfolio(dbfire, entry, session['user'], session['simName'])
+                    portfolio = Portfolio(dbfire, entry, session['user'], session['simName'])
                     #order = Order.sellTaxLot(dbfire, session['user'], session['simName'], session['orderID'])
-                    if Portfolio.quantity != 0:
+                    if portfolio.quantity != 0:
                         currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
                         tickers.append(entry)
-                        quantities.append(Portfolio.quantity)
-                        sharesPrices.append("$%.2f" % round(Portfolio.avgSharePrice,2))
+                        quantities.append(portfolio.quantity)
+                        sharesPrices.append("$%.2f" % round(portfolio.avgSharePrice,2))
                         currentPrices.append("$%.2f" % round(currentPrice, 2))
-                        totalValue.append("$%.2f" % round(Portfolio.quantity*currentPrice, 2))
-                        originalValue.append("$%.2f" % round(Portfolio.avgSharePrice*Portfolio.quantity, 2))
-                        profits.append("%.2f" % round((Portfolio.quantity*currentPrice) - (Portfolio.avgSharePrice*Portfolio.quantity), 2))
-                        percent = Portfolio.quantity*currentPrice / (currentCash+sharesValue) * 100
+                        totalValue.append("$%.2f" % round(portfolio.quantity*currentPrice, 2))
+                        originalValue.append("$%.2f" % round(portfolio.avgSharePrice*portfolio.quantity, 2))
+                        profits.append("%.2f" % round((portfolio.quantity*currentPrice) - (portfolio.avgSharePrice*portfolio.quantity), 2))
+                        percent = portfolio.quantity*currentPrice / (currentCash+sharesValue) * 100
                         percentageTotal += percent
                         percentage.append("%.2f" % round(percent, 2))
-                        volatility.append("%.2f" % round(Portfolio.volatility,2))
-                        links.append(Portfolio.link)
-                        buyLink.append(Portfolio.buyForm)
-                        sellLink.append(Portfolio.sellForm)
+                        volatility.append("%.2f" % round(portfolio.volatility,2))
+                        links.append(portfolio.link)
+                        buyLink.append(portfolio.buyForm)
+                        sellLink.append(portfolio.sellForm)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
@@ -775,7 +785,11 @@ def goToSimulation():
     else:
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
-        
+    
+#@app.route("/portfolioGraph")
+#def portfolioGraph():
+    
+# Helped with finish simulation function
 @app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
     session['simulationFlag'] = 0
@@ -1165,7 +1179,7 @@ def orderlists():
         orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
         buySellButtons = []
         for entry in Order.stocksBought(dbfire,session['simName']):
-            Portfolio = portfolio(dbfire,entry,session['user'],session['simName'])
+            portfolio = Portfolio(dbfire,entry,session['user'],session['simName'])
 
         return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
         tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list(), partiallySold=orderlist['partiallySold'].to_list(), 
@@ -1190,7 +1204,7 @@ def fourOhFour():
     return render_template('404Error.html',person = session['user'], stockNames = session['stockNames'])
     
 #@app.route('/startSimulation')
-#def portfolioGraph():
+#def PortfolioGraph():
 #    if 'user' in session:
 
 ## Route for Quiz selection page - Muneeb Khan
@@ -1288,7 +1302,6 @@ def quizpage():
         answers8 = [answers[7]]
         answers9 = [answers[8]]
         answers10 = [answers[9]]
-        #answers11 = [answers[10]]
 
         if (request.method == 'POST'):
             
@@ -1315,5 +1328,51 @@ def quizpage():
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
 
+
+@app.route("/quiz2", methods = ["POST", "GET"])
+def quiz2():
+    if ('user' in session):
+        quizID = 'Quiz2'
+        quiz = Quiz(dbfire,quizID,session['user'])
+        questions = quiz.questions['text']
+        answers = quiz.questions['answers']
+        answers1 = [answers[0]]
+        answers2 = [answers[1]]
+        answers3 = [answers[2]]
+        answers4 = [answers[3]]
+        answers5 = [answers[4]]
+        answers6 = [answers[5]]
+        answers7 = [answers[6]]
+        answers8 = [answers[7]]
+        answers9 = [answers[8]]
+        answers10 = [answers[9]]
+        answers11 = [answers[10]]
+
+
+        if (request.method == 'POST'):
+            
+            choiceA = request.args['a']
+            choiceB = request.args['b']
+            choiceC = request.args['c']
+            choiceD = request.args['d']
+            submitButton = request.args['submitButton']
+
+            if request.method == choiceA:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceA)
+            elif request.method == choiceB:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceB)
+            elif request.method == choiceC:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceC)
+            elif request.method == submitButton:
+                return Quiz.submitScore(dbfire)
+            
+
+        return render_template('quiz2.html',quiz = quiz, questions = questions, answers = answers,
+        answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
+        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10, answers11 = answers11)
+                   
+    else:
+        flash("Sorry you must be logged in to take the quiz.")
+        return redirect(url_for("login"))
 if __name__ == '__main__':
     app.run(debug=True)

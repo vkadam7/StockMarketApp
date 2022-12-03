@@ -146,5 +146,23 @@ def test_register_fail_blankUsername():
     assert testregister.status_code == 500 # Temporary workaround but should really return 200
 
 
+#Logout test case - Muneeb Khan
+def test_logout(client):
+    testlogout = client.get("/logout")
+    assert testlogout.status_code == 302 # Redirect user to login page code 302
+    
+def test_login_successful(client):
+    testuser = client.post("/login", data = {'email': "virajk063@gmail.com", "password": "ABCDEF2@"})
+    assert testuser.status_code == 302
+
+def test_login_failure_invalidEmail(client):
+    testuser = client.post("/login", data = {"email": "virajk063@gmail.com", "password": "ABCDEF2@"})
+    assert testuser.status_code == 200
+    
+def test_login_failure_invalidPassword(client):
+    testuser = client.post("/login", data = {"email": "virajk063@gmail.com", "password": "ABCDEF2@"})
+    assert testuser.status_code == 200
+
+
 if __name__ == '__main__':
     pytest.main()

@@ -43,6 +43,13 @@
       </li class = "nav-item">
           <a class = "nav-link active" method = "POST" href = "social"> Your Network</a>
        </li>
+       <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">StockFeed</a>
+        <ul class = "dropdown-menu">
+          <li><a class ="dropdown-item" href="Blog">StockFeed</a></li>
+          <li><a class ="dropdown-item" href="userPosts">Your Posts</a></li>
+        </ul>
+      </li>
         <li class="nav-item">
           <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
         </li>
@@ -79,9 +86,16 @@
           </li>
         {% endif %}
       </ul>
-                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
-                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
-            <script type="text/javascript">
+      <div class="dropdown">
+                <button style = "margin: 4px; background-color:white;color:rgb(33, 103, 42);" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Simulation Status
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin :10px; padding: 10px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
+                  <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin :10px; padding: 10px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
+                </div>
+                </div>
+                <script type="text/javascript">
               if ({{ session['simulationFlag'] }} == 0 ) { 
                 document.getElementById('currentCashNav').style.display = "none";
                 document.getElementById('portfolioValueNav').style.display = "none";
@@ -116,12 +130,12 @@
                                 <div class = "flex-grow-1 ms-3">
                                     
                                     <h5 class = "mb-1"> {{userResult['Name']}}</h5>
-                                    <div class = "d-flex justify-content-start rounded-3 p-2 mb-2" style="background-color: #efefef; margin-left: 5px;">
-                                        <div>
+                                    <div class = "d-flex justify-content-center rounded-3 p-2 mb-2" style="background-color: #efefef; margin-left: 5px;">
+                                        <div class = "px-3">
                                             <p class = "small text-muted mb-1">Followers  </p>
                                             <p class = "mb-0">{{userResult['Followers']}}  </p>
                                         </div>
-                                        <div>
+                                        <div class = "px-3">
                                             <p class = "small text-muted mb-1">Following</p>
                                             <p class = "mb-0">{{userResult['Following']}}</p>
                                         </div>
@@ -129,22 +143,19 @@
                                             <p class = "small text-muted mb-1">User Name</p>
                                             <p class = "mb-0">{{userResult['userName']}}</p>
                                         </div>
-                                        <div class = "px-3">
-                                            <p class = "small text-muted mb-1">Email</p>
-                                            <p class = "mb-0">{{userResult['Email']}}</p>
-                                        </div>
+                                        
                                     
                                     </div>
-                                    {% if matching %}
+                                    {% if matching == True %}
                                     <div class = "d-flex justify-content-end">
                                     <a href="/social">
                                     <button class = "btn btn-primary" input type = "submit" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Close</button>
                                     </a>  
                                     </div>
-                                    {% elif alreadyFollows %}
+                                    {% elif alreadyFollows == True %}
                                     <form action = "/unfollow" method = "POST">
                                     <div class = "d-flex justify-content-end">
-                                        <button class = "btn btn-primary" input type = "submit" name = "option" value = "Follow" style = "background-color:rgb(33, 103, 42)">Unfollow</button> 
+                                        <button class = "btn btn-primary" input type = "submit" name = "option" value = "Unfollow" style = "background-color:rgb(33, 103, 42)">Unfollow</button> 
                                     </div>
                                     </form>
                                     {% else %}

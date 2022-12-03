@@ -475,7 +475,7 @@ class StockData:
 ## Class: Simulation
 #   Description: Class used to manage Simulation entries and data from the Firestore database
 #
-#   Dependencies: firebase_admin, numpy, StockData, Order, portfolio, SimulationFactory
+#   Dependencies: firebase_admin, numpy, StockData, Order, Portfolio, SimulationFactory
 #
 #   Authors: Ian McNulty
 class Simulation:
@@ -606,12 +606,14 @@ class Simulation:
         return quantityOwned
 
     ## Simulation.finishSimulation
-    #   Description:
+    #   Description: Calculates score based on final valuation of Portfolio combined with
+    #   current amount of cash available to the user, it then marks the simulation as 
+    #   finished and stores the score
     #
     #   Inputs: db - Firestore object, link to Firestore database
     #           simName - String, ID of the simulation data entry to be finished
     #
-    #   Author: Ian McNulty
+    #   Author: Ian McNulty, Miqdad: helped with the creating a score and sending the score to the database.
     def finishSimulation(db, simName):
         data = db.collection('Simulations').document(simName).get().to_dict()
 
@@ -621,12 +623,12 @@ class Simulation:
         
         # Retrieve current values of owned shares
         for entry in Order.stocksBought(db, simName):
-            Portfolio = portfolio(db, entry, data['user'], simName)
-            if Portfolio.quantity != 0:
-                quantities.append(Portfolio.quantity)
+            portfolio = Portfolio(db, entry, data['user'], simName)
+            if portfolio.quantity != 0:
+                quantities.append(portfolio.quantity)
                 currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
         
-        # Summation of portfolio value
+        # Summation of Portfolio value
         for i in range(len(quantities)):
             totalValue += quantities[i] * currentPrices[i]
 
@@ -704,7 +706,7 @@ class Simulation:
     #   adding the amount of change to it
     #
     #   Inputs: db - Firestore object, link to Firestore database
-    #           simName - String, ID of the simulation data entry to be finished
+    #           simName - String, ID of the simulation data entry
     #           delta - Float, amount to update the currently available cash by
     #
     #   Author: Ian McNulty
@@ -718,7 +720,7 @@ class Simulation:
     #   Description: Retrieves the available amount of cash to the user in the simulation
     #
     #   Inputs: db - Firestore object, link to Firestore database
-    #           simName - String, ID of the simulation data entry to be finished
+    #           simName - String, ID of the simulation data entry
     #
     #   Return: data['currentCash'] - Float, currently available amount of cash to the user
     #
@@ -732,7 +734,7 @@ class Simulation:
     #   the simulation's associated stocks; to be used with time limit checking for simulation
     #
     #   Inputs: db - Firestore object, link to Firestore database
-    #           simName - String, ID of the simulation data entry to be finished
+    #           simName - String, ID of the simulation data entry
     #
     #   Return: highestIndex - Integer, highest index found in the IntradayStockData for the sim
     #
@@ -751,7 +753,7 @@ class Simulation:
     #   user
     #
     #   Inputs: db - Firestore object, link to Firestore database
-    #           simName - String, ID of the simulation data entry to be finished
+    #           simName - String, ID of the simulation data entry
     #           user - String, ID of the user to be checked
     #
     #   Return: True, if ongoing simulation found
@@ -815,13 +817,13 @@ class Simulation:
         return False
 
     ## Simulation.getPortfolioValue
-    #   Description: Calculates the current portfolio value and gives it to the user along with
+    #   Description: Calculates the current Portfolio value and gives it to the user along with
     #   the current cash amount available to the user
     #
     #   Inputs: db - Firestore object, link to Firestore database
     #           simName - String, ID of the simulation data entry to be finished
     #
-    #   Return: totalValue - Float, total value of the portfolio, in USD
+    #   Return: totalValue - Float, total value of the Portfolio, in USD
     #           data['currentCash'] - Float, currently available amount of cash to the user
     #               in this simulation
     #
@@ -833,9 +835,9 @@ class Simulation:
         data = db.collection('Simulations').document(simName).get().to_dict()
         
         for entry in Order.stocksBought(db, simName):
-            Portfolio = portfolio(db, entry, data['user'], simName)
-            if Portfolio.quantity != 0:
-                quantities.append(Portfolio.quantity)
+            portfolio = Portfolio(db, entry, data['user'], simName)
+            if portfolio.quantity != 0:
+                quantities.append(portfolio.quantity)
                 currentPrices.append(round(SimulationFactory(db, data['user']).simulation.currentPriceOf(entry), 2))
         
         for i in range(len(quantities)):
@@ -873,21 +875,58 @@ class Simulation:
                     names.append(str(temp['name']))
         return tickers, prices, links, names
 
+## Class: SimulationFactory
+#   Description: Class used to create Simulation objects by retrieving the currently ongoing 
+#   simulation associated with the user
+#
+#   Dependencies: Simulation
+#
+#   Authors: Ian McNulty
 class SimulationFactory:
-    def __init__(self, db, email):
-        self.simulation = Simulation.retrieveOngoing(db, email)
+    ## SimulationFactory.__init__
+    #   Description: Retrieves the ongoing simulation data with only a user ID as a key
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           user - String, ID of the user to be searched for
+    #
+    #   Author: Ian McNulty
+    def __init__(self, db, user):
+        self.simulation = Simulation.retrieveOngoing(db, user)
 
-    def existenceCheck(db, email):
-        array = [entry for entry in db.collection('Simulations').where('ongoing','==',True).where('user','==',email).stream()]
+    ## SimulationFactory.existenceCheck
+    #   Description: Checks whether there is an ongoing simulation for the given user
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           user - String, ID of the user to be searched for
+    #
+    #   Return: True, if ongoing simulation exists
+    #           False, if ongoing simulation does not exist
+    #
+    #   Author: Ian McNulty
+    def existenceCheck(db, user):
+        array = [entry for entry in db.collection('Simulations').where('ongoing','==',user).where('user','==',email).stream()]
         if len(array) == 0:
             return False, "None"
         else:
             return True, array[0].id
 
+## Class: User
+#   Description: Class used to handle and change User data within the application
+#
+#   Dependencies: firebase_admin, numpy, StockData, Order, Portfolio, SimulationFactory
+#
+#   Authors: Ian McNulty, Muneeb Khan
 class User:
-    def __init__(self, db, username):
+    ## User.__init__
+    #   Description: Creates an object of User type with the given inputs
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           user - String, ID of the user to be created
+    #
+    #   Author: Ian McNulty
+    def __init__(self, db, user):
         self.db = db
-        self.username = username
+        self.user = user
         self.userDataDocument = self.retrieve()
         if self.userDataDocument != 'This data entry does not exist':
             self.email = self.userDataDocument['Email']
@@ -898,12 +937,27 @@ class User:
         else:
             print("This user does not exist")
 
+    ## User.retrieve
+    #   Description: Retrieves the user from the Firestore database
+    # 
+    #   Return: 'This data entry does not exist', if the user is not found
+    #           self.db.collection('Users').document(self.user).get(), if the user is found
+    #
+    #   Author: Ian McNulty
     def retrieve(self):
         try:
-            return self.db.collection('Users').document(self.username).get()
+            return self.db.collection('Users').document(self.user).get()
         except:
             return 'This data entry does not exist'
 
+    ## User.updateProfile
+    #   Description: Updates the profile entry in the database with the given parameters
+    # 
+    #   Inputs: description - String, new description of the user
+    #           picture - Photo (JPG, PNG, etc), new profile photo for the user
+    #           experience - String, new experience description of the user
+    #
+    #   Author: Ian McNulty
     def updateProfile(self, description="", picture="", experience=""):
         if description == "":
             description = self.description
@@ -915,37 +969,49 @@ class User:
         self.updatePicture(picture)
         self.updateExperience(experience)
 
+    ## User.updateDescription
+    #   Description: Updates the description field in the User entry
+    # 
+    #   Inputs: description - String, new description of the user
+    #
+    #   Author: Ian McNulty
     def updateDescription(self, description):
-        data = self.db.collection("Users").document(self.username)
+        data = self.db.collection("Users").document(self.user)
         data.update({ 'Description' : description })
 
+    ## User.updatePicture
+    #   Description: Updates the profile photo field in the User entry
+    # 
+    #   Inputs: picture - Photo (JPG, PNG, etc), new profile photo for the user
+    #
+    #   Author: Ian McNulty
     def updatePicture(self, picture):
-        data = self.db.collection("Users").document(self.username)
+        data = self.db.collection("Users").document(self.user)
         data.update({ 'Picture' : picture })
 
+    ## User.updateExperience
+    #   Description: Updates the experence field in the User entry
+    # 
+    #   Inputs: experience - String, new experience description of the user
+    #
+    #   Author: Ian McNulty
     def updateExperience(self, experience):
-        data = self.db.collection("Users").document(self.username)
+        data = self.db.collection("Users").document(self.user)
         data.update({ 'Experience' : experience })
 
-    #No longer part of follower feature
-    #def addFriend(db, user1, user2):
-    #    data = {
-    #        'user1': user1,
-    #        'user2': user2
-    #    }
-    #    db.collection("Users").add(data)
-
-    #def removeFriend(db, user1, user2):
-    #    for entry in db.collection('Users').where('user1','==',user1).where('user2','==',user2).stream():
-    #        db.collection('Users').document(entry.id).delete()
-
-    def listFriends(db, user):
-        friends = []
-        for entry in db.collection('Users').where('user1','==',user).stream():
-            temp = entry.to_dict()
-            friends.append(temp['user2'])
-        return friends
-
+    ## User.registerUser
+    #   Description: Registers a user data entry with the given inputs
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           username - String, username of the user
+    #           email - String, email of the user
+    #           name - String, name of the user
+    #           userID - String, ID of the user
+    #           description - String, new description of the user
+    #           picture - Photo (JPG, PNG, etc), new profile photo for the user
+    #           experience - String, new experience description of the user
+    #
+    #   Author: Ian McNulty
     def registerUser(db, username, email, name, userID, description="", picture="", experience=""):
         data = {
             'Email' : email,
@@ -958,7 +1024,12 @@ class User:
         }
         db.collection('Users').document(username).set(data)
 
-    # User list by Muneeb Khan
+    ## User.userList
+    #   Description: Lists the user values for viewing on the front end
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #
+    #   Author: Ian McNulty, Muneeb Khan
     def userList(db):
 
         # The usernames list function will loop through the usernames in firebase and store each one
@@ -973,10 +1044,28 @@ class User:
         print(df)
         return df                 
 
+## Class: Order
+#   Description: Class used to handle and change Order data from the application
+#
+#   Dependencies: firebase_admin, numpy, Simulation, SimulationFactory
+#
+#   Authors: Ian McNulty, Muneeb Khan
 class Order:
-    def __init__(self, db, simulation, stock, buyOrSell, quantity, stockPrice):
+    ## Order.__init__
+    #   Description: Creates an object of Order type to be able to add it to the Orders collection in
+    #   the Firestore database
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           simName - String, ID of the associated simulation
+    #           stock - String, ID of the associated stock
+    #           buyOrSell - String, type of order to be created
+    #           quantity - Integer, amount of shares to be bought or sold
+    #           stockPrice - Float, price of the stock at time of purchase
+    #
+    #   Author: Ian McNulty
+    def __init__(self, db, simName, stock, buyOrSell, quantity, stockPrice):
         self.db = db
-        self.sim = simulation
+        self.simName = simName
         self.stock = stock
         self.dayOfPurchase = datetime.datetime.now()
         self.option = buyOrSell
@@ -984,14 +1073,18 @@ class Order:
         self.avgStockPrice = stockPrice
         self.totalPrice = float(quantity)*float(stockPrice)
 
+    ## Order.buyOrder
+    #   Description: Creates a buy order if the user has enough money
+    #
+    #   Author: Ian McNulty
     def buyOrder(self):
         if self.option == 'Buy':
             if self.doTheyHaveEnoughMoney():
-                count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
-                orderName = self.sim + self.stock + str(count)
+                count = len(self.db.collection('Orders').where('simulation', '==', self.simName).get())
+                orderName = self.simName + self.stock + str(count)
                 data = {
                     'sold': False,
-                    'simulation': self.sim,
+                    'simulation': self.simName,
                     'ticker': self.stock,
                     'dayOfPurchase': self.dayOfPurchase,
                     'buyOrSell': 'Buy',
@@ -1000,18 +1093,22 @@ class Order:
                     'totalPrice': self.totalPrice
                 }
                 self.db.collection('Orders').document(orderName).set(data)
-                Simulation.updateCash(self.db, self.sim, float(self.totalPrice) * -1)
+                Simulation.updateCash(self.db, self.simName, float(self.totalPrice) * -1)
                 return 1
             else: return -1
 
+    ## Order.sellOrder
+    #   Description: Creates a sell order if the user has enough shares
+    #
+    #   Author: Ian McNulty
     def sellOrder(self):
         if self.option == 'Sell':
             check, averagePrice = self.doTheyOwnThat()
             if check == True:
-                count = len(self.db.collection('Orders').where('simulation', '==', self.sim).get())
-                orderName = self.sim + self.stock + str(count)
+                count = len(self.db.collection('Orders').where('simulation', '==', self.simName).get())
+                orderName = self.simName + self.stock + str(count)
                 data = {
-                    'simulation': self.sim,
+                    'simulation': self.simName,
                     'ticker': self.stock,
                     'dayOfPurchase': self.dayOfPurchase,
                     'buyOrSell': 'Sell',
@@ -1021,24 +1118,33 @@ class Order:
                     'profit': float(self.avgStockPrice)*float(self.quantity) - float(averagePrice)*float(self.quantity)
                 }
                 self.db.collection('Orders').document(orderName).set(data)
-                Simulation.updateCash(self.db, self.sim, self.totalPrice)
+                Simulation.updateCash(self.db, self.simName, self.totalPrice)
                 return 1
             else: return -1
 
+    ## Order.doTheyHaveEnoughMoney
+    #   Description: Checks if the user has enough money to buy the requested amount of shares
+    #
+    #   Author: Ian McNulty
     def doTheyHaveEnoughMoney(self):
         enoughFlag = False
 
-        currentCash = int(self.db.collection('Simulations').document(self.sim).get().to_dict()['currentCash'])
+        currentCash = int(self.db.collection('Simulations').document(self.simName).get().to_dict()['currentCash'])
         if currentCash >= self.totalPrice:
             enoughFlag = True
 
         return enoughFlag
 
+    ## Order.doTheyOwnThat
+    #   Description: Checks if the user owns the shares they are trying to sell
+    #
+    #   Author: Ian McNulty
     def doTheyOwnThat(self):
         quantityOwned = 0
         ownageFlag = False
         partialFlag = False
-        for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).get():
+        # Retrieve buy orders
+        for entry in self.db.collection('Orders').where('simulation','==',self.simName).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).get():
             temp = entry.to_dict()
             if temp.get('newQuantity') != None:
                 quantityOwned += int(temp['newQuantity'])
@@ -1053,8 +1159,9 @@ class Order:
         amountToSell = int(self.quantity)
         if ownageFlag:
             while amountToSell > 0:
+                # Partial order sales go first
                 if partialFlag == True:
-                    for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).where('partiallySold','==',True).stream():
+                    for entry in self.db.collection('Orders').where('simulation','==',self.simName).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).where('partiallySold','==',True).stream():
                         if amountToSell <= 0:
                             break
                         temp = entry.to_dict()
@@ -1066,7 +1173,8 @@ class Order:
                             self.db.collection('Orders').document(entry.id).update({'sold' : True, 'newQuantity' : 0})
                             amountToSell -= int(temp['newQuantity'])
                 
-                for entry in self.db.collection('Orders').where('simulation','==',self.sim).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).stream():
+                # Whole order sales go second
+                for entry in self.db.collection('Orders').where('simulation','==',self.simName).where('buyOrSell','==','Buy').where('sold','==',False).where('ticker','==',self.stock).stream():
                     if amountToSell <= 0:
                         break
                     temp = entry.to_dict()
@@ -1082,30 +1190,59 @@ class Order:
         
         return ownageFlag
 
-    def retrieve(db, sim, ticker):
-        return db.collection('Orders').where('simulation','==',sim).where('ticker','==',ticker).stream()
+    ## Order.retrieve
+    #   Description: Retrieves all orders associated with the simulation and ticker
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           simName - String, ID of the simulation data entry
+    #           ticker - String, ID of the stock to be affected
+    #
+    #   Author: Ian McNulty
+    def retrieve(db, simName, ticker):
+        return db.collection('Orders').where('simulation','==',simName).where('ticker','==',ticker).stream()
 
-    def retrieveOwned(db, sim, ticker):
-        return db.collection('Orders').where('simulation','==',sim).where('ticker','==',ticker).where('sold','==',False).stream()
+    ## Order.retrieveOwned
+    #   Description: Retrieves all unsold buy orders associated with the simulation and ticker
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           simName - String, ID of the simulation data entry
+    #           ticker - String, ID of the stock to be affected
+    #
+    #   Author: Ian McNulty
+    def retrieveOwned(db, simName, ticker):
+        return db.collection('Orders').where('simulation','==',simName).where('ticker','==',ticker).where('sold','==',False).stream()
 
-    def stocksBought(db, sim):
+    ## Order.stocksBought
+    #   Description: Retrieve list of stocks bought in the associated simulation
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           simName - String, ID of the simulation data entry
+    #
+    #   Author: Ian McNulty
+    def stocksBought(db, simName):
         tickers = []
-        for entry in db.collection('Orders').where('simulation','==',sim).stream():
+        for entry in db.collection('Orders').where('simulation','==',simName).stream():
             temp = entry.to_dict()
             tickers.append(temp['ticker'])
         return [*set(tickers)]
-    
-    #def buyRoute(db, user, sim):
-        
 
-    def sellTaxLot(db, user, sim, orderID):
+    ## Order.sellTaxLot
+    #   Description: Sells all remaining shares of a specific order
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           simName - String, ID of the simulation data entry
+    #           ticker - String, ID of the stock to be affected
+    #           orderID - String, ID of the order to be sold
+    #
+    #   Author: Ian McNulty
+    def sellTaxLot(db, user, simName, orderID):
         doc = db.collection('Orders').document(orderID).get().to_dict()
         avgStockPrice = SimulationFactory(db, user).simulation.currentPriceOf(doc['ticker'])
         if doc.get('newQuantity') == None:
-            count = len(db.collection('Orders').where('simulation', '==', sim).get())
-            orderName = sim + doc['ticker'] + str(count)
+            count = len(db.collection('Orders').where('simulation', '==', simName).get())
+            orderName = simName + doc['ticker'] + str(count)
             data = {
-                'simulation': sim,
+                'simulation': simName,
                 'ticker': doc['ticker'],
                 'dayOfPurchase': datetime.datetime.now(),
                 'buyOrSell': 'Sell',
@@ -1116,13 +1253,13 @@ class Order:
             }
             db.collection('Orders').document(orderName).set(data)
             db.collection('Orders').document(orderID).update({'sold' : True})
-            Simulation.updateCash(db, sim, float(doc['totalPrice']))
+            Simulation.updateCash(db, simName, float(doc['totalPrice']))
             return 1
         else:
-            count = len(db.collection('Orders').where('simulation', '==', sim).get())
-            orderName = sim + doc['ticker'] + str(count)
+            count = len(db.collection('Orders').where('simulation', '==', simName).get())
+            orderName = simName + doc['ticker'] + str(count)
             data = {
-                'simulation': sim,
+                'simulation': simName,
                 'ticker': doc['ticker'],
                 'dayOfPurchase': datetime.datetime.now(),
                 'buyOrSell': 'Sell',
@@ -1133,13 +1270,17 @@ class Order:
             }
             db.collection('Orders').document(orderName).set(data)
             db.collection('Orders').document(orderID).update({'sold' : True, 'newQuantity' : 0})
-            Simulation.updateCash(db, sim, doc['totalPrice'])
+            Simulation.updateCash(db, simName, doc['totalPrice'])
             return 1
-        return -1
 
-    # List of Orders by Muneeb Khan
+    ## Order.orderList
+    #   Description: Lists the order values for viewing on the front end
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           simName - String, ID for the current simulation
+    #
+    #   Author: Ian McNulty, Muneeb Khan
     def orderList(db, simName):
-        quantityOwned = 0
         ownageFlag = True
 
         # The order list function will loop through the orders in firebase and store each one
@@ -1170,25 +1311,45 @@ class Order:
             
             return df
 
-class portfolio:
-    def __init__(self, db, stock, user, simulation):
+## Class: Portfolio
+#   Description: Class used to handle and concatenate relevant ownership data for the user in the front end
+#
+#   Dependencies: firebase_admin, numpy, StockData, Order, Portfolio, SimulationFactory
+#
+#   Authors: Viraj Kadam, Ian McNulty, Muneeb Khan
+class Portfolio:
+    ## Portfolio.__init__
+    #   Description: Initiates an entry of the portfolio table for the front end and 
+    #   creates all necessary data for viewing
+    # 
+    #   Inputs: db - String, link to the Firestore database
+    #           stock - String, ID of the associated stock
+    #           user - String, ID of the associated user
+    #           simName - String, ID for the current simulation
+    #
+    #   Author: Ian McNulty, Viraj Kadam
+    def __init__(self, db, stock, user, simName):
         self.firebase = db
         self.stock = stock
         self.user = user
-        self.sim = simulation 
+        self.simName = simName 
         self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
         self.profit, self.avgSharePrice, self.quantity = self.getVariables()
         self.volatility = 0
         self.buyForm = str('/buyOrder?ticker='+stock)
         self.sellForm = str('/stockSell?ticker='+stock)
-        #self.sellForm = str('/sellForm')
 
+    ## Portfolio.getVariables
+    #   Description: Obtains the values for profit of the shares owned, average 
+    #   share price of the owned shares, and the quantity of the owned shares
+    #
+    #   Author: Ian McNulty
     def getVariables(self):
         currentPriceOfStock = SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock)
         prices = []
         avgStockPrices = []
         amountOfSharesOwned = 0
-        for entry in Order.retrieve(self.firebase, self.sim, self.stock):
+        for entry in Order.retrieve(self.firebase, self.simName, self.stock):
             temp = entry.to_dict()
             avgStockPrices.append(float(temp['avgStockPrice']))
             prices.append(float(temp['totalPrice']))
@@ -1207,7 +1368,7 @@ class portfolio:
         else:
             return currentValueOfShares - avgPriceOfOrders, 0, amountOfSharesOwned
             
-
+    ## Portfolio.GainorLoss - DEPRECATED
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
     def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
           #tempData = self.db.collection('Simulations').document(self.sim).document('Orders').get()
@@ -1218,8 +1379,6 @@ class portfolio:
         currentCash = self.db.collection('Simulations').document(self.sim).document('currentCash').get()
         currentPrice = Simulation.currentPriceOf
         day = datetime()
-        
-        
         stocksOwned = self.db.collection('Orders').document(self.sim).document('ticker')
 
         if quanity > 0:    
@@ -1242,7 +1401,8 @@ class portfolio:
                  netGainorLoss = (currentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
                  return netGainorLoss
               
-     #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
+    ## Portfolio.funds_remaining - DEPRECATED
+    #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
     def funds_remaining(self, initialAmount, finalAmount):
         finalAmount = 0
         fundsUsed = 0
@@ -1274,14 +1434,15 @@ class portfolio:
                  fundsUsed = data['currentCash'] - data['initialCash']
                  fundsRemainiing = fundsUsed
                  return fundsRemainiing
-       
         
+    ## Portfolio.returns - DEPRECATED
     #Edited returns feature
     def returns(self, quantity, avgStockPrice, AdjustClose):
         returns = self.db.collection('Stocks').document('daily').document('closes').get()
         daily_returns = returns.pct_change()
         print(daily_returns)
-       
+
+    ## Portfolio.volatitlity - DEPRECATED  
     #New volatility function (Viraj Kadam)   
     def volatitlity(self):
        currentPriceOfStock = round(SimulationFactory(self.firebase, self.user).simulation.currentPriceOf(self.stock), 2)
@@ -1297,6 +1458,7 @@ class portfolio:
            
        return volatility
            
+    ## Portfolio.percentChange - DEPRECATED
     #Percent change in stock per day. Part of initial push to viraj branch, will add more later tonight
     #Updated by Muneeb Khan
     def percentChange(db,simName):
@@ -1313,6 +1475,7 @@ class portfolio:
         print(str(finalAmount) + " %")
         return (str(finalAmount) + " %")   
         
+    ## Portfolio.user_graph - DEPRECATED
     #Author: Viraj Kadam    
     #Graph of user stocks   (Need buy and sell info)
     def user_graph(self, db, startDate, endDate):
@@ -1323,18 +1486,30 @@ class portfolio:
             temp = entry.to_dict()
             xlabel = prices
             ylabel = dates
-            fig = plt.figure()
-            plt.xlabel('Date')
-            plt.ylabel('Price')
-            fig = plt.plot(prices[i], dates[i])
-            for i in range(db.collection('Simulations').collections('simName').collection('startDate'), db.collection('Simulations').collections('simName').collection('endDate')):
-                fig[i].set_color(color[i])
+            ##fig = plt.figure()
+            ##plt.xlabel('Date')
+            ##plt.ylabel('Price')
+            ##fig = plt.plot(prices[i], dates[i])
+            ##for i in range(db.collection('Simulations').collections('simName').collection('startDate'), db.collection('Simulations').collections('simName').collection('endDate')):
+            ##    fig[i].set_color(color[i])
             
-            plt.show
+            ##plt.show
 
-## Class for setting up quiz - Muneeb Khan
-## Updated by Ian Mcnulty
+## Class: Quiz
+#   Description: Class used to handle questions and answers for quizzes taken by the user
+#
+#   Dependencies: firebase_admin, pandas
+#
+#   Authors: Muneeb Khan, Ian McNulty
 class Quiz:
+    ## Quiz.__init__
+    #   Description: Creates a Quiz object with data retrieved from the Firestore database
+    #
+    #   Inputs: db - Firestore object, link to the Firestore database
+    #           quizID - String, ID of the requested quiz
+    #           user - String, ID of the associated user taking the quiz
+    #
+    #   Author: Muneeb Khan, Ian McNulty
     def __init__(self,db,quizID,user):
         self.db = db
         self.questions = self.retrieveQuestions(quizID)
@@ -1342,7 +1517,12 @@ class Quiz:
         self.user = user
         self.correct = []
     
-    # To store all the questions and answers for the Quiz
+    ## Quiz.retrieveQuestions
+    #   Description: To store all the questions and answers for the Quiz
+    #
+    #   Inputs: quizID - String, ID of the requested quiz
+    #
+    #   Author: Muneeb Khan, Ian McNulty
     def retrieveQuestions(self, quizid):
         quiz = self.db.collection('Quiz').document(quizid).get().to_dict()
 
@@ -1354,7 +1534,13 @@ class Quiz:
         self.questions = pd.DataFrame(questions, columns=['id','text','answers','correct'])
         return pd.DataFrame(questions, columns=['id','text','answers','correct'])
 
-    # Check if Users answer is correct
+    ## Quiz.answerQuestion
+    #   Description: Check if Users answer is correct
+    #
+    #   Inputs: questionid - String, ID of the requested question
+    #           answer - Character, answer from the user for this question
+    #
+    #   Author: Muneeb Khan, Ian McNulty
     def answerQuestion(self, questionid, answer):
         question = self.questions.loc[self.questions['id'].isin([questionid])]
         index = self.questions[self.questions['id'] == questionid].index[0]
@@ -1362,12 +1548,20 @@ class Quiz:
         if answer == correct[0]:
             self.correct.append(True)
 
+    ## Quiz.scoreCalc
+    #   Description: Calculates the score of the quiz after finishing
+    #
+    #   Author: Muneeb Khan, Ian McNulty
     def scoreCalc(self):
         count = len(self.correct)
 
         self.score = round(count, 2)
         return round(count, 2)
 
+    ## Quiz.submitScore
+    #   Description: Submits the score as an entry into the database
+    #
+    #   Author: Muneeb Khan, Ian McNulty
     def submitScore(self):
         data = {
             'user': self.user,
@@ -1376,7 +1570,15 @@ class Quiz:
         }
         self.db.collection('QuizScores').add(data)
 
-    def retrieveScore(db, user, qid):
-        for entry in db.collection('QuizScores').where('user','==',user).where('qid','==',qid).stream():
+    ## Quiz.retrieveScore
+    #   Description: Retrieves the score entry associated with the user for the requested quiz
+    #
+    #   Inputs: db - Firestore object, link to the Firestore database
+    #           quizID - String, ID of the requested quiz
+    #           user - String, ID of the associated user taking the quiz
+    #
+    #   Author: Muneeb Khan, Ian McNulty
+    def retrieveScore(db, quizID, user):
+        for entry in db.collection('QuizScores').where('user','==',user).where('qid','==',quizID).stream():
             temp = entry.to_dict()
             return temp['score']
