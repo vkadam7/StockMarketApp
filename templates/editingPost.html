@@ -1,4 +1,4 @@
-<!-- page for user posts created by Miqdad-->
+<!-- Created by Miqdad -->
 <!doctype html>
 <html lang="en" class="h-100">
   <head>
@@ -10,15 +10,15 @@
     <link href="/static/stylesheets/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.0/sweetalert.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
     </head>
     <header>
-
       <a class="navbar-brand" href="home" style = "color: black; padding: 10px;">
         StockSim: Learn How to Trade
       </a>
         <nav class="navbar navbar-expand-md navbar-dark" id = "navBar">
           <img src = "/static/stockLogo.png" alt = "stock symbol" width = "45" height = "45" class="d-inline-block align-top">
+            <div class="container-fluid">
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
               </button>
@@ -46,17 +46,14 @@
             <a class = "nav-link" method = "POST" href = "social"> Your Network</a>
          </li>
          <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">StockFeed</a>
+          <a class="nav-link dropdown-toggle active" data-bs-toggle="dropdown">StockFeed</a>
           <ul class = "dropdown-menu">
             <li><a class ="dropdown-item" href="Blog">StockFeed</a></li>
             <li><a class ="dropdown-item" href="userPosts">Your Posts</a></li>
           </ul>
-         </li>
+        </li>
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "Leaderboard">Leaderboard</a> 
-          </li>
-          <li class = "nav-item">
-            <a class = "nav-link" method = "POST" href = "update">Update</a>
           </li>
           <li class="nav-item">
             <a class = "nav-link" method = "POST" href = "logout">Logout</a> 
@@ -73,7 +70,7 @@
           </li>
           <li>
             <form id="nav-link" action="/simulation" method="post"> 
-              <button class = "btn btn btn-lg btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="goToSim">Go to Current Sim!</button>
+              <button class = "btn btn btn-block" style = "background-color:white;color:rgb(33, 103, 42);padding-left: 10px;margin-left: 5px;" id="goToSim">Go to Current Sim!</button>
             </form>
             <script type="text/javascript">
               if ({{ session['simulationFlag'] }} == 0 ) { 
@@ -89,7 +86,21 @@
             <a class = "nav-link" method = "POST" href = "register">Register</a>
           </li>
         {% endif %}
-                </ul>
+                </ul><div class="dropdown">
+                <button style = "margin: 4px; background-color:white;color:rgb(33, 103, 42);" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Simulation Status
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin :10px; padding: 10px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
+                  <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin :10px; padding: 10px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
+                </div>
+                </div>
+                <script type="text/javascript">
+              if ({{ session['simulationFlag'] }} == 0 ) { 
+                document.getElementById('currentCashNav').style.display = "none";
+                document.getElementById('portfolioValueNav').style.display = "none";
+              }
+            </script>  
                 <form action="/stockSearch" method="post">
                     <input class = "stockSearchBar" type="search" list = "stockNames" name="searchTerm" placeholder="Find a stock..."
                             value="{{ request.form['searchTerm'] }}">

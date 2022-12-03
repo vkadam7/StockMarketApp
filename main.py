@@ -143,8 +143,12 @@ def postDelete(id):
 def editPost(id):
     edit = dbfire.collection('Blog').document(id).get()
     edit = edit.to_dict()
-    edit['DocID'] = id
-    return render_template("editingPost.html", edit = edit, stockNames = session['stockNames'])
+     try:
+        edit['DocID'] = id
+        return render_template("editingPost.html", edit = edit)
+    except:
+        return redirect(url_for(id))
+
 
 
 @app.route("/editingPost/<id>", methods = ["POST","GET"])
@@ -155,9 +159,13 @@ def editingPost(id):
             editedPost = result["editingthePost"]
             
             
-            dbfire.collection('Blog').document(id).update({'Post': editedPost})
+            dbfire.collection('Blog').document(id).update({'Post': editedPost,'DatePosted':firestore.SERVER_TIMESTAMP})
             flash("Post has been updated.")
-        return redirect(url_for('userPosts'))
+            return redirect(url_for('userPosts'))
+        else:
+            return redirect(url_for('userPosts'))
+
+
 #Author: Miqdad Hafiz
 @app.route("/postBlog", methods = ["POST","GET"])
 def postBlog():
@@ -277,12 +285,12 @@ def social():
             grabUser = dbfire.collection('Users').where('userName', '==', searchKey).get()
             found = True
             size = len(grabUser)
-            print(size, "try block 1")
+            
             if(size == 0):
                 grabUser = dbfire.collection('Users').where('Name', '==', searchKey).get()
                 found = True
                 size = len(grabUser)
-                print(size, "try block 2")
+                
                 if(size == 0):
                     found = False
 
@@ -303,6 +311,7 @@ def social():
                 else:
                     matching = False
                 
+                print("print matching", matching)
                 #check if user already follows
                 myselfs = dbfire.collection('Users').where('Email', '==', userEmail)
                 for doc in myselfs.stream():
@@ -310,15 +319,16 @@ def social():
                 myUsername = myselfs['userName']
 
                 for key in userResult['FollowerNames']:
+                    print(key)
+                    print(myUsername)
                     if(key == myUsername):
                         alreadyFollows = True
+                        break
                     else:
                         alreadyFollows = False
-                     
-                print("HERE COMES THE USERNAME!")
-                print(userResult)
-                print("HERE COMES THE SESSION VARIABLE")
-                print(session['userResults'])
+                    
+                print("print already follows", alreadyFollows)
+                
                 return render_template("userDisplay.html",  userResult = userResult, matching = matching, alreadyFollows = alreadyFollows, stockNames = session['stockNames'])
             else:
                 print("Can't find user.")
