@@ -143,14 +143,14 @@ def postDelete(id):
 def editPost(id):
     edit = dbfire.collection('Blog').document(id).get()
     edit = edit.to_dict()
-     try:
+    try:
         edit['DocID'] = id
         return render_template("editingPost.html", edit = edit)
     except:
         return redirect(url_for(id))
 
 
-
+#Author: Miqdad Hafiz
 @app.route("/editingPost/<id>", methods = ["POST","GET"])
 def editingPost(id):
     if('user' in session):
@@ -377,7 +377,7 @@ def follow():
         return redirect(url_for("social"))
             
 
-
+#Author: Miqdad Hafiz and Viraj 
 @app.route("/unfollow", methods = ['POST', 'GET'])
 def unfollow():
     if 'user' in session:
@@ -422,7 +422,7 @@ def userSearchSuggestions():
             
         return render_template('social.html', userNames = session['userName'])
         
-#Author: Viraj Kadam
+#Author: Viraj Kadam, Miqdad helped
 @app.route('/register', methods = ["POST", "GET"])
 def register():
     if request.method == "POST":
@@ -789,7 +789,7 @@ def goToSimulation():
 #@app.route("/portfolioGraph")
 #def portfolioGraph():
     
-        
+# Helped with finish simulation function
 @app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
     session['simulationFlag'] = 0
