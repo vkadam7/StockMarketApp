@@ -131,7 +131,8 @@ quiz = {
 quizName = 'Quiz2'
 db.collection('Quiz').document(quizName).set(quiz)
 
-
+#Author: Viraj Kadam
+#Description: Entries for quizzes 3 and 4
 questions2 = [
 {
     #Question 1
@@ -140,89 +141,94 @@ questions2 = [
         'a': 'Your holdings',
         'b': 'Stock Buy Options',
         'c': 'Profits/Losses',
-        'd': 'All of the above',
+        'd': 'All of the above'
         },
     
     'correct': 'd'
 },            
 {
     #Question 2
-    'text':'',
+    'text':'Should you take into account the historic value of the stock?',
     'answers': {
-        'a': '',
-        'b': '',
-        'c': '',
-        'd': '',
+        'a': 'Yes',
+        'b': 'No'
     },
     
-    'correct': ''  
+    'correct': 'a'  
 },
 
 { # Question 3
-    'text' : 'What is an ownership of a part of the companies investments?',
+    'text' : 'Can someone in the United States invest in a company in China',
     'answers' : {
-        'a' : 'Stocks',
-        'b' : 'Yields',
-        'c' : 'Volatility'
+        'a' : 'Yes',
+        'b' : 'No'
     },
     'correct' : 'a'
 },
 { # Question 4
-    'text' : 'Who was the founder of stocks?',
+    'text' : 'Which of the following can affect the stock market?',
     'answers' : {
-        'a' : 'Benjamin Franklin',
-        'b' : 'The Dutch East India Company',
-        'c' : 'New York Stock exchange'
+        'a' : 'Current Events',
+        'b' : 'Interest Rates',
+        'c' : 'Natural Calamaties',
+        'd': 'All of the above'
     },
-    'correct' : 'b'
+    'correct' : 'd'
 },
 { # Question 5
-    'text' : 'For dividends what is the cut off date before the record date called?',
+    'text' : 'What is the ticker for Google?',
     'answers' : {
-        'a' : 'Dividend date',
-        'b' : 'Ex-dividend date',
-        'c' : 'Dividend reinvestment date'
+        'a' : 'G',
+        'b' : 'GOOG',
+        'c' : 'GE',
+        'd' : 'GOO'
     },
     'correct' : 'b'
 }, 
 { # Question 6
-    'text' : 'Which of the following usually have high liquidity',
+    'text' : 'How often should you keep track of your investments?',
     'answers' : {
-        'a' : 'Cash & stocks',
-        'b' : 'Real estates',
-        'c' : 'Interest rates'
+        'a' : 'Once every week',
+        'b' : 'Everyday',
+        'c' : 'Every two weeks',
+        'd' : 'Every month'
     },
-    'correct' : 'a'
+    'correct' : 'b'
 },
 { # Question 7
-    'text' : 'What is the highest point of a companys price called?',
+    'text' : 'What should you consider when buying a stock?',
     'answers' : {
-        'a' : 'Open',
-        'b' : 'Max',
-        'c' : 'High'
-    },
-    'correct' : 'c'
-}, 
-{ # Question 8
-    'text' : 'Stock graphs can be displayed as',
-    'answers' : {
-        'a' : 'Line charts',
-        'b' : 'Bar charts',
-        'c' : 'Pie charts',
-        'd' : 'all of the above',
-        'e' : 'a & b only'
+        'a' : 'What the company does',
+        'b' : 'How popular the company is',
+        'c' : 'Is the company profitable', 
+        'd' : 'What is the value of the stock',
+        'e' : 'All of the above'
     },
     'correct' : 'e'
+}, 
+{ # Question 8
+    'text' : 'Is trading more skill or luck?',
+    'answers' : {
+        'a' : 'Skills',
+        'b' : 'Luck'
+    },
+    'correct' : 'b'
 },
 { # Question 9
-    'text' : 'What is the ticker for the Walt Disney company?',
+    'text' : 'What is the ticker for Ford Motor company?',
     'answers' : {
-        'a' : 'DISNE',
-        'b' : 'DI',
-        'c' : 'DISN',
-        'd' : 'DIS'
+        'a' : 'FORD',
+        'b' : 'FD',
+        'c' : 'F',
+        'd' : 'FO'
     },
-    'correct' : 'd'
+    'correct' : 'c'
 }
 ]
+for entry in questions2:
+    temp, tempID = db.collection('Quiz').add(entry)
+    ids.append(tempID)
+
+quiz3 = 'Quiz3'
+db.collection('Quiz').document(quiz3).set(quiz)
 
