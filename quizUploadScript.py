@@ -147,12 +147,12 @@ questions2 = [
 },            
 {
     #Question 2
-    'text':
+    'text':'',
     'answers': {
-        'a': 
-        'b': ,
-        'c':, 
-        'd':,
+        'a': '',
+        'b': '',
+        'c': '',
+        'd': '',
     },
     
     'correct': ''  
