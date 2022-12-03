@@ -143,7 +143,7 @@ def postDelete(id):
 def editPost(id):
     edit = dbfire.collection('Blog').document(id).get()
     edit = edit.to_dict()
-     try:
+    try:
         edit['DocID'] = id
         return render_template("editingPost.html", edit = edit)
     except:
