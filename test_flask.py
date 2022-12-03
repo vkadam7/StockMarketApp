@@ -191,7 +191,21 @@ def test_login_failure_invalidPassword(client):
     assert testuser.status_code == 200
     
 def test_stockSearch_successful(client):
-    testuser = client.post()
+    testEmail  = "go8940@wayne.edu"
+    testTicker = "GOOG"
+
+#Author: Viraj Kadam
+#Test cases for follow and unfollow functions
+def test_Follow_successful(client):
+    testUser = client.post9("/follow", data = {"userName": "viraj1"})
+    assert testUser.status_code == 200
+
+def test_Unfollow_successful(client):
+    testUser = client.post("/unfollow", data = {"userName": "viraj1"})
+    assert testUser.status_code == 200
+
+
+    
 
 
 
