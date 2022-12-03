@@ -145,6 +145,21 @@ def test_register_fail_blankUsername():
     testregister = app.test_client().post("/register", data = user)
     assert testregister.status_code == 500 # Temporary workaround but should really return 200
 
+# Testing Password Recovery with valid, invalid, and missing emails - Muneeb Khan
+def test_passwordRecovery_success():
+    user = {"email" : "muneebfkhan93@gmail.com"}
+    testPasswordRecovery = app.test_client().post("/PasswordRecovery", data = user)
+    assert testPasswordRecovery.status_code == 302
+
+def test_passwordRecovery_fail_invalidEmail():
+    user = {"email" : "muneebfkhan94@gmail.com"}
+    testPasswordRecovery = app.test_client().post("/PasswordRecovery", data = user)
+    assert testPasswordRecovery.status_code == 200
+
+def test_passwordRecovery_fail_missingEmail():
+    user = {"email" : ""}
+    testPasswordRecovery = app.test_client().post("/PasswordRecovery", data = user)
+    assert testPasswordRecovery.status_code == 200
 
 #Logout test case - Muneeb Khan
 def test_logout(client):
