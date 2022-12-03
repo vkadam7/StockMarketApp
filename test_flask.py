@@ -177,7 +177,9 @@ def test_login_failure_invalidEmail(client):
 def test_login_failure_invalidPassword(client):
     testuser = client.post("/login", data = {"email": "virajk063@gmail.com", "password": "ABCDEF2@"})
     assert testuser.status_code == 200
-
+    
+def test_stockSearch_successful(client):
+    testuser = client.post()
 
 
 

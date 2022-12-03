@@ -765,6 +765,8 @@ def goToSimulation():
     
 #@app.route("/portfolioGraph")
 #def portfolioGraph():
+#    if 'user' in session:
+        
     
         
 @app.route("/finishSimulation", methods=['POST', 'GET'])
@@ -1096,6 +1098,10 @@ def displayStock():
     else:
         return redirect(url_for('finishSimulation'))
 
+
+        
+
+
 ## changeStockView
 #   Description: Retrieves data from stockView page to determine how to change
 #   the view of the stock (monthly instead of weekly, change date range, etc)
@@ -1180,9 +1186,6 @@ def orderHistory():
 def fourOhFour():
     return render_template('404Error.html',person = session['user'], stockNames = session['stockNames'])
     
-#@app.route('/startSimulation')
-#def PortfolioGraph():
-#    if 'user' in session:
 
 ## Route for Quiz selection page - Muneeb Khan
 @app.route("/quizselection")
