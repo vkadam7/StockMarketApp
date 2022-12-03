@@ -377,7 +377,8 @@ def follow():
         return redirect(url_for("social"))
             
 
-
+#Author: Viraj Kadam
+#Function unfollows a user and removes name from following database
 @app.route("/unfollow", methods = ['POST', 'GET'])
 def unfollow():
     if 'user' in session:
@@ -409,18 +410,6 @@ def unfollow():
         flash("You have unfollowed " + userNamed)
         return redirect(url_for("social"))
 
-@app.route('/_userSearchSuggestion', methods = ['POST', 'GET'])
-def userSearchSuggestions():
-    if 'user' in session:
-        if request.method == 'GET':
-            userNames = []
-            for search in dbfire.collection('Users').get():
-                temp = search.to_dict()
-                userNames.append(temp(['userName']))
-            session['userName'] = userNames
-            print(userNames)
-            
-        return render_template('social.html', userNames = session['userName'])
         
 #Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
@@ -719,7 +708,10 @@ def startSimulation():
     else:
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
-        
+
+
+#Authors: Viraj Kadam and Ian McNulty
+#Route for portfolio page        
 @app.route("/simulation", methods=['POST', 'GET'])
 def goToSimulation():
     if ('user' in session):
@@ -825,7 +817,7 @@ def orderFormFill():
     session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
     return render_template('orderForm.html', option=session['option'], stockNames = session['stockNames'])
 
-
+#Author: Viraj Kadam
 @app.route("/buyOrder")
 def buyRoute():
     if 'user' in session:
@@ -834,7 +826,7 @@ def buyRoute():
         session['optionType'] = 0
         session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
         return redirect(url_for('.orderFormFill'))
-
+#Author: Viraj Kadam
 @app.route("/stockSell")
 def stockSellRoute():
     if 'user' in session:
@@ -948,6 +940,20 @@ def stockSearchSuggestions():
             session['stockNames'] = stockNames # This will store the names in session list (Updated from Ian Mcnulty)
             print(stockNames) 
             return render_template("home.html", stockNames = session['stockNames'])
+
+#Author: Viraj Kadam
+@app.route('/_userSearchSuggestion', methods = ['POST', 'GET'])
+def userSearchSuggestions():
+    if ('user' in session):
+        if request.method == 'GET':
+            userNames = []
+            for search in dbfire.collection('Users').get():
+                temp = search.to_dict()
+                userNames.append(temp(['userName']))
+            session['Name'] = userNames
+            print(userNames)
+            
+        return render_template('social.html', userNames = session['Name'])
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
