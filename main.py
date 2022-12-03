@@ -1302,7 +1302,6 @@ def quizpage():
         answers8 = [answers[7]]
         answers9 = [answers[8]]
         answers10 = [answers[9]]
-        answers11 = [answers[10]]
 
         if (request.method == 'POST'):
             
@@ -1323,7 +1322,7 @@ def quizpage():
 
         return render_template('quiz.html',quiz = quiz, questions = questions, answers = answers,
         answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
-        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10, answers11 = answers11)
+        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10)
                    
     else:
         flash("Sorry you must be logged in to take the quiz.")
