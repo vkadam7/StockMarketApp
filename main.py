@@ -153,10 +153,10 @@ def editPost():
     edit = dbfire.collection('Blog').document(session['postID']).get()
     edit = edit.to_dict()
     try:
-        edit['DocID'] = id
+        edit['DocID'] = session['postID']
         return render_template("editingPost.html", edit = edit)
     except:
-        return redirect(url_for(id))
+        return redirect(url_for(session['postID']))
 
 @app.route("/editingPost", methods = ["POST","GET"])
 def editingPost():
@@ -164,7 +164,7 @@ def editingPost():
         if(request.method == "POST"):
             result = request.form
             editedPost = result["editingthePost"]
-            dbfire.collection('Blog').document(id).update({'Post': editedPost,'DatePosted':firestore.SERVER_TIMESTAMP})
+            dbfire.collection('Blog').document(session['postID']).update({'Post': editedPost,'DatePosted':firestore.SERVER_TIMESTAMP})
             flash("Post has been updated.")
             return redirect(url_for('userPosts'))
         else:
