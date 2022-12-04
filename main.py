@@ -678,12 +678,10 @@ def graphPictures():
     else:
         return render_template("graphPictures.html")
 
-@app.route("/simulationSuggestion", methods=['POST', 'GET'])
-def simSuggest():
-    return -1
-
 ## startSimulation
-#   Description: 
+#   Description: Creates simulation from starting values
+#
+#   Author: Ian McNulty
 @app.route("/startSimulation", methods=['POST'])
 def startSimulation():
     if ('user' in session):
@@ -720,6 +718,10 @@ def startSimulation():
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
         
+## goToSimulation
+#   Description: Takes user to the portfolio page
+#
+#   Author: Ian McNulty, Viraj Kadam
 @app.route("/simulation", methods=['POST', 'GET'])
 def goToSimulation():
     if ('user' in session):
@@ -805,11 +807,10 @@ def simlists():
         return render_template('simulationHistory.html', person = session['user'],sims = sims, 
         dates = dates, scores = scores, links=links, stockNames = session['stockNames'])
 
-#@app.route("/buySell/<simName>")
-#def buySell(simName):
-#    if 'user' in session:
-#        return redirect(url_for('.ordeForm'))
-
+## orderFormFill
+#   Description: Receive filled out inputs from the order form
+#
+#   Author: Ian McNulty
 @app.route("/orderForm", methods=['POST', 'GET'])
 def orderFormFill():
     option = request.form.get('option', None)
@@ -823,14 +824,12 @@ def orderFormFill():
     session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
     return render_template('orderForm.html', option=session['option'], stockNames = session['stockNames'])
 
-
 @app.route("/buyOrder")
 def buyRoute():
     if 'user' in session:
         session['ticker'] = request.args['ticker']
         session['option'] = 'Buy'
         session['optionType'] = 0
-        session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
         return redirect(url_for('.orderFormFill'))
 
 @app.route("/stockSell")
@@ -839,10 +838,12 @@ def stockSellRoute():
         session['ticker'] = request.args['ticker']
         session['option'] = 'Sell'
         session['optionType'] = 1
-        order = Order(dbfire, session['simName'], session['ticker'], 
-                        session['option'], session['orderQuantity'], session['currentPrice'])
-        return render_template('orderForm.html', option = session['option'])   
+        return redirect(url_for('.orderFormFill'))
     
+## sellTaxLot
+#   Description: Sell remaining shares of this buy order
+#
+#   Author: Ian McNulty
 @app.route("/sellTaxLot/<orderID>")
 def sellTaxLot(orderID):
     if 'user' in session:
@@ -860,6 +861,10 @@ def sellTaxLot(orderID):
         return render_template('orderConfirmation.html')
     else: return redirect(url_for('fourOhFour'))
 
+## taxLotSellConfirm
+#   Description: Confirm sale of tax lot
+#
+#   Author: Ian McNulty
 @app.route("/sellTaxLot/taxLotSellConfirm", methods=['POST', 'GET'])
 def taxLotSellConfirm():
     if 'user' in session:
@@ -867,10 +872,10 @@ def taxLotSellConfirm():
         return redirect(url_for('.goToSimulation'))
     else: return redirect(url_for('fourOhFour'))
 
-#@app.route("/orderCreate", methods=['POST', 'GET'])
-#def orderCreate():
-#    return render_template('orderConfirmation.html', option=session['option'])
-
+## orderConfirm
+#   Description: Confirm sale of order
+#
+#   Author: Ian McNulty
 @app.route("/orderConfirm", methods=['POST', 'GET'])
 def orderConfirm():
     if request.form['stockQuantity'].isnumeric():
