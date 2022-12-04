@@ -62,6 +62,7 @@ def profile():
         leaderboard = dbfire.collection('Leaderboard').where('email', '==', session['user'])
         for doc in results.stream(): 
             results = doc.to_dict()
+            quizGrab = doc.to_dict()
         #Author: Viraj Kadam    
         for doc in cash.stream():
             cash = doc.to_dict()
@@ -72,8 +73,14 @@ def profile():
         #while(startDateFetch >= endDateFetch):
         #    startDate = startDateFetch[0]
         #    endDate = endDateFetch[0]
-            
-            
+        
+    
+        for i in range(1,3):
+            if quizGrab.get('QuizScoreQuiz'+str(i)) != None:
+                session['QuizScore' + str(i)] = quizGrab['QuizScoreQuiz'+str(i)]
+            else:
+                session['QuizScore' + str(i)] = ''
+
         return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard, stockNames = session['stockNames'])
     else:
 
@@ -129,19 +136,21 @@ def userPosts():
 
 
 #Author: Miqdad Hafiz
-@app.route("/postDelete/<id>", methods = ["GET"])
-def postDelete(id):
+@app.route("/postDelete", methods = ["GET"])
+def postDelete():
+    session['postID'] = request.args['postID']
     if('user' in session):
         print("Testing delete")
-        print(id)
-        dbfire.collection('Blog').document(id).delete()
+        print(session['postID'])
+        dbfire.collection('Blog').document(session['postID']).delete()
         flash("Your post has been deleted.")
         return redirect(url_for("userPosts"))
 
 #Author: Miqdad Hafiz
-@app.route("/editPost/<id>",methods = ["POST","GET"])
-def editPost(id):
-    edit = dbfire.collection('Blog').document(id).get()
+@app.route("/editPost",methods = ["POST","GET"])
+def editPost():
+    session['postID'] = request.args['postID']
+    edit = dbfire.collection('Blog').document(session['postID']).get()
     edit = edit.to_dict()
     try:
         edit['DocID'] = id
@@ -149,22 +158,17 @@ def editPost(id):
     except:
         return redirect(url_for(id))
 
-
-#Author: Miqdad Hafiz
-@app.route("/editingPost/<id>", methods = ["POST","GET"])
-def editingPost(id):
+@app.route("/editingPost", methods = ["POST","GET"])
+def editingPost():
     if('user' in session):
         if(request.method == "POST"):
             result = request.form
             editedPost = result["editingthePost"]
-            
-            
             dbfire.collection('Blog').document(id).update({'Post': editedPost,'DatePosted':firestore.SERVER_TIMESTAMP})
             flash("Post has been updated.")
             return redirect(url_for('userPosts'))
         else:
             return redirect(url_for('userPosts'))
-
 
 #Author: Miqdad Hafiz
 @app.route("/postBlog", methods = ["POST","GET"])
@@ -844,9 +848,10 @@ def stockSellRoute():
 #   Description: Sell remaining shares of this buy order
 #
 #   Author: Ian McNulty
-@app.route("/sellTaxLot/<orderID>")
-def sellTaxLot(orderID):
+@app.route("/sellTaxLot")
+def sellTaxLot():
     if 'user' in session:
+        orderID = request.args['orderID']
         order = dbfire.collection('Orders').document(orderID).get().to_dict()
         session['orderID'] = orderID
         session['option'] = 'Sell'
@@ -865,7 +870,7 @@ def sellTaxLot(orderID):
 #   Description: Confirm sale of tax lot
 #
 #   Author: Ian McNulty
-@app.route("/sellTaxLot/taxLotSellConfirm", methods=['POST', 'GET'])
+@app.route("/sellTaxLotConfirm", methods=['POST', 'GET'])
 def taxLotSellConfirm():
     if 'user' in session:
         order = Order.sellTaxLot(dbfire, session['user'], session['simName'], session['orderID'])
@@ -1221,6 +1226,15 @@ def quizselection():
         for x in person.get():
             person = x.to_dict()
 
+        for i in range(1,3):
+            if person.get('QuizScoreQuiz'+str(i)) != None:
+                session['QuizScore' + str(i)] = person['QuizScoreQuiz'+str(i)]
+                session['QuizScoreFlag' + str(i)] = 1
+            else:
+                session['QuizScore' + str(i)] = ''
+                session['QuizScoreFlag' + str(i)] = 0
+            print(session['QuizScore' + str(i)])
+
         return render_template("quizselection.html", person = person, stockNames = session['stockNames'])
     else:
         flash("Sorry you must be logged in to take the quiz.")
@@ -1230,7 +1244,7 @@ def quizselection():
 # Updates by Muneeb and Ian
 @app.route('/quizSubmit', methods = ['GET', 'POST'])
 def quizSubmit():
-    quiz = Quiz(dbfire,'Quiz1',session['user'])
+    quiz = Quiz(dbfire,session['quiz'],session['user'])
     answers = []
     ids = quiz.questions['id']
     for i in range(10):
@@ -1249,7 +1263,11 @@ def quizSubmit():
         for scores in yourscore:
             updatescore = scores.id
             yourscore = scores.to_dict()
-        dbfire.collection('Users').document(updatescore).update({'QuizScore': str(score*10) + "%"}) # Convert users score to percentage - Muneeb Khan
+        dbfire.collection('Users').document(updatescore).update({'QuizScore'+session['quiz']: str(score*10) + "%"}) # Convert users score to percentage - Muneeb Khan
+        for i in range(3):
+            if str(i) in session['quiz']:
+                index = 'QuizScore' + str(i)
+                session[index] = str(score*10) + "%"
         flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
         " You are now ready to invest, please click the start simulation button above to start investing." +
         "Correct answers were: " +
@@ -1270,7 +1288,11 @@ def quizSubmit():
         for scores in yourscore:
             updatescore = scores.id
             yourscore = scores.to_dict()
-        dbfire.collection('Users').document(updatescore).update({'QuizScore': str(score*10) + "%"}) # Convert users score to percentage - Muneeb Khan
+        dbfire.collection('Users').document(updatescore).update({'QuizScore'+session['quiz']: str(score*10) + "%"}) # Convert users score to percentage - Muneeb Khan
+        for i in range(3):
+            if str(i) in session['quiz']:
+                index = 'QuizScore' + str(i)
+                session[index] = str(score*10) + "%"
         flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
         " You need to score at least a 7/10 to pass. Please try again."  + 
         "Correct answers were: " +
@@ -1293,8 +1315,9 @@ def quizSubmit():
 @app.route('/quiz', methods =['GET','POST'])
 def quizpage():
     if ('user' in session):
-        quizID = 'Quiz1'
-        quiz = Quiz(dbfire,quizID,session['user'])
+        session['quiz'] = request.form['quiz']
+        quiz = Quiz(dbfire,session['quiz'],session['user'])
+        print(quiz)
         questions = quiz.questions['text']
         answers = quiz.questions['answers']
         answers1 = [answers[0]]
@@ -1308,21 +1331,21 @@ def quizpage():
         answers9 = [answers[8]]
         answers10 = [answers[9]]
 
-        if (request.method == 'POST'):
+        #if (request.method == 'POST'):
             
-            choiceA = request.args['a']
-            choiceB = request.args['b']
-            choiceC = request.args['c']
-            submitButton = request.args['submitButton']
+        #    choiceA = request.args['a']
+        #   choiceB = request.args['b']
+        #   choiceC = request.args['c']
+        #   submitButton = request.args['submitButton']
 
-            if request.method == choiceA:
-                return Quiz.answerQuestion(dbfire,session['user'],choiceA)
-            elif request.method == choiceB:
-                return Quiz.answerQuestion(dbfire,session['user'],choiceB)
-            elif request.method == choiceC:
-                return Quiz.answerQuestion(dbfire,session['user'],choiceC)
-            elif request.method == submitButton:
-                return Quiz.submitScore(dbfire)
+        #   if request.method == choiceA:
+        #       return Quiz.answerQuestion(dbfire,session['user'],choiceA)
+        #   elif request.method == choiceB:
+        #       return Quiz.answerQuestion(dbfire,session['user'],choiceB)
+        #   elif request.method == choiceC:
+        #       return Quiz.answerQuestion(dbfire,session['user'],choiceC)
+        #   elif request.method == submitButton:
+        #       return Quiz.submitScore(dbfire)
             
 
         return render_template('quiz.html',quiz = quiz, questions = questions, answers = answers,

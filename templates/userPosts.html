@@ -113,7 +113,7 @@
     </header>
 
 
-<br><br><br><br><br><br>
+<br>
 
 <body>
 <main>
@@ -149,8 +149,8 @@
                                 <div class="btn-group">
                                 <button class="fa fa-ellipsis-v text-black-50" type="button" data-bs-toggle="dropdown" aria-expanded="false"></button>
                                 <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/editPost/{{users['DocID']}}">Edit</a></li>
-                                <li><a class="dropdown-item" href="/postDelete/{{users['DocID']}}">Delete</a></li>
+                                <li><a class="dropdown-item" href="/editPost?postID={{users['DocID']}}">Edit</a></li>
+                                <li><a class="dropdown-item" href="/postDelete?postID={{users['DocID']}}">Delete</a></li>
                                 </ul>
                                 </div>
                         </div>
