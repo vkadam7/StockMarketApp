@@ -60,9 +60,7 @@ def test_register_success():
     "username" : "Pytest2"}
     testregister = app.test_client().post("/register", data = user)
     assert testregister.status_code == 302
-    dbfire = firestore.client()
-    dbfire.collection('UsersTest').document(user).delete() # Trying to make it so the account created from the test
-    # gets deleted immediately
+
 
 def test_register_fail_usernameInUse():
     user = {"email" : "pytest3@gmail.com",
@@ -136,15 +134,6 @@ def test_register_fail_blankPassword():
     testregister = app.test_client().post("/register", data = user)
     assert testregister.status_code == 200
 
-def test_register_fail_blankUsername():
-    user = {"email" : "pytest3@gmail.com",
-    "password" : "ABCDEG44",
-    "confirmPassw" : "ABCDEG$",
-    "Unames" : "",
-    "username" : ""}
-    testregister = app.test_client().post("/register", data = user)
-    assert testregister.status_code == 500 # Temporary workaround but should really return 200
-
 # Testing Password Recovery with valid, invalid, and missing emails - Muneeb Khan
 def test_passwordRecovery_success():
     user = {"email" : "muneebfkhan93@gmail.com"}
@@ -161,20 +150,43 @@ def test_passwordRecovery_fail_missingEmail():
     testPasswordRecovery = app.test_client().post("/PasswordRecovery", data = user)
     assert testPasswordRecovery.status_code == 200
 
+# Logout test - Muneeb Khan
 def test_logout():
-    testlogout = app.test_client().post("/logout")
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'muneebfkhan93@gmail.com'
+    testlogout = client.get("/logout")
     assert testlogout.status_code == 302
 
+# Update Profile tests with validations - Muneeb Khan
 def test_updateProfile_success():
-    user = {"Unames" : "Test Update Username",
-    "experience" : "Test Update experience"}
-    testupdateProfile = app.test_client().post("/update")
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'muneebfkhan93@gmail.com'
+
+    user = {"Unames" : "Muneeb Test1",
+    "experience" : "Experience test1"}
+    testupdateProfile = client.post("/update", data = user)
     assert testupdateProfile.status_code == 302
 
+def test_updateProfile_userNameInUse():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'muneebfkhan93@gmail.com'
+
+    user = {"Unames" : "UnitTesting",
+    "experience" : "Experience test1"}
+    testupdateProfile = client.post("/update", data = user)
+    assert testupdateProfile.status_code == 200
+
 def test_updateProfile_fail_missingUserName():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'muneebfkhan93@gmail.com'
+
     user = {"Unames" : "",
     "experience" : "Test Update eperience"}
-    testupdateProfile = app.test_client().post("/update")
+    testupdateProfile = app.test_client().post("/update", data = user)
     assert testupdateProfile.status_code == 200
 
 
