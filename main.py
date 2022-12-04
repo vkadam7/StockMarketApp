@@ -824,9 +824,10 @@ def stockSellRoute():
 #   Description: Sell remaining shares of this buy order
 #
 #   Author: Ian McNulty
-@app.route("/sellTaxLot/<orderID>")
-def sellTaxLot(orderID):
+@app.route("/sellTaxLot")
+def sellTaxLot():
     if 'user' in session:
+        orderID = request.args['orderID']
         order = dbfire.collection('Orders').document(orderID).get().to_dict()
         session['orderID'] = orderID
         session['option'] = 'Sell'
@@ -845,7 +846,7 @@ def sellTaxLot(orderID):
 #   Description: Confirm sale of tax lot
 #
 #   Author: Ian McNulty
-@app.route("/sellTaxLot/taxLotSellConfirm", methods=['POST', 'GET'])
+@app.route("/sellTaxLotConfirm", methods=['POST', 'GET'])
 def taxLotSellConfirm():
     if 'user' in session:
         order = Order.sellTaxLot(dbfire, session['user'], session['simName'], session['orderID'])
