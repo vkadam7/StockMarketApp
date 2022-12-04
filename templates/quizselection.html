@@ -147,11 +147,19 @@
                 const quizScore2 = document.getElementById('quizScore2');
                 let check1 = {{session['QuizScoreFlag1']|safe}};
                 let check2 = {{session['QuizScoreFlag2']|safe}};
+                let check3 = {{session['QuizScoreFlag3']|safe}};
+                let check4 = {{session['QuizScoreFlag4']|safe}};
                 if (check1 === 0) {
                   quizScore1.style.display = 'none';
                 }
                 if (check2 === 0) {
                   quizScore2.style.display = 'none';
+                }
+                if (check3 == 0){
+                  quizScore3.style.display = 'none';
+                }
+                if (check4 == 0){
+                  quizScore4.style.display = 'none';
                 }
               </script>
             </div>
