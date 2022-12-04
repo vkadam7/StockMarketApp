@@ -406,8 +406,11 @@ def unfollow():
         
         flash("You have unfollowed " + userNamed)
         return redirect(url_for("social"))
+    
+    
 #Author: Viraj Kadam
-@app.route('/userSearchSuggestion', methods = ['POST', 'GET'])
+#Search suggestions for user search
+@app.route('/_userSearchSuggestion', methods = ['POST', 'GET'])
 def userSearchSuggestions():
     if 'user' in session:
         if request.method == 'GET':
@@ -956,19 +959,6 @@ def stockSearchSuggestions():
             print(stockNames) 
             return render_template("home.html", stockNames = session['stockNames'])
 
-#Author: Viraj Kadam
-@app.route('/_userSearchSuggestion', methods = ['POST', 'GET'])
-def userSearchSuggestions():
-    if ('user' in session):
-        if request.method == 'GET':
-            userNames = []
-            for search in dbfire.collection('Users').get():
-                temp = search.to_dict()
-                userNames.append(temp(['userName']))
-            session['Name'] = userNames
-            print(userNames)
-            
-        return render_template('social.html', userNames = session['Name'])
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
