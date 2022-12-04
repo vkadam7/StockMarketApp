@@ -235,6 +235,30 @@ def test_Unfollow_successful(client):
     testUser = client.post("/unfollow", data = {"userName": "viraj1"})
     assert testUser.status_code == 200
 
+#Social System test cases
+def test_blog_post():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+    testuser = client.post("/postBlog", data = {"blogPost":"This post comes from the test file."})
+    assert testuser.status_code == 302
+
+def test_Blog():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+            session['stockNames'] = "BlackRock Capital Investment Corporation"
+    testuser = client.get("/Blog")
+    assert testuser.status_code == 200
+
+def test_userPosts():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+            session['stockNames'] = "BlackRock Capital Investment Corporation"
+    testuser = client.get("/userPosts")
+    assert testuser.status_code == 200
+
 
     
 

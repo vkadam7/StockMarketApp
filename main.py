@@ -406,7 +406,18 @@ def unfollow():
         
         flash("You have unfollowed " + userNamed)
         return redirect(url_for("social"))
-
+#Author: Viraj Kadam
+@app.route('/userSearchSuggestion', methods = ['POST', 'GET'])
+def userSearchSuggestions():
+    if 'user' in session:
+        if request.method == 'GET':
+            userNames = []
+            for search in dbfire.collection('Users').get():
+                temp = search.to_dict()
+                userNames.append(temp(['userName']))
+            session['userName'] = userNames
+            print(userNames)
+        return render_template('social.html', userNames = session['userName'])
         
 #Author: Viraj Kadam, Miqdad helped
 # Minor bug fixes by Muneeb Khan
