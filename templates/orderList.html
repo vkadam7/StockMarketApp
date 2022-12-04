@@ -19,7 +19,7 @@
       <a class="navbar-brand" href="home" style = "color: black; padding: 10px;">
         StockSim: Learn How to Trade
       </a>
-        <nav class="navbar navbar-expand-md navbar-dark" id = "navBar">
+        <nav class="navbar navbar-expand-md navbar-dark" id = "navBar" style="width: 100%;">
           <img src = "/static/stockLogo.png" alt = "stock symbol" width = "45" height = "45" class="d-inline-block align-top">
               <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -91,9 +91,16 @@
 
         {% endif %}
       </ul>
-                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
-                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin-right: 4px; margin-top: 18px; padding-left: 10px;margin-left: 5px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
-            <script type="text/javascript">
+                <div class="dropdown">
+                <button style = "margin: 4px; background-color:white;color:rgb(33, 103, 42);" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Simulation Status
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                  <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin :10px; padding: 10px;" id="currentCashNav">Current Cash: ${{session['currentCash']}}</p>
+                <p class="nav-link"  style = "border-radius: 8px; background-color: bisque;color:rgb(33, 103, 42);margin :10px; padding: 10px;" id="portfolioValueNav">Portfolio Value: ${{session['portfolioValue'] }}</p>
+                </div>
+                </div>
+                <script type="text/javascript">
               if ({{ session['simulationFlag'] }} == 0 ) { 
                 document.getElementById('currentCashNav').style.display = "none";
                 document.getElementById('portfolioValueNav').style.display = "none";
@@ -107,7 +114,7 @@
                       <option value = "{{stockname}}" />
                   {% endfor %}
                    </datalist>
-                  <button class = "btn btn-block" style = "margin-bottom: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
+                  <button class = "btn btn-block" style = "margin: 4px; background-color:white;color:rgb(33, 103, 42);">Display Stock</button>
       </form>
               </div>        
             </div>
@@ -119,7 +126,7 @@
         
         <h3>Current Orders in this Simulation:</h3>
         <div class = "orderlist">
-          <div class="row justify-content-center">
+          <div class="row justify-content-center px-4">
           <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
 
             <thead class = "bg-light">
