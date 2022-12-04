@@ -1,17 +1,9 @@
-from ast import Constant, Or
-from mimetypes import init
-from queue import Empty
-from re import search
-from statistics import mean, quantiles
-from this import d
-from time import daylight
+from statistics import mean
 import numpy as np
 import pandas as pd
 import firebase_admin
 from firebase_admin import firestore
 import datetime
-
-import math
 
 DAYS_IN_MONTH = {
     1 : 31,
@@ -904,7 +896,7 @@ class SimulationFactory:
     #
     #   Author: Ian McNulty
     def existenceCheck(db, user):
-        array = [entry for entry in db.collection('Simulations').where('ongoing','==',user).where('user','==',email).stream()]
+        array = [entry for entry in db.collection('Simulations').where('ongoing','==',user).where('user','==',user).stream()]
         if len(array) == 0:
             return False, "None"
         else:
