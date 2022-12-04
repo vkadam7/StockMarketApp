@@ -136,35 +136,37 @@ def userPosts():
 
 
 #Author: Miqdad Hafiz
-@app.route("/postDelete/<id>", methods = ["GET"])
-def postDelete(id):
+@app.route("/postDelete", methods = ["GET"])
+def postDelete():
+    session['postID'] = request.args['postID']
     if('user' in session):
         print("Testing delete")
-        print(id)
-        dbfire.collection('Blog').document(id).delete()
+        print(session['postID'])
+        dbfire.collection('Blog').document(session['postID']).delete()
         flash("Your post has been deleted.")
         return redirect(url_for("userPosts"))
 
 #Author: Miqdad Hafiz
-@app.route("/editPost/<id>",methods = ["POST","GET"])
-def editPost(id):
-    edit = dbfire.collection('Blog').document(id).get()
+@app.route("/editPost",methods = ["POST","GET"])
+def editPost():
+    session['postID'] = request.args['postID']
+    edit = dbfire.collection('Blog').document(session['postID']).get()
     edit = edit.to_dict()
-    edit['DocID'] = id
+    edit['DocID'] = session['postID']
     return render_template("editingPost.html", edit = edit, stockNames = session['stockNames'])
 
-
-@app.route("/editingPost/<id>", methods = ["POST","GET"])
-def editingPost(id):
+@app.route("/editingPost", methods = ["POST","GET"])
+def editingPost():
     if('user' in session):
         if(request.method == "POST"):
             result = request.form
             editedPost = result["editingthePost"]
             
             
-            dbfire.collection('Blog').document(id).update({'Post': editedPost})
+            dbfire.collection('Blog').document(session['postID']).update({'Post': editedPost})
             flash("Post has been updated.")
         return redirect(url_for('userPosts'))
+        
 #Author: Miqdad Hafiz
 @app.route("/postBlog", methods = ["POST","GET"])
 def postBlog():
