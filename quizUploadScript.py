@@ -130,3 +130,169 @@ quiz = {
 # Name of quiz entry
 quizName = 'Quiz2'
 db.collection('Quiz').document(quizName).set(quiz)
+
+#Author: Viraj Kadam
+#Description: Entries for quizzes 3 and 4
+questions2 = [
+{
+    #Question 1
+    'text': 'What does a portfolio contain?',
+    'answers': {
+        'a': 'Your holdings',
+        'b': 'Stock Buy Options',
+        'c': 'Profits/Losses',
+        'd': 'All of the above'
+        },
+    
+    'correct': 'd'
+},            
+{
+    #Question 2
+    'text':'Should you take into account the historic value of the stock?',
+    'answers': {
+        'a': 'Yes',
+        'b': 'No'
+    },
+    
+    'correct': 'a'  
+},
+
+{ # Question 3
+    'text' : 'Can someone in the United States invest in a company in China',
+    'answers' : {
+        'a' : 'Yes',
+        'b' : 'No'
+    },
+    'correct' : 'a'
+},
+{ # Question 4
+    'text' : 'Which of the following can affect the stock market?',
+    'answers' : {
+        'a' : 'Current Events',
+        'b' : 'Interest Rates',
+        'c' : 'Natural Calamaties',
+        'd': 'All of the above'
+    },
+    'correct' : 'd'
+},
+{ # Question 5
+    'text' : 'What is the ticker for Google?',
+    'answers' : {
+        'a' : 'G',
+        'b' : 'GOOG',
+        'c' : 'GE',
+        'd' : 'GOO'
+    },
+    'correct' : 'b'
+}, 
+{ # Question 6
+    'text' : 'How often should you keep track of your investments?',
+    'answers' : {
+        'a' : 'Once every week',
+        'b' : 'Everyday',
+        'c' : 'Every two weeks',
+        'd' : 'Every month'
+    },
+    'correct' : 'b'
+},
+{ # Question 7
+    'text' : 'What should you consider when buying a stock?',
+    'answers' : {
+        'a' : 'What the company does',
+        'b' : 'How popular the company is',
+        'c' : 'Is the company profitable', 
+        'd' : 'What is the value of the stock',
+        'e' : 'All of the above'
+    },
+    'correct' : 'e'
+}, 
+{ # Question 8
+    'text' : 'Is trading more skill or luck?',
+    'answers' : {
+        'a' : 'Skills',
+        'b' : 'Luck'
+    },
+    'correct' : 'b'
+},
+{ # Question 9
+    'text' : 'What is the ticker for Ford Motor company?',
+    'answers' : {
+        'a' : 'FORD',
+        'b' : 'FD',
+        'c' : 'F',
+        'd' : 'FO'
+    },
+    'correct' : 'c'
+}
+]
+for entry in questions2:
+    temp, tempID = db.collection('Quiz').add(entry)
+    ids.append(tempID)
+
+quiz3 = 'Quiz3'
+db.collection('Quiz').document(quiz3).set(quiz)
+
+questions3 = [
+{
+    #Question 1
+    'text': 'When is the best time to buy a stock?',
+    'answers': {
+        'a': 'Buy Low',
+        'b': 'Buy High',
+        'c': 'Never buy',
+        'd': 'All of the above'
+        },
+    
+    'correct': 'a'
+},            
+{
+    #Question 2
+    'text': 'When can the value of a stock drop?',
+    'answers': {
+        'a': 'During a recession',
+        'b': 'Scandal within a company',
+        'c': 'A and B', 
+        'd': 'None of the above'
+    },
+    
+    'correct': 'c'  
+},
+
+{ # Question 3
+    'text' : 'What is the best Trading App for beginners?',
+    'answers' : {
+        'a' : 'Robinhood',
+        'b' : 'TD Ameritrade',
+        'c' : 'Fidelity', 
+        'd' : 'All of the above'
+    },
+    'correct' : 'a'
+},
+{ # Question 4
+    'text' : 'Which of the following can affect the stock market?',
+    'answers' : {
+        'a' : 'Current Events',
+        'b' : 'Interest Rates',
+        'c' : 'Natural Calamaties',
+        'd': 'All of the above'
+    },
+    'correct' : 'd'
+},
+{ # Question 5
+    'text' : 'What is the ticker for Google?',
+    'answers' : {
+        'a' : 'G',
+        'b' : 'GOOG',
+        'c' : 'GE',
+        'd' : 'GOO'
+    },
+    'correct' : 'b'
+}
+]
+for entry in questions3:
+    temp, tempID = db.collection('Quiz').add(entry)
+    ids.append(tempID)
+
+quiz4 = 'Quiz4'
+db.collection('Quiz').document(quiz4).set(quiz)
+

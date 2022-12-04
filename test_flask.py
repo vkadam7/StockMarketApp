@@ -151,17 +151,53 @@ def test_logout(client):
     testlogout = client.get("/logout")
     assert testlogout.status_code == 302 # Redirect user to login page code 302
     
-def test_login_successful(client):
-    testuser = client.post("/login", data = {'email': "virajk063@gmail.com", "password": "ABCDEF2@"})
-    assert testuser.status_code == 302
+#Login test case- Viraj Kadam
+#Status Code = 200: If user login test is successful, the user will be redirected to the profile page
+#Status Code = 500: If user login test has failed, then the user will remain on the login page
+    
+def test_login_successful():
+    user = {
+        "email": "pytest3@gmail.com",
+        "password": "ABCDEG4$3"
+    }
+    testLogin = app.test_client().post("/login", data = user)
+    assert testLogin.status_code == 200
+   
 
-def test_login_failure_invalidEmail(client):
-    testuser = client.post("/login", data = {"email": "virajk063@gmail.com", "password": "ABCDEF2@"})
-    assert testuser.status_code == 200
+def test_login_failure_invalidEmail():
+    user = {
+        "email": " ", 
+        "password": "ABCDEG4$3"
+    }
+    testLogin = app.test_client().post("/login", data = user)
+    assert testLogin.status_code == 500
+    
     
 def test_login_failure_invalidPassword(client):
-    testuser = client.post("/login", data = {"email": "virajk063@gmail.com", "password": "ABCDEF2@"})
-    assert testuser.status_code == 200
+    user = {
+        "email": "pytest3@gmail.com",
+        "password": " "
+    }
+def test_stockSearch_successful(client):
+    testEmail  = "go8940@wayne.edu"
+    testTicker = "GOOG"
+
+#Author: Viraj Kadam
+#Test cases for follow and unfollow functions
+
+def test_UserSearch(client):
+    testUser = client.post("/social", data = {"userName": "viraj1"})
+def test_Follow_successful(client):
+    testUser = client.post9("/follow", data = {"userName": "viraj1"})
+    assert testUser.status_code == 200
+
+def test_Unfollow_successful(client):
+    testUser = client.post("/unfollow", data = {"userName": "viraj1"})
+    assert testUser.status_code == 200
+
+
+    
+
 
 
 if __name__ == '__main__':

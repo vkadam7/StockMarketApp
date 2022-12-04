@@ -129,12 +129,18 @@
               <form action = "/quiz" method ="POST">
                 <h2>Please select a Quiz to begin</h2>
                   <br>
-                    <h5><button class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  name='quiz' value="Quiz1">Quiz 1</a></h5> 
-                      <p id="quizScore1">Your last score on this quiz was {{session['QuizScore1']}}</p>
-                      <br>
-                    <h5><button class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  name='quiz' value="Quiz2">Quiz 2</a></h5> 
-                      <p id="quizScore2">Your last score on this quiz was {{session['QuizScore2']}}</p>
-
+                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "quiz">Quiz 1</a></h5> 
+                    <br><h5>Your last score on this quiz was {{person['QuizScore1']}}</h5>
+                    <br><br>
+                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "quiz2">Quiz 2</a></h5> 
+                    <br><h5>Your last score on this quiz was {{person['QuizScore2']}}</h5>
+                    <br><br>
+                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "quiz3">Quiz 3</a></h5> 
+                    <br><h5>Your last score on this quiz was {{person['QuizScore3']}}</h5>
+                    <br><br>
+                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "quiz4">Quiz 4</a></h5> 
+                    <br><h5>Your last score on this quiz was {{person['QuizScore4']}}</h5>
+                    <br><br>
               </form>
               <script>
                 const quizScore1 = document.getElementById('quizScore1');

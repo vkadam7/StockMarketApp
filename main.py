@@ -381,7 +381,8 @@ def follow():
         return redirect(url_for("social"))
             
 
-#Author: Miqdad Hafiz and Viraj 
+#Author: Viraj Kadam
+#Function unfollows a user and removes name from following database
 @app.route("/unfollow", methods = ['POST', 'GET'])
 def unfollow():
     if 'user' in session:
@@ -412,7 +413,7 @@ def unfollow():
         
         flash("You have unfollowed " + userNamed)
         return redirect(url_for("social"))
-
+#Author: Viraj Kadam
 @app.route('/_userSearchSuggestion', methods = ['POST', 'GET'])
 def userSearchSuggestions():
     if 'user' in session:
@@ -426,7 +427,7 @@ def userSearchSuggestions():
             
         return render_template('social.html', userNames = session['userName'])
         
-#Author: Viraj Kadam, Miqdad helped
+#Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
 def register():
     if request.method == "POST":
@@ -721,11 +722,14 @@ def startSimulation():
     else:
         flash("Sorry you must be logged in to view that page.")
         return redirect(url_for("login"))
-        
+
 ## goToSimulation
 #   Description: Takes user to the portfolio page
 #
 #   Author: Ian McNulty, Viraj Kadam
+
+#Authors: Viraj Kadam and Ian McNulty
+#Route for portfolio page        
 @app.route("/simulation", methods=['POST', 'GET'])
 def goToSimulation():
     if ('user' in session):
@@ -795,7 +799,7 @@ def goToSimulation():
 #@app.route("/portfolioGraph")
 #def portfolioGraph():
     
-# Helped with finish simulation function
+        
 @app.route("/finishSimulation", methods=['POST', 'GET'])
 def finishSimulation():
     session['simulationFlag'] = 0
@@ -828,6 +832,7 @@ def orderFormFill():
     session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
     return render_template('orderForm.html', option=session['option'], stockNames = session['stockNames'])
 
+
 @app.route("/buyOrder")
 def buyRoute():
     if 'user' in session:
@@ -835,7 +840,7 @@ def buyRoute():
         session['option'] = 'Buy'
         session['optionType'] = 0
         return redirect(url_for('.orderFormFill'))
-
+#Author: Viraj Kadam
 @app.route("/stockSell")
 def stockSellRoute():
     if 'user' in session:
@@ -956,6 +961,20 @@ def stockSearchSuggestions():
             session['stockNames'] = stockNames # This will store the names in session list (Updated from Ian Mcnulty)
             print(stockNames) 
             return render_template("home.html", stockNames = session['stockNames'])
+
+#Author: Viraj Kadam
+@app.route('/_userSearchSuggestion', methods = ['POST', 'GET'])
+def userSearchSuggestions():
+    if ('user' in session):
+        if request.method == 'GET':
+            userNames = []
+            for search in dbfire.collection('Users').get():
+                temp = search.to_dict()
+                userNames.append(temp(['userName']))
+            session['Name'] = userNames
+            print(userNames)
+            
+        return render_template('social.html', userNames = session['Name'])
 
 ## displayStock
 #   Description: Creates a StockData object for manipulation and then creates
@@ -1129,6 +1148,10 @@ def displayStock():
     else:
         return redirect(url_for('finishSimulation'))
 
+
+        
+
+
 ## changeStockView
 #   Description: Retrieves data from stockView page to determine how to change
 #   the view of the stock (monthly instead of weekly, change date range, etc)
@@ -1213,9 +1236,6 @@ def orderHistory():
 def fourOhFour():
     return render_template('404Error.html',person = session['user'], stockNames = session['stockNames'])
     
-#@app.route('/startSimulation')
-#def PortfolioGraph():
-#    if 'user' in session:
 
 ## Route for Quiz selection page - Muneeb Khan
 @app.route("/quizselection")
@@ -1361,6 +1381,98 @@ def quizpage():
 def quiz2():
     if ('user' in session):
         quizID = 'Quiz2'
+        quiz = Quiz(dbfire,quizID,session['user'])
+        questions = quiz.questions['text']
+        answers = quiz.questions['answers']
+        answers1 = [answers[0]]
+        answers2 = [answers[1]]
+        answers3 = [answers[2]]
+        answers4 = [answers[3]]
+        answers5 = [answers[4]]
+        answers6 = [answers[5]]
+        answers7 = [answers[6]]
+        answers8 = [answers[7]]
+        answers9 = [answers[8]]
+        answers10 = [answers[9]]
+        answers11 = [answers[10]]
+
+
+        if (request.method == 'POST'):
+            
+            choiceA = request.args['a']
+            choiceB = request.args['b']
+            choiceC = request.args['c']
+            choiceD = request.args['d']
+            submitButton = request.args['submitButton']
+
+            if request.method == choiceA:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceA)
+            elif request.method == choiceB:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceB)
+            elif request.method == choiceC:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceC)
+            elif request.method == submitButton:
+                return Quiz.submitScore(dbfire)
+            
+
+        return render_template('quiz2.html',quiz = quiz, questions = questions, answers = answers,
+        answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
+        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10, answers11 = answers11)
+                   
+    else:
+        flash("Sorry you must be logged in to take the quiz.")
+        return redirect(url_for("login"))
+
+@app.route("/quiz3", methods = ["POST", "GET"])
+def quiz3():
+    if ('user' in session):
+        quizID = 'Quiz4'
+        quiz = Quiz(dbfire,quizID,session['user'])
+        questions = quiz.questions['text']
+        answers = quiz.questions['answers']
+        answers1 = [answers[0]]
+        answers2 = [answers[1]]
+        answers3 = [answers[2]]
+        answers4 = [answers[3]]
+        answers5 = [answers[4]]
+        answers6 = [answers[5]]
+        answers7 = [answers[6]]
+        answers8 = [answers[7]]
+        answers9 = [answers[8]]
+        answers10 = [answers[9]]
+        answers11 = [answers[10]]
+
+
+        if (request.method == 'POST'):
+            
+            choiceA = request.args['a']
+            choiceB = request.args['b']
+            choiceC = request.args['c']
+            choiceD = request.args['d']
+            submitButton = request.args['submitButton']
+
+            if request.method == choiceA:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceA)
+            elif request.method == choiceB:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceB)
+            elif request.method == choiceC:
+                return Quiz.answerQuestion(dbfire,session['user'],choiceC)
+            elif request.method == submitButton:
+                return Quiz.submitScore(dbfire)
+            
+
+        return render_template('quiz2.html',quiz = quiz, questions = questions, answers = answers,
+        answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
+        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10, answers11 = answers11)
+                   
+    else:
+        flash("Sorry you must be logged in to take the quiz.")
+        return redirect(url_for("login"))
+    
+@app.route("/quiz4", methods = ["POST", "GET"])
+def quiz4():
+    if ('user' in session):
+        quizID = 'Quiz4'
         quiz = Quiz(dbfire,quizID,session['user'])
         questions = quiz.questions['text']
         answers = quiz.questions['answers']
