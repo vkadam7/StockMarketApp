@@ -613,7 +613,7 @@ class Simulation:
     #   Inputs: db - Firestore object, link to Firestore database
     #           simName - String, ID of the simulation data entry to be finished
     #
-    #   Author: Ian McNulty
+    #   Author: Ian McNulty, Miqdad: helped with the creating a score and sending the score to the database.
     def finishSimulation(db, simName):
         data = db.collection('Simulations').document(simName).get().to_dict()
 

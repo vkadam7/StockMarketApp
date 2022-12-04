@@ -150,7 +150,7 @@ def editPost(id):
         return redirect(url_for(id))
 
 
-
+#Author: Miqdad Hafiz
 @app.route("/editingPost/<id>", methods = ["POST","GET"])
 def editingPost(id):
     if('user' in session):
@@ -410,6 +410,18 @@ def unfollow():
         flash("You have unfollowed " + userNamed)
         return redirect(url_for("social"))
 
+@app.route('/_userSearchSuggestion', methods = ['POST', 'GET'])
+def userSearchSuggestions():
+    if 'user' in session:
+        if request.method == 'GET':
+            userNames = []
+            for search in dbfire.collection('Users').get():
+                temp = search.to_dict()
+                userNames.append(temp(['userName']))
+            session['userName'] = userNames
+            print(userNames)
+            
+        return render_template('social.html', userNames = session['userName'])
         
 #Author: Viraj Kadam
 @app.route('/register', methods = ["POST", "GET"])
@@ -652,7 +664,7 @@ def StockDefinitions():
 
         return render_template("StockDefinitions.html", person = person, stockNames = session['stockNames'])
     else:
-        return render_template("StockDefinitions.html", stockNames = session['stockNames'])
+        return render_template("StockDefinitions.html")
 
 # Route for Graph pictures page - Muneeb Khan
 @app.route("/graphPictures")
@@ -665,7 +677,7 @@ def graphPictures():
 
         return render_template("graphPictures.html", person = person, stockNames = session['stockNames'])
     else:
-        return render_template("graphPictures.html", stockNames = session['stockNames'])
+        return render_template("graphPictures.html")
 
 @app.route("/simulationSuggestion", methods=['POST', 'GET'])
 def simSuggest():
@@ -780,8 +792,6 @@ def goToSimulation():
     
 #@app.route("/portfolioGraph")
 #def portfolioGraph():
-#    if 'user' in session:
-        
     
         
 @app.route("/finishSimulation", methods=['POST', 'GET'])
@@ -1311,7 +1321,6 @@ def quizpage():
         answers8 = [answers[7]]
         answers9 = [answers[8]]
         answers10 = [answers[9]]
-        answers11 = [answers[10]]
 
         if (request.method == 'POST'):
             
@@ -1332,7 +1341,7 @@ def quizpage():
 
         return render_template('quiz.html',quiz = quiz, questions = questions, answers = answers,
         answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
-        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10, answers11 = answers11)
+        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10)
                    
     else:
         flash("Sorry you must be logged in to take the quiz.")

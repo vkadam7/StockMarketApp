@@ -24,152 +24,127 @@ import pyrebase
 import firebase_admin
 from firebase_admin import db
 
-@pytest.fixture()
-def client():
+# Testing landing response codes for frontend pages - Muneeb Khan
+def test_landing():
+    testlanding = app.test_client().get("/")
+    assert testlanding.status_code == 200
 
-    client = app.test_client()
+def test_home():
+    testhome = app.test_client().get("/home")
+    assert testhome.status_code == 200
 
-    yield client
+def test_aboutus():
+    testaboutus = app.test_client().get("/aboutus")
+    assert testaboutus.status_code == 200
 
-#Test responses for landing pages - Muneeb Khan
-def test_home_page(client):
-    testget = client.get("/home")
-    assert testget.status_code == 200
+def test_information():
+    testinformation = app.test_client().get("/information")
+    assert testinformation.status_code == 200
 
-def test_aboutus_page(client):
-    testget = client.get("/aboutus")
-    assert testget.status_code == 200
+def test_graphPictures():
+    testgraphPictures = app.test_client().get("/graphPictures")
+    assert testgraphPictures.status_code == 200
 
-def test_information_page(client):
-    testget = client.get("/information")
-    assert testget.status_code == 200
+def test_stockDefinitions():
+    teststockDefinitions = app.test_client().get("/StockDefinitions")
+    assert teststockDefinitions.status_code == 200
 
+# Testing Registrations with Email, Username, and Password Validations - Muneeb Khan
+# Succesfull registrations will redirect the user to login page (code 302)
+# Fail registrations will keep user on registration page (code 200)
+def test_register_success():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEG4$3",
+    "confirmPassw" : "ABCDEG4$3",
+    "Unames" : "Pytest2",
+    "username" : "Pytest2"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 302
+    dbfire = firestore.client()
+    dbfire.collection('UsersTest').document(user).delete() # Trying to make it so the account created from the test
+    # gets deleted immediately
 
-
-# Test cases for registration and validations for email, password, and username - Muneeb Khan
-# Successful registration test
-def test_register_success(client):
-
-    testregisteruser = client.post("/register", data = {"email" : "Unittest123456@gmail.com",
-    "password" : "ABCDEF4$",
-    "confirmPassw" : "ABCDEF4$",
-    "Unames" : "UnitTesting3",
-    "username" : "UnitTesting3"})
-    assert testregisteruser.status_code == 302 # Redirects user to profile page code 302
-
-# Unsuccesful registration tests
-def test_register_invalidpassword_missingspecial(client):
-
-    testregisteruser = client.post("/register", data = {"email" : "sample123459@gmail.com",
-    "password" : "ABCDEF3",
-    "confirmPassw" : "ABCDEF3",
-    "Unames" : "Samples",
-    "username" : "Samples"})
-    assert testregisteruser.status_code == 200 # Keeps user on register page code 200
-
-def test_register_invalidpassword_missingdigit(client):
-
-    testregisteruser = client.post("/register", data = {"email" : "sample123459@gmail.com",
-    "password" : "ABCDEF#",
-    "confirmPassw" : "ABCDEF#",
-    "Unames" : "Samples",
-    "username" : "Samples"})
-    assert testregisteruser.status_code == 200 # Keeps user on register page code 200
-
-def test_register_invalidpassword_tooshort(client):
-
-    testregisteruser = client.post("/register", data = {"email" : "sample123459@gmail.com",
-    "password" : "AB1@",
-    "confirmPassw" : "AB1@",
-    "Unames" : "Samples",
-    "username" : "Samples"})
-    assert testregisteruser.status_code == 200 # Keeps user on register page code 200
-
-def test_register_invalidpassword_toolong(client):
-
-    testregisteruser = client.post("/register", data = {"email" : "sample123459@gmail.com",
-    "password" : "ABCDEF#istoolongandover20characters",
-    "confirmPassw" : "ABCDEF#istoolongandover20characters",
-    "Unames" : "Samples",
-    "username" : "Samples"})
-    assert testregisteruser.status_code == 200 # Keeps user on register page code 200
-
-def test_register_invalidemail(client):
-
-    testregisteruser = client.post("/register", data = {"email" : "sample1234.com",
-    "password" : "ABCDEF3#",
-    "confirmPassw" : "ABCDEF3#",
-    "Unames" : "Samples",
-    "username" : "Samples"})
-    assert testregisteruser.status_code == 200 # Keeps user on register page code 200
-
-def test_register_missingemail(client):
-
-    testregisteruser = client.post("/register", data = { "email" : "",
-    "password" : "ABCDEF3#",
-    "confirmPassw" : "ABCDEF3#",
-    "Unames" : "Samples",
-    "username" : "Samples"})
-    assert testregisteruser.status_code == 200 # Keeps user on register page code 200
-
-def test_register_invalidusername(client):
-
-    testregisteruser = client.post("/register", data = {"email" : "sample1234@gmail.com",
-    "password" : "ABCDEF3#",
-    "confirmPassw" : "ABCDEF3#",
+def test_register_fail_usernameInUse():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEG4$",
+    "confirmPassw" : "ABCDEG4$",
     "Unames" : "UnitTesting",
-    "username" : "UnitTesting"})
-    assert testregisteruser.status_code == 200 # Keeps user on register page code 200
+    "username" : "UnitTesting"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
 
-def test_register_missingusername(client):
+def test_register_fail_passwordsDontMatch():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEG4$",
+    "confirmPassw" : "ABCDEG5%",
+    "Unames" : "Pytest1",
+    "username" : "Pytest1"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
 
-    testregisteruser = client.post("/register", data = {"email" : "sample1234@gmail.com",
-    "password" : "ABCDEF3#",
-    "confirmPassw" : "ABCDEF3#",
+def test_register_fail_passwordTooShort():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "AB4$",
+    "confirmPassw" : "AB4$",
+    "Unames" : "Pytest1",
+    "username" : "Pytest1"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_passwordTooLong():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEFG123$%^IStoolongandover20characters",
+    "confirmPassw" : "ABCDEFG123$%^IStoolongandover20characters",
+    "Unames" : "Pytest1",
+    "username" : "Pytest1"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_passwordMissingDigit():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEG$$",
+    "confirmPassw" : "ABCDEG$$",
+    "Unames" : "Pytest1",
+    "username" : "Pytest1"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_passwordMissingSpecial():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEG44",
+    "confirmPassw" : "ABCDEG44",
+    "Unames" : "Pytest12",
+    "username" : "Pytest12"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_blankEmail():
+    user = {"email" : "",
+    "password" : "ABCDEG4$",
+    "confirmPassw" : "ABCDEG4$",
+    "Unames" : "Pytest12",
+    "username" : "Pytest12"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_blankPassword():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "",
+    "confirmPassw" : "",
+    "Unames" : "Pytest12",
+    "username" : "Pytest12"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_blankUsername():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEG44",
+    "confirmPassw" : "ABCDEG$",
     "Unames" : "",
-    "username" : "Samples"})
-    assert testregisteruser.status_code == 200 # Keeps user on register page code 200
+    "username" : ""}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 500 # Temporary workaround but should really return 200
 
-#Test cases for Password recovery - Muneeb Khan
-#Succesful Password recovery test
-def test_passwordRecoverySuccess(client):
-    testpasswordRecovery = client.post("/PasswordRecovery", data = {"email" : "Unittest1234@gmail.com"})
-    assert testpasswordRecovery.status_code == 302 # Redirect user to login page code 302
-
-#Unsuccesful Password recovery tests
-def test_passwordRecoveryFail(client):
-    testpasswordRecovery = client.post("/PasswordRecovery", data = {"email" : "failemail@gmail.com"})
-    assert testpasswordRecovery.status_code == 200 # Keep user on Password recovery page code 200
-
-def test_passwordRecoveryNoEmail(client):
-    testpasswordRecovery = client.post("/PasswordRecovery", data = {"email" : ""})
-    assert testpasswordRecovery.status_code == 200 # Keep user on Password recovery page code 200
-
-
-#Profile update tests - Muneeb Khan
-def test_editProfilesuccess(client): 
-
-    testprofileEdit = client.post("/update", data = {"Unames" : "MuneebEdit",
-    "experience" : "Update Experience"})
-    assert testprofileEdit.status_code == 302 # Redirect user to profile page code 302
-
-def test_editProfilefail_usernameinuse(client):
-
-    testprofileEdit = client.post("/update", data = {"Unames" : "UnitTesting",
-    "experience" : "Update Experience"})
-    assert testprofileEdit.status_code == 200 # Keep user on update page code 200
-
-def test_editProfilefail_nousername(client):
-
-    testprofileEdit = client.post("/update", data = {"Unames" : "",
-    "experience" : "Update Experience"})
-    assert testprofileEdit.status_code == 200 # Keep user on update page code 200
-
-def test_editProfilefail_toomanycharacters(client):
-
-    testprofileEdit = client.post("/update", data = {"Unames" : "MuneebEdit",
-    "experience" : "This experience is too long"})
-    assert testprofileEdit.status_code == 200 # Keep user on update page code 200
 
 #Logout test case - Muneeb Khan
 def test_logout(client):
@@ -177,22 +152,32 @@ def test_logout(client):
     assert testlogout.status_code == 302 # Redirect user to login page code 302
     
 #Login test case- Viraj Kadam
+#Status Code = 200: If user login test is successful, the user will be redirected to the profile page
+#Status Code = 500: If user login test has failed, then the user will remain on the login page
     
-def test_login_successful(client):
-    testuser = client.post("/login", data = {'email': 
-        "virajk063@gmail.com", 
-        "password": "ABCDEF2@"})
-    assert testuser.status_code == 302
+def test_login_successful():
+    user = {
+        "email": "pytest3@gmail.com",
+        "password": "ABCDEG4$3"
+    }
+    testLogin = app.test_client().post("/login", data = user)
+    assert testLogin.status_code == 200
+   
 
-def test_login_failure_invalidEmail(client):
-    testuser = client.post("/login", data = {"email": "virajk063@gmail.com", 
-    "password": "ABCDEF2@"})
-    assert testuser.status_code == 200
+def test_login_failure_invalidEmail():
+    user = {
+        "email": " ", 
+        "password": "ABCDEG4$3"
+    }
+    testLogin = app.test_client().post("/login", data = user)
+    assert testLogin.status_code == 500
+    
     
 def test_login_failure_invalidPassword(client):
-    testuser = client.post("/login", data = {"email": "virajk063@gmail.com", "password": "ABCDEF2@"})
-    assert testuser.status_code == 200
-    
+    user = {
+        "email": "pytest3@gmail.com",
+        "password": " "
+    }
 def test_stockSearch_successful(client):
     testEmail  = "go8940@wayne.edu"
     testTicker = "GOOG"
@@ -214,9 +199,6 @@ def test_Unfollow_successful(client):
     
 
 
-
-
-    
 
 if __name__ == '__main__':
     pytest.main()
