@@ -15,7 +15,7 @@ from flask import Flask, abort, flash, session, render_template, request, redire
 import pyrebase
 import firebase_admin
 
-from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, portfolio
+from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, Portfolio
 from followers import FollowUnfollow, UserInfo
 from firebase_admin import firestore
 from firebase_admin import credentials
@@ -161,22 +161,21 @@ def test_passwordRecovery_fail_missingEmail():
     testPasswordRecovery = app.test_client().post("/PasswordRecovery", data = user)
     assert testPasswordRecovery.status_code == 200
 
-#Logout test case - Muneeb Khan
-def test_logout(client):
-    testlogout = client.get("/logout")
-    assert testlogout.status_code == 302 # Redirect user to login page code 302
-    
-def test_login_successful(client):
-    testuser = client.post("/login", data = {'email': "virajk063@gmail.com", "password": "ABCDEF2@"})
-    assert testuser.status_code == 302
+def test_logout():
+    testlogout = app.test_client().post("/logout")
+    assert testlogout.status_code == 302
 
-def test_login_failure_invalidEmail(client):
-    testuser = client.post("/login", data = {"email": "virajk063@gmail.com", "password": "ABCDEF2@"})
-    assert testuser.status_code == 200
-    
-def test_login_failure_invalidPassword(client):
-    testuser = client.post("/login", data = {"email": "virajk063@gmail.com", "password": "ABCDEF2@"})
-    assert testuser.status_code == 200
+def test_updateProfile_success():
+    user = {"Unames" : "Test Update Username",
+    "experience" : "Test Update experience"}
+    testupdateProfile = app.test_client().post("/update")
+    assert testupdateProfile.status_code == 302
+
+def test_updateProfile_fail_missingUserName():
+    user = {"Unames" : "",
+    "experience" : "Test Update eperience"}
+    testupdateProfile = app.test_client().post("/update")
+    assert testupdateProfile.status_code == 200
 
 
 if __name__ == '__main__':
