@@ -153,11 +153,9 @@ def editPost():
         session['postID'] = request.args['postID']
         edit = dbfire.collection('Blog').document(session['postID']).get()
         edit = edit.to_dict()
-        try:
-            edit['DocID'] = id
-            return render_template("editingPost.html", edit = edit)
-        except:
-            return redirect(url_for(id))
+        edit['DocID'] = id
+        return render_template("editingPost.html", edit = edit)
+        
 
 @app.route("/editingPost", methods = ["POST","GET"])
 def editingPost():

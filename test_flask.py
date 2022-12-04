@@ -272,9 +272,22 @@ def test_edit():
         with client.session_transaction() as session:
             session['user'] = 'miqdadhafiz35@gmail.com'
             session['postID'] = "Jp0h4YgXepatDz4bzaDD"
-    testuser = client.post("/editingPost", data = {"editingthePost":"This post edits from the test file."} )
+    testuser = client.post("/editingPost", data = {"editingthePost":"This post edits from the test file."})
+    assert testuser.status_code == 302
 
-    
+def test_editPage():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+    testuser = client.get("/editPost", query_string = {"postID": "Jp0h4YgXepatDz4bzaDD"})
+    assert testuser.status_code == 200
+
+def test_delete():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+    testuser = client.get("/postDelete", query_string = {"postID": "Jp0h4YgXepatDz4bzaDD"})
+    assert testuser.status_code == 302
 
 if __name__ == '__main__':
     pytest.main()
