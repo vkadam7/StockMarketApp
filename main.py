@@ -164,7 +164,7 @@ def editingPost():
             result = request.form
             id = session['postID']
             editedPost = result["editingthePost"]
-            dbfire.collection('Blog').document(id).update({'Post': editedPost,'DatePosted':firestore.SERVER_TIMESTAMP})
+            dbfire.collection('Blog').document(session['postID']).update({'Post': editedPost,'DatePosted':firestore.SERVER_TIMESTAMP})
             flash("Post has been updated.")
             return redirect(url_for('userPosts'))
         else:
@@ -1302,43 +1302,45 @@ def quizSubmit():
 @app.route('/quiz', methods =['GET','POST'])
 def quizpage():
     if ('user' in session):
-        session['quiz'] = request.form['quiz']
-        quiz = Quiz(dbfire,session['quiz'],session['user'])
-        print(quiz)
-        questions = quiz.questions['text']
-        answers = quiz.questions['answers']
-        answers1 = [answers[0]]
-        answers2 = [answers[1]]
-        answers3 = [answers[2]]
-        answers4 = [answers[3]]
-        answers5 = [answers[4]]
-        answers6 = [answers[5]]
-        answers7 = [answers[6]]
-        answers8 = [answers[7]]
-        answers9 = [answers[8]]
-        answers10 = [answers[9]]
+        try:
+            session['quiz'] = request.form['quiz']
+            quiz = Quiz(dbfire,session['quiz'],session['user'])
+            print(quiz)
+            questions = quiz.questions['text']
+            answers = quiz.questions['answers']
+            answers1 = [answers[0]]
+            answers2 = [answers[1]]
+            answers3 = [answers[2]]
+            answers4 = [answers[3]]
+            answers5 = [answers[4]]
+            answers6 = [answers[5]]
+            answers7 = [answers[6]]
+            answers8 = [answers[7]]
+            answers9 = [answers[8]]
+            answers10 = [answers[9]]
 
-        #if (request.method == 'POST'):
-            
-        #    choiceA = request.args['a']
-        #   choiceB = request.args['b']
-        #   choiceC = request.args['c']
-        #   submitButton = request.args['submitButton']
+            #if (request.method == 'POST'):
+                
+            #    choiceA = request.args['a']
+            #   choiceB = request.args['b']
+            #   choiceC = request.args['c']
+            #   submitButton = request.args['submitButton']
 
-        #   if request.method == choiceA:
-        #       return Quiz.answerQuestion(dbfire,session['user'],choiceA)
-        #   elif request.method == choiceB:
-        #       return Quiz.answerQuestion(dbfire,session['user'],choiceB)
-        #   elif request.method == choiceC:
-        #       return Quiz.answerQuestion(dbfire,session['user'],choiceC)
-        #   elif request.method == submitButton:
-        #       return Quiz.submitScore(dbfire)
-            
+            #   if request.method == choiceA:
+            #       return Quiz.answerQuestion(dbfire,session['user'],choiceA)
+            #   elif request.method == choiceB:
+            #       return Quiz.answerQuestion(dbfire,session['user'],choiceB)
+            #   elif request.method == choiceC:
+            #       return Quiz.answerQuestion(dbfire,session['user'],choiceC)
+            #   elif request.method == submitButton:
+            #       return Quiz.submitScore(dbfire)
+                
 
-        return render_template('quiz.html',quiz = quiz, questions = questions, answers = answers,
-        answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
-        answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10)
-                   
+            return render_template('quiz.html',quiz = quiz, questions = questions, answers = answers,
+            answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
+            answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10)
+        except:
+            return redirect(url_for('fourOhFour'))    
     else:
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
