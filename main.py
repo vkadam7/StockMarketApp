@@ -225,20 +225,13 @@ def followingList():
     else:
         redirect(url_for("profile"))
     
-#Route for the Order list - Muneeb Khan
-#@app.route("/orderList")
-#def orderlists():
-#    if ('user' in session):
-#        orderlist = Order.orderList(dbfire, session['simName']) # This will have the username show on webpage when logged in - Muneeb Khan
-
-#        return render_template('orderList.html',person=session['user'],buys=orderlist['buyOrSell'].to_list(), dates=orderlist['dayOfPurchase'].to_list(),
-#        tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list())
 
 # Login
 #  This function allows the user to log into the app with correct credentials
 #  If correct users will be taken to the profile page
 #  If incorrect, users will be taken back to login page
 #  Author: Miqdad Hafiz
+#  Minor bug fixes by Muneeb Khan
 @app.route("/login", methods = ["POST","GET"])
 def login():
     if('user' in session): #to check if the user is logged in will change to profile page
@@ -423,6 +416,7 @@ def userSearchSuggestions():
         return render_template('social.html', userNames = session['userName'])
         
 #Author: Viraj Kadam, Miqdad helped
+# Minor bug fixes by Muneeb Khan
 @app.route('/register', methods = ["POST", "GET"])
 def register():
     if request.method == "POST":
@@ -465,6 +459,7 @@ def register():
             flash("Username is already taken. Please enter a valid username.") #check to see if username is taken
             return render_template('register.html')
 
+        # Condition to check for blank fields on the form - Muneeb Khan
         elif (email == "" or Password == "" or confirmPass == "" or NameU == "" or UseN == ""):
             flash("A field was left blank, please fill out all required fields")
             return render_template('register.html')
