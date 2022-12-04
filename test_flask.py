@@ -259,6 +259,20 @@ def test_userPosts():
     testuser = client.get("/userPosts")
     assert testuser.status_code == 200
 
+def test_Leaderboard():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+            session['stockNames'] = "BlackRock Capital Investment Corporation"
+    testuser = client.get("/Leaderboard")
+    assert testuser.status_code == 200
+
+def test_edit():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+            session['postID'] = "Jp0h4YgXepatDz4bzaDD"
+    testuser = client.post("/editingPost", data = {"editingthePost":"This post edits from the test file."} )
 
     
 

@@ -149,20 +149,22 @@ def postDelete():
 #Author: Miqdad Hafiz
 @app.route("/editPost",methods = ["POST","GET"])
 def editPost():
-    session['postID'] = request.args['postID']
-    edit = dbfire.collection('Blog').document(session['postID']).get()
-    edit = edit.to_dict()
-    try:
-        edit['DocID'] = id
-        return render_template("editingPost.html", edit = edit)
-    except:
-        return redirect(url_for(id))
+    if('user' in session):
+        session['postID'] = request.args['postID']
+        edit = dbfire.collection('Blog').document(session['postID']).get()
+        edit = edit.to_dict()
+        try:
+            edit['DocID'] = id
+            return render_template("editingPost.html", edit = edit)
+        except:
+            return redirect(url_for(id))
 
 @app.route("/editingPost", methods = ["POST","GET"])
 def editingPost():
     if('user' in session):
         if(request.method == "POST"):
             result = request.form
+            id = session['postID']
             editedPost = result["editingthePost"]
             dbfire.collection('Blog').document(id).update({'Post': editedPost,'DatePosted':firestore.SERVER_TIMESTAMP})
             flash("Post has been updated.")
