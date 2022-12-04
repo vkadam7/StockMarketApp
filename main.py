@@ -1247,17 +1247,9 @@ def quizSubmit():
         dbfire.collection('Users').document(updatescore).update({'QuizScore': str(score*10) + "%"}) # Convert users score to percentage - Muneeb Khan
         flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
         " You are now ready to invest, please click the start simulation button above to start investing." +
-        "Correct answers were: " +
-        "1 B " + 
-        "2 A " +
-        "3 B " +
-        "4 A " +
-        "5 C " +
-        "6 C " +
-        "7 A " +
-        "8 C " +
-        "9 B " +
-        "10 A ")
+        "Correct answers were: " + "1 B " + "2 A " + "3 B " + "4 A " + "5 C " + "6 C " + "7 A " +
+        "8 C " + "9 B " + "10 A ")
+
         return redirect(url_for('information', person = session['user']))
     else:
         ## This will store the users quiz score on Firebase - Muneeb Khan
@@ -1268,18 +1260,9 @@ def quizSubmit():
         dbfire.collection('Users').document(updatescore).update({'QuizScore': str(score*10) + "%"}) # Convert users score to percentage - Muneeb Khan
         flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
         " You need to score at least a 7/10 to pass. Please try again."  + 
-        "Correct answers were: " +
-        "1 B " + 
-        "2 A " +
-        "3 B " +
-        "4 A " +
-        "5 C " +
-        "6 C " +
-        "7 A " +
-        "8 C " +
-        "9 B " +
-        "10 A "
-        )
+        "Correct answers were: " + "1 B " + "2 A " + "3 B " + "4 A " + "5 C " + "6 C " + "7 A " +
+        "8 C " + "9 B " + "10 A ")
+        
         return redirect(url_for('information', person = session['user']))
 
 
