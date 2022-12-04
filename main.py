@@ -409,7 +409,7 @@ def unfollow():
         
         flash("You have unfollowed " + userNamed)
         return redirect(url_for("social"))
-
+#Author: Viraj Kadam
 @app.route('/_userSearchSuggestion', methods = ['POST', 'GET'])
 def userSearchSuggestions():
     if 'user' in session:
