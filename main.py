@@ -420,7 +420,6 @@ def userSearchSuggestions():
                 userNames.append(temp(['userName']))
             session['userName'] = userNames
             print(userNames)
-            
         return render_template('social.html', userNames = session['userName'])
         
 #Author: Viraj Kadam, Miqdad helped
