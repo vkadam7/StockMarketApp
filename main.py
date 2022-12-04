@@ -1451,6 +1451,11 @@ def quiz4():
         answers3 = [answers[2]]
         answers4 = [answers[3]]
         answers5 = [answers[4]]
+        answers6 = [answers[5]]
+        answers7 = [answers[6]]
+        answers8 = [answers[7]]
+        answers9 = [answers[8]]
+        
 
 
         if (request.method == 'POST'):
@@ -1474,7 +1479,8 @@ def quiz4():
             
 
         return render_template('quiz4.html',quiz = quiz, questions = questions, answers = answers,
-        answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5)
+        answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5, answers6 = answers6, answers7 = answers7, answers8 = answers8,
+        answers9 = answers9)
                    
     else:
         flash("Sorry you must be logged in to take the quiz.")
