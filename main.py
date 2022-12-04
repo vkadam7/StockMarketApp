@@ -78,7 +78,9 @@ def profile():
         for i in range(1,3):
             if quizGrab.get('QuizScoreQuiz'+str(i)) != None:
                 session['QuizScore' + str(i)] = quizGrab['QuizScoreQuiz'+str(i)]
-            
+            else:
+                session['QuizScore' + str(i)] = ''
+
         return render_template("profile.html", results = results, cash = cash, leaderboard = leaderboard, stockNames = session['stockNames'])
     else:
 
@@ -1199,6 +1201,15 @@ def quizselection():
         for x in person.get():
             person = x.to_dict()
 
+        for i in range(1,3):
+            if person.get('QuizScoreQuiz'+str(i)) != None:
+                session['QuizScore' + str(i)] = person['QuizScoreQuiz'+str(i)]
+                session['QuizScoreFlag' + str(i)] = 1
+            else:
+                session['QuizScore' + str(i)] = ''
+                session['QuizScoreFlag' + str(i)] = 0
+            print(session['QuizScore' + str(i)])
+
         return render_template("quizselection.html", person = person, stockNames = session['stockNames'])
     else:
         flash("Sorry you must be logged in to take the quiz.")
@@ -1231,7 +1242,7 @@ def quizSubmit():
         for i in range(3):
             if str(i) in session['quiz']:
                 index = 'QuizScore' + str(i)
-                session[index] = score
+                session[index] = str(score*10) + "%"
         flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
         " You are now ready to invest, please click the start simulation button above to start investing." +
         "Correct answers were: " +
@@ -1256,7 +1267,7 @@ def quizSubmit():
         for i in range(3):
             if str(i) in session['quiz']:
                 index = 'QuizScore' + str(i)
-                session[index] = score
+                session[index] = str(score*10) + "%"
         flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
         " You need to score at least a 7/10 to pass. Please try again."  + 
         "Correct answers were: " +

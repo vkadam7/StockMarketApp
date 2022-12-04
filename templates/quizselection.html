@@ -110,11 +110,11 @@
           </nav>
     </header>
 
-<br><br><br><br><br><br>
+<br>
 
     <body>
         <div class = "centering">
-            <h1>Quiz selection</h1>
+            <h1>Quiz Selection</h1>
             <hr>
         </div>
           <div class = "card w-75" style= "padding-top: 10px; padding-bottom: 10px;">
@@ -123,12 +123,24 @@
                 <h2>Please select a Quiz to begin</h2>
                   <br>
                     <h5><button class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  name='quiz' value="Quiz1">Quiz 1</a></h5> 
-                      <br><h5>Your last score on this quiz was {{session['QuizScore1']}}/10</h5>
+                      <p id="quizScore1">Your last score on this quiz was {{session['QuizScore1']}}</p>
                       <br>
                     <h5><button class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  name='quiz' value="Quiz2">Quiz 2</a></h5> 
-                      <br><h5>Your last score on this quiz was {{session['QuizScore2']}}/10</h5>
-                      <br>
+                      <p id="quizScore2">Your last score on this quiz was {{session['QuizScore2']}}</p>
+
               </form>
+              <script>
+                const quizScore1 = document.getElementById('quizScore1');
+                const quizScore2 = document.getElementById('quizScore2');
+                let check1 = {{session['QuizScoreFlag1']|safe}};
+                let check2 = {{session['QuizScoreFlag2']|safe}};
+                if (check1 === 0) {
+                  quizScore1.style.display = 'none';
+                }
+                if (check2 === 0) {
+                  quizScore2.style.display = 'none';
+                }
+              </script>
             </div>
             </div>
             
