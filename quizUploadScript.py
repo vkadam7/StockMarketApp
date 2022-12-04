@@ -287,8 +287,63 @@ questions3 = [
         'd' : 'GOO'
     },
     'correct' : 'b'
+},
+#Question 6 
+{
+    'text' : 'What is volatility?', 
+    'answers': {
+        'a' : 'A statistical measure of how much a stock moves up or down.', 
+        'b' : 'A person who owns at least one share of a stock.', 
+        'c' : 'The measure of how easy it is to buy or sell a stock', 
+        'd' : 'All of the above'
+    },
+    'correct' : 'a'
+},
+#Question 7
+{
+    'text' : 'What is arbitrage?', 
+    'answers': {
+        'a' : 'A statistical measure of how much a stock moves up or down.', 
+        'b' : 'A person who owns at least one share of a stock.', 
+        'c' : 'The measure of how easy it is to buy or sell a stock', 
+        'd' : 'The practice of taking advantage of a small price difference between 2 or more markets.'
+    },
+    'correct' : 'd'
+}, 
+{#Question 8
+    'text' : 'What is portfolio?', 
+    'answers': {
+        'a' : 'A statistical measure of how much a stock moves up or down.', 
+        'b' : 'A person who owns at least one share of a stock.', 
+        'c' : 'An investors records of stocks bought and sold during a period of time.', 
+        'd' : 'The practice of taking advantage of a small price difference between 2 or more markets.'
+    },
+    'correct' : 'c'
+}, 
+{
+    #Question 9
+    'text' : 'For dividends what is the cut off date before the record date called?',
+    'answers' : {
+        'a' : 'Dividend date',
+        'b' : 'Ex-dividend date',
+        'c' : 'Dividend reinvestment date'
+    },
+    'correct' : 'b'
+}, 
+{
+    #Question 10
+    'text' : 'What is a yield?', 
+    'answers': {
+        'a' : 'Measures a return on an investment, such as a dividend payment.', 
+        'b' : 'A person who owns at least one share of a stock.', 
+        'c' : 'An investors records of stocks bought and sold during a period of time.', 
+        'd' : 'The practice of taking advantage of a small price difference between 2 or more markets.'
+    },
+    'correct' : 'a'
 }
+
 ]
+
 for entry in questions3:
     temp, tempID = db.collection('Quiz').add(entry)
     ids.append(tempID)
