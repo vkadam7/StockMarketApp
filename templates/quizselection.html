@@ -129,16 +129,16 @@
               <form action = "/quiz" method ="POST">
                 <h2>Please select a Quiz to begin</h2>
                   <br>
-                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "quiz">Quiz 1</a></h5> 
+                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  name="quiz" value="Quiz1">Quiz 1</a></h5> 
                     <br><h5>Your last score on this quiz was {{person['QuizScore1']}}</h5>
                     <br><br>
-                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "quiz2">Quiz 2</a></h5> 
+                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  name="quiz" value="Quiz2">Quiz 2</a></h5> 
                     <br><h5>Your last score on this quiz was {{person['QuizScore2']}}</h5>
                     <br><br>
-                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "quiz3">Quiz 3</a></h5> 
+                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  name="quiz" value="Quiz3">Quiz 3</a></h5> 
                     <br><h5>Your last score on this quiz was {{person['QuizScore3']}}</h5>
                     <br><br>
-                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  href = "quiz4">Quiz 4</a></h5> 
+                  <h5><a class = "btn-block btn-lg btn-warning" style = "color:black;" method = "POST"  name="quiz" value="Quiz4">Quiz 4</a></h5> 
                     <br><h5>Your last score on this quiz was {{person['QuizScore4']}}</h5>
                     <br><br>
               </form>
@@ -155,10 +155,10 @@
                 if (check2 === 0) {
                   quizScore2.style.display = 'none';
                 }
-                if (check3 == 0){
+                if (check3 === 0){
                   quizScore3.style.display = 'none';
                 }
-                if (check4 == 0){
+                if (check4 === 0){
                   quizScore4.style.display = 'none';
                 }
               </script>
