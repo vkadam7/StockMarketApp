@@ -112,30 +112,30 @@
     </header>
 
 <body>  
-        <br><br><br>
         
-        <h3>People You Follow</h3>
-        <div class = "container-fluid w-50" id = "centers">
-          <div class="justify-content-center mt-5">
-            <div class = "card">
-              <div class = "d-flex justify-content-between align-items-center">
-          <table class = "table w-75 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
+        <br><br><br><br><br>
 
-            <thead class = "bg-light">
-              <tr><th>Name:</th></tr>
-            </thead>
-            {%for user in names%}
-            <tbody>
-              <tr>
-                <td>{{user[0]}}</td>
-              </tr>
-            </tbody>
-            {% endfor %}
-           </table>
-          </div>
-        </div>
-      </div>
-    </div>
+<div class="row justify-content-center">
+
+  <table class = "table w-50 table-bordered table-hover align-middle mb-0 bg-white" id = "tableL">
+
+    <h2 style="text-align: center;">People you follow</h2>
+
+    <thead class = "bg-light">
+      <tr><th><h3>Names: </h3></th></tr>
+    </thead>
+
+    {% for user in names%}
+      <tbody>
+        <tr>
+          <td><h4>{{user[0]}}</h4></td>  
+        </tr>  
+      </tbody>
+    {% endfor %}
+    
+   </table>
+
+</div>
           <br><br>
           <footer class="footer mt-auto py-3 fixed-bottom" id = "foot">
         <div class="container">
