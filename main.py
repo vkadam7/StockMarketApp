@@ -1141,6 +1141,10 @@ def changeStockView():
         return redirect(url_for('.displayStock', ticker=session['ticker'], timespan=request.form['timespan'], startDate=request.form['startDate']))
     return -1
 
+## stockListing
+#   Description: Lists all available stocks in a given simulation
+#
+#   Author: Ian McNulty
 @app.route('/stockList', methods=['POST','GET'])
 def stockListing():
     if session['simulationFlag'] == 1:
@@ -1195,11 +1199,19 @@ def orderlists():
         tickers=orderlist['ticker'].to_list(), quantities=orderlist['quantity'].to_list(), prices=orderlist['totalPrice'].to_list(), partiallySold=orderlist['partiallySold'].to_list(), 
         profits=orderlist['profit'].to_list(), links=orderlist['links'].to_list(), stockNames = session['stockNames'])
 
+## Order Hist
+#   Redirects users to order history with a specific simulation
+#
+#   Author: Ian McNulty
 @app.route("/orderHist/<simName>")
 def orderHist(simName):
     if ('user' in session):
         return redirect(url_for('.orderHistory', simName=simName))
 
+## Order History
+#   Retrieves the history of orders from a specific simulation
+#
+#   Author: Ian McNulty, Muneeb Khan
 @app.route("/orderHistory")
 def orderHistory():
     simName = request.args['simName']
@@ -1332,23 +1344,6 @@ def quizpage():
             answers9 = [answers[8]]
             answers10 = [answers[9]]
 
-            #if (request.method == 'POST'):
-                
-            #    choiceA = request.args['a']
-            #   choiceB = request.args['b']
-            #   choiceC = request.args['c']
-            #   submitButton = request.args['submitButton']
-
-            #   if request.method == choiceA:
-            #       return Quiz.answerQuestion(dbfire,session['user'],choiceA)
-            #   elif request.method == choiceB:
-            #       return Quiz.answerQuestion(dbfire,session['user'],choiceB)
-            #   elif request.method == choiceC:
-            #       return Quiz.answerQuestion(dbfire,session['user'],choiceC)
-            #   elif request.method == submitButton:
-            #       return Quiz.submitScore(dbfire)
-                
-
             return render_template('quiz.html',quiz = quiz, questions = questions, answers = answers,
             answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5,
             answers6 = answers6, answers7 = answers7, answers8 = answers8, answers9 = answers9, answers10 =answers10)
@@ -1404,5 +1399,6 @@ def quiz2():
     else:
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
+
 if __name__ == '__main__':
     app.run(debug=True)
