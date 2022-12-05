@@ -1365,7 +1365,7 @@ class Portfolio:
             return currentValueOfShares - avgPriceOfOrders, mean(avgStockPrices), amountOfSharesOwned
         else:
             return currentValueOfShares - avgPriceOfOrders, 0, amountOfSharesOwned
-            
+    ## Author: Viraj Kadam        
     ## Portfolio.GainorLoss - DEPRECATED
     #Fixed this section to account for gains or losses, need to test to check if everything is correct  
     def GainorLoss(self, db, stock, quanity, stockPrice, simName=""):
@@ -1398,7 +1398,8 @@ class Portfolio:
         elif Order.sellOrder == True:
                  netGainorLoss = (currentPrice[day + 1] - tempPrice[day]) / (tempPrice[day]) * 100
                  return netGainorLoss
-              
+             
+    ## Author: Viraj Kadam          
     ## Portfolio.funds_remaining - DEPRECATED
     #Determines how much money the user has left to spend in the game. Need to include an if statement for when the user sells stocks      
     def funds_remaining(self, initialAmount, finalAmount):
@@ -1432,7 +1433,8 @@ class Portfolio:
                  fundsUsed = data['currentCash'] - data['initialCash']
                  fundsRemainiing = fundsUsed
                  return fundsRemainiing
-        
+             
+    ## Author: Viraj Kadam   
     ## Portfolio.returns - DEPRECATED
     #Edited returns feature
     def returns(self, quantity, avgStockPrice, AdjustClose):
