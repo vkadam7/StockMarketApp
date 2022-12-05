@@ -531,7 +531,7 @@ def update():
             experience = results["experience"]
             goodName = newUsername
 
-            # Check if user left the username update field blank
+            # Check if user left the username update field blank - Muneeb Khan
             if (newUsername == ""):
                 print("Please enter a new username")
                 flash("Please choose a new username", "pass")
@@ -539,13 +539,13 @@ def update():
 
             # Otherwise procced with the update
             else:
-                # For loop to check if User is already using the username
+                # For loop to check if User is already using the new username - Muneeb Khan
                 checkName = dbfire.collection('Users').where('Email','==',session['user']).get()
                 for docs in checkName:
                     updatesInfo = docs.id
                     checkName = docs.to_dict()
 
-                # For loop to check all documents on Firebase if the username is already in use by any other user
+                # For loop to check all documents on Firebase if the username is already in use by any other user - Muneeb Khan
                 checkNames = dbfire.collection('Users').document(newUsername).get()
                 if checkNames.exists:
                     grabExistingName = dbfire.collection('Users').where('userName', '==', newUsername)
