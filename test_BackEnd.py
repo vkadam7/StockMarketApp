@@ -168,6 +168,8 @@ def test_StockSimFinish():
     assert len(testArr) == 0
     dbfire.collection('Simulations').document(sim.simName).delete()
 
+#Author: Viraj Kadam 
+#Smaller test cases for backend stockSim functions
 def test_getPortfolioValues():
     testEmail = "go8940@wayne.edu"
     testTicker = "GOOG"
@@ -178,9 +180,30 @@ def test_getPortfolioValues():
     portfolioValue = Simulation.getPortfolioValue(dbfire, sim.simName)
     currentPrice = "%.2f" % round(SimulationFactory(dbfire, testEmail).simulation.currentPriceOf(testTicker), 2)
     order = Order(dbfire, sim.simName, testTicker, 'Buy', 5, currentPrice)
+    assert buyOrder['quantity'] == 2
     order.buyOrder()
+    for entry in dbfire.collection('Orders').where('simulation', '==', sim.simName).where('ticker','==',testTicker).where('buyOrSell','==','Buy').stream():
+        buyOrder = entry
     assert portfolioValue == 5*float(currentPrice)
 
-def test_quizSelection():
+def test_retrievCurrentCash():
     testEmail = "go8940@wayne.edu"
-    quiz = Quiz()
+    testTicker = "GOOG"
+    dbfire = firestore.client()
+    sim = SimulationFactory(dbfire, testEmail)
+    sim = sim.simulation
+    Simulation.retrieveCurrentCash(dbfire, testEmail)
+    portfolioValue, currentCash = Simulation.getPortfolioValue(dbfire,sim.simName)
+    assert currentCash == 100
+    assert sellOrder['quantity'] == 2
+    retrieveCurrentCash = Simulation.retrieveCurrentCash(dbfire, testEmail)
+    currentPrice ="%.2f" % round(SimulationFactory(dbfire, testEmail).simulation.currentPriceOf(testTicker), 2)
+    order = Order(dbfire, sim.simName, testTicker, 'Sell', 5, currentPrice)
+    order.sellOrder()
+    for entry in dbfire.collection('Orders').where('simulation', '==', sim.simName).where('ticker','==',testTicker).where('buyOrSell','==','Sell').stream():
+        sellOrder = entry
+    sellOrder2 = sellOrder2.to_dict()
+    currentCash = Simulation.retrieveCurrentCash(dbfire, testEmail)
+    retrieveCurrentCash = currentCash
+    assert retrieveCurrentCash == 5*float(currentPrice)
+    

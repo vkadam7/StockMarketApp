@@ -214,6 +214,13 @@ def test_login_successful():
     testLogin = app.test_client().post("/login", data = user)
     assert testLogin.status_code == 302
    
+def test_login_failure_noAccount():
+    user = {
+        "email": " ", 
+        "password": " ", 
+    }
+    testLogin = app.test_client().post("/login", data = user)
+    assert testLogin.status_code == 200
 
 def test_login_failure_invalidEmail():
     user = {"email" : "invalidEmail@gmail.com", 
@@ -228,13 +235,21 @@ def test_login_failure_invalidPassword():
     testLogin = app.test_client().post("/login", data = user)
     assert testLogin.status_code == 200
 
-def test_stockSearch_successful(client):
+def test_stockSearch_successful():
     with app.test_client() as client:
         with client.session_transaction() as session:
             session['user'] = "go8940@wayne.edu"
             session['stockNames'] = "Ford"
         testUser = client.post("/stockSearch", data = session['stockNames'])
         assert testUser.status_code == 302
+
+def test_stockSearch_failure():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = "go8940@wayne.edu"
+            session['stockNames'] = " "
+        testUser = client.post("/stockSearch", data = session['stockNames'])
+        assert testUser.status_code == 200
 #Author: Viraj Kadam
 #Test cases for follow and unfollow functions
 
@@ -244,6 +259,15 @@ def test_UserSearch():
             session['user'] = "go8940@wayne.edu"
         testUser = client.post("/social", data = {"userName" : "viraj1"})
         assert testUser.status_code == 302
+        
+def test_UserSearch_failure():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = "go8940@wayne.edu"
+        testUser = client.post("/social", data = {"userName": " "})
+        assert testUser.status_code == 200
+
+
 def test_Follow_successful():
     with app.test_client() as client:
         with client.session_transaction() as session:
