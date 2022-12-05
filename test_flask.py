@@ -64,8 +64,6 @@ def test_register_success():
     dbfire = firestore.client()
     dbfire.collection('Users').document(user).update({"TestUser" : "True"})
 
-
-
 def test_register_fail_usernameInUse():
     user = {"email" : "pytest3@gmail.com",
     "password" : "ABCDEG4$",
@@ -78,7 +76,7 @@ def test_register_fail_usernameInUse():
 def test_register_fail_passwordsDontMatch():
     user = {"email" : "pytest3@gmail.com",
     "password" : "ABCDEG4$",
-    "confirmPassw" : "ABCDEG5%",
+    "confirmPassw" : "ABCDEG5#",
     "Unames" : "Pytest1",
     "username" : "Pytest1"}
     testregister = app.test_client().post("/register", data = user)
@@ -134,6 +132,15 @@ def test_register_fail_blankPassword():
     "password" : "",
     "confirmPassw" : "",
     "Unames" : "Pytest12",
+    "username" : "Pytest12"}
+    testregister = app.test_client().post("/register", data = user)
+    assert testregister.status_code == 200
+
+def test_register_fail_blankUsername():
+    user = {"email" : "pytest3@gmail.com",
+    "password" : "ABCDEG4$3",
+    "confirmPassw" : "ABCDEG4$3",
+    "Unames" : "",
     "username" : "Pytest12"}
     testregister = app.test_client().post("/register", data = user)
     assert testregister.status_code == 200
