@@ -661,7 +661,8 @@ def information():
     else:
         return render_template("information.html")
 
-## Route for Definitions Page - Muneeb Khan    
+## Route for Definitions Page - Muneeb Khan
+## Minor additions from Viraj Kadam    
 @app.route("/StockDefinitions")
 def StockDefinitions():
     if('user' in session):
@@ -836,7 +837,8 @@ def orderFormFill():
     session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
     return render_template('orderForm.html', option=session['option'], stockNames = session['stockNames'])
 
-
+#Author: Viraj Kadam
+#Description: Buy and sell buttons for portfolio table
 @app.route("/buyOrder")
 def buyRoute():
     if 'user' in session:
@@ -1229,6 +1231,7 @@ def fourOhFour():
     
 
 ## Route for Quiz selection page - Muneeb Khan
+## Minor Fixes from Viraj
 @app.route("/quizselection")
 def quizselection():
     if('user' in session): 
@@ -1253,6 +1256,7 @@ def quizselection():
 
 # Submission check route for Quiz by Ian Mcnulty
 # Updates by Muneeb and Ian
+# Minor fix from Viraj
 @app.route('/quizSubmit', methods = ['GET', 'POST'])
 def quizSubmit():
     quiz = Quiz(dbfire,session['quiz'],session['user'])
