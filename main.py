@@ -258,7 +258,7 @@ def login():
             else:
                 session['simulationFlag'] = 0
             sessionFlagCheck(session['loginFlagPy'], session['simulationFlag'])
-            flash("Login succesful!.", "pass")
+            flash("Login succesful!", "pass")
             print("Login successful.")
             return redirect(url_for("profile")) # this will be a placeholder until I get the database and profile page are up and running 
         except:
