@@ -227,6 +227,18 @@ def test_login_failure_invalidEmail():
     "password" : "ABCDEG4$3"}
     testLogin = app.test_client().post("/login", data = user)
     assert testLogin.status_code == 200
+
+def test_login_failure_missingEmail():
+    user = {"email" : " ", 
+    "password" : "ABCDEG4$3"}
+    testLogin = app.test_client().post("/login", data = user)
+    assert testLogin.status_code == 200
+
+def test_login_failure_missingPassword():
+    user = {"email" : "go8940@wayne.edu", 
+    "password" : " "}
+    testLogin = app.test_client().post("/login", data = user)
+    assert testLogin.status_code == 200
     
     
 def test_login_failure_invalidPassword():
