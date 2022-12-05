@@ -3,6 +3,7 @@
 #   Author: Ian McNulty
 #   Update by Muneeb Khan
 #   Quizzes 3 and 4 uploaded by Viraj Kadam
+####Ran into issues with quiz 3
 import numpy as np
 from firebase_admin import firestore
 from firebase_admin import credentials
