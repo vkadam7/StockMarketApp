@@ -225,13 +225,20 @@ def test_stockSearch_successful(client):
 #Author: Viraj Kadam
 #Test cases for follow and unfollow functions
 
-def test_UserSearch(client):
-    testUser = client.post("/social", data = {"userName": "viraj1"})
-def test_Follow_successful(client):
-    testUser = client.post9("/follow", data = {"userName": "viraj1"})
-    assert testUser.status_code == 200
+def test_UserSearch():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = "go8940@wayne.edu"
+        testUser = client.post("/social", data = {"userName" : "viraj1"})
+        assert testUser.status_code == 302
+def test_Follow_successful():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = "go8940@wayne.edu"
+        testUser = client.post("/follow", data = {"userName" : "viraj1"})
+        assert testUser.status_code == 302
 
-def test_Unfollow_successful(client):
+def test_Unfollow_successful():
     testUser = client.post("/unfollow", data = {"userName": "viraj1"})
     assert testUser.status_code == 200
 
