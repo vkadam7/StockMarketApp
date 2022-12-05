@@ -88,6 +88,7 @@ def profile():
 @app.route("/Blog", methods = ["POST","GET"])
 def Blog():
     if('user' in session):
+        #create an array to store all user's followers
         followingArray = []
         userF = dbfire.collection('Users').where('Email', '==', session['user'])
         for docs in userF.stream():
@@ -96,6 +97,7 @@ def Blog():
         print("Printing user's following list ")
         print(followingArray)
 
+        #create a list to hold every post made by the people the user's following.
         print("Here comes the BLOG.")
         blog = []
         for x in followingArray:
@@ -106,12 +108,14 @@ def Blog():
                 showBlog['DatePosted'] = str(datetime.datetime.fromtimestamp(showBlog['DatePosted'].timestamp()).strftime("%Y-%m-%d"))
                 blog.append(showBlog)
         
+        #sort the list by date posted and send to the blog page
         print("Here comes personal B")
         blog.sort(key = itemgetter('DatePosted'), reverse=True)
         print(blog)   
         return render_template("Blog.html", blog = blog, stockNames = session['stockNames'])
 
 #Author: Miqdad Hafiz
+#show the posts made by the user by grabbing every post with the user's username as Author
 @app.route("/userPosts", methods = ["POST","GET"])
 def userPosts():
     if('user' in session):
@@ -134,6 +138,7 @@ def userPosts():
 
 
 #Author: Miqdad Hafiz
+#Delete a post made by the user
 @app.route("/postDelete", methods = ["GET"])
 def postDelete():
     session['postID'] = request.args['postID']
@@ -145,6 +150,7 @@ def postDelete():
         return redirect(url_for("userPosts"))
 
 #Author: Miqdad Hafiz
+#Edit the user's posts by clicking the 3 dot on the side of the post
 @app.route("/editPost",methods = ["POST","GET"])
 def editPost():
     if('user' in session):
@@ -154,7 +160,8 @@ def editPost():
         edit['DocID'] = id
         return render_template("editingPost.html", edit = edit)
         
-
+#Author: Miqdad Hafiz
+#Continuing the editing posts for the form.
 @app.route("/editingPost", methods = ["POST","GET"])
 def editingPost():
     if('user' in session):
@@ -169,6 +176,7 @@ def editingPost():
             return redirect(url_for('userPosts'))
 
 #Author: Miqdad Hafiz
+#Post on the feed with the username as Author and whatever the user typed as the post.
 @app.route("/postBlog", methods = ["POST","GET"])
 def postBlog():
     if('user' in session):
@@ -187,6 +195,7 @@ def postBlog():
 
 
 #Author: Miqdad Hafiz
+#List everything in the leaderboard database by score.
 @app.route("/Leaderboard")
 def Leaderboard():
     if('user' in session):
@@ -238,12 +247,13 @@ def followingList():
 def login():
     if('user' in session): #to check if the user is logged in will change to profile page
         return redirect(url_for("profile"))
-
+    
+    #grab the form items
     if request.method == "POST":
         result = request.form
         email = result["email"]
         passw = result["password"]
-        try:
+        try: #sign in the user and check if they have a simulation going on
             user = authen.sign_in_with_email_and_password(email,passw)
             session['user'] = email
             session['loginFlagPy'] = 1
@@ -270,17 +280,19 @@ def login():
 
 
 #Author: Miqdad Hafiz
+#Search for a user from the social page
 @app.route('/social', methods = ["POST", "GET"])
 def social():
     if('user' in session):
         if request.method == "POST":
             search = request.form
             searchKey = search["searchUser"]
-            
+            #check if the user is found by username
             grabUser = dbfire.collection('Users').where('userName', '==', searchKey).get()
             found = True
             size = len(grabUser)
             
+            #check if the user is found by name
             if(size == 0):
                 grabUser = dbfire.collection('Users').where('Name', '==', searchKey).get()
                 found = True
@@ -290,7 +302,7 @@ def social():
                     found = False
 
             
-                
+            #check if the user searched themselves
             if(found == True ):
                 for docs in grabUser: 
                     grabUser = docs.to_dict()
