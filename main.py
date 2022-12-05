@@ -1374,6 +1374,8 @@ def quiz2():
                 return Quiz.answerQuestion(dbfire,session['user'],choiceB)
             elif request.method == choiceC:
                 return Quiz.answerQuestion(dbfire,session['user'],choiceC)
+            elif request.method == choiceD:
+                return Quiz.answerQuestion(dbfire, session['user'],choiceD)
             elif request.method == submitButton:
                 return Quiz.submitScore(dbfire)
             
