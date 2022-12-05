@@ -451,11 +451,8 @@ def register():
         
         # If else conditions to check the password requirements - Muneeb Khan
         if (len(Password) < 6 or len(Password) > 20 or digits == 0 or specials == 0):
-            flash("Invalid Password! Must contain the following requirements: ")
-            flash("6 characters minimum")
-            flash("20 characters maximum")
-            flash("at least 1 digit")
-            flash("at least 1 special character ('!','@','#', or '$'")
+            flash("Invalid Password! Must contain the following requirements: " + " 6 characters minimum," + 
+            " 20 characters maximum," + " at least 1 digit," + " and at least 1 special character (! @ # or $)")
             return render_template("register.html")
 
         elif (Password != confirmPass): # If password and cofirm password don't match
