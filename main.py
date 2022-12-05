@@ -75,7 +75,7 @@ def profile():
         #    endDate = endDateFetch[0]
         
     
-        for i in range(1,3):
+        for i in range(1,4):
             if quizGrab.get('QuizScoreQuiz'+str(i)) != None:
                 session['QuizScore' + str(i)] = quizGrab['QuizScoreQuiz'+str(i)]
             else:
@@ -1227,7 +1227,7 @@ def quizselection():
         for x in person.get():
             person = x.to_dict()
 
-        for i in range(1,3):
+        for i in range(1,4):
             if person.get('QuizScoreQuiz'+str(i)) != None:
                 session['QuizScore' + str(i)] = person['QuizScoreQuiz'+str(i)]
                 session['QuizScoreFlag' + str(i)] = 1
@@ -1265,7 +1265,7 @@ def quizSubmit():
             updatescore = scores.id
             yourscore = scores.to_dict()
         dbfire.collection('Users').document(updatescore).update({'QuizScore'+session['quiz']: str(score*10) + "%"}) # Convert users score to percentage - Muneeb Khan
-        for i in range(3):
+        for i in range(4):
             if str(i) in session['quiz']:
                 index = 'QuizScore' + str(i)
                 session[index] = str(score*10) + "%"
@@ -1282,7 +1282,7 @@ def quizSubmit():
             updatescore = scores.id
             yourscore = scores.to_dict()
         dbfire.collection('Users').document(updatescore).update({'QuizScore'+session['quiz']: str(score*10) + "%"}) # Convert users score to percentage - Muneeb Khan
-        for i in range(3):
+        for i in range(4):
             if str(i) in session['quiz']:
                 index = 'QuizScore' + str(i)
                 session[index] = str(score*10) + "%"
@@ -1453,7 +1453,7 @@ def quiz4():
         answers7 = [answers[6]]
         answers8 = [answers[7]]
         answers9 = [answers[8]]
-        
+        answers10 = [answers[9]]
         
 
 
@@ -1479,7 +1479,7 @@ def quiz4():
 
         return render_template('quiz4.html',quiz = quiz, questions = questions, answers = answers,
         answers1 = answers1, answers2 = answers2, answers3 = answers3, answers4 = answers4, answers5 = answers5, answers6 = answers6, answers7 = answers7, answers8 = answers8,
-        answers9 = answers9)
+        answers9 = answers9, answers10 = answers10)
                    
     else:
         flash("Sorry you must be logged in to take the quiz.")
