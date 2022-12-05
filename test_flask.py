@@ -205,6 +205,105 @@ def test_updateProfile_fail_missingUserName():
     testupdateProfile = app.test_client().post("/update", data = user)
     assert testupdateProfile.status_code == 200
 
+    assert testlogout.status_code == 302 # Redirect user to login page code 302
+    
+#Login test case- Viraj Kadam
+#Status Code = 200: If user login test is successful, the user will be redirected to the profile page
+#Status Code = 500: If user login test has failed, then the user will remain on the login page
+    
+def test_login_successful():
+    user = {
+        "email": "pytest3@gmail.com",
+        "password": "ABCDEG4$3"
+    }
+    testLogin = app.test_client().post("/login", data = user)
+    assert testLogin.status_code == 200
+   
+
+def test_login_failure_invalidEmail():
+    user = {
+        "email": " ", 
+        "password": "ABCDEG4$3"
+    }
+    testLogin = app.test_client().post("/login", data = user)
+    assert testLogin.status_code == 500
+    
+    
+def test_login_failure_invalidPassword(client):
+    user = {
+        "email": "pytest3@gmail.com",
+        "password": " "
+    }
+def test_stockSearch_successful(client):
+    testEmail  = "go8940@wayne.edu"
+    testTicker = "GOOG"
+
+#Author: Viraj Kadam
+#Test cases for follow and unfollow functions
+
+def test_UserSearch(client):
+    testUser = client.post("/social", data = {"userName": "viraj1"})
+def test_Follow_successful(client):
+    testUser = client.post9("/follow", data = {"userName": "viraj1"})
+    assert testUser.status_code == 200
+
+def test_Unfollow_successful(client):
+    testUser = client.post("/unfollow", data = {"userName": "viraj1"})
+    assert testUser.status_code == 200
+
+#Social System test cases
+def test_blog_post():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+    testuser = client.post("/postBlog", data = {"blogPost":"This post comes from the test file."})
+    assert testuser.status_code == 302
+
+def test_Blog():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+            session['stockNames'] = "BlackRock Capital Investment Corporation"
+    testuser = client.get("/Blog")
+    assert testuser.status_code == 200
+
+def test_userPosts():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+            session['stockNames'] = "BlackRock Capital Investment Corporation"
+    testuser = client.get("/userPosts")
+    assert testuser.status_code == 200
+
+def test_Leaderboard():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+            session['stockNames'] = "BlackRock Capital Investment Corporation"
+    testuser = client.get("/Leaderboard")
+    assert testuser.status_code == 200
+
+def test_edit():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+            session['postID'] = "Jp0h4YgXepatDz4bzaDD"
+    testuser = client.post("/editingPost", data = {"editingthePost":"This post edits from the test file."})
+    assert testuser.status_code == 302
+
+def test_editPage():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+    testuser = client.get("/editPost", query_string = {"postID": "Jp0h4YgXepatDz4bzaDD"})
+    assert testuser.status_code == 200
+
+def test_delete():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = 'miqdadhafiz35@gmail.com'
+    testuser = client.get("/postDelete", query_string = {"postID": "Jp0h4YgXepatDz4bzaDD"})
+    assert testuser.status_code == 302
 
 if __name__ == '__main__':
     pytest.main()

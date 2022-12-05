@@ -121,7 +121,7 @@
         <div class="loader" style="text-align: center;"></div> 
         </div>
     <br>
-    <form action="taxLotSellConfirm" method="post">
+    <form action="sellTaxLotConfirm" method="post">
         <p>Order ID: {{session['orderID']}}</p>
         <p>Currently Owned Amount of Shares of this Stock: {{session['currentAmount']}}</p>
         <p id="totalPrice">Order Price: ${{session['orderPrice'] }}</p>
@@ -156,7 +156,7 @@
 
 <br><br>
 
-    <footer class="footer mt-5 py-3 fixed-bottom" id = "foot">
+    <footer class="footer mt-5 py-3" id = "foot">
     <div class="container">
       <span>Copyright 2022 by StockSim</span>
     </div>

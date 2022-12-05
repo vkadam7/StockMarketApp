@@ -904,7 +904,7 @@ class SimulationFactory:
     #
     #   Author: Ian McNulty
     def existenceCheck(db, user):
-        array = [entry for entry in db.collection('Simulations').where('ongoing','==',user).where('user','==',email).stream()]
+        array = [entry for entry in db.collection('Simulations').where('ongoing','==',user).where('user','==',user).stream()]
         if len(array) == 0:
             return False, "None"
         else:
@@ -1247,9 +1247,9 @@ class Order:
                 'dayOfPurchase': datetime.datetime.now(),
                 'buyOrSell': 'Sell',
                 'quantity': doc['quantity'],
-                'avgStockPrice': avgStockPrice,
-                'totalPrice': avgStockPrice * float(doc['quantity']),
-                'profit': avgStockPrice * float(doc['quantity']) - float(doc['totalPrice'])
+                'avgStockPrice': "%.2f" % round(avgStockPrice, 2),
+                'totalPrice': "%.2f" % round(avgStockPrice * float(doc['quantity']), 2),
+                'profit': "%.2f" % round(avgStockPrice * float(doc['quantity']) - float(doc['totalPrice']), 2)
             }
             db.collection('Orders').document(orderName).set(data)
             db.collection('Orders').document(orderID).update({'sold' : True})
@@ -1264,9 +1264,9 @@ class Order:
                 'dayOfPurchase': datetime.datetime.now(),
                 'buyOrSell': 'Sell',
                 'quantity': doc['newQuantity'],
-                'avgStockPrice': avgStockPrice,
-                'totalPrice': avgStockPrice * float(doc['newQuantity']),
-                'profit': avgStockPrice * float(doc['newQuantity']) - float(doc['avgStockPrice']) * float(doc['newQuantity'])
+                'avgStockPrice': "%.2f" % round(avgStockPrice, 2),
+                'totalPrice': "%.2f" % round(avgStockPrice * float(doc['newQuantity']), 2),
+                'profit': "%.2f" % round(avgStockPrice * float(doc['newQuantity']) - float(doc['avgStockPrice']) * float(doc['newQuantity']), 2)
             }
             db.collection('Orders').document(orderName).set(data)
             db.collection('Orders').document(orderID).update({'sold' : True, 'newQuantity' : 0})
@@ -1292,9 +1292,7 @@ class Order:
                 temp = entry.to_dict()
                 date = str(datetime.datetime.fromtimestamp(temp['dayOfPurchase'].timestamp()).strftime("%Y-%m-%d %H:%M:%S"))
                 if temp['buyOrSell'] == 'Buy' and temp['sold'] == False:
-                    link = str('/sellTaxLot/' + entry.id)
-                elif temp['buyOrSell'] == 'Buy' and temp['sold'] == True:
-                    link = str('/buyOrder/' + entry.id)
+                    link = str('/sellTaxLot?orderID=' + entry.id)
                 else:
                     link = ""
                 if temp.get('partiallySold') != None and temp['sold'] == False:
@@ -1302,7 +1300,7 @@ class Order:
                 else:
                     partiallySold = ""
                 if temp.get('profit') != None:
-                    profit = "%.2f" % round(temp['profit'],2)
+                    profit = "%.2f" % round(float(temp['profit']),2)
                 else:
                     profit = ""
                 orderslist.append([temp['buyOrSell'],temp['quantity'],temp['ticker'],"%.2f" % round(float(temp['totalPrice']),2),date, partiallySold, profit, link])
