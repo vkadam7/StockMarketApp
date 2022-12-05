@@ -128,12 +128,12 @@
           <span class = "font-weight-bold"> Search for a user</span>
           </div>
           
-          <form action = "social" method = "GET">
+          <form action = "/social" method = "post">
           <div class = "mt-3 inputs">
             <i class = "fa fa-search"></i>
             <input name = "searchUser" id = "searchUser" type = "search" class = "form-control" list = "userName" value = "{{request.form['searchUser']}}"
              placeholder="Search for a user...">
-            <datalist id = "Name">
+            <datalist id = "searchUser">
               {%for users in Name%}
                 <option value = {{Name}}/>
               {%endfor%}
