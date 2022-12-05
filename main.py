@@ -262,7 +262,7 @@ def login():
         except:
             flash("Failed to log in, either your email or password were incorrect, please try again", "fail")
             print("login failed.")
-            return render_template('login.html', stockNames = session['stockNames'])
+            return render_template('login.html')
             
     else:
         print("Landing on page")

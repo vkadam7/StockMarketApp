@@ -204,34 +204,30 @@ def test_updateProfile_fail_missingUserName():
     assert testupdateProfile.status_code == 200
     
 #Login test case- Viraj Kadam
-#Status Code = 200: If user login test is successful, the user will be redirected to the profile page
-#Status Code = 500: If user login test has failed, then the user will remain on the login page
+#Fixed by Muneeb Khan
+#Status Code = 302: If user login test is successful, the user will be redirected to the profile page
+#Status Code = 200: If user login test has failed, then the user will remain on the login page
     
 def test_login_successful():
-    user = {
-        "email": "pytest3@gmail.com",
-        "password": "ABCDEG4$3"
-    }
+    user = {"email": "muneebfkhan93@gmail.com",
+    "password": "ABCDEF2@"}
     testLogin = app.test_client().post("/login", data = user)
-    assert testLogin.status_code == 200
+    assert testLogin.status_code == 302
    
 
 def test_login_failure_invalidEmail():
-    user = {
-        "email": " ", 
-        "password": "ABCDEG4$3"
-    }
+    user = {"email" : "invalidEmail@gmail.com", 
+    "password" : "ABCDEG4$3"}
     testLogin = app.test_client().post("/login", data = user)
-    assert testLogin.status_code == 500
+    assert testLogin.status_code == 200
     
     
-def test_login_failure_invalidPassword(client):
-    user = {
-        "email": "pytest3@gmail.com",
-        "password": " "
-    }
+def test_login_failure_invalidPassword():
+    user = {"email": "muneebfkhan93@gmail.com",
+    "password": "invalidPassword"}
     testLogin = app.test_client().post("/login", data = user)
-    assert testLogin.status_code == 500
+    assert testLogin.status_code == 200
+
 def test_stockSearch_successful(client):
     with app.test_client() as client:
         with client.session_transaction() as session:
