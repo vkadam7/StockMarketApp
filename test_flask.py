@@ -1,20 +1,15 @@
 import pytest
 from main import app, register, login
 from asyncio.windows_events import NULL
-#from crypt import methods
-#from crypt import methods
-#from re import T
 from datetime import datetime
 import math
 from operator import itemgetter, mod
 import re
 from statistics import mean
 from datetime import timedelta
-#from django.shortcuts import render
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
 import firebase_admin
-
 from stockSim import Quiz, SimulationFactory, StockData, User, Order, Simulation, Portfolio
 from followers import FollowUnfollow, UserInfo
 from firebase_admin import firestore
@@ -204,8 +199,6 @@ def test_updateProfile_fail_missingUserName():
     "experience" : "Test Update eperience"}
     testupdateProfile = app.test_client().post("/update", data = user)
     assert testupdateProfile.status_code == 200
-
-    assert testlogout.status_code == 302 # Redirect user to login page code 302
     
 #Login test case- Viraj Kadam
 #Status Code = 200: If user login test is successful, the user will be redirected to the profile page
