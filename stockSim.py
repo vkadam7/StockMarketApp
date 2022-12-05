@@ -904,7 +904,7 @@ class SimulationFactory:
     #
     #   Author: Ian McNulty
     def existenceCheck(db, user):
-        array = [entry for entry in db.collection('Simulations').where('ongoing','==',user).where('user','==',email).stream()]
+        array = [entry for entry in db.collection('Simulations').where('ongoing','==',user).where('user','==',user).stream()]
         if len(array) == 0:
             return False, "None"
         else:
