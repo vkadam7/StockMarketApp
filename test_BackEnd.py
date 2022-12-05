@@ -169,3 +169,20 @@ def test_StockSimFinish():
         testArr.append(entry.to_dict())
     assert len(testArr) == 0
     dbfire.collection('Simulations').document(sim.simName).delete()
+
+def test_getPortfolioValues():
+    testEmail = "go8940@wayne.edu"
+    testTicker = "GOOG"
+    dbfire = firestore.client()
+    sim = SimulationFactory(dbfire, testEmail)
+    sim = sim.simulation
+    Simulation.getPortfolioValue(dbfire, sim.simName)
+    portfolioValue = Simulation.getPortfolioValue(dbfire, sim.simName)
+    currentPrice = "%.2f" % round(SimulationFactory(dbfire, testEmail).simulation.currentPriceOf(testTicker), 2)
+    order = Order(dbfire, sim.simName, testTicker, 'Buy', 5, currentPrice)
+    order.buyOrder()
+    assert portfolioValue == 5*float(currentPrice)
+
+def test_quizSelection():
+    testEmail = "go8940@wayne.edu"
+    quiz = Quiz()

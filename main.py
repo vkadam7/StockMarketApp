@@ -1388,7 +1388,8 @@ def quiz2():
     else:
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
-
+    
+#Quiz 3 and 4 by Viraj Kadam
 @app.route("/quiz3", methods = ["POST", "GET"])
 def quiz3():
     if ('user' in session):
@@ -1452,6 +1453,7 @@ def quiz4():
         answers7 = [answers[6]]
         answers8 = [answers[7]]
         answers9 = [answers[8]]
+        
         
 
 
