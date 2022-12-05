@@ -25,6 +25,7 @@ import firebase_admin
 from firebase_admin import db
 
 # Testing landing response codes for frontend pages - Muneeb Khan
+# Successful landing of pages (code 200)
 def test_landing():
     testlanding = app.test_client().get("/")
     assert testlanding.status_code == 200
@@ -60,6 +61,9 @@ def test_register_success():
     "username" : "Pytest2"}
     testregister = app.test_client().post("/register", data = user)
     assert testregister.status_code == 302
+    dbfire = firestore.client()
+    dbfire.collection('Users').document(user).update({"TestUser" : "True"})
+
 
 
 def test_register_fail_usernameInUse():
@@ -135,8 +139,10 @@ def test_register_fail_blankPassword():
     assert testregister.status_code == 200
 
 # Testing Password Recovery with valid, invalid, and missing emails - Muneeb Khan
+# Successful Email entry will redirect the user to login page (code 302)
+# If unsuccessful however will keep the user on recovery page (code 200)
 def test_passwordRecovery_success():
-    user = {"email" : "muneebfkhan93@gmail.com"}
+    user = {"email" : "pytest1@gmail.com"}
     testPasswordRecovery = app.test_client().post("/PasswordRecovery", data = user)
     assert testPasswordRecovery.status_code == 302
 
@@ -151,6 +157,7 @@ def test_passwordRecovery_fail_missingEmail():
     assert testPasswordRecovery.status_code == 200
 
 # Logout test - Muneeb Khan
+# A successful logout will redirect the user to login page (code 302)
 def test_logout():
     with app.test_client() as client:
         with client.session_transaction() as session:
@@ -159,6 +166,8 @@ def test_logout():
     assert testlogout.status_code == 302
 
 # Update Profile tests with validations - Muneeb Khan
+# Succuessful profile update will redirect the user to profile page (code 302)
+# Failed profile update will keep user on update page (code 200)
 def test_updateProfile_success():
     with app.test_client() as client:
         with client.session_transaction() as session:
