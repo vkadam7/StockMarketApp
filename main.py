@@ -1293,7 +1293,6 @@ def quizSubmit():
 
 
 # Quiz page route by Muneeb Khan
-# Updated by Muneeb & Viraj
 @app.route('/quiz', methods =['GET','POST'])
 def quizpage():
     if ('user' in session):
@@ -1340,7 +1339,7 @@ def quizpage():
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
 
-
+#Quiz 2 page route by Muneeb and Viraj
 @app.route("/quiz2", methods = ["POST", "GET"])
 def quiz2():
     if ('user' in session):
