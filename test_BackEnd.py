@@ -1,16 +1,14 @@
 import pytest
 from main import app, register, login
 from asyncio.windows_events import NULL
-#from crypt import methods
-#from crypt import methods
-#from re import T
+
 from datetime import datetime
 import math
 from operator import itemgetter, mod
 import re
 from statistics import mean
 from datetime import timedelta
-#from django.shortcuts import render
+
 from flask import Flask, abort, flash, session, render_template, request, redirect, url_for
 import pyrebase
 import firebase_admin
