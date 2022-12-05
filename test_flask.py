@@ -147,7 +147,7 @@ def test_passwordRecovery_success():
     assert testPasswordRecovery.status_code == 302
 
 def test_passwordRecovery_fail_invalidEmail():
-    user = {"email" : "muneebfkhan94@gmail.com"}
+    user = {"email" : "fakeEmail@gmail.com"}
     testPasswordRecovery = app.test_client().post("/PasswordRecovery", data = user)
     assert testPasswordRecovery.status_code == 200
 
@@ -173,8 +173,8 @@ def test_updateProfile_success():
         with client.session_transaction() as session:
             session['user'] = 'muneebfkhan93@gmail.com'
 
-    user = {"Unames" : "Muneeb Test1",
-    "experience" : "Experience test1"}
+    user = {"Unames" : "MuneebTestName",
+    "experience" : "Experience test update"}
     testupdateProfile = client.post("/update", data = user)
     assert testupdateProfile.status_code == 302
 
