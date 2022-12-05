@@ -234,10 +234,15 @@ def test_login_failure_invalidPassword(client):
         "email": "pytest3@gmail.com",
         "password": " "
     }
+    testLogin = app.test_client().post("/login", data = user)
+    assert testLogin.status_code == 500
 def test_stockSearch_successful(client):
-    testEmail  = "go8940@wayne.edu"
-    testTicker = "GOOG"
-
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = "go8940@wayne.edu"
+            session['stockNames'] = "Ford"
+        testUser = client.post("/stockSearch", data = session['stockNames'])
+        assert testUser.status_code == 302
 #Author: Viraj Kadam
 #Test cases for follow and unfollow functions
 
@@ -255,8 +260,11 @@ def test_Follow_successful():
         assert testUser.status_code == 302
 
 def test_Unfollow_successful():
-    testUser = client.post("/unfollow", data = {"userName": "viraj1"})
-    assert testUser.status_code == 200
+     with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = "go8940@wayne.edu"
+        testUser = client.post("/unfollow", data = {"userName" : "viraj1"})
+        assert testUser.status_code == 302
 
 #Social System test cases
 def test_blog_post():
