@@ -622,6 +622,15 @@ def update():
                             if(match == originalName):
                                 dbfire.collection('Users').document(ColID).update({'FollowerNames': firestore.ArrayRemove([originalName])})
                                 dbfire.collection('Users').document(ColID).update({'FollowerNames': firestore.ArrayUnion([newUsername])})
+                    
+                    userFollowingList = dbfire.collection('Users').stream()
+                    for docs in userFollowingList:
+                        newId = docs.id
+                        userFollowingList = docs.to_dict()
+                        for match in userFollowingList['FollowingNames']:
+                            if(match == originalName):
+                                dbfire.collection('Users').document(newId).update({'FollowingNames': firestore.ArrayRemove([originalName])})
+                                dbfire.collection('Users').document(newId).update({'FollowingNames': firestore.ArrayUnion([newUsername])})
                                 
                     dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "experience": experience})
                     #dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "Email": newEmail, "experience": experience})
