@@ -556,6 +556,8 @@ def update():
                 for docs in checkName:
                     updatesInfo = docs.id
                     checkName = docs.to_dict()
+                    originalName = checkName['userName']
+                    print(originalName)
 
                 # For loop to check all documents on Firebase if the username is already in use by any other user - Muneeb Khan
                 checkNames = dbfire.collection('Users').document(newUsername).get()
@@ -583,16 +585,27 @@ def update():
 
                 # Update the username and experience based on user input
                 else:
+                    userPost = dbfire.collection('Blog').stream()
+                    for docs in userPost:
+                        key = docs.id
+                        userPost = docs.to_dict()
+                        if(userPost['Author'] == originalName):
+                            dbfire.collection('Blog').document(key).update({"Author": newUsername})
+
+                    userLB = dbfire.collection('Leaderboard').stream()
+                    for docs in userLB:
+                        key1 = docs.id
+                        userLB = docs.to_dict()
+                        if(userLB['username'] == originalName):
+                            dbfire.collection('Blog').document(key1).update({"username": newUsername})
+                                
                     dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "experience": experience})
                     #dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "Email": newEmail, "experience": experience})
                     print("Account details updated")
                     flash("Account details updated", "pass")
-
                     return redirect(url_for("profile"))
         else:
-            return render_template('update.html')
-
-          
+            return render_template('update.html')       
     return render_template('update.html')   
 #Logout
 # After user logs out session is ended and user is taken to login page
