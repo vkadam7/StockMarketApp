@@ -210,6 +210,7 @@ def Leaderboard():
 
 
 # Followers and Following lists functions updated by Viraj and Muneeb
+# Description: If a user in session follows another person who is registered, their username will appear in 
 @app.route("/followers")
 def followList():
     if ('user' in session):
