@@ -548,15 +548,26 @@ def update():
             experience = results["experience"]
             goodName = newUsername
 
-            # Check if user left the username update field blank - Muneeb Khan
-            if (newUsername == ""):
-                print("Please enter a new username")
-                flash("Please choose a new username", "pass")
-                return render_template('update.html')
+            # Check if user left both fields blank - Muneeb Khan
+            if (newUsername == "" and experience == ""):
+                print("No changes were made to profile")
+                flash("No changes were made to profile")
+                return redirect(url_for('profile'))
+
+            # If user left username field blank then just update experience - Muneeb Khan
+            elif (newUsername == ""):
+                updateExp = dbfire.collection('Users').where('Email','==',session['user']).get()
+                for docs in updateExp:
+                    updates = docs.id
+                    updateExp = docs.to_dict()
+                dbfire.collection('Users').document(updates).update({"experience": experience})
+                print("Account details updated")
+                flash("Account details updated")
+                return redirect(url_for('profile'))
 
             # Otherwise procced with the update
             else:
-                # For loop to check if User is already using the new username - Muneeb Khan
+                # For loop to update the Users information - Muneeb Khan
                 checkName = dbfire.collection('Users').where('Email','==',session['user']).get()
                 for docs in checkName:
                     updatesInfo = docs.id
