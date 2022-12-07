@@ -536,7 +536,7 @@ def PasswordRecovery():
     return render_template("PasswordRecovery.html")   
 
 #Author: Viraj Kadam
-#Updated by Viraj and Muneeb
+#Updated by Viraj, Muneeb, & Miqdad
 #Description: Allows the user to update their username and add a small description about themselves
 ##Updated usernames will replace the old username in the profile page, leaderboard, blog, and following/follower list
 @app.route('/update', methods = ["POST", "GET"])
@@ -568,7 +568,7 @@ def update():
 
             # Otherwise procced with the update
             else:
-                # For loop to update the Users information - Muneeb Khan
+                # For loop to update the Users information - Muneeb and Miqdad
                 checkName = dbfire.collection('Users').where('Email','==',session['user']).get()
                 for docs in checkName:
                     updatesInfo = docs.id
@@ -604,6 +604,7 @@ def update():
 
                 # Update the username and experience based on user input
                 else:
+                    # Updated by Miqdad and Viraj
                     userPost = dbfire.collection('Blog').stream()
                     for docs in userPost:
                         key = docs.id
