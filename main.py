@@ -212,14 +212,15 @@ def Leaderboard():
 
 
 # Followers and Following lists functions updated by Viraj and Muneeb
-# Description: If a user in session follows another person who is registered, their username will appear in 
+# Description: If a user in session follows another person who is registered.
+## The usernames will be retrieved from the database and inserted into the respective tables
 @app.route("/followers")
 def followList():
     if ('user' in session):
         followersList = []
         for entry in dbfire.collection('Users').where('Email','==',session['user']).stream():
             temp = entry.to_dict()
-            followersList.extend(temp['FollowerNames'])
+            followersList.extend(temp['FollowerNames']) #Retrieves usernames from "FollowerNames" array in Firestore
         splitNames = [item.split(',') for item in followersList]
         print(splitNames)
         return render_template('followers.html',splitNames = splitNames, stockNames = session['stockNames'])
@@ -232,7 +233,7 @@ def followingList():
         followingList= []
         for name in dbfire.collection('Users').where('Email', '==', session['user']).stream():
             temp = name.to_dict()
-            followingList.extend(temp['FollowingNames'])
+            followingList.extend(temp['FollowingNames']) #Retrieves usernames from "FollowingNames" array in Firestore
         names = [item.split(',') for item in followingList]
         print(names)
         return render_template('followingList.html', names = names, stockNames = session['stockNames'])
@@ -407,8 +408,8 @@ def unfollow():
             key1 = doc1.id
         myself = doc1.to_dict()
         print(key1 + " key1")
-        me = dbfire.collection('Users').document(key1).update({'Following': firestore.Increment(-1)})
-        myself2 = dbfire.collection('Users').document(key1).update({'FollowingNames': firestore.ArrayRemove([userNamed])})
+        me = dbfire.collection('Users').document(key1).update({'Following': firestore.Increment(-1)}) #Decreases following count 
+        myself2 = dbfire.collection('Users').document(key1).update({'FollowingNames': firestore.ArrayRemove([userNamed])}) #Removes username from "FollowingNames" list
         
         followArray = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for f in followArray:
