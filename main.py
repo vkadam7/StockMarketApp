@@ -597,7 +597,7 @@ def update():
                         key1 = docs.id
                         userLB = docs.to_dict()
                         if(userLB['username'] == originalName):
-                            dbfire.collection('Blog').document(key1).update({"username": newUsername})
+                            dbfire.collection('Leaderboard').document(key1).update({"username": newUsername})
                                 
                     dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "experience": experience})
                     #dbfire.collection('Users').document(updatesInfo).update({"userName": newUsername, "Email": newEmail, "experience": experience})
