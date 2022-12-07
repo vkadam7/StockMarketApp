@@ -118,8 +118,9 @@
 
 <body>
     
+  <br><br>
     <section>
-        <div class = "container py-5 h-100 w-75">
+        <div class = "container py-2 h-100 w-75">
             <div class = "row d-flex justify-content-center align-items-center h-100">
                 <div class = "col col-md-9 col-lg-7 col-xl-5d-flex">
                     <div class = "card" style = "border-radius: 15px;">
@@ -127,7 +128,7 @@
                             <div class = "d-flex text-black">
                                 <div class = "flex-grow-1 ms-3">
                                     
-                                    <h5 class = "mb-1"> {{userResult['Name']}}</h5>
+                                    <h5 class = "mb-1"> {{userResult['userName']}}</h5>
                                     <div class = "d-flex justify-content-center rounded-3 p-2 mb-2" style="background-color: #efefef; margin-left: 5px;">
                                         <div class = "px-3">
                                             <p class = "small text-muted mb-1">Followers  </p>
@@ -137,12 +138,6 @@
                                             <p class = "small text-muted mb-1">Following</p>
                                             <p class = "mb-0">{{userResult['Following']}}</p>
                                         </div>
-                                        <div class = "px-3">
-                                            <p class = "small text-muted mb-1">User Name</p>
-                                            <p class = "mb-0">{{userResult['userName']}}</p>
-                                        </div>
-                                        
-                                    
                                     </div>
                                     {% if matching == True %}
                                     <div class = "d-flex justify-content-end">
