@@ -558,6 +558,8 @@ def update():
                     updatesInfo = docs.id
                     checkName = docs.to_dict()
                     originalName = checkName['userName']
+                    if(newUsername == ""):
+                        newUsername = originalName
                     print(originalName)
 
                 # For loop to check all documents on Firebase if the username is already in use by any other user - Muneeb Khan
@@ -598,6 +600,18 @@ def update():
                         key1 = docs.id
                         userLB = docs.to_dict()
                         if(userLB['username'] == originalName):
+                            dbfire.collection('Leaderboard').document(key1).update({"username": newUsername})
+
+                    userFollowing = dbfire.collection('Users').stream()
+                    for docus in userFollowing:
+                        ColID = docus.id
+                        userFollowings = docus.to_dict()
+                        userFList = userFollowings
+                        for match in userFList['FollowerNames']:
+                            if(match == originalName):
+                                dbfire.collection('Users').document(ColID).update({'FollowerNames': firestore.ArrayRemove([originalName])})
+                                dbfire.collection('Users').document(ColID).update({'FollowerNames': firestore.ArrayUnion([newUsername])})
+                                
                             dbfire.collection('Blog').document(key1).update({"username": newUsername})
                     
                     userFollowing = dbfire.collection('Users').stream()
