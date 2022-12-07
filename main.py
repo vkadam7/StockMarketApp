@@ -826,7 +826,7 @@ def goToSimulation():
                         currentPrices.append("$%.2f" % round(currentPrice, 2))
                         totalValue.append("$%.2f" % round(portfolio.quantity*currentPrice, 2))
                         originalValue.append("$%.2f" % round(portfolio.avgSharePrice*portfolio.quantity, 2))
-                        profits.append("%.2f" % round((portfolio.quantity*currentPrice) - (portfolio.avgSharePrice*portfolio.quantity), 2))
+                        profits.append("%.2f" % round(round(portfolio.quantity*currentPrice, 2) - round(portfolio.avgSharePrice*portfolio.quantity, 2), 2))
                         profit += (portfolio.quantity*currentPrice) - (portfolio.avgSharePrice*portfolio.quantity)
                         percent = portfolio.quantity*currentPrice / (currentCash+sharesValue) * 100
                         percentageTotal += percent
@@ -835,8 +835,9 @@ def goToSimulation():
                         links.append(portfolio.link)
                         buyLink.append(portfolio.buyForm)
                         sellLink.append(portfolio.sellForm)
-                session['currentChange'] = "%.2f" % round(profit, 2)
+                session['currentChange'] = "%.2f" % round(profit + currentCash + sharesValue - float(session['initialCash']), 2)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
+                session['portfolioValue'] = "%.2f" % round(currentCash + sharesValue + profit, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
 

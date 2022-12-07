@@ -1270,7 +1270,7 @@ class Order:
             }
             db.collection('Orders').document(orderName).set(data)
             db.collection('Orders').document(orderID).update({'sold' : True, 'newQuantity' : 0})
-            Simulation.updateCash(db, simName, doc['totalPrice'])
+            Simulation.updateCash(db, simName, float(doc['newQuantity']) * avgStockPrice)
             return 1
 
     ## Order.orderList
