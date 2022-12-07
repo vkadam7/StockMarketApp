@@ -48,6 +48,8 @@ def sessionFlagCheck(loginFlag, simFlag):
     print("simulationFlag is: " + str(simFlag))
 
 #Author: Miqdad Hafiz and Viraj Kadam
+#Description: The profile page will retrieve information from our databases, and display the information in each of the respective cards 
+## on the profile page
 @app.route("/profile")
 def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
@@ -534,6 +536,8 @@ def PasswordRecovery():
 
 #Author: Viraj Kadam
 #Updated by Viraj and Muneeb
+#Description: Allows the user to update their username and add a small description about themselves
+##Updated usernames will replace the old username in the profile page, leaderboard, blog, and following/follower list
 @app.route('/update', methods = ["POST", "GET"])
 def update():
     if 'user' in session:
@@ -875,6 +879,7 @@ def orderFormFill():
 
 #Author: Viraj Kadam
 #Description: Buy and sell buttons for portfolio table
+##Buy and sell links will take the user to the order forms for the respective stocks
 @app.route("/buyOrder")
 def buyRoute():
     if 'user' in session:
@@ -1267,7 +1272,7 @@ def fourOhFour():
     
 
 ## Route for Quiz selection page - Muneeb Khan
-## Minor Fixes from Viraj
+## Minor updates from Viraj
 @app.route("/quizselection")
 def quizselection():
     if('user' in session): 
@@ -1292,7 +1297,7 @@ def quizselection():
 
 # Submission check route for Quiz by Ian Mcnulty
 # Updates by Muneeb and Ian
-# Minor fix from Viraj
+# Minor fixes from Viraj
 @app.route('/quizSubmit', methods = ['GET', 'POST'])
 def quizSubmit():
     quiz = Quiz(dbfire,session['quiz'],session['user'])
@@ -1439,8 +1444,9 @@ def quiz2():
     else:
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
-    
-#Quiz 3 and 4 by Viraj Kadam
+ 
+#Viraj Kadam   
+#Quiz 3 route
 @app.route("/quiz3", methods = ["POST", "GET"])
 def quiz3():
     if ('user' in session):
@@ -1487,7 +1493,10 @@ def quiz3():
     else:
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
-    
+
+
+#Viraj Kadam
+#Quiz 4 route   
 @app.route("/quiz4", methods = ["POST", "GET"])
 def quiz4():
     if ('user' in session):
