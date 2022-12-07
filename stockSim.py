@@ -904,7 +904,7 @@ class SimulationFactory:
     #
     #   Author: Ian McNulty
     def existenceCheck(db, user):
-        array = [entry for entry in db.collection('Simulations').where('ongoing','==',user).where('user','==',user).stream()]
+        array = [entry for entry in db.collection('Simulations').where('ongoing','==',True).where('user','==',user).stream()]
         if len(array) == 0:
             return False, "None"
         else:
@@ -1331,7 +1331,7 @@ class Portfolio:
         self.stock = stock
         self.user = user
         self.simName = simName 
-        self.link = str('/displayStock?ticker='+stock+'&timespan=hourly')
+        self.link = str('/displayStock?ticker='+stock+'&timespan=hourly&startDate=')
         self.profit, self.avgSharePrice, self.quantity = self.getVariables()
         self.volatility = 0
         self.buyForm = str('/buyOrder?ticker='+stock)

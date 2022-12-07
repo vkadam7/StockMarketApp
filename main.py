@@ -750,7 +750,6 @@ def goToSimulation():
                 session['currentCash'] = "%.2f" % round(currentCash,2)
                 session['sharesValue'] = "%.2f" % round(sharesValue,2)
                 session['portfolioValue'] = "%.2f" % round(currentCash + sharesValue, 2)
-                session['currentChange'] = "%.2f" % round(currentCash + sharesValue - float(session['initialCash']), 2)
                 tickers = []
                 quantities = []
                 profits = []
@@ -764,10 +763,10 @@ def goToSimulation():
                 buyLink = []
                 sellLink = []
                 
+                profit = 0
                 percentageTotal = 0
                 for entry in Order.stocksBought(dbfire, session['simName']):
                     portfolio = Portfolio(dbfire, entry, session['user'], session['simName'])
-                    #order = Order.sellTaxLot(dbfire, session['user'], session['simName'], session['orderID'])
                     if portfolio.quantity != 0:
                         currentPrice = SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(entry)
                         tickers.append(entry)
@@ -777,6 +776,7 @@ def goToSimulation():
                         totalValue.append("$%.2f" % round(portfolio.quantity*currentPrice, 2))
                         originalValue.append("$%.2f" % round(portfolio.avgSharePrice*portfolio.quantity, 2))
                         profits.append("%.2f" % round((portfolio.quantity*currentPrice) - (portfolio.avgSharePrice*portfolio.quantity), 2))
+                        profit += (portfolio.quantity*currentPrice) - (portfolio.avgSharePrice*portfolio.quantity)
                         percent = portfolio.quantity*currentPrice / (currentCash+sharesValue) * 100
                         percentageTotal += percent
                         percentage.append("%.2f" % round(percent, 2))
@@ -784,6 +784,7 @@ def goToSimulation():
                         links.append(portfolio.link)
                         buyLink.append(portfolio.buyForm)
                         sellLink.append(portfolio.sellForm)
+                session['currentChange'] = "%.2f" % round(profit, 2)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
