@@ -75,7 +75,7 @@ def profile():
         #    endDate = endDateFetch[0]
         
     
-        for i in range(1,4):
+        for i in range(1,5):
             if quizGrab.get('QuizScoreQuiz'+str(i)) != None:
                 session['QuizScore' + str(i)] = quizGrab['QuizScoreQuiz'+str(i)]
             else:
