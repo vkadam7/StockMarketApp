@@ -1344,10 +1344,24 @@ def quizSubmit():
             if str(i) in session['quiz']:
                 index = 'QuizScore' + str(i)
                 session[index] = str(score*10) + "%"
-        flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
-        " You are now ready to invest, please click the start simulation button above to start investing." +
-        "Correct answers were: " + "1 B " + "2 A " + "3 B " + "4 A " + "5 C " + "6 C " + "7 A " +
-        "8 C " + "9 B " + "10 A ")
+
+        if (session['quiz'] == 'Quiz1'):
+            flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
+            " You are now ready to invest, please click the start simulation button above to start investing." +
+            "Correct answers were: " + "1 B " + "2 A " + "3 B " + "4 A " + "5 C " + "6 C " + "7 A " +
+            "8 C " + "9 B " + "10 A ")
+
+        elif (session['quiz'] == 'Quiz2'):
+            flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
+            " You are now ready to invest, please click the start simulation button above to start investing." +
+            "Correct answers were: " + "1 A " + "2 C " + "3 C " + "4 A " + "5 B " + "6 B " + "7 A " +
+            "8 C " + "9 E " + "10 D ")
+
+        elif (session['quiz'] == 'Quiz4'):
+            flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
+            " You are now ready to invest, please click the start simulation button above to start investing." +
+            "Correct answers were: " + "1 A " + "2 C " + "3 A " + "4 D " + "5 B " + "6 A " + "7 C " +
+            "8 C " + "9 B " + "10 A ")
 
         return redirect(url_for('information', person = session['user']))
     else:
@@ -1361,11 +1375,25 @@ def quizSubmit():
             if str(i) in session['quiz']:
                 index = 'QuizScore' + str(i)
                 session[index] = str(score*10) + "%"
-        flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
-        " You need to score at least a 7/10 to pass. Please try again."  + 
-        "Correct answers were: " + "1 B " + "2 A " + "3 B " + "4 A " + "5 C " + "6 C " + "7 A " +
-        "8 C " + "9 B " + "10 A ")
-        
+
+        if (session['quiz'] == 'Quiz1'):
+            flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
+            " You need to score at least a 7/10 to pass. Please try again."  + 
+            "Correct answers were: " + "1 B " + "2 A " + "3 B " + "4 A " + "5 C " + "6 C " + "7 A " +
+            "8 C " + "9 B " + "10 A ")
+
+        elif (session['quiz'] == 'Quiz2'):
+            flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
+            " You need to score at least a 7/10 to pass. Please try again."  + 
+            "Correct answers were: " + "1 A " + "2 C " + "3 C " + "4 A " + "5 B " + "6 B " + "7 A " +
+            "8 C " + "9 E " + "10 D ")
+
+        elif (session['quiz'] == 'Quiz4'):
+            flash("Sorry! You did not pass the Quiz, your score was " + str(score) + "/10," + 
+            " You need to score at least a 7/10 to pass. Please try again."  + 
+            "Correct answers were: " + "1 A " + "2 C " + "3 A " + "4 C " + "5 B " + "6 A " + "7 C " +
+            "8 C " + "9 B " + "10 A ")
+
         return redirect(url_for('information', person = session['user']))
 
 
