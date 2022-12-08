@@ -648,12 +648,15 @@ class Simulation:
 
         if(size == 0 ):
             db.collection('Leaderboard').add({"email":grabDataEmail, "score":scoreRounded, "username":grabUserName})
+            print("Creating leadboard doc.")
         else:
             for docs in checkUser:
                 docID = docs.id
-                oldScore = docs['score']
+                checkUser = docs.to_dict()
+                oldScore = checkUser['score']
             if(oldScore < scoreRounded):
                 db.collection('Leaderboard').document(docID).update({'score': scoreRounded})
+                print("Updating score.")
             
 
 

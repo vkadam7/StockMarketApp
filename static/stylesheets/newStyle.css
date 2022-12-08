@@ -103,6 +103,12 @@ footer{
   flex-direction: column;
   justify-content: space-between;
 }
+.flex-wrapperLB {
+  display: flex;
+  min-height: 65vh;
+  flex-direction: column;
+  justify-content: space-between;
+}
 
 /*
 .login{
