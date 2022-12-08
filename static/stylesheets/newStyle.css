@@ -20,6 +20,9 @@ h5 a{
 body {
   background-color: white;
   color:black;
+  display: flex;
+  flex-direction: column;
+  
 }
 
 h1{
@@ -93,6 +96,18 @@ h3{
 footer{
   text-align:center;
   color:white;
+}
+.flex-wrapper {
+  display: flex;
+  min-height: 45vh;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.flex-wrapperLB {
+  display: flex;
+  min-height: 65vh;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 /*

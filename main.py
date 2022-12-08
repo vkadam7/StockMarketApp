@@ -889,6 +889,8 @@ def orderFormFill():
     else:
         session['optionType'] = 1
     session['currentPrice'] = request.form['currentPrice']
+    if session['currentPrice'] == '':
+        session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
     session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
     return render_template('orderForm.html', option=session['option'], stockNames = session['stockNames'])
 
