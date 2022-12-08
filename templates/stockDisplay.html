@@ -117,13 +117,15 @@
     <body>
       <br><br><br>
         <div class="stockDisplay">
-            <h1>{{ stock['ticker'] }} - {{ stock['name'] }} - ${{session['currentPrice']}}</h1>
-            <h3>Headquarters: {{ stock['headquarters'] }}</h3>
-            <h3>Listed at: {{ stock['listedAt'] }}</h3>
+            <h1 id="companyTitles">{{ session['ticker'] }} - {{ session['name'] }} - ${{session['currentPrice']}}</h1>
+            <h3>Headquarters: {{ session['headquarters'] }}</h3>
+            <h3>Listed at: {{ session['listedAt'] }}</h3>
             <canvas id="stockChart" width="200" height="50"></canvas>        
             
-            <script>
-                var ctx = document.getElementById("stockChart").getContext("2d");
+            <script type="text/javascript">
+                const ctx = document.getElementById("stockChart").getContext("2d");
+
+                var avgsTemp = {{ avgs | safe }};
                 var stockChart = new Chart(ctx, {
                     type: "line",
                     data: {
@@ -137,9 +139,47 @@
                         }]
                     },
                     options: {
-                        display: true
+                        display: true,
+                        animation: {
+                          duration: 0
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: ({{min}}) - ({{min}}) / 10,
+                                    suggestedMax: ({{max}}) + ({{max}}) / 10
+                                    //suggestedMin: 0,
+                                    //suggestedMax: 20
+                                }
+                            }]
+                        }
                     }
                 });
+
+                setInterval(intervalFunction, 1000, stockChart);
+
+                function intervalFunction(chart){
+
+                        var avgsTemp = {{ avgs | safe }};
+                        var tempChange = avgsTemp[avgsTemp.length - 1] + Math.random() * (Math.random() * 2 - 1);
+                        avgsTemp[avgsTemp.length - 1] = tempChange;
+                        ctx.clearRect(0, 0, document.getElementById("stockChart").width, document.getElementById("stockChart").height);
+                        chart.clear();
+                        chart.data.datasets = [{
+                          label: "Stock values",
+                            data: avgsTemp,
+                            fill: true,
+                            borderColor: "rgb(20, 100, 200)",
+                            lineTension: 0
+                        }];
+                        chart.update();
+                        index = document.getElementById('companyTitles').textContent.indexOf('$');
+                        tempText = document.getElementById('companyTitles').textContent.substring(0, index+1) + tempChange.toFixed(2);
+                      document.getElementById('companyTitles').textContent = tempText;
+                      //document.getElementById('companyTitles').textContent = "hi there";
+                    }
+
 
                 <!-- This function will reconfigure the graph settings based on selection from dropdown - Muneeb Khan -->
                 function changeStockChart(chartType2) {

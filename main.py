@@ -1059,6 +1059,10 @@ def displayStock():
             if timespan == 'hourly':
                 for entry in stockData:
                     stock = entry.to_dict()
+                    session['name'] = stock['name']
+                    session['headquarters'] = stock['headquarters']
+                    session['listedAt'] = stock['listedAt']
+                    name = stock['name']
                 if stock != -1:
                     session['currentYear'] = str(stock['dates'][final][0:4])
                     session['currentMonth'] = str(stock['dates'][final][5:7])
@@ -1071,7 +1075,7 @@ def displayStock():
                         if i % 6 == 1:
                             prices.append(mean(avgPrice))
                             dates.append(stock['dates'][i-1])
-                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'], name=name, ticker=ticker, min=min(prices), max=max(prices))
             elif timespan == 'daily' or timespan == 'weekly' or timespan == 'monthly':
                 if timespan == 'daily':
                     mod = 40
@@ -1080,6 +1084,10 @@ def displayStock():
                     BasisMod = 7
                 for entry in stockData:
                     stock = entry.to_dict()
+                    session['name'] = stock['name']
+                    session['headquarters'] = stock['headquarters']
+                    session['listedAt'] = stock['listedAt']
+                    name = stock['name']
                 if stock != -1:
                     session['currentYear'] = str(stock['dates'][final][0:4])
                     session['currentMonth'] = str(stock['dates'][final][5:7])
@@ -1138,11 +1146,15 @@ def displayStock():
                         #    if int(stock['dates'][i][11:13]) == 9:
                         #        mod = 6
                     session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
-                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'])
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'], name=name, ticker=ticker, min=min(prices), max=max(prices))
 
             elif timespan == '1minute' or timespan == '5minute':
                 for entry in stockData:
                     stock = entry.to_dict()
+                    session['name'] = stock['name']
+                    session['headquarters'] = stock['headquarters']
+                    session['listedAt'] = stock['listedAt']
+                    name = stock['name']
                 if stock != -1:
                     session['currentYear'] = str(stock['dates'][final][0:4])
                     session['currentMonth'] = str(stock['dates'][final][5:7])
@@ -1150,19 +1162,6 @@ def displayStock():
                     dates = []
                     prices = []
                     for i in range(1, final):
-                        #if timespan == '5minute':
-                        #    tempInterp = np.interp(range(0,3),[0, 2],[stock['prices'][i-1], stock['prices'][i]])
-                        #    for element in tempInterp:
-                        #        element += (np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]]))/50
-                        #        prices.append(element)
-                        #    # 15 = index of minute
-                        #    tempDate1 = list(stock['dates'][i])
-                        #    for j in range(1,3):
-                        #        tempDate2 = tempDate1
-                        #        tempDate2[15] = str((j*5)%10)
-                        #        if i % 6 != 0:
-                        #            tempDate2 = tempDate2[11:19]
-                        #        dates.append("".join(tempDate2))
                         if timespan == '1minute':
                             tempInterp = np.interp(range(0,11),[0, 10],[stock['prices'][i-1], stock['prices'][i]])
                             for element in tempInterp:
@@ -1176,10 +1175,14 @@ def displayStock():
                                     tempDate2 = tempDate2[11:19]
                                 dates.append("".join(tempDate2))
                     session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
-                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'])
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'], name=name, ticker=ticker, min=min(prices), max=max(prices))
             else:
                 for entry in stockData:
                     stock = entry.to_dict()
+                    session['name'] = stock['name']
+                    session['headquarters'] = stock['headquarters']
+                    session['listedAt'] = stock['listedAt']
+                    name = stock['name']
                 if stock != -1:
                     session['currentYear'] = str(stock['dates'][final][0:4])
                     session['currentMonth'] = str(stock['dates'][final][5:7])
@@ -1190,7 +1193,7 @@ def displayStock():
                         dates.append(stock['dates'][i])
                         prices.append(stock['prices'][i])
                     session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
-                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'])
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'], name=name, ticker=ticker, min=min(prices), max=max(prices))
         else:
             return redirect(url_for('fourOhFour'))
     else:
