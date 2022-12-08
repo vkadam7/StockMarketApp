@@ -328,7 +328,8 @@ questions3 = [
     'answers' : {
         'a' : 'Dividend date',
         'b' : 'Ex-dividend date',
-        'c' : 'Dividend reinvestment date'
+        'c' : 'Dividend reinvestment date',
+        'd': 'Dividend expense'
     },
     'correct' : 'b'
 }, 
