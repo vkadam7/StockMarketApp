@@ -827,8 +827,9 @@ def goToSimulation():
                         currentPrices.append("$%.2f" % round(currentPrice, 2))
                         totalValue.append("$%.2f" % round(portfolio.quantity*currentPrice, 2))
                         originalValue.append("$%.2f" % round(portfolio.avgSharePrice*portfolio.quantity, 2))
-                        profits.append("%.2f" % round(round(portfolio.quantity*currentPrice, 2) - round(portfolio.avgSharePrice*portfolio.quantity, 2), 2))
-                        profit += (portfolio.quantity*currentPrice) - (portfolio.avgSharePrice*portfolio.quantity)
+                        profitTmp = round(portfolio.quantity*currentPrice, 2) - round(portfolio.avgSharePrice*portfolio.quantity, 2)
+                        profits.append("%.2f" % round(profitTmp, 2))
+                        profit += round(profitTmp, 2)
                         percent = portfolio.quantity*currentPrice / (currentCash+sharesValue) * 100
                         percentageTotal += percent
                         percentage.append("%.2f" % round(percent, 2))
@@ -836,9 +837,9 @@ def goToSimulation():
                         links.append(portfolio.link)
                         buyLink.append(portfolio.buyForm)
                         sellLink.append(portfolio.sellForm)
-                session['currentChange'] = "%.2f" % round(profit + currentCash + sharesValue - float(session['initialCash']), 2)
+                session['currentChange'] = "%.2f" % round(currentCash + sharesValue - float(session['initialCash']), 2)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
-                session['portfolioValue'] = "%.2f" % round(currentCash + sharesValue + profit, 2)
+                session['portfolioValue'] = "%.2f" % round(currentCash + sharesValue, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
 
@@ -887,7 +888,7 @@ def orderFormFill():
         session['optionType'] = 0
     else:
         session['optionType'] = 1
-    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
+    session['currentPrice'] = request.form['currentPrice']
     session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
     return render_template('orderForm.html', option=session['option'], stockNames = session['stockNames'])
 

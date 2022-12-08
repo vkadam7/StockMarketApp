@@ -115,9 +115,9 @@
           </nav>
     </header>
     <body>
-      <br><br><br>
+      <br><br>
         <div class="stockDisplay">
-            <h1 id="companyTitles">{{ session['ticker'] }} - {{ session['name'] }} - ${{session['currentPrice']}}</h1>
+           <h1 id="companyTitles" >{{ session['ticker'] }} - {{ session['name'] }} - ${{session['currentPrice']}}</h1>
             <h3>Headquarters: {{ session['headquarters'] }}</h3>
             <h3>Listed at: {{ session['listedAt'] }}</h3>
             <canvas id="stockChart" width="200" height="50"></canvas>        
@@ -157,7 +157,7 @@
                     }
                 });
 
-                setInterval(intervalFunction, 1000, stockChart);
+                setInterval(intervalFunction, 3000, stockChart);
 
                 function intervalFunction(chart){
 
@@ -177,6 +177,7 @@
                         index = document.getElementById('companyTitles').textContent.indexOf('$');
                         tempText = document.getElementById('companyTitles').textContent.substring(0, index+1) + tempChange.toFixed(2);
                       document.getElementById('companyTitles').textContent = tempText;
+                      document.getElementById('currentPrice').value = tempChange.toFixed(2);
                       //document.getElementById('companyTitles').textContent = "hi there";
                     }
 
@@ -276,6 +277,8 @@
         </script>
 
         <form action="/orderForm" method="post" style = "padding-left: 30px;">
+          <input id="currentPrice" name="currentPrice" value="{{request.form['currentPrice']}}" style="display: none;">
+
                 <button  class="btn btn btn-lg" name="option" value="Buy" style = "color:rgb(33, 103, 42);background-color:antiquewhite;">Buy</button>
                 <button  class="btn btn btn-lg" name="option" value="Sell" style = "color:rgb(33, 103, 42);background-color: antiquewhite;">Sell</button>
                 <script>
