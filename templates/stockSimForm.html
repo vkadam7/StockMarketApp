@@ -185,11 +185,15 @@
                 if (money.value.match(regexForString) != null) {
                   moneyFlag = false;
                   cashNotice.textContent = "Please enter a valid quantity.";
+                } else if (+(money.value) > 10000) {
+                  moneyFlag = false;
+                  cashNotice.textContent = "Please enter a value less than or equal to $10000."
                 } else if (money.value.match(regexForDecimal) != null) {
                   moneyFlag = false;
                   cashNotice.textContent = "Please enter a whole number.";
                 } 
-                if (+(money.value) > 0 && money.value.includes('.') == false) {
+                
+                if (+(money.value) > 0 && money.value.includes('.') == false && +(money.value) <= 10000) {
                   moneyFlag = true;
                   cashNotice.textContent = "";
                 }

@@ -48,6 +48,8 @@ def sessionFlagCheck(loginFlag, simFlag):
     print("simulationFlag is: " + str(simFlag))
 
 #Author: Miqdad Hafiz and Viraj Kadam
+#Description: The profile page will retrieve information from our databases, and display the information in each of the respective cards 
+## on the profile page
 @app.route("/profile")
 def profile():
     if('user' in session): #to check if the user is logged in will change to profile page
@@ -73,7 +75,7 @@ def profile():
         #    endDate = endDateFetch[0]
         
     
-        for i in range(1,4):
+        for i in range(1,5):
             if quizGrab.get('QuizScoreQuiz'+str(i)) != None:
                 session['QuizScore' + str(i)] = quizGrab['QuizScoreQuiz'+str(i)]
             else:
@@ -210,14 +212,15 @@ def Leaderboard():
 
 
 # Followers and Following lists functions updated by Viraj and Muneeb
-# Description: If a user in session follows another person who is registered, their username will appear in 
+# Description: If a user in session follows another person who is registered.
+## The usernames will be retrieved from the database and inserted into the respective tables
 @app.route("/followers")
 def followList():
     if ('user' in session):
         followersList = []
         for entry in dbfire.collection('Users').where('Email','==',session['user']).stream():
             temp = entry.to_dict()
-            followersList.extend(temp['FollowerNames'])
+            followersList.extend(temp['FollowerNames']) #Retrieves usernames from "FollowerNames" array in Firestore
         splitNames = [item.split(',') for item in followersList]
         print(splitNames)
         return render_template('followers.html',splitNames = splitNames, stockNames = session['stockNames'])
@@ -230,7 +233,7 @@ def followingList():
         followingList= []
         for name in dbfire.collection('Users').where('Email', '==', session['user']).stream():
             temp = name.to_dict()
-            followingList.extend(temp['FollowingNames'])
+            followingList.extend(temp['FollowingNames']) #Retrieves usernames from "FollowingNames" array in Firestore
         names = [item.split(',') for item in followingList]
         print(names)
         return render_template('followingList.html', names = names, stockNames = session['stockNames'])
@@ -405,8 +408,8 @@ def unfollow():
             key1 = doc1.id
         myself = doc1.to_dict()
         print(key1 + " key1")
-        me = dbfire.collection('Users').document(key1).update({'Following': firestore.Increment(-1)})
-        myself2 = dbfire.collection('Users').document(key1).update({'FollowingNames': firestore.ArrayRemove([userNamed])})
+        me = dbfire.collection('Users').document(key1).update({'Following': firestore.Increment(-1)}) #Decreases following count 
+        myself2 = dbfire.collection('Users').document(key1).update({'FollowingNames': firestore.ArrayRemove([userNamed])}) #Removes username from "FollowingNames" list
         
         followArray = dbfire.collection('Users').where('userName', '==', userNamed).get()
         for f in followArray:
@@ -533,7 +536,9 @@ def PasswordRecovery():
     return render_template("PasswordRecovery.html")   
 
 #Author: Viraj Kadam
-#Updated by Viraj and Muneeb
+#Updated by Viraj, Muneeb, & Miqdad
+#Description: Allows the user to update their username and add a small description about themselves
+##Updated usernames will replace the old username in the profile page, leaderboard, blog, and following/follower list
 @app.route('/update', methods = ["POST", "GET"])
 def update():
     if 'user' in session:
@@ -544,15 +549,26 @@ def update():
             experience = results["experience"]
             goodName = newUsername
 
-            # Check if user left the username update field blank - Muneeb Khan
-            if (newUsername == ""):
-                print("Please enter a new username")
-                flash("Please choose a new username", "pass")
-                return render_template('update.html')
+            # Check if user left both fields blank - Muneeb Khan
+            if (newUsername == "" and experience == ""):
+                print("No changes were made to profile")
+                flash("No changes were made to profile")
+                return redirect(url_for('profile'))
+
+            # If user left username field blank then just update experience - Muneeb Khan
+            elif (newUsername == ""):
+                updateExp = dbfire.collection('Users').where('Email','==',session['user']).get()
+                for docs in updateExp:
+                    updates = docs.id
+                    updateExp = docs.to_dict()
+                dbfire.collection('Users').document(updates).update({"experience": experience})
+                print("Account details updated")
+                flash("Account details updated")
+                return redirect(url_for('profile'))
 
             # Otherwise procced with the update
             else:
-                # For loop to check if User is already using the new username - Muneeb Khan
+                # For loop to update the Users information - Muneeb and Miqdad
                 checkName = dbfire.collection('Users').where('Email','==',session['user']).get()
                 for docs in checkName:
                     updatesInfo = docs.id
@@ -588,6 +604,7 @@ def update():
 
                 # Update the username and experience based on user input
                 else:
+                    # Updated by Miqdad and Viraj
                     userPost = dbfire.collection('Blog').stream()
                     for docs in userPost:
                         key = docs.id
@@ -611,6 +628,15 @@ def update():
                             if(match == originalName):
                                 dbfire.collection('Users').document(ColID).update({'FollowerNames': firestore.ArrayRemove([originalName])})
                                 dbfire.collection('Users').document(ColID).update({'FollowerNames': firestore.ArrayUnion([newUsername])})
+                    
+                    userFollowingList = dbfire.collection('Users').stream()
+                    for docs in userFollowingList:
+                        newId = docs.id
+                        userFollowingList = docs.to_dict()
+                        for match in userFollowingList['FollowingNames']:
+                            if(match == originalName):
+                                dbfire.collection('Users').document(newId).update({'FollowingNames': firestore.ArrayRemove([originalName])})
+                                dbfire.collection('Users').document(newId).update({'FollowingNames': firestore.ArrayUnion([newUsername])})
                                 
                             dbfire.collection('Blog').document(key1).update({"username": newUsername})
                     
@@ -812,8 +838,9 @@ def goToSimulation():
                         currentPrices.append("$%.2f" % round(currentPrice, 2))
                         totalValue.append("$%.2f" % round(portfolio.quantity*currentPrice, 2))
                         originalValue.append("$%.2f" % round(portfolio.avgSharePrice*portfolio.quantity, 2))
-                        profits.append("%.2f" % round((portfolio.quantity*currentPrice) - (portfolio.avgSharePrice*portfolio.quantity), 2))
-                        profit += (portfolio.quantity*currentPrice) - (portfolio.avgSharePrice*portfolio.quantity)
+                        profitTmp = round(portfolio.quantity*currentPrice, 2) - round(portfolio.avgSharePrice*portfolio.quantity, 2)
+                        profits.append("%.2f" % round(profitTmp, 2))
+                        profit += round(profitTmp, 2)
                         percent = portfolio.quantity*currentPrice / (currentCash+sharesValue) * 100
                         percentageTotal += percent
                         percentage.append("%.2f" % round(percent, 2))
@@ -821,8 +848,9 @@ def goToSimulation():
                         links.append(portfolio.link)
                         buyLink.append(portfolio.buyForm)
                         sellLink.append(portfolio.sellForm)
-                session['currentChange'] = "%.2f" % round(profit, 2)
+                session['currentChange'] = "%.2f" % round(currentCash + sharesValue - float(session['initialCash']), 2)
                 session['stockPercentage'] = "%.2f" % round(percentageTotal, 2)
+                session['portfolioValue'] = "%.2f" % round(currentCash + sharesValue, 2)
                 session['cashPercentage'] = "%.2f" % round(currentCash / (sharesValue + currentCash) * 100, 2)
                 session['percentGrowth'] = "%.2f" % round((currentCash + sharesValue - float(session['initialCash']))/float(session['initialCash']) * 100, 2)
 
@@ -871,12 +899,13 @@ def orderFormFill():
         session['optionType'] = 0
     else:
         session['optionType'] = 1
-    session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(session['ticker']), 2)
+    session['currentPrice'] = request.form['currentPrice']
     session['currentAmount'] = SimulationFactory(dbfire, session['user']).simulation.amountOwned(session['ticker'])
     return render_template('orderForm.html', option=session['option'], stockNames = session['stockNames'])
 
 #Author: Viraj Kadam
 #Description: Buy and sell buttons for portfolio table
+##Buy and sell links will take the user to the order forms for the respective stocks
 @app.route("/buyOrder")
 def buyRoute():
     if 'user' in session:
@@ -1042,6 +1071,10 @@ def displayStock():
             if timespan == 'hourly':
                 for entry in stockData:
                     stock = entry.to_dict()
+                    session['name'] = stock['name']
+                    session['headquarters'] = stock['headquarters']
+                    session['listedAt'] = stock['listedAt']
+                    name = stock['name']
                 if stock != -1:
                     session['currentYear'] = str(stock['dates'][final][0:4])
                     session['currentMonth'] = str(stock['dates'][final][5:7])
@@ -1054,7 +1087,7 @@ def displayStock():
                         if i % 6 == 1:
                             prices.append(mean(avgPrice))
                             dates.append(stock['dates'][i-1])
-                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices)
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'], name=name, ticker=ticker, min=min(prices), max=max(prices))
             elif timespan == 'daily' or timespan == 'weekly' or timespan == 'monthly':
                 if timespan == 'daily':
                     mod = 40
@@ -1063,6 +1096,10 @@ def displayStock():
                     BasisMod = 7
                 for entry in stockData:
                     stock = entry.to_dict()
+                    session['name'] = stock['name']
+                    session['headquarters'] = stock['headquarters']
+                    session['listedAt'] = stock['listedAt']
+                    name = stock['name']
                 if stock != -1:
                     session['currentYear'] = str(stock['dates'][final][0:4])
                     session['currentMonth'] = str(stock['dates'][final][5:7])
@@ -1121,11 +1158,15 @@ def displayStock():
                         #    if int(stock['dates'][i][11:13]) == 9:
                         #        mod = 6
                     session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
-                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'])
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'], name=name, ticker=ticker, min=min(prices), max=max(prices))
 
             elif timespan == '1minute' or timespan == '5minute':
                 for entry in stockData:
                     stock = entry.to_dict()
+                    session['name'] = stock['name']
+                    session['headquarters'] = stock['headquarters']
+                    session['listedAt'] = stock['listedAt']
+                    name = stock['name']
                 if stock != -1:
                     session['currentYear'] = str(stock['dates'][final][0:4])
                     session['currentMonth'] = str(stock['dates'][final][5:7])
@@ -1133,19 +1174,6 @@ def displayStock():
                     dates = []
                     prices = []
                     for i in range(1, final):
-                        #if timespan == '5minute':
-                        #    tempInterp = np.interp(range(0,3),[0, 2],[stock['prices'][i-1], stock['prices'][i]])
-                        #    for element in tempInterp:
-                        #        element += (np.random.randn() + np.std([stock['prices'][i-1], stock['prices'][i]]))/50
-                        #        prices.append(element)
-                        #    # 15 = index of minute
-                        #    tempDate1 = list(stock['dates'][i])
-                        #    for j in range(1,3):
-                        #        tempDate2 = tempDate1
-                        #        tempDate2[15] = str((j*5)%10)
-                        #        if i % 6 != 0:
-                        #            tempDate2 = tempDate2[11:19]
-                        #        dates.append("".join(tempDate2))
                         if timespan == '1minute':
                             tempInterp = np.interp(range(0,11),[0, 10],[stock['prices'][i-1], stock['prices'][i]])
                             for element in tempInterp:
@@ -1159,10 +1187,14 @@ def displayStock():
                                     tempDate2 = tempDate2[11:19]
                                 dates.append("".join(tempDate2))
                     session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
-                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'])
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'], name=name, ticker=ticker, min=min(prices), max=max(prices))
             else:
                 for entry in stockData:
                     stock = entry.to_dict()
+                    session['name'] = stock['name']
+                    session['headquarters'] = stock['headquarters']
+                    session['listedAt'] = stock['listedAt']
+                    name = stock['name']
                 if stock != -1:
                     session['currentYear'] = str(stock['dates'][final][0:4])
                     session['currentMonth'] = str(stock['dates'][final][5:7])
@@ -1173,7 +1205,7 @@ def displayStock():
                         dates.append(stock['dates'][i])
                         prices.append(stock['prices'][i])
                     session['currentPrice'] = "%.2f" % round(SimulationFactory(dbfire, session['user']).simulation.currentPriceOf(stock['ticker']), 2)
-                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'])
+                    return render_template('stockDisplay.html', stock=stock, dates=dates, avgs=prices, stockNames = session['stockNames'], name=name, ticker=ticker, min=min(prices), max=max(prices))
         else:
             return redirect(url_for('fourOhFour'))
     else:
@@ -1269,7 +1301,7 @@ def fourOhFour():
     
 
 ## Route for Quiz selection page - Muneeb Khan
-## Minor Fixes from Viraj
+## Minor updates from Viraj
 @app.route("/quizselection")
 def quizselection():
     if('user' in session): 
@@ -1294,7 +1326,7 @@ def quizselection():
 
 # Submission check route for Quiz by Ian Mcnulty
 # Updates by Muneeb and Ian
-# Minor fix from Viraj
+# Minor fixes from Viraj
 @app.route('/quizSubmit', methods = ['GET', 'POST'])
 def quizSubmit():
     quiz = Quiz(dbfire,session['quiz'],session['user'])
@@ -1441,8 +1473,9 @@ def quiz2():
     else:
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
-    
-#Quiz 3 and 4 by Viraj Kadam
+ 
+#Viraj Kadam   
+#Quiz 3 route
 @app.route("/quiz3", methods = ["POST", "GET"])
 def quiz3():
     if ('user' in session):
@@ -1489,7 +1522,10 @@ def quiz3():
     else:
         flash("Sorry you must be logged in to take the quiz.")
         return redirect(url_for("login"))
-    
+
+
+#Viraj Kadam
+#Quiz 4 route   
 @app.route("/quiz4", methods = ["POST", "GET"])
 def quiz4():
     if ('user' in session):
