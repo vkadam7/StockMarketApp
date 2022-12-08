@@ -157,7 +157,7 @@
                     }
                 });
 
-                setInterval(intervalFunction, 3000, stockChart);
+                setInterval(intervalFunction, 3000);
 
                 function intervalFunction(chart){
 
@@ -165,15 +165,15 @@
                         var tempChange = avgsTemp[avgsTemp.length - 1] + Math.random() * (Math.random() * 2 - 1);
                         avgsTemp[avgsTemp.length - 1] = tempChange;
                         ctx.clearRect(0, 0, document.getElementById("stockChart").width, document.getElementById("stockChart").height);
-                        chart.clear();
-                        chart.data.datasets = [{
+                        stockChart.clear();
+                        stockChart.data.datasets = [{
                           label: "Stock values",
                             data: avgsTemp,
                             fill: true,
                             borderColor: "rgb(20, 100, 200)",
                             lineTension: 0
                         }];
-                        chart.update();
+                        stockChart.update();
                         index = document.getElementById('companyTitles').textContent.indexOf('$');
                         tempText = document.getElementById('companyTitles').textContent.substring(0, index+1) + tempChange.toFixed(2);
                       document.getElementById('companyTitles').textContent = tempText;
@@ -183,10 +183,11 @@
 
 
                 <!-- This function will reconfigure the graph settings based on selection from dropdown - Muneeb Khan -->
-                function changeStockChart(chartType2) {
+              function changeStockChart(chartType2) {
                 stockChart.destroy();
-                stockChart = new Chart(ctx, {type: document.getElementById("chartType").value,
-                  data: {
+                stockChart = new Chart(ctx, {
+                    type: document.getElementById('chartType').value,
+                    data: {
                         labels: {{ dates | safe }},
                         datasets: [{
                             label: "Stock values",
@@ -197,7 +198,19 @@
                         }]
                     },
                     options: {
-                        display: true
+                        display: true,
+                        animation: {
+                          duration: 0
+                        },
+                        scales: {
+                            yAxes: [{
+                                display: true,
+                                ticks: {
+                                    suggestedMin: ({{min}}) - ({{min}}) / 10,
+                                    suggestedMax: ({{max}}) + ({{max}}) / 10
+                                }
+                            }]
+                        }
                     }
                 });
               }
