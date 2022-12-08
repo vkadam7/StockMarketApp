@@ -643,7 +643,19 @@ class Simulation:
         grabUserName = emails['userName']
 
         # Leaderboard data entry calculation
-        db.collection('Leaderboard').add({"email":grabDataEmail, "score":scoreRounded, "username":grabUserName})
+        checkUser = db.collection('Leaderboard').where('email', '==', grabDataEmail).get()
+        size = len(checkUser)
+
+        if(size == 0 ):
+            db.collection('Leaderboard').add({"email":grabDataEmail, "score":scoreRounded, "username":grabUserName})
+        else:
+            for docs in checkUser:
+                docID = docs.id
+                oldScore = docs['score']
+            if(oldScore < scoreRounded):
+                db.collection('Leaderboard').document(docID).update({'score': scoreRounded})
+            
+
 
         # Delete newly useless entries in the IntradayStockData entries associated with finished Sim
         for entry in db.collection('IntradayStockData').where('simulation','==',simName).stream():
