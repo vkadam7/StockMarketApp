@@ -827,7 +827,10 @@ def goToSimulation():
                         currentPrices.append("$%.2f" % round(currentPrice, 2))
                         totalValue.append("$%.2f" % round(portfolio.quantity*currentPrice, 2))
                         originalValue.append("$%.2f" % round(portfolio.avgSharePrice*portfolio.quantity, 2))
-                        profitTmp = round(portfolio.quantity*currentPrice, 2) - round(portfolio.avgSharePrice*portfolio.quantity, 2)
+                        if currentPrice == portfolio.avgSharePrice:
+                            profitTmp = 0
+                        else:
+                            profitTmp = round(portfolio.quantity*currentPrice, 2) - round(portfolio.avgSharePrice*portfolio.quantity, 2)
                         profits.append("%.2f" % round(profitTmp, 2))
                         profit += round(profitTmp, 2)
                         percent = portfolio.quantity*currentPrice / (currentCash+sharesValue) * 100
