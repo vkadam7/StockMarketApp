@@ -490,7 +490,8 @@ def register():
             authen.send_email_verification(user['idToken'])
 
                 #User.registerUser(dbfire, UseN, email, NameU, user['localId'])
-            dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""], "experience": "", "QuizScore" : "0%"})
+            dbfire.collection('Users').document(UseN).set({"Email": email, "Name":NameU, "UserID": user['localId'], "userName": UseN, "Followers": 0, "Following": 0, "FollowerNames": [""],"FollowingNames":[""], "experience": "", 
+            "QuizScoreQuiz1" : "0%", "QuizScoreQuiz2" : "0%", "QuizScoreQuiz4" : "0%"})
                 #dbfire.collection('UsersFollowers').document(UseN).set({"Name": ""})
             flash("Account created, you will now be redirected to verify your account!" , "pass")
             flash("Account succesfully created, you may now login!" , "pass")
@@ -1363,7 +1364,7 @@ def quizSubmit():
         elif (session['quiz'] == 'Quiz4'):
             flash("Congratulations! You passed the Quiz, your score was " + str(score) + "/10" + 
             " You are now ready to invest, please click the start simulation button above to start investing." +
-            "Correct answers were: " + "1 A " + "2 C " + "3 A " + "4 D " + "5 B " + "6 A " + "7 C " +
+            "Correct answers were: " + "1 A " + "2 C " + "3 A " + "4 C " + "5 B " + "6 A " + "7 C " +
             "8 C " + "9 B " + "10 A ")
 
         return redirect(url_for('information', person = session['user']))
