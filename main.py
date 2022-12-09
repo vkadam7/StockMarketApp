@@ -369,6 +369,7 @@ def social():
 
 
 
+
 #Miqdad Hafiz            
 @app.route('/follow', methods = ["POST","GET"])
 def follow():
