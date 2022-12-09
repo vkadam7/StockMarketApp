@@ -202,6 +202,16 @@ def test_updateProfile_fail_missingUserName():
     "experience" : "Test Update eperience"}
     testupdateProfile = app.test_client().post("/update", data = user)
     assert testupdateProfile.status_code == 200
+
+def test_updateProfile_fail_missingExperience():
+    with app.test_client() as client:
+        with client.session_transaction() as session:
+            session['user'] = "go894@wayne.edu"
+    user = {"Unames" : "UnitTesting",
+    "experience" : " "}
+    testupdateProfile = app.test_client().post("/update", data = user)
+    assert testupdateProfile.status_code == 200
+    
     
 #Login test case- Viraj Kadam
 #Fixed by Muneeb Khan
@@ -347,6 +357,7 @@ def test_delete():
             session['user'] = 'miqdadhafiz35@gmail.com'
     testuser = client.get("/postDelete", query_string = {"postID": "Jp0h4YgXepatDz4bzaDD"})
     assert testuser.status_code == 302
+
 
 if __name__ == '__main__':
     pytest.main()
