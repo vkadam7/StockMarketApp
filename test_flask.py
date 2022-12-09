@@ -59,8 +59,6 @@ def test_register_success():
     "username" : "Pytest2"}
     testregister = app.test_client().post("/register", data = user)
     assert testregister.status_code == 302
-    dbfire = firestore.client()
-    dbfire.collection('Users').document(user).update({"TestUser" : "True"})
 
 def test_register_fail_usernameInUse():
     user = {"email" : "pytest3@gmail.com",
