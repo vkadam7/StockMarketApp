@@ -450,3 +450,7 @@ table{
 .row{
   --bs-gutter-x: 0rem!important;
 }
+#txtArea,#buttons{
+  display:inline-block;
+  vertical-align: top;
+}

@@ -115,31 +115,33 @@
 <body>
 <main>
 
-  <h2 style = "text-align: center;"> StockFeed</h2>
-  <hr>
+<h2 style = "text-align: center;"> StockFeed</h2>
+<hr>
+
+<button class="btn btn-sm" style = "background-color:rgb(33, 103, 42);color:WHITE; margin: 10px;" type="submit"><a href = "Blog" style="color:white;"> Return to StockFeed</a></button>
+
 <div class = "container" style = "width: 80%;">
 <div class="container bootdey">
 <div class="col-md-12 bootstrap snippets">
 <div class="panel">
   <div class="panel-body">
     <form action = "/postBlog" method = "POST">
-    <textarea class="form-control w-100" name = "blogPost" rows="3" placeholder="Share your thoughts"></textarea>
+    <textarea class="form-control w-100" name = "blogPost" rows="4" style="margin-right:5px;" placeholder="Share your thoughts"></textarea>
     <br>
     <div class="mar-top clearfix">
       <button class="btn btn-sm btn-primary pull-right" style = "background-color:rgb(33, 103, 42);color:WHITE;" type="submit"><i class="fa fa-pencil fa-fw"></i> Post</button>
     </div>
     </form>
   </div>
-  <br>
-
-
-  <div class="panel-body">
+</div>
+<br>
+<div class="panel-body">
     <form action = "/filteredBlog" method = "POST">
     <div id = "txtArea" style="padding: 5px;">
-    <textarea class="form-control w-100" name = "blogFilter" rows="3" placeholder="Filter by User"></textarea>
+    <textarea class="form-control w-100" name = "blogFilter" rows="4" placeholder="Filter by User"></textarea>
     </div>
     <div id = "buttons" style = "margin-top: 10px;"> 
-      <button class="btn btn-sm btn-primary" style = "background-color:rgb(33, 103, 42);color:WHITE;" type="submit"> Filter</button>
+      <button class="btn btn-sm btn-primary" style = "background-color:rgb(33, 103, 42);color:WHITE;" type="submit">Filter</button>
   </div>
     </form>
   </div>
@@ -149,7 +151,7 @@
     <div class="panel-body">
     <!-- Newsfeed Content -->
     <!--===================================================-->
-    {% for user in blog %}
+    {% for user in posts %}
     <div class="media-block">
       
       <div class="media-body">

@@ -116,6 +116,26 @@ def Blog():
         print(blog)   
         return render_template("Blog.html", blog = blog, stockNames = session['stockNames'])
 
+@app.route("/filteredBlog", methods = ["POST","GET"])
+def filterBlog():
+    if('user' in session):
+        if(request.method == "POST"):
+            result = request.form
+            filterName = result["blogFilter"]
+            posts =[]
+            userPost = dbfire.collection('Blog').stream()
+            for docs in userPost:
+                userPost = docs.to_dict()
+                if(userPost['Author'] == filterName):
+                    userPost['DatePosted'] = str(datetime.datetime.fromtimestamp(userPost['DatePosted'].timestamp()).strftime("%Y-%m-%d"))
+                    userPost['DocID'] = docs.id
+                    posts.append(userPost)
+                posts.sort(key = itemgetter('DatePosted'), reverse=True)
+            print(posts)
+            return render_template("filteredBlog.html",posts = posts, stockNames = session['stockNames'])
+            
+
+
 #Author: Miqdad Hafiz
 #show the posts made by the user by grabbing every post with the user's username as Author
 @app.route("/userPosts", methods = ["POST","GET"])
